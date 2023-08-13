@@ -1,0 +1,19 @@
+<template>
+  <br>
+  <company-component/>
+  <department-component/>
+  <area-component/>
+</template>
+
+<script>
+
+import DepartmentComponent from "@/components/department/DepartmentComponent.vue";
+import CompanyComponent from "@/components/company/CompanyComponent.vue";
+import AreaComponent from "@/components/area/AreaComponent.vue";
+import MaterialComponent from "@/components/material/MaterialComponent.vue";
+
+export default {
+  name: "main-page",
+  components: {MaterialComponent, CompanyComponent, DepartmentComponent, AreaComponent}
+}
+</script>

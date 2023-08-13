@@ -1,0 +1,101 @@
+<template>
+  <v-dialog v-model="isToolingCreateDialogVisible" width="768">
+    <v-form ref="form" v-model="valid" @submit.prevent="save()">
+      <v-card>
+        <v-card-title>
+          <span class="text-h5">Оснастка:</span>
+        </v-card-title>
+        <v-card-text>
+          <v-container>
+            <v-row>
+              <v-col cols="4">
+                <v-text-field
+                  label="Торговое название:"
+                  v-model="tooling.toolingName"
+                  :rules="[rules.required,rules.counter,rules.nameValidation]"
+                  counter
+                  maxlength="20">
+                </v-text-field>
+              </v-col>
+              <v-col cols="4">
+                <v-text-field
+                  label="Описание:"
+                  v-model="tooling.description"
+                  :rules="[rules.required,rules.counter,rules.nameValidation]"
+                  counter
+                  maxlength="20">
+                </v-text-field>
+              </v-col>
+              <v-col cols="4">
+                <v-text-field
+                  label="Стоимость оснастки:"
+                  v-model="tooling.price.amount"
+                  :rules="[rules.required, rules.priceValidation]"
+                  counter
+                  maxlength="40"
+                ></v-text-field>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="orange-darken-1" variant="text" @click="hideToolingCreateDialogVisible">
+            Закрыть
+          </v-btn>
+          <v-btn color="orange-darken-1" variant="text" type="submit" :disabled="!valid">
+            Сохранить
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-form>
+  </v-dialog>
+</template>
+<script>
+import {computed, ref} from "vue";
+import {useStore} from "vuex";
+
+export default {
+  name: "tooling-create-dialog",
+  setup() {
+    const store = useStore();
+
+    const form = ref(null);
+    const valid = ref(false);
+
+    const tooling = computed(() => store.getters.getTooling);
+    const isToolingCreateDialogVisible = computed(() => store.getters.isToolingCreateDialogVisible);
+    const hideToolingCreateDialogVisible = () => {
+      store.commit("setToolingCreateDialogVisible", false);
+    };
+
+    const save = () => {
+      if (form.value.validate()) {
+        tooling.value.price.currency = 'RUB';
+        store.dispatch("saveTooling", tooling.value);
+        hideToolingCreateDialogVisible();
+      }
+    };
+
+    const rules = {
+      required: (value) => !!value || "Обязательное поле",
+      counter: (value) => value.length <= 200 || "Не более 200 символов",
+      nameValidation: (value) => value.length >= 3 || "Минимальное количество символов: 3",
+      priceValidation: value => {
+        const pattern = /^[0-9]{1,10}$/
+        return pattern.test(value) || 'Неверный формат, введите 1-10 цифр'
+      },
+    };
+
+    return {
+      hideToolingCreateDialogVisible,
+      isToolingCreateDialogVisible,
+      form,
+      valid,
+      save,
+      rules,
+      tooling
+    };
+  },
+};
+</script>
