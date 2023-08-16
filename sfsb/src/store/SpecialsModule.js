@@ -4,7 +4,7 @@ export default {
   state: {
     specials: [],
     special: {
-      processTime: 'PT16M40S'
+      price: {}
     },
     specialDialogVisible: false,
     specialCreateDialogVisible: false,

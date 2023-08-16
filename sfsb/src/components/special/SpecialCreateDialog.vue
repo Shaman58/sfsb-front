@@ -18,17 +18,23 @@
                   maxlength="20">
                 </v-text-field>
               </v-col>
-
-              <v-col cols="6">
-                <v-select
-                  v-if="workpieces"
-                  label="Выберите заготовку:"
-                  :items="workpieces"
-                  :item-title="formatObjectData"
-                  return-object
-                  v-model="special.workpiece"
-                  :rules="[rules.required]"
-                ></v-select>
+              <v-col cols="4">
+                <v-text-field
+                  label="Описание:"
+                  v-model="special.description"
+                  :rules="[rules.required,rules.counter,rules.nameValidation]"
+                  counter
+                  maxlength="20">
+                </v-text-field>
+              </v-col>
+              <v-col cols="4">
+                <v-text-field
+                  label="Стоимость инструмента:"
+                  v-model="special.price.amount"
+                  :rules="[rules.required, rules.priceValidation]"
+                  counter
+                  maxlength="40"
+                ></v-text-field>
               </v-col>
 
             </v-row>
@@ -61,13 +67,13 @@ export default {
 
     const special = computed(() => store.getters.getSpecial);
     const isSpecialCreateDialogVisible = computed(() => store.getters.isSpecialCreateDialogVisible);
-    const workpieces = computed(() => store.getters.getWorkpieces)
     const hideSpecialCreateDialogVisible = () => {
       store.commit("setSpecialCreateDialogVisible", false);
     };
 
     const save = () => {
       if (form.value.validate()) {
+        special.value.price.currency = 'RUB';
         store.dispatch("saveSpecial", special.value);
         store.commit("setSpecialCreateDialogVisible", false);
       }
@@ -77,36 +83,10 @@ export default {
       required: (value) => !!value || "Обязательное поле",
       counter: (value) => value.length <= 200 || "Не более 200 символов",
       nameValidation: (value) => value.length >= 3 || "Минимальное количество символов: 3",
-    };
-
-    const formatObjectData = (data) => {
-      const {id, geometry, geom1, geom2, geom3, material: {materialName}} = data;
-
-      if (id === 'new') {
-        return 'Создать заготовку'
-      } else {
-        let shape = '';
-        let dimensions = '';
-
-        switch (geometry) {
-          case 'CYLINDER':
-            shape = 'Круг';
-            dimensions = `Ф${geom1}х${geom2}`;
-            break;
-          case 'TUBE':
-            shape = 'Труба';
-            dimensions = `Ф${geom1}ф${geom2}х${geom3}`;
-            break;
-          case 'BLANK':
-            shape = 'Плита';
-            dimensions = `${geom1}х${geom2}х${geom3}`;
-            break;
-          default:
-            break;
-        }
-
-        return `${shape} ${materialName} ${dimensions}`;
-      }
+      priceValidation: value => {
+        const pattern = /^[0-9]{1,10}$/
+        return pattern.test(value) || 'Неверный формат, введите 1-10 цифр'
+      },
     };
 
     return {
@@ -117,8 +97,6 @@ export default {
       save,
       rules,
       special,
-      workpieces,
-      formatObjectData,
     };
   },
 };

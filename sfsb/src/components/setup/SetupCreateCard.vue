@@ -118,7 +118,7 @@
     <cutter-tool-create-dialog/>
     <measure-tool-create-dialog/>
     <tooling-create-dialog/>
-    <tech-special-dialog/>
+    <special-create-dialog/>
   </v-card>
 </template>
 
@@ -130,13 +130,12 @@ import MeasureToolCreateDialog from "@/components/measure/MeasureToolCreateDialo
 import ToolingCreateDialog from "@/components/tooling/ToolingCreateDialog.vue";
 import SpecialCreateDialog from "@/components/special/SpecialCreateDialog.vue";
 import WorkpieceCreateDialog from "@/components/workpiece/WorkpieceCreateDialog.vue";
-import TechSpecialDialog from "@/components/technology/TechSpecialDialog.vue";
 
 export default {
   components: {
-    TechSpecialDialog,
     WorkpieceCreateDialog,
-    SpecialCreateDialog, ToolingCreateDialog, MeasureToolCreateDialog, CutterToolCreateDialog},
+    SpecialCreateDialog, ToolingCreateDialog, MeasureToolCreateDialog, CutterToolCreateDialog
+  },
   props: {
     setup: {
       type: Object,

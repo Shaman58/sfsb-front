@@ -2,7 +2,8 @@
   <v-card>
     <v-form ref="form" v-model="valid" @submit.prevent="save()">
       <v-card-title>
-        <span class="text-h5">Создать заготовку:</span>
+        <span v-if="workpiece.geometry" class="text-h5">Изменить заготовку:</span>
+        <span v-else class="text-h5">Создать заготовку:</span>
       </v-card-title>
       <v-card-text>
         <v-container>
@@ -107,7 +108,7 @@
 </template>
 
 <script setup>
-import {defineProps, ref, getCurrentInstance, reactive} from 'vue';
+import {ref, getCurrentInstance, reactive} from 'vue';
 
 // ---- ПРОПСЫ ----
 const props = defineProps({
@@ -133,6 +134,7 @@ const geometries = ref([
 const save = () => {
   if (form.value.validate()) {
     const validWorkpiece = {
+      ...workpiece,
       geometry: workpiece.geometry,
       geom1: parseFloat(workpiece.geom1),
       geom2: parseFloat(workpiece.geom2),

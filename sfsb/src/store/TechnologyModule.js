@@ -16,9 +16,6 @@ export default {
     setTechnologyDialogVisible(state, payload) {
       state.dialogVisible = payload
     },
-    setTechnologyWorkpiece(state, payload) {
-      state.technology.workpiece = payload
-    },
     saveTechnology(state, payload) {
       const index = state.technologies.findIndex(technology => technology.id === payload.id);
       if (index !== -1) {
@@ -61,6 +58,17 @@ export default {
           console.log('Технология не найдена');
           console.error(error);
         });
+    },
+    async saveTechnology({dispatch}, technology) {
+      try {
+        const url = `/technology/${technology.id}`;
+        const response = await api.put(url, technology);
+        dispatch("fetchTechnologyById", technology.id);
+        return response.data;
+      } catch (error) {
+        console.log("Заготовка не создана");
+        console.error(error);
+      }
     },
   },
 }

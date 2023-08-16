@@ -2,11 +2,11 @@
   <v-container fluid>
     <v-dialog v-model="isDialogVisible" fullscreen>
       <v-form ref="form" v-model="valid" @submit.prevent="save()">
-        <v-card>
+        <v-card class="dialog-content">
           <v-card-title>
             <span class="text-h5">{{ technology.drawingNumber + " " + technology.drawingName }}</span>
           </v-card-title>
-          <v-card-text class="dialog-content">
+          <v-card-text>
 
             <v-row>
 
@@ -32,18 +32,24 @@
                 <v-text-field
                   label="Из заготовки"
                   v-model="technology.quantityOfPartsFromWorkpiece"
+                  type="number"
+                  :rules="[rules.required, rules.numberValidate, rules.min]"
                 />
               </v-col>
               <v-col cols="3" v-if="!workpieceCardVisible">
                 <v-text-field
                   label="Наладочных"
                   v-model="technology.quantityOfSetUpParts"
+                  type="number"
+                  :rules="[rules.required, rules.numberValidate, rules.min]"
                 />
               </v-col>
               <v-col cols="3" v-if="!workpieceCardVisible">
                 <v-text-field
-                  label="Бракованных"
+                  label="На брак"
                   v-model="technology.quantityOfDefectiveParts"
+                  type="number"
+                  :rules="[rules.required, rules.numberValidate, rules.min]"
                 />
               </v-col>
             </v-row>
@@ -85,6 +91,7 @@
 
                 </v-row>
               </v-col>
+
               <v-col cols="4">
                 <v-card title="Расходники:">
                   <v-card-item v-if="techCutters.length!==0">
@@ -125,6 +132,18 @@
 
           </v-card-text>
           <v-card-actions>
+            <v-col cols="2">
+              <v-switch
+                v-model="technology.computed"
+                :true-value="true"
+                :false-value="false"
+                :label="technology.computed ? 'Рассчитан': 'Не рассчитан' ">
+              </v-switch>
+            </v-col>
+            <v-btn
+              color="orange-darken-1" variant="text" @click="calculateItem">
+              Рассчитать
+            </v-btn>
             <v-spacer></v-spacer>
             <v-btn color="orange-darken-1" variant="text" @click="hideDialog">
               Закрыть
@@ -144,11 +163,10 @@ import {useStore} from "vuex";
 import {computed, ref} from "vue";
 import TechWorkpieceCard from "@/components/technology/TechWorkpieceCard.vue";
 import SetupCreateCard from "@/components/setup/SetupCreateCard.vue";
-import TechWorkpieceCreateDialogTest from "@/components/technology/TechWorkpieceCard.vue";
 
 export default {
   name: "technology-create-dialog",
-  components: {TechWorkpieceCreateDialogTest, SetupCreateCard, TechWorkpieceCard},
+  components: {SetupCreateCard, TechWorkpieceCard},
 
   setup() {
     const store = useStore();
@@ -220,7 +238,7 @@ export default {
 
     const isTechWorkpieceDialogVisible = computed(() => store.getters.isWorkpieceCreateDialogVisible);
     const save = () => {
-
+      store.dispatch("saveTechnology", technology.value);
     };
 
     const hideSetup = (item) => {
@@ -240,6 +258,10 @@ export default {
     const hideDialog = () => {
       store.commit("setTechnologyDialogVisible", false);
     };
+
+    const calculateItem = () => {
+
+    }
 
     const formatObjectData = (data) => {
       const {geometry, geom1, geom2, geom3, material: {materialName}} = data;
@@ -282,6 +304,19 @@ export default {
       workpieceCardVisible.value = true;
     };
 
+    const rules = {
+      required: (value) => !!value || "Обязательное поле",
+      counter: (value) => value.length <= 200 || "Не более 200 символов",
+      numberValidate: value => {
+        const pattern = /^[0-9]{1,5}$/
+        return pattern.test(value) || 'Неверный формат, введите 1-5 цифр'
+      },
+      min: value => {
+        return value > 0 || 'Неверный формат, должно быть больше 0'
+      }
+    };
+
+
     return {
       isDialogVisible,
       technology,
@@ -306,7 +341,9 @@ export default {
       techSpecials,
       techCutters,
       techMeasurers,
-      techToolings
+      techToolings,
+      calculateItem,
+      rules
     }
   }
 }
@@ -315,7 +352,7 @@ export default {
 <style>
 
 .dialog-content {
-  max-height: 88vh;
+  max-height: 100vh;
   overflow-y: auto;
 }
 

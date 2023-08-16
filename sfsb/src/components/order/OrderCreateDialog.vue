@@ -134,7 +134,9 @@
                       <v-list>
                         <v-list-item
                           v-for="orderItem in order.items"
-                          @click="selectItem({...orderItem})">
+                          @click="selectItem({...orderItem})"
+                          :class="getBackgroundColorClass(orderItem)"
+                        >
                           <v-list-item-title>
                             <div class="d-flex align-center">
                               <div class="flex-grow-1">
@@ -161,6 +163,7 @@
           </v-container>
         </v-card-text>
         <v-card-actions>
+          <v-btn @click="getCommerce" :disabled="kpAvailable">Вывести компред</v-btn>
           <v-spacer></v-spacer>
           <v-btn color="orange-darken-1" variant="text" @click="hideDialog">
             Закрыть
@@ -176,6 +179,8 @@
 <script>
 import {computed, ref} from "vue";
 import {useStore} from "vuex";
+import api from "@/api/instance";
+import {saveAs} from 'file-saver';
 
 export default {
   name: "order-create-dialog",
@@ -189,6 +194,13 @@ export default {
     const employees = computed(() => store.getters.getEmployees);
     const item = computed(() => store.getters.getItem);
     const technologies = computed(() => store.getters.getTechnologies);
+    const kpAvailable = computed(() => {
+      if (order.value.items.length === 0) {
+        return true;
+      }
+      const index = order.value.items.findIndex(item => item.technology.computed === false);
+      return index !== -1;
+    });
 
     const filteredTechnologies = computed(() => {
       const searchQuery = !!item.value.technology.drawingNumber ? item.value.technology.drawingNumber.toLowerCase() : null;
@@ -238,6 +250,28 @@ export default {
 
     const isFilteredVisible = computed(() => filteredTechnologies.value.length !== 0 && !!!item.value.technology.id);
 
+    const getBackgroundColorClass = (item) => {
+      if (item.technology.computed) {
+        return 'computed';
+      } else {
+        return 'not-computed';
+      }
+    };
+
+    const getCommerce = () => {
+      api.get("/doc/kp", {
+        params: {orderId: order.value.id},
+        responseType: 'blob'
+      })
+        .then((response) => {
+          const blob = new Blob([response.data], {type: response.headers['content-type']});
+          saveAs(blob, order.value.customer.companyName + "_" + order.value.applicationNumber + '.docx');
+        })
+        .catch((error) => {
+          console.error("There was an error downloading the file:", error);
+        });
+    };
+
     return {
       isDialogVisible,
       order,
@@ -256,8 +290,26 @@ export default {
       deleteItem,
       technologies,
       filteredTechnologies,
-      isFilteredVisible
+      isFilteredVisible,
+      getBackgroundColorClass,
+      getCommerce,
+      kpAvailable
     };
   },
 };
+
 </script>
+
+<style>
+.not-computed {
+  border: 1px solid #ff7b7b;
+  border-radius: 10px;
+  margin: 2px;
+}
+
+.computed {
+  border: 1px solid #97ffa0;
+  border-radius: 10px;
+  margin: 2px;
+}
+</style>

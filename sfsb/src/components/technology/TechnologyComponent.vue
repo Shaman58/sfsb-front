@@ -25,6 +25,7 @@ export default {
     this.$store.dispatch("fetchMeasurers");
     this.$store.dispatch("fetchToolings");
     this.$store.dispatch("fetchSpecials");
+    this.$store.dispatch("fetchItems");
   },
 }
 </script>
