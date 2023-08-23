@@ -6,10 +6,10 @@
       </v-card-title>
       <v-list density="compact">
         <v-list-item
-          v-for="item in employeeTechnologiesComputed"
+          v-for="item in employeeItemsComputed"
           :key="item.id"
           :value="item"
-          :title="`${item.drawingName} ${item.drawingNumber}`"
+          :title="`${item.technology.drawingName} ${item.technology.drawingNumber}`"
           @click="showTechnologyCreateDialog({...item})">
         </v-list-item>
       </v-list>
@@ -25,10 +25,10 @@
       </v-card-title>
       <v-list density="compact">
         <v-list-item
-          v-for="item in employeeTechnologiesNotComputed"
+          v-for="item in employeeItemsNotComputed"
           :key="item.id"
           :value="item"
-          :title="`${item.drawingName} ${item.drawingNumber}`"
+          :title="`${item.technology.drawingName} ${item.technology.drawingNumber}`"
           @click="showTechnologyCreateDialog({...item})">
         </v-list-item>
       </v-list>
@@ -46,29 +46,25 @@ export default {
     const store = useStore();
 
     const technologist = computed(() => store.getters.getEmployee);
-    const technologies = computed(() => store.getters.getTechnologies);
     const items = computed(() => store.getters.getItems);
     const employeeItems = computed(() => !!technologist.value ? items.value.filter(item => item.technology.employee.id === technologist.value.id) : []);
     const employeeItemsComputed = computed(() => employeeItems.value.filter(item => item.technology.computed !== true));
     const employeeItemsNotComputed = computed(() => employeeItems.value.filter(item => item.technology.computed === true));
-    const employeeTechnologies = computed(() => !!technologist.value ? technologies.value.filter(tech => tech.employee.id === technologist.value.id) : []);
-    const employeeTechnologiesComputed = computed(() => employeeTechnologies.value.filter(tech => tech.computed !== true));
-    const employeeTechnologiesNotComputed = computed(() => employeeTechnologies.value.filter(tech => tech.computed === true));
-    const isComputedVisible = computed(() => employeeTechnologiesComputed.value.length !== 0);
-    const isNotComputedVisible = computed(() => employeeTechnologiesNotComputed.value.length !== 0);
+    const isComputedVisible = computed(() => employeeItemsComputed.value.length !== 0);
+    const isNotComputedVisible = computed(() => employeeItemsNotComputed.value.length !== 0);
 
-    const showTechnologyCreateDialog = (technology) => {
-      store.commit("setTechnology", technology);
-      store.commit("setSetups", technology.setups);
+    const showTechnologyCreateDialog = (item) => {
+      store.commit("setItem", item);
+      store.commit("setSetups", item.technology.setups);
       store.commit("setTechnologyDialogVisible", true);
     }
 
     return {
-      employeeTechnologiesComputed,
-      employeeTechnologiesNotComputed,
       showTechnologyCreateDialog,
       isComputedVisible,
-      isNotComputedVisible
+      isNotComputedVisible,
+      employeeItemsComputed,
+      employeeItemsNotComputed
     };
   },
 };

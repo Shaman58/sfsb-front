@@ -26,6 +26,7 @@
                 label="Машинное время(чч:мм)"
                 v-model="setup.processTime"
                 type="time"
+                :rules="[rules.durationNotZeroValidation]"
               ></v-text-field>
             </v-col>
             <v-col cols="4">
@@ -33,6 +34,7 @@
                 label="Межоперационное время(чч:мм)"
                 v-model="setup.interoperativeTime"
                 type="time"
+                :rules="[rules.durationNotZeroValidation]"
               ></v-text-field>
             </v-col>
             <v-col cols="4">
@@ -40,6 +42,7 @@
                 label="Наладочное время(чч:мм)"
                 v-model="setup.setupTime"
                 type="time"
+                :rules="[rules.durationNotZeroValidation]"
               ></v-text-field>
             </v-col>
             <v-col cols="4">
@@ -48,7 +51,8 @@
                 :item-title="'unitName'"
                 return-object
                 v-model="setup.productionUnit"
-                label="Оборудование">
+                label="Оборудование"
+                :rules="[rules.required]">
               </v-select>
             </v-col>
             <v-col cols="12">
@@ -178,6 +182,7 @@ export default {
         const isUnique = !setupNumbers.value.includes(Number(value))
         return pattern.test(value) && isUnique || 'Неверный формат или число уже присутствует в массиве'
       },
+      durationNotZeroValidation: value => value !== '00:00' || 'Продолжительность не должна быть равна "00:00"'
     };
 
     const createNewCutter = () => {

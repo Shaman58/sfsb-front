@@ -1,7 +1,7 @@
 <template>
   <v-select
     :items="employees"
-    :item-title="'firstName'"
+    :item-title=getItemText
     return-object
     v-model="employee"
     @update:model-value="setTechnologist(employee)"
@@ -24,12 +24,15 @@ export default {
 
     const setTechnologist = (employee) => {
       store.commit("setEmployee", employee);
-    }
+    };
+
+    const getItemText = (item) => `${item.firstName} ${item.lastName} (${item.position})`;
 
     return {
       employees,
       employee,
-      setTechnologist
+      setTechnologist,
+      getItemText
     }
   }
 }

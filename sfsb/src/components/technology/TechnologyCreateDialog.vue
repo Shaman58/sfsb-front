@@ -133,22 +133,20 @@
           </v-card-text>
           <v-card-actions>
             <v-col cols="2">
-              <v-switch
-                v-model="technology.computed"
-                :true-value="true"
-                :false-value="false"
-                :label="technology.computed ? 'Рассчитан': 'Не рассчитан' ">
-              </v-switch>
+              <a>
+                {{ computedValue ? 'Рассчитан' : 'Не рассчитан' }}
+              </a>
             </v-col>
             <v-btn
-              color="orange-darken-1" variant="text" @click="calculateItem">
+              color="orange-darken-1" variant="text" @click="calculateItem"
+              :disabled="computedValue||!valid||!technology.workpiece||sortedSetups.length===0">
               Рассчитать
             </v-btn>
             <v-spacer></v-spacer>
             <v-btn color="orange-darken-1" variant="text" @click="hideDialog">
               Закрыть
             </v-btn>
-            <v-btn color="orange-darken-1" variant="text" type="submit" :disabled="!valid">
+            <v-btn color="orange-darken-1" variant="text" type="submit" :disabled="!valid || !technology.workpiece">
               Сохранить
             </v-btn>
           </v-card-actions>
@@ -163,6 +161,9 @@ import {useStore} from "vuex";
 import {computed, ref} from "vue";
 import TechWorkpieceCard from "@/components/technology/TechWorkpieceCard.vue";
 import SetupCreateCard from "@/components/setup/SetupCreateCard.vue";
+import api from "@/api/instance";
+import 'vue-toast-notification/dist/theme-bootstrap.css'
+import {useToast} from 'vue-toast-notification';
 
 export default {
   name: "technology-create-dialog",
@@ -170,17 +171,23 @@ export default {
 
   setup() {
     const store = useStore();
+    const toast = useToast();
 
     const form = ref(null);
     const valid = ref(false);
 
     const isDialogVisible = computed(() => store.getters.isTechnologyDialogVisible);
-    const technology = computed(() => store.getters.getTechnology);
+    const item = computed(() => store.getters.getItem);
+    const technology = computed(() => item.value.technology);
     const workpiece = computed(() => store.getters.getWorkpiece);
     const sortedSetups = computed(() => store.getters.getSetups);
     const materials = computed(() => store.getters.getMaterials);
+    const computedValue = computed(() => item.value.technology.computed);
 
     const techCutters = computed(() => {
+      if (!technology.value.setups) {
+        return [];
+      }
       const combined = technology.value.setups.flatMap(setup => setup.cutterTools);
 
       return combined.filter((item, index, self) =>
@@ -189,6 +196,9 @@ export default {
     });
 
     const techSpecials = computed(() => {
+      if (!technology.value.setups) {
+        return [];
+      }
       const combined = technology.value.setups.flatMap(setup => setup.specialTools);
 
       return combined.filter((item, index, self) =>
@@ -197,6 +207,9 @@ export default {
     });
 
     const techMeasurers = computed(() => {
+      if (!technology.value.setups) {
+        return [];
+      }
       const combined = technology.value.setups.flatMap(setup => setup.measureTools);
 
       return combined.filter((item, index, self) =>
@@ -205,6 +218,9 @@ export default {
     });
 
     const techToolings = computed(() => {
+      if (!technology.value.setups) {
+        return [];
+      }
       const combined = technology.value.setups.flatMap(setup => setup.toolings);
 
       return combined.filter((item, index, self) =>
@@ -212,14 +228,16 @@ export default {
       );
     });
 
+    console.log(sortedSetups.value.length)
+
     const newSetup = ref({
       isVisible: false,
       technology: technology,
       setupName: '',
-      setupTime: "00:01",
-      processTime: "00:01",
+      setupTime: "00:00",
+      processTime: "00:00",
       measureTools: [],
-      interoperativeTime: "00:01",
+      interoperativeTime: "00:00",
       cutterTools: [],
       additionalTools: [],
       specialTools: [],
@@ -233,12 +251,14 @@ export default {
           return i;
         }
       }
-      return -1
+      return -1;
     });
 
     const isTechWorkpieceDialogVisible = computed(() => store.getters.isWorkpieceCreateDialogVisible);
-    const save = () => {
-      store.dispatch("saveTechnology", technology.value);
+
+    const save = async () => {
+      await store.dispatch("saveTechnology", technology.value);
+      await store.dispatch("fetchItemById", item.value.id);
     };
 
     const hideSetup = (item) => {
@@ -259,9 +279,19 @@ export default {
       store.commit("setTechnologyDialogVisible", false);
     };
 
-    const calculateItem = () => {
-
-    }
+    const calculateItem = async () => {
+      await save();
+      await api.get("/doc/calculate", {
+        params: {itemId: item.value.id},
+      })
+        .then(async () => {
+          toast.info("Успешно!", {position: "top-right"});
+          await store.dispatch("fetchItemById", item.value.id);
+        })
+        .catch(error => {
+          toast.error(error.response.data.info, {position: "top-right"});
+        });
+    };
 
     const formatObjectData = (data) => {
       const {geometry, geom1, geom2, geom3, material: {materialName}} = data;
@@ -289,7 +319,6 @@ export default {
       return `${shape} ${materialName} ${dimensions}`;
     };
 
-
     const workpieceCardVisible = ref(false);
 
     const saveWorkpiece = (validWorkpiece) => {
@@ -315,7 +344,6 @@ export default {
         return value > 0 || 'Неверный формат, должно быть больше 0'
       }
     };
-
 
     return {
       isDialogVisible,
@@ -343,6 +371,7 @@ export default {
       techMeasurers,
       techToolings,
       calculateItem,
+      computedValue,
       rules
     }
   }
@@ -354,6 +383,10 @@ export default {
 .dialog-content {
   max-height: 100vh;
   overflow-y: auto;
+}
+
+.v-toast {
+  z-index: 9999 !important;
 }
 
 </style>

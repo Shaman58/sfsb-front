@@ -18,7 +18,7 @@ export default {
   mounted() {
     this.$store.dispatch("fetchAllOrdersData");
     this.$store.dispatch("fetchEmployees");
-    this.$store.dispatch("fetchAllTechnologiesData");
+    this.$store.dispatch("fetchTechnologies");
   }
 }
 </script>

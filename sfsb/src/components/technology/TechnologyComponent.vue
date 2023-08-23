@@ -18,14 +18,13 @@ export default {
   components: {WorkpieceCreateDialog, TechnologyCreateDialog, TechnologyListDialog, TechnologistSelect},
   mounted() {
     this.$store.dispatch("fetchEmployees");
-    this.$store.dispatch("fetchAllTechnologiesData");
     this.$store.dispatch("fetchMaterials");
     this.$store.dispatch("fetchAllUnits");
     this.$store.dispatch("fetchCutters");
     this.$store.dispatch("fetchMeasurers");
     this.$store.dispatch("fetchToolings");
     this.$store.dispatch("fetchSpecials");
-    this.$store.dispatch("fetchItems");
+    this.$store.dispatch("fetchAllItemsData");
   },
 }
 </script>

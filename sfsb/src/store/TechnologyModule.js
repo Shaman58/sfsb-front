@@ -31,16 +31,6 @@ export default {
     isTechnologyDialogVisible: (state) => state.dialogVisible,
   },
   actions: {
-    async fetchAllTechnologiesData({dispatch, state}) {
-      try {
-        await dispatch("fetchTechnologies");
-        const technologies = state.technologies;
-        const promises = technologies.map(technology => dispatch('fetchSetupsByTechnologyId', technology));
-        await Promise.all(promises);
-      } catch (error) {
-        console.error(error);
-      }
-    },
     fetchTechnologies({commit}) {
       return api.get('/technology')
         .then(response => commit("setTechnologies", response.data))
@@ -63,7 +53,6 @@ export default {
       try {
         const url = `/technology/${technology.id}`;
         const response = await api.put(url, technology);
-        dispatch("fetchTechnologyById", technology.id);
         return response.data;
       } catch (error) {
         console.log("Заготовка не создана");

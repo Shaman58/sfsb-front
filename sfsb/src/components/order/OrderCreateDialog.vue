@@ -29,7 +29,7 @@
                 <v-select
                   v-if="!!order.customer"
                   :items="order.customer.contacts"
-                  :item-title="'firstName'"
+                  :item-title=getItemText
                   return-object
                   v-model="order.contact"
                   :rules="[rules.required]"
@@ -40,7 +40,7 @@
                 <v-select
                   v-if="!!employees"
                   :items="employees"
-                  :item-title="'firstName'"
+                  :item-title=getItemText
                   return-object
                   v-model="order.employee"
                   :rules="[rules.required]"
@@ -109,7 +109,7 @@
                         <v-select
                           v-if="!!employees"
                           :items="employees"
-                          :item-title="'firstName'"
+                          :item-title=getItemText
                           return-object
                           v-model="item.technology.employee"
                           :rules="[rules.required]"
@@ -163,7 +163,7 @@
           </v-container>
         </v-card-text>
         <v-card-actions>
-          <v-btn @click="getCommerce" :disabled="kpAvailable">Вывести компред</v-btn>
+          <v-btn @click="previewCommerce" :disabled="kpAvailable">Вывести компред</v-btn>
           <v-spacer></v-spacer>
           <v-btn color="orange-darken-1" variant="text" @click="hideDialog">
             Закрыть
@@ -181,6 +181,7 @@ import {computed, ref} from "vue";
 import {useStore} from "vuex";
 import api from "@/api/instance";
 import {saveAs} from 'file-saver';
+import mammoth from 'mammoth';
 
 export default {
   name: "order-create-dialog",
@@ -258,18 +259,34 @@ export default {
       }
     };
 
-    const getCommerce = () => {
-      api.get("/doc/kp", {
-        params: {orderId: order.value.id},
-        responseType: 'blob'
-      })
-        .then((response) => {
-          const blob = new Blob([response.data], {type: response.headers['content-type']});
-          saveAs(blob, order.value.customer.companyName + "_" + order.value.applicationNumber + '.docx');
-        })
-        .catch((error) => {
-          console.error("There was an error downloading the file:", error);
+    const getItemText = (item) => `${item.firstName} ${item.lastName} (${item.position})`;
+
+    const previewCommerce = async () => {
+      try {
+        const response = await api.get("/doc/kp", {
+          params: {orderId: order.value.id},
+          responseType: 'arraybuffer'
         });
+
+        const arrayBuffer = response.data;
+        const result = await mammoth.convertToHtml({arrayBuffer: arrayBuffer});
+        const blob = new Blob([response.data], {type: response.headers['content-type']});
+        const objectURL = URL.createObjectURL(blob);
+        const filename = order.value.customer.companyName + "_" + order.value.applicationNumber + '.docx';
+
+        const downloadButtonHtml = `
+      <a href="${objectURL}" download="${filename}" style="display: block; margin: 20px;">
+        Скачать
+      </a>
+    `;
+
+        const newWindow = window.open("", "_blank");
+        newWindow.document.write(downloadButtonHtml);
+        newWindow.document.write(result.value);
+        newWindow.document.close();
+      } catch (error) {
+        console.error("There was an error previewing the DOCX file:", error);
+      }
     };
 
     return {
@@ -292,8 +309,9 @@ export default {
       filteredTechnologies,
       isFilteredVisible,
       getBackgroundColorClass,
-      getCommerce,
-      kpAvailable
+      kpAvailable,
+      previewCommerce,
+      getItemText
     };
   },
 };
