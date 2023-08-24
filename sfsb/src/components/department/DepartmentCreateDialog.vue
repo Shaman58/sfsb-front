@@ -3,22 +3,22 @@
     <v-form ref="formDep" v-model="validDep" @submit.prevent="saveDepartment()">
       <v-card>
         <v-card-title>
-          <span class="text-h5">Отдел</span>
+          <span class="text-h5">{{selectDepartment.departmentName}}</span>
         </v-card-title>
         <v-card-text>
           <v-container>
-            <v-row>
-              <v-col cols="12">
-                <v-text-field
-                  label="Название отдела"
-                  v-model="selectDepartment.departmentName"
-                  :rules="[rules.required, rules.counter, rules.nameValidation]"
-                  counter
-                  maxlength="200"
-                >
-                </v-text-field>
-              </v-col>
-            </v-row>
+<!--            <v-row>-->
+<!--              <v-col cols="12">-->
+<!--                <v-text-field-->
+<!--                  label="Название отдела"-->
+<!--                  v-model="selectDepartment.departmentName"-->
+<!--                  :rules="[rules.required, rules.counter, rules.nameValidation]"-->
+<!--                  counter-->
+<!--                  maxlength="200"-->
+<!--                >-->
+<!--                </v-text-field>-->
+<!--              </v-col>-->
+<!--            </v-row>-->
             <!--employees-->
             <employees-list-dialog/>
             <employee-create-dialog/>
@@ -30,9 +30,9 @@
           <v-btn color="orange-darken-1" variant="text" @click="hideCreateDialog">
             Закрыть
           </v-btn>
-          <v-btn color="orange-darken-1" variant="text" type="submit" :disabled="!validDep">
-            Сохранить
-          </v-btn>
+<!--          <v-btn color="orange-darken-1" variant="text" type="submit" :disabled="!validDep">-->
+<!--            Сохранить-->
+<!--          </v-btn>-->
         </v-card-actions>
       </v-card>
     </v-form>

@@ -201,8 +201,8 @@ export default {
         return pattern.test(value) || 'Неверный формат'
       },
       phoneValidation: value => {
-        const pattern = /^\+7\s\(\d{4}\)\s\d{2}-\d{2}-\d{2}$/
-        return pattern.test(value) || 'Неверный формат +X (XXXX) XX-XX-XX'
+        const pattern = /^\+?[78][-\(]?\d{3}\)?-?\d{3}-?\d{2}-?\d{2}$/
+        return pattern.test(value) || 'Неверный формат'
       },
       accountValidation: value => {
         const pattern = /^[0-9]{20}$/

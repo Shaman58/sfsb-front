@@ -1,5 +1,5 @@
 <template>
-  <v-container @click="containerClick">
+  <v-container>
     <v-dialog v-model="mainDialogVisible" width="800">
       <v-card>
         <v-card-title>
@@ -20,19 +20,19 @@
               ></v-btn>
             </template>
           </v-list-item>
-          <v-list-item>
-            <v-list-item-title>
-              ...
-            </v-list-item-title>
-            <template v-slot:append>
-              <v-btn
-                color="orange-lighten-1"
-                icon="mdi-plus"
-                variant="text"
-                @click.stop="selectDepartment({})"
-              ></v-btn>
-            </template>
-          </v-list-item>
+<!--          <v-list-item>-->
+<!--            <v-list-item-title>-->
+<!--              ...-->
+<!--            </v-list-item-title>-->
+<!--            <template v-slot:append>-->
+<!--              <v-btn-->
+<!--                color="orange-lighten-1"-->
+<!--                icon="mdi-plus"-->
+<!--                variant="text"-->
+<!--                @click.stop="selectDepartment({})"-->
+<!--              ></v-btn>-->
+<!--            </template>-->
+<!--          </v-list-item>-->
         </v-list>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -69,17 +69,12 @@ export default {
       store.commit("setEmployees", department.employees);
     };
 
-    const containerClick = (event) => {
-      event.stopPropagation();
-    };
-
     return {
       departments,
       mainDialogVisible,
       hideMainDialog,
       deleteDepartment,
       selectDepartment,
-      containerClick,
     };
   },
 };

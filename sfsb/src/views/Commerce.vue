@@ -1,7 +1,15 @@
 <template>
   <br>
-  <customer-component/>
-  <order-component/>
+  <v-container>
+    <v-row>
+      <v-col cols="6">
+        <customer-component/>
+      </v-col>
+      <v-col cols="6">
+        <order-component/>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>

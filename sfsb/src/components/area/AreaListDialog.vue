@@ -6,8 +6,8 @@
           <span class="text-h5">{{ area.areaName }}</span>
         </v-card-title>
         <unit-list-card/>
-        <v-divider/>
-        <store-list-card/>
+<!--        <v-divider/>-->
+<!--        <store-list-card/>-->
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="orange-darken-1" variant="text" @click="hideAreaDialog">Закрыть</v-btn>

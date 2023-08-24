@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <technologist-select/>
+<!--    <technologist-select/>-->
     <technology-list-dialog/>
     <technology-create-dialog/>
   </v-container>

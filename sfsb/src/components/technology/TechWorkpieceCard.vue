@@ -15,24 +15,33 @@
                 :items="geometries"
                 item-text="title"
                 item-value="label"
-                v-model="workpiece.geometry"
+                v-model="geometry"
                 :rules="[rules.required]">
               </v-select>
+              <v-text-field
+                label="Фильтр:"
+                v-model="materialFilter">
+              </v-text-field>
             </v-col>
 
             <v-col cols="4">
               <v-select
                 v-if="materials"
                 label="Выберите материал:"
-                :items="materials"
-                :item-title="'materialName'"
+                :items="filteredMaterials"
+                :item-title="formatObjectData"
                 return-object
                 v-model="workpiece.material"
                 :rules="[rules.required]">
               </v-select>
             </v-col>
 
-            <v-col cols="4" v-if="workpiece.geometry==='BLANK'">
+            <v-col cols="4"
+                   v-if="
+                   workpiece?.material?.geometry==='BLANK' ||
+                   workpiece?.material?.geometry==='TAPE' ||
+                   workpiece?.material?.geometry==='LIST' ||
+                   workpiece?.material?.geometry==='OTHER'">
               <v-text-field
                 label="Длина"
                 v-model="workpiece.geom1"
@@ -54,7 +63,8 @@
               </v-text-field>
             </v-col>
 
-            <v-col cols="4" v-if="workpiece.geometry==='TUBE'">
+            <v-col cols="4"
+                   v-if="workpiece?.material?.geometry==='TUBE'">
               <v-text-field
                 label="Внешний диаметр:"
                 v-model="workpiece.geom1"
@@ -76,7 +86,11 @@
               </v-text-field>
             </v-col>
 
-            <v-col cols="4" v-if="workpiece.geometry==='CYLINDER'">
+            <v-col cols="4"
+                   v-if="
+                   workpiece?.material?.geometry==='CYLINDER' ||
+                   workpiece?.material?.geometry==='HEXAGON'||
+                   workpiece?.material?.geometry==='ROD'">
               <v-text-field
                 label="Диаметр:"
                 v-model="workpiece.geom1"
@@ -84,6 +98,32 @@
                 counter
                 numeric>
               </v-text-field>
+              <v-text-field
+                label="Длина:"
+                v-model="workpiece.geom2"
+                :rules="[rules.required, rules.numeric, rules.minValidation]"
+                counter>
+              </v-text-field>
+            </v-col>
+
+            <v-col cols="4"
+                   v-if="workpiece?.material?.geometry==='SQUARE'">
+              <v-text-field
+                label="Сторона:"
+                v-model="workpiece.geom1"
+                :rules="[rules.required, rules.numeric, rules.minValidation]"
+                counter
+                numeric>
+              </v-text-field>
+              <v-text-field
+                label="Длина:"
+                v-model="workpiece.geom2"
+                :rules="[rules.required, rules.numeric, rules.minValidation]"
+                counter>
+              </v-text-field>
+            </v-col>
+
+            <v-col cols="4" v-if="workpiece?.material?.geometry==='PROFILE'">
               <v-text-field
                 label="Длина:"
                 v-model="workpiece.geom2"
@@ -108,8 +148,8 @@
 </template>
 
 <script setup>
-import {ref, getCurrentInstance, reactive} from 'vue';
-
+import {ref, getCurrentInstance, reactive, computed, watch} from 'vue';
+import materialDataFormatting from '@/mixins/MaterialDataFormatting'
 // ---- ПРОПСЫ ----
 const props = defineProps({
   workpiece: {
@@ -123,19 +163,16 @@ const workpiece = reactive(props.workpiece);
 // ---- ССЫЛКИ И СОСТОЯНИЯ ----
 const form = ref(null);
 const valid = ref(false);
+const geometry = ref(null);
+const materialFilter = ref(null);
 const {emit} = getCurrentInstance();
-const geometries = ref([
-  {title: 'Круг', label: 'CYLINDER'},
-  {title: 'Плита', label: 'BLANK'},
-  {title: 'Труба', label: 'TUBE'}
-]);
+const {geometries} = materialDataFormatting();
 
 // ---- ФУНКЦИИ ----
 const save = () => {
   if (form.value.validate()) {
     const validWorkpiece = {
       ...workpiece,
-      geometry: workpiece.geometry,
       geom1: parseFloat(workpiece.geom1),
       geom2: parseFloat(workpiece.geom2),
       geom3: parseFloat(workpiece.geom3),
@@ -146,8 +183,26 @@ const save = () => {
   }
 };
 
+const formatObjectData = (data) => {
+  const {materialName, gost} = data;
+  return `${materialName} ${gost}`;
+};
+
+const filteredMaterials = computed(() => {
+  return props.materials.filter((item) => {
+    return (
+      (!geometry.value || item.geometry === geometry.value) &&
+      (!materialFilter.value || item.materialName.toLowerCase().includes(materialFilter.value.toLowerCase()) || item.gost.toLowerCase().includes(materialFilter.value.toLowerCase()))
+    );
+  });
+});
+
 const hide = () => emit('hide');
 const validatedWorkpiece = (validWorkpiece) => emit('validatedWorkpiece', validWorkpiece);
+
+watch(geometry, () => {
+  workpiece.material = null; // Сбросить material при изменении geometry
+});
 
 // ---- ПРАВИЛА ВАЛИДАЦИИ ----
 const rules = {

@@ -45,11 +45,9 @@ export default {
   setup() {
     const store = useStore();
 
-    const technologist = computed(() => store.getters.getEmployee);
     const items = computed(() => store.getters.getItems);
-    const employeeItems = computed(() => !!technologist.value ? items.value.filter(item => item.technology.employee.id === technologist.value.id) : []);
-    const employeeItemsComputed = computed(() => employeeItems.value.filter(item => item.technology.computed !== true));
-    const employeeItemsNotComputed = computed(() => employeeItems.value.filter(item => item.technology.computed === true));
+    const employeeItemsComputed = computed(() => items.value.filter(item => item.technology.computed !== true));
+    const employeeItemsNotComputed = computed(() => items.value.filter(item => item.technology.computed === true));
     const isComputedVisible = computed(() => employeeItemsComputed.value.length !== 0);
     const isNotComputedVisible = computed(() => employeeItemsNotComputed.value.length !== 0);
 
@@ -64,7 +62,7 @@ export default {
       isComputedVisible,
       isNotComputedVisible,
       employeeItemsComputed,
-      employeeItemsNotComputed
+      employeeItemsNotComputed,
     };
   },
 };

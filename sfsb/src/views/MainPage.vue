@@ -1,7 +1,15 @@
 <template>
   <br>
-  <company-component/>
-  <department-component/>
+  <v-container>
+    <v-row>
+      <v-col cols="6">
+        <company-component/>
+      </v-col>
+      <v-col cols="6">
+        <department-component/>
+      </v-col>
+    </v-row>
+  </v-container>
   <area-component/>
 </template>
 

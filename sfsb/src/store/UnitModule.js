@@ -68,10 +68,10 @@ export default {
           const url = `/unit/area/${currentArea.id}`;
           const response = await api.post(url, {
             unitName: unit.unitName,
-            price: {
-              amount: unit.price.amount,
-              currency: 'RUB'
-            },
+            // price: {
+            //   amount: unit.price.amount,
+            //   currency: 'RUB'
+            // },
             paymentPerHour: {
               amount: unit.paymentPerHour.amount,
               currency: 'RUB'

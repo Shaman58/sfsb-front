@@ -33,14 +33,14 @@
               </v-list-item>
             </v-list>
 
-            <v-list>
-              <v-list-subheader>{{ area.stores ? `Склады (${area.stores.length})` : 'Склады' }}</v-list-subheader>
-              <v-list-item
-                v-for="store in getLimitedStores(area.stores)"
-                :key="store.id"
-                :title="store.storeName">
-              </v-list-item>
-            </v-list>
+<!--            <v-list>-->
+<!--              <v-list-subheader>{{ area.stores ? `Склады (${area.stores.length})` : 'Склады' }}</v-list-subheader>-->
+<!--              <v-list-item-->
+<!--                v-for="store in getLimitedStores(area.stores)"-->
+<!--                :key="store.id"-->
+<!--                :title="store.storeName">-->
+<!--              </v-list-item>-->
+<!--            </v-list>-->
           </v-card>
         </v-col>
       </v-row>

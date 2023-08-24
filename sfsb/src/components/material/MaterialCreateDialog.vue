@@ -1,10 +1,10 @@
 <template>
   <v-dialog v-model="isMaterialDialogVisible">
-    <v-card title="Материал">
+    <v-card :title=formatObjectData(material)>
       <v-form ref="form" v-model="valid" @submit.prevent="save()">
         <v-card-text>
           <v-row>
-            <v-col cols="8">
+            <v-col cols="4">
               <v-text-field
                 label="Название:"
                 v-model="material.materialName"
@@ -13,10 +13,19 @@
               </v-text-field>
             </v-col>
             <v-col cols="4">
+              <v-select
+                label="Выберите вид:"
+                :items="geometries"
+                item-text="title"
+                item-value="label"
+                v-model="material.geometry"
+                :rules="[rules.required]">
+              </v-select>
+            </v-col>
+            <v-col cols="4">
               <v-text-field
-                label="Плотность:"
-                v-model="material.density"
-                :rules="[rules.required, rules.numeric]">
+                label="Гост:"
+                v-model="material.gost">
               </v-text-field>
             </v-col>
           </v-row>
@@ -44,6 +53,7 @@
 <script>
 import {useStore} from "vuex";
 import {computed, ref} from "vue";
+import materialDataFormatting from '@/mixins/MaterialDataFormatting'
 
 export default {
   name: "material-create-dialog",
@@ -54,6 +64,7 @@ export default {
 
     const form = ref(null);
     const valid = ref(false);
+    const {formatObjectData, geometries} = materialDataFormatting();
 
     const isMaterialDialogVisible = computed(() => store.getters.getMaterialDialogVisible);
     const material = computed(() => store.getters.getMaterial);
@@ -83,6 +94,8 @@ export default {
       valid,
       rules,
       form,
+      formatObjectData,
+      geometries,
       save
     };
   },

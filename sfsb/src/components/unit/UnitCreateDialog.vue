@@ -17,15 +17,15 @@
                   maxlength="40"
                 ></v-text-field>
               </v-col>
-              <v-col cols="4">
-                <v-text-field
-                  label="Стоимость оборудования"
-                  v-model="selectedUnit.price.amount"
-                  :rules="[rules.required, rules.priceValidation]"
-                  counter
-                  maxlength="40"
-                ></v-text-field>
-              </v-col>
+<!--              <v-col cols="4">-->
+<!--                <v-text-field-->
+<!--                  label="Стоимость оборудования"-->
+<!--                  v-model="selectedUnit.price.amount"-->
+<!--                  :rules="[rules.required, rules.priceValidation]"-->
+<!--                  counter-->
+<!--                  maxlength="40"-->
+<!--                ></v-text-field>-->
+<!--              </v-col>-->
               <v-col cols="4">
                 <v-text-field
                   label="Стоимость часа оборудования"

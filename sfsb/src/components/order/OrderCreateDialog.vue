@@ -53,6 +53,12 @@
                   v-model="order.description">
                 </v-textarea>
               </v-col>
+              <v-col cols="12">
+                <v-textarea
+                  label="КП"
+                  v-model="order.businessProposal">
+                </v-textarea>
+              </v-col>
               <v-divider/>
               <v-container v-if="!!order.id">
                 <v-col cols="12">

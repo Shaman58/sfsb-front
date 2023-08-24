@@ -9,7 +9,6 @@
           <v-card-text>
 
             <v-row>
-
               <v-col>
                 <v-card
                   width="200"
@@ -17,7 +16,9 @@
                   title="Заготовка:"
                   @click="showWorkpieceCard">
                   <v-card-item>
-                    {{ !!technology.workpiece ? formatObjectData(technology.workpiece) : "Задать заготовку" }}
+                    {{
+                      !!technology.workpiece ? formatObjectData(technology.workpiece.material) : "Задать заготовку"
+                    }}
                   </v-card-item>
                 </v-card>
                 <tech-workpiece-card
@@ -52,8 +53,14 @@
                   :rules="[rules.required, rules.numberValidate, rules.min]"
                 />
               </v-col>
-            </v-row>
 
+            </v-row>
+            <v-row justify="end">
+              <v-btn color="orange-darken-1" variant="text" type="submit"
+                     :disabled="!valid || !technology.workpiece">
+                Сохранить данные заготовки
+              </v-btn>
+            </v-row>
             <br/>
             <v-divider/>
             <br/>
@@ -63,11 +70,17 @@
                 <v-row>
 
                   <v-col cols="12" v-for="(item, index) in sortedSetups" :key="index">
-                    <v-card v-if="!(item.isVisible)"
-                            :title="item.setupName"
-                            @click="item.isVisible = true">
+                    <v-card v-if="!(item.isVisible)" @click="item.isVisible = true">
+                      <v-card-title>
+                        <a>
+                          {{ "№" + item.setupNumber + " " + item.setupName }}
+                          <v-spacer>
+                            <a>{{ item.productionUnit?.unitName }}</a>
+                          </v-spacer>
+                        </a>
+                      </v-card-title>
                       <v-card-item>
-                        {{ item.setupNumber }}
+                        {{ compactInfo(item) }}
                       </v-card-item>
                     </v-card>
                     <setup-create-card
@@ -146,9 +159,6 @@
             <v-btn color="orange-darken-1" variant="text" @click="hideDialog">
               Закрыть
             </v-btn>
-            <v-btn color="orange-darken-1" variant="text" type="submit" :disabled="!valid || !technology.workpiece">
-              Сохранить
-            </v-btn>
           </v-card-actions>
         </v-card>
       </v-form>
@@ -164,6 +174,7 @@ import SetupCreateCard from "@/components/setup/SetupCreateCard.vue";
 import api from "@/api/instance";
 import 'vue-toast-notification/dist/theme-bootstrap.css'
 import {useToast} from 'vue-toast-notification';
+import materialDataFormatting from '@/mixins/MaterialDataFormatting'
 
 export default {
   name: "technology-create-dialog",
@@ -175,6 +186,7 @@ export default {
 
     const form = ref(null);
     const valid = ref(false);
+    const {formatObjectData} = materialDataFormatting();
 
     const isDialogVisible = computed(() => store.getters.isTechnologyDialogVisible);
     const item = computed(() => store.getters.getItem);
@@ -228,7 +240,9 @@ export default {
       );
     });
 
-    console.log(sortedSetups.value.length)
+    const compactInfo = ((data) => {
+      return `Обработка: ${data.processTime} Наладка: ${data.setupTime} Межоперационка: ${data.interoperativeTime}`
+    });
 
     const newSetup = ref({
       isVisible: false,
@@ -293,32 +307,6 @@ export default {
         });
     };
 
-    const formatObjectData = (data) => {
-      const {geometry, geom1, geom2, geom3, material: {materialName}} = data;
-
-      let shape = '';
-      let dimensions = '';
-
-      switch (geometry) {
-        case 'CYLINDER':
-          shape = 'Круг';
-          dimensions = `Ф${geom1}х${geom2}`;
-          break;
-        case 'TUBE':
-          shape = 'Труба';
-          dimensions = `Ф${geom1}ф${geom2}х${geom3}`;
-          break;
-        case 'BLANK':
-          shape = 'Плита';
-          dimensions = `${geom1}х${geom2}х${geom3}`;
-          break;
-        default:
-          break;
-      }
-
-      return `${shape} ${materialName} ${dimensions}`;
-    };
-
     const workpieceCardVisible = ref(false);
 
     const saveWorkpiece = (validWorkpiece) => {
@@ -372,6 +360,7 @@ export default {
       techToolings,
       calculateItem,
       computedValue,
+      compactInfo,
       rules
     }
   }
