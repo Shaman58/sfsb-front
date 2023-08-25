@@ -27,15 +27,15 @@
                   maxlength="20">
                 </v-text-field>
               </v-col>
-              <v-col cols="4">
-                <v-text-field
-                  label="Стоимость инструмента:"
-                  v-model="special.price.amount"
-                  :rules="[rules.required, rules.priceValidation]"
-                  counter
-                  maxlength="40"
-                ></v-text-field>
-              </v-col>
+<!--              <v-col cols="4">-->
+<!--                <v-text-field-->
+<!--                  label="Стоимость инструмента:"-->
+<!--                  v-model="special.price.amount"-->
+<!--                  :rules="[rules.required, rules.priceValidation]"-->
+<!--                  counter-->
+<!--                  maxlength="40"-->
+<!--                ></v-text-field>-->
+<!--              </v-col>-->
 
             </v-row>
           </v-container>
@@ -73,7 +73,7 @@ export default {
 
     const save = () => {
       if (form.value.validate()) {
-        special.value.price.currency = 'RUB';
+       // special.value.price.currency = 'RUB';
         store.dispatch("saveSpecial", special.value);
         store.commit("setSpecialCreateDialogVisible", false);
       }

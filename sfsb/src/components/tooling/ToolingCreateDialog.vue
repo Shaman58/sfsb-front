@@ -26,15 +26,15 @@
                   maxlength="20">
                 </v-text-field>
               </v-col>
-              <v-col cols="4">
-                <v-text-field
-                  label="Стоимость оснастки:"
-                  v-model="tooling.price.amount"
-                  :rules="[rules.required, rules.priceValidation]"
-                  counter
-                  maxlength="40"
-                ></v-text-field>
-              </v-col>
+<!--              <v-col cols="4">-->
+<!--                <v-text-field-->
+<!--                  label="Стоимость оснастки:"-->
+<!--                  v-model="tooling.price.amount"-->
+<!--                  :rules="[rules.required, rules.priceValidation]"-->
+<!--                  counter-->
+<!--                  maxlength="40"-->
+<!--                ></v-text-field>-->
+<!--              </v-col>-->
             </v-row>
           </v-container>
         </v-card-text>
@@ -71,7 +71,7 @@ export default {
 
     const save = () => {
       if (form.value.validate()) {
-        tooling.value.price.currency = 'RUB';
+       // tooling.value.price.currency = 'RUB';
         store.dispatch("saveTooling", tooling.value);
         hideToolingCreateDialogVisible();
       }

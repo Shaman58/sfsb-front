@@ -26,15 +26,15 @@
                   maxlength="20">
                 </v-text-field>
               </v-col>
-              <v-col cols="4">
-                <v-text-field
-                  label="Стоимость мерителя:"
-                  v-model="measureTool.price.amount"
-                  :rules="[rules.required, rules.priceValidation]"
-                  counter
-                  maxlength="40"
-                ></v-text-field>
-              </v-col>
+<!--              <v-col cols="4">-->
+<!--                <v-text-field-->
+<!--                  label="Стоимость мерителя:"-->
+<!--                  v-model="measureTool.price.amount"-->
+<!--                  :rules="[rules.required, rules.priceValidation]"-->
+<!--                  counter-->
+<!--                  maxlength="40"-->
+<!--                ></v-text-field>-->
+<!--              </v-col>-->
             </v-row>
           </v-container>
         </v-card-text>
@@ -71,7 +71,7 @@ export default {
 
     const save = () => {
       if (form.value.validate()) {
-        measureTool.value.price.currency = 'RUB';
+       // measureTool.value.price.currency = 'RUB';
         store.dispatch("saveMeasure", measureTool.value);
         hideMeasureCreateDialogVisible();
       }
