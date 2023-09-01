@@ -36,34 +36,20 @@
   </v-container>
 </template>
 
-<script>
-import {computed} from "vue";
-import {useStore} from "vuex";
+<script setup>
+import {computed} from 'vue';
+import {useStore} from 'vuex';
 
-export default {
-  name: "technology-list-dialog",
-  setup() {
-    const store = useStore();
+const store = useStore();
 
-    const items = computed(() => store.getters.getItems);
-    const employeeItemsComputed = computed(() => items.value.filter(item => item.technology.computed !== true));
-    const employeeItemsNotComputed = computed(() => items.value.filter(item => item.technology.computed === true));
-    const isComputedVisible = computed(() => employeeItemsComputed.value.length !== 0);
-    const isNotComputedVisible = computed(() => employeeItemsNotComputed.value.length !== 0);
+const items = computed(() => store.getters.getItems);
+const employeeItemsComputed = computed(() => items.value.filter(item => item.technology.computed !== true));
+const employeeItemsNotComputed = computed(() => items.value.filter(item => item.technology.computed === true));
+const isComputedVisible = computed(() => employeeItemsComputed.value.length !== 0);
+const isNotComputedVisible = computed(() => employeeItemsNotComputed.value.length !== 0);
 
-    const showTechnologyCreateDialog = (item) => {
-      store.commit("setItem", item);
-      store.commit("setSetups", item.technology.setups);
-      store.commit("setTechnologyDialogVisible", true);
-    }
-
-    return {
-      showTechnologyCreateDialog,
-      isComputedVisible,
-      isNotComputedVisible,
-      employeeItemsComputed,
-      employeeItemsNotComputed,
-    };
-  },
+const showTechnologyCreateDialog = (item) => {
+  store.commit('setItem', item);
+  store.commit('setTechnologyDialogVisible', true);
 };
 </script>

@@ -4,7 +4,7 @@
       <v-form ref="form" v-model="valid" @submit.prevent="save()">
         <v-card class="dialog-content">
           <v-card-title>
-            <span class="text-h5">{{ technology.drawingNumber + " " + technology.drawingName }}</span>
+            <span class="text-h5">{{ item.technology.drawingNumber + " " + item.technology.drawingName }}</span>
           </v-card-title>
           <v-card-text>
 
@@ -17,13 +17,13 @@
                   @click="showWorkpieceCard">
                   <v-card-item>
                     {{
-                      !!technology.workpiece ? formatObjectData(technology.workpiece.material) : "Задать заготовку"
+                      !!item.technology.workpiece ? formatObjectData(item.technology.workpiece.material) : "Задать заготовку"
                     }}
                   </v-card-item>
                 </v-card>
                 <tech-workpiece-card
                   v-else
-                  :workpiece="{...technology.workpiece}"
+                  :workpiece="{...item.technology.workpiece}"
                   :materials="materials"
                   @validatedWorkpiece="saveWorkpiece"
                   @hide="hideWorkpieceCard"
@@ -32,32 +32,32 @@
               <v-col cols="3" v-if="!workpieceCardVisible">
                 <v-text-field
                   label="Из заготовки"
-                  v-model="technology.quantityOfPartsFromWorkpiece"
+                  v-model="item.technology.quantityOfPartsFromWorkpiece"
                   type="number"
-                  :rules="[rules.required, rules.numberValidate, rules.min]"
+                  :rules="[rules.required,rules.numeric, rules.minValidation]"
                 />
               </v-col>
               <v-col cols="3" v-if="!workpieceCardVisible">
                 <v-text-field
                   label="Наладочных"
-                  v-model="technology.quantityOfSetUpParts"
+                  v-model="item.technology.quantityOfSetUpParts"
                   type="number"
-                  :rules="[rules.required, rules.numberValidate, rules.min]"
+                  :rules="[rules.required,rules.numeric, rules.minValidation]"
                 />
               </v-col>
               <v-col cols="3" v-if="!workpieceCardVisible">
                 <v-text-field
                   label="На брак"
-                  v-model="technology.quantityOfDefectiveParts"
+                  v-model="item.technology.quantityOfDefectiveParts"
                   type="number"
-                  :rules="[rules.required, rules.numberValidate, rules.min]"
+                  :rules="[rules.required,rules.numeric, rules.minValidation]"
                 />
               </v-col>
 
             </v-row>
             <v-row justify="end">
               <v-btn color="orange-darken-1" variant="text" type="submit"
-                     :disabled="!valid || !technology.workpiece">
+                     :disabled="!valid || !item.technology.workpiece">
                 Сохранить данные заготовки
               </v-btn>
             </v-row>
@@ -69,25 +69,26 @@
               <v-col cols="8">
                 <v-row>
 
-                  <v-col cols="12" v-for="(item, index) in sortedSetups" :key="index">
-                    <v-card v-if="!(item.isVisible)" @click="item.isVisible = true">
+                  <v-col cols="12" v-for="(setup, index) in setups" :key="index">
+                    <v-card v-if="!(setup.isVisible)" @click="setup.isVisible = true">
                       <v-card-title>
                         <a>
-                          {{ "№" + item.setupNumber + " " + item.setupName }}
+                          {{ "№" + setup.setupNumber + " " + setup.operation.operationName }}
                           <v-spacer>
-                            <a>{{ item.productionUnit?.unitName }}</a>
+                            <a>{{ setup.productionUnit?.unitName }}</a>
                           </v-spacer>
                         </a>
                       </v-card-title>
                       <v-card-item>
-                        {{ compactInfo(item) }}
+                        {{ compactInfo(setup) }}
                       </v-card-item>
                     </v-card>
                     <setup-create-card
                       v-else
-                      :setup="{...item}"
-                      @hideSetup="hideSetup(item)"
-                      @deleteSetup="deleteSetup(item)"/>
+                      :setup="{...setup, technology: item.technology}"
+                      :items-from-workpiece="Number(item.technology.quantityOfPartsFromWorkpiece)"
+                      @hideSetup="hideSetup(setup)"
+                      @deleteSetup="deleteSetup(setup)"/>
                   </v-col>
 
                   <v-col cols="12">
@@ -98,7 +99,7 @@
                     </v-card>
                     <setup-create-card
                       v-else
-                      :setup="{...newSetup, setupNumber:calculateSetupNumber}"
+                      :setup="{...newSetup, setupNumber: calculateSetupNumber}"
                       @hideSetup="hideSetup(newSetup)"/>
                   </v-col>
 
@@ -107,20 +108,13 @@
 
               <v-col cols="4">
                 <v-card title="Расходники:">
-                  <v-card-item v-if="techCutters.length!==0">
-                    Режущий инструмент:
-                    <v-list>
-                      <v-list-item
-                        v-for="item in techCutters"
-                        :title="item.toolName"/>
-                    </v-list>
-                  </v-card-item>
                   <v-card-item v-if="techSpecials.length!==0">
                     Специнструмент:
                     <v-list>
                       <v-list-item
                         v-for="item in techSpecials"
-                        :title="item.toolName"/>
+                        :key="item.id"
+                        :title="item.toolName +'   '+ item.amount"/>
                     </v-list>
                   </v-card-item>
                   <v-card-item v-if="techMeasurers.length!==0">
@@ -128,6 +122,7 @@
                     <v-list>
                       <v-list-item
                         v-for="item in techMeasurers"
+                        :key="item.id"
                         :title="item.toolName"/>
                     </v-list>
                   </v-card-item>
@@ -136,7 +131,8 @@
                     <v-list>
                       <v-list-item
                         v-for="item in techToolings"
-                        :title="item.toolingName"/>
+                        :key="item.id"
+                        :title="item.toolName"/>
                     </v-list>
                   </v-card-item>
                 </v-card>
@@ -147,12 +143,12 @@
           <v-card-actions>
             <v-col cols="2">
               <a>
-                {{ computedValue ? 'Рассчитан' : 'Не рассчитан' }}
+                {{ item.technology.computed ? 'Рассчитан' : 'Не рассчитан' }}
               </a>
             </v-col>
             <v-btn
               color="orange-darken-1" variant="text" @click="calculateItem"
-              :disabled="computedValue||!valid||!technology.workpiece||sortedSetups.length===0">
+              :disabled="item.technology.computed||!valid||!item.technology.workpiece||item.technology.setups.length===0">
               Рассчитать
             </v-btn>
             <v-spacer></v-spacer>
@@ -166,205 +162,130 @@
   </v-container>
 </template>
 
-<script>
+<script setup>
 import {useStore} from "vuex";
-import {computed, ref} from "vue";
+import {computed, ref, watch} from "vue";
 import TechWorkpieceCard from "@/components/technology/TechWorkpieceCard.vue";
-import SetupCreateCard from "@/components/setup/SetupCreateCard.vue";
+import SetupCreateCard from "@/components/technology/SetupCreateCard.vue";
 import api from "@/api/instance";
 import 'vue-toast-notification/dist/theme-bootstrap.css'
 import {useToast} from 'vue-toast-notification';
 import materialDataFormatting from '@/mixins/MaterialDataFormatting'
+import {useValidationRules} from "@/mixins/FieldValidationRules";
 
-export default {
-  name: "technology-create-dialog",
-  components: {SetupCreateCard, TechWorkpieceCard},
+const {rules} = useValidationRules();
+const store = useStore();
+const toast = useToast();
+const form = ref(null);
+const valid = ref(false);
+const workpieceCardVisible = ref(false);
+const {formatObjectData} = materialDataFormatting();
 
-  setup() {
-    const store = useStore();
-    const toast = useToast();
+const isDialogVisible = computed(() => store.getters.isTechnologyDialogVisible);
+const item = computed(() => store.getters.getItem);
+const materials = computed(() => store.getters.getMaterials);
+const setups = computed(() => item.value.technology.setups.slice().sort((a, b) => a.setupNumber - b.setupNumber))
 
-    const form = ref(null);
-    const valid = ref(false);
-    const {formatObjectData} = materialDataFormatting();
+const getUniqueItems = (key) => {
+  if (!item.value.technology.setups) {
+    return [];
+  }
+  const combined = item.value.technology.setups.flatMap(setup => setup[key]);
+  return combined.filter((item, index, self) =>
+    index === self.findIndex(t => t.id === item.id)
+  );
+};
 
-    const isDialogVisible = computed(() => store.getters.isTechnologyDialogVisible);
-    const item = computed(() => store.getters.getItem);
-    const technology = computed(() => item.value.technology);
-    const workpiece = computed(() => store.getters.getWorkpiece);
-    const sortedSetups = computed(() => store.getters.getSetups);
-    const materials = computed(() => store.getters.getMaterials);
-    const computedValue = computed(() => item.value.technology.computed);
+const techSpecials = computed(() => getUniqueItems('specialTools'));
+const techMeasurers = computed(() => getUniqueItems('measureTools'));
+const techToolings = computed(() => getUniqueItems('toolings'));
 
-    const techCutters = computed(() => {
-      if (!technology.value.setups) {
-        return [];
-      }
-      const combined = technology.value.setups.flatMap(setup => setup.cutterTools);
+const compactInfo = ((data) => {
+  if (data.operation.operationType === 'FROM_OPERATION_WITH_CALC'
+    || data.operation?.operationType === 'FROM_OPERATION') {
+    return `Обработка: ${data.processTime}`
+  } else if (data.operation.operationType === 'FROM_PROCESS_UNIT') {
+    return `Обработка: ${data.processTime} Наладка: ${data.setupTime} Межоперационка: ${data.interoperativeTime}`
+  } else {
+    return '';
+  }
+});
 
-      return combined.filter((item, index, self) =>
-        index === self.findIndex(t => t.id === item.id)
-      );
-    });
+const newSetup = ref({
+  isVisible: false,
+  technology: item.value.technology,
+  setupTime: "00:00",
+  processTime: "00:00",
+  interoperativeTime: "00:00",
+  measureTools: [],
+  specialTools: [],
+  toolings: [],
+  additionalTools: [],
+});
 
-    const techSpecials = computed(() => {
-      if (!technology.value.setups) {
-        return [];
-      }
-      const combined = technology.value.setups.flatMap(setup => setup.specialTools);
+watch(item, (newValue) => {
+  if (newValue && newValue.technology) {
+    newSetup.value.technology = newValue.technology;
+  }
+});
 
-      return combined.filter((item, index, self) =>
-        index === self.findIndex(t => t.id === item.id)
-      );
-    });
-
-    const techMeasurers = computed(() => {
-      if (!technology.value.setups) {
-        return [];
-      }
-      const combined = technology.value.setups.flatMap(setup => setup.measureTools);
-
-      return combined.filter((item, index, self) =>
-        index === self.findIndex(t => t.id === item.id)
-      );
-    });
-
-    const techToolings = computed(() => {
-      if (!technology.value.setups) {
-        return [];
-      }
-      const combined = technology.value.setups.flatMap(setup => setup.toolings);
-
-      return combined.filter((item, index, self) =>
-        index === self.findIndex(t => t.id === item.id)
-      );
-    });
-
-    const compactInfo = ((data) => {
-      return `Обработка: ${data.processTime} Наладка: ${data.setupTime} Межоперационка: ${data.interoperativeTime}`
-    });
-
-    const newSetup = ref({
-      isVisible: false,
-      technology: technology,
-      setupName: '',
-      setupTime: "00:00",
-      processTime: "00:00",
-      measureTools: [],
-      interoperativeTime: "00:00",
-      cutterTools: [],
-      additionalTools: [],
-      specialTools: [],
-      toolings: []
-    });
-
-    const calculateSetupNumber = computed(() => {
-      const setupNumbers = sortedSetups.value.map(setup => setup.setupNumber);
-      for (let i = 1; i <= Number.MAX_SAFE_INTEGER; i++) {
-        if (!setupNumbers.includes(i)) {
-          return i;
-        }
-      }
-      return -1;
-    });
-
-    const isTechWorkpieceDialogVisible = computed(() => store.getters.isWorkpieceCreateDialogVisible);
-
-    const save = async () => {
-      await store.dispatch("saveTechnology", technology.value);
-      await store.dispatch("fetchItemById", item.value.id);
-    };
-
-    const hideSetup = (item) => {
-      item.isVisible = false;
-    };
-
-    const deleteSetup = (item) => {
-      store.dispatch("deleteSetup", item);
-      store.dispatch("fetchTechnologyById", technology.value.id);
-    };
-
-    const showWorkpieceDialog = () => {
-      store.commit("setWorkpiece", technology.value.workpiece ? {...technology.value.workpiece} : {});
-      store.commit("setWorkpieceCreateDialogVisible", true);
-    };
-
-    const hideDialog = () => {
-      store.commit("setTechnologyDialogVisible", false);
-    };
-
-    const calculateItem = async () => {
-      await save();
-      await api.get("/doc/calculate", {
-        params: {itemId: item.value.id},
-      })
-        .then(async () => {
-          toast.info("Успешно!", {position: "top-right"});
-          await store.dispatch("fetchItemById", item.value.id);
-        })
-        .catch(error => {
-          toast.error(error.response.data.info, {position: "top-right"});
-        });
-    };
-
-    const workpieceCardVisible = ref(false);
-
-    const saveWorkpiece = (validWorkpiece) => {
-      technology.value.workpiece = validWorkpiece;
-    };
-
-    const hideWorkpieceCard = () => {
-      workpieceCardVisible.value = false;
-    };
-
-    const showWorkpieceCard = () => {
-      workpieceCardVisible.value = true;
-    };
-
-    const rules = {
-      required: (value) => !!value || "Обязательное поле",
-      counter: (value) => value.length <= 200 || "Не более 200 символов",
-      numberValidate: value => {
-        const pattern = /^[0-9]{1,5}$/
-        return pattern.test(value) || 'Неверный формат, введите 1-5 цифр'
-      },
-      min: value => {
-        return value > 0 || 'Неверный формат, должно быть больше 0'
-      }
-    };
-
-    return {
-      isDialogVisible,
-      technology,
-      save,
-      form,
-      valid,
-      hideDialog,
-      showWorkpieceDialog,
-      formatObjectData,
-      workpiece,
-      isTechWorkpieceDialogVisible,
-      newSetup,
-      calculateSetupNumber,
-      sortedSetups,
-      hideSetup,
-      deleteSetup,
-      saveWorkpiece,
-      hideWorkpieceCard,
-      workpieceCardVisible,
-      showWorkpieceCard,
-      materials,
-      techSpecials,
-      techCutters,
-      techMeasurers,
-      techToolings,
-      calculateItem,
-      computedValue,
-      compactInfo,
-      rules
+const calculateSetupNumber = computed(() => {
+  if (!item.value.technology.setups) {
+    return -1
+  }
+  const setupNumbers = item.value.technology.setups.map(setup => setup.setupNumber);
+  for (let i = 10; i <= Number.MAX_SAFE_INTEGER; i = i + 10) {
+    if (!setupNumbers.includes(i)) {
+      return i;
     }
   }
-}
+  return -1;
+});
+
+const save = async () => {
+  await store.dispatch("saveTechnology", item.value.technology);
+  await store.dispatch("fetchItem", item.value.id);
+};
+
+const hideSetup = (setup) => {
+  store.dispatch("fetchItem", item.value.id);
+  setup.isVisible = false;
+};
+
+const deleteSetup = async (setup) => {
+  await store.dispatch("deleteSetup", setup);
+  await store.dispatch("fetchItem", item.value.id);
+};
+
+const hideDialog = () => {
+  store.commit("setTechnologyDialogVisible", false);
+};
+
+const calculateItem = async () => {
+  await save();
+  await api.get("/doc/calculate", {
+    params: {itemId: item.value.id},
+  })
+    .then(async () => {
+      toast.info("Успешно!", {position: "top-right"});
+      await store.dispatch("fetchItem", item.value.id);
+    })
+    .catch(error => {
+      toast.error(error.response.data.info, {position: "top-right"});
+    });
+};
+
+const saveWorkpiece = (validWorkpiece) => {
+  item.value.technology.workpiece = validWorkpiece;
+};
+
+const hideWorkpieceCard = () => {
+  workpieceCardVisible.value = false;
+};
+
+const showWorkpieceCard = () => {
+  workpieceCardVisible.value = true;
+};
 </script>
 
 <style>

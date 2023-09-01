@@ -1,8 +1,10 @@
 import api from "@/api/instance";
+import {useToast} from "vue-toast-notification";
 
 export default {
   state: {
     materials: [],
+    materialTemplates: [],
     material: {},
     materialListVisible: false,
     materialDialogVisible: false,
@@ -10,6 +12,9 @@ export default {
   mutations: {
     setMaterials(state, payload) {
       state.materials = payload;
+    },
+    setMaterialTemplates(state, payload) {
+      state.materialTemplates = payload;
     },
     setMaterial(state, payload) {
       state.material = payload;
@@ -35,6 +40,7 @@ export default {
   getters: {
     getMaterials: (state) => state.materials,
     getMaterial: (state) => state.material,
+    getMaterialTemplates: (state) => state.materialTemplates,
     getMaterialListVisible: (state) => state.materialListVisible,
     getMaterialDialogVisible: (state) => state.materialDialogVisible,
   },
@@ -45,6 +51,15 @@ export default {
         commit("setMaterials", response.data);
       } catch (error) {
         console.log("Материалы не найдены");
+        console.error(error);
+      }
+    },
+    async fetchMaterialTemplates({commit}) {
+      try {
+        const response = await api.get('/material-density-template');
+        commit("setMaterialTemplates", response.data);
+      } catch (error) {
+        console.log("Шаблоны материалов не найдены");
         console.error(error);
       }
     },
@@ -67,6 +82,7 @@ export default {
         commit("setMaterial", response.data)
         commit("saveMaterialToMaterials", response.data);
       } catch (error) {
+        useToast().error("Материал не создан", {position: "top-right"});
         console.log("Материал не создан");
         console.error(error);
       }

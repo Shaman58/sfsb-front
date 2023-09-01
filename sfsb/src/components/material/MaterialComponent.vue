@@ -26,6 +26,10 @@ export default {
     return {
       showMaterialList
     }
-  }
+  },
+  mounted() {
+    this.$store.dispatch("fetchMaterials");
+    this.$store.dispatch("fetchMaterialTemplates");
+  },
 }
 </script>

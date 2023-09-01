@@ -232,7 +232,6 @@
 <script>
 import {useStore} from "vuex";
 import {computed, ref} from "vue";
-import CutterToolListItemDialog from "@/components/cutter/CutterToolListItemDialog.vue";
 import MeasureToolListItemDialog from "@/components/measure/MeasureToolListItemDialog.vue";
 import ToolingListItemDialog from "@/components/tooling/ToolingListItemDialog.vue";
 import SpecialToolListItemDialog from "@/components/special/SpecialToolListItemDialog.vue";
@@ -242,7 +241,7 @@ export default {
   name: "store-content-dialog",
   components: {
     WorkpieceListItemDialog,
-    SpecialToolListItemDialog, ToolingListItemDialog, MeasureToolListItemDialog, CutterToolListItemDialog
+    SpecialToolListItemDialog, ToolingListItemDialog, MeasureToolListItemDialog
   },
   setup() {
     const store = useStore();

@@ -39,17 +39,7 @@ export default {
     isOrderCreateDialogVisible: (state) => state.createDialog,
   },
   actions: {
-    async fetchAllOrdersData({dispatch, state}) {
-      try {
-        await dispatch("fetchOrdersData");
-        const orders = state.orders;
-        const promises = orders.map(order => dispatch('fetchItemsByOrderId', order));
-        await Promise.all(promises);
-      } catch (error) {
-        console.error(error);
-      }
-    },
-    fetchOrdersData({commit}) {
+    fetchOrders({commit}) {
       return api.get('/order')
         .then(response => commit("setOrders", response.data))
         .catch(error => {
@@ -63,7 +53,7 @@ export default {
           ? `/order/${order.id}`
           : '/order';
         const response = await (order.id ? api.put(url, order) : api.post(url, order));
-        dispatch("fetchItemsByOrderId", response.data)
+        commit("saveOrderToOrders", response.data);
       } catch (error) {
         console.log("Заявка не создана");
         console.error(error);

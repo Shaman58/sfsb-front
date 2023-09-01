@@ -100,7 +100,7 @@
                         <v-text-field
                           label="Количество:"
                           v-model="item.quantity"
-                          :rules="[rules.required, rules.numberValidate, rules.min]"
+                          :rules="[rules.required, rules.numberValidate, rules.min1]"
                         ></v-text-field>
                       </v-col>
                       <v-col cols="3">
@@ -186,7 +186,7 @@
 import {computed, ref} from "vue";
 import {useStore} from "vuex";
 import api from "@/api/instance";
-import {saveAs} from 'file-saver';
+import {useValidationRules} from "@/mixins/FieldValidationRules";
 import mammoth from 'mammoth';
 
 export default {
@@ -194,7 +194,7 @@ export default {
 
   setup() {
     const store = useStore();
-
+    const {rules} = useValidationRules();
     const isDialogVisible = computed(() => store.getters.isOrderCreateDialogVisible);
     const order = computed(() => store.getters.getOrder);
     const customers = computed(() => store.getters.getCustomers);
@@ -220,18 +220,6 @@ export default {
     const valid = ref(false);
     const formItem = ref(null);
     const validItem = ref(false);
-
-    const rules = {
-      required: (value) => !!value || "Обязательное поле",
-      counter: (value) => value.length <= 200 || "Не более 200 символов",
-      numberValidate: value => {
-        const pattern = /^[0-9]{1,5}$/
-        return pattern.test(value) || 'Неверный формат, введите 1-5 цифр'
-      },
-      min: value => {
-        return value > 0 || 'Неверный формат, должно быть больше 0'
-      }
-    };
 
     const hideDialog = () => {
       store.commit("setOrderCreateDialog", false);

@@ -16,7 +16,7 @@
                 item-text="title"
                 item-value="label"
                 v-model="geometry"
-                :rules="[rules.required]">
+              >
               </v-select>
               <v-text-field
                 label="Фильтр:"
@@ -75,7 +75,7 @@
               <v-text-field
                 label="Внутренний диаметр:"
                 v-model="workpiece.geom2"
-                :rules="[rules.required, rules.numeric, rules.minValidation, rules.geom2LessThanGeom1]"
+                :rules="[rules.required, rules.numeric, rules.minValidation, geom2LessThanGeom1]"
                 counter>
               </v-text-field>
               <v-text-field
@@ -150,6 +150,7 @@
 <script setup>
 import {ref, getCurrentInstance, reactive, computed, watch} from 'vue';
 import materialDataFormatting from '@/mixins/MaterialDataFormatting'
+import {useValidationRules} from "@/mixins/FieldValidationRules";
 // ---- ПРОПСЫ ----
 const props = defineProps({
   workpiece: {
@@ -167,7 +168,8 @@ const geometry = ref(null);
 const materialFilter = ref(null);
 const {emit} = getCurrentInstance();
 const {geometries} = materialDataFormatting();
-
+const {rules} = useValidationRules();
+const geom2LessThanGeom1 = rules.geom2LessThanGeom1(workpiece);
 // ---- ФУНКЦИИ ----
 const save = () => {
   if (form.value.validate()) {
@@ -204,17 +206,4 @@ watch(geometry, () => {
   workpiece.material = null; // Сбросить material при изменении geometry
 });
 
-// ---- ПРАВИЛА ВАЛИДАЦИИ ----
-const rules = {
-  required: (value) => !!value || "Обязательное поле",
-  counter: (value) => value.length <= 200 || "Не более 200 символов",
-  numeric: (value) => !isNaN(value) || "Введите число",
-  geom2LessThanGeom1: () => {
-    if (workpiece.geom1 !== null && workpiece.geom2 !== null && parseFloat(workpiece.geom2) >= parseFloat(workpiece.geom1)) {
-      return "Внутренний диаметр должен быть меньше внешнего диаметра";
-    }
-    return true;
-  },
-  minValidation: (value) => value > 0 || "Число должно быть больше 0",
-};
 </script>

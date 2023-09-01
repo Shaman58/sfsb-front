@@ -9,8 +9,8 @@
         <department-component/>
       </v-col>
     </v-row>
+    <material-component/>
   </v-container>
-  <area-component/>
 </template>
 
 <script>

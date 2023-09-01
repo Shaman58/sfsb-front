@@ -5,7 +5,6 @@ import companyModule from "@/store/CompanyModule";
 import areaModule from "@/store/AreaModule";
 import unitModule from "@/store/UnitModule";
 import storeModule from "@/store/StoreModule";
-import cutterModule from "@/store/CutterModule";
 import measureModule from "@/store/MeasureModule";
 import toolingModule from "@/store/ToolingModule";
 import specialsModule from "@/store/SpecialsModule"
@@ -17,6 +16,7 @@ import orderModule from "@/store/OrderModule";
 import itemModule from "@/store/itemModule";
 import technologyModule from "@/store/TechnologyModule";
 import setupModule from "@/store/SetupModule";
+import operationModule from "@/store/OperationModule";
 
 export default new Vuex.Store({
   modules: {
@@ -26,7 +26,6 @@ export default new Vuex.Store({
     areaModule,
     unitModule,
     storeModule,
-    cutterModule,
     measureModule,
     toolingModule,
     specialsModule,
@@ -37,6 +36,7 @@ export default new Vuex.Store({
     orderModule,
     itemModule,
     technologyModule,
-    setupModule
+    setupModule,
+    operationModule
   }
 })

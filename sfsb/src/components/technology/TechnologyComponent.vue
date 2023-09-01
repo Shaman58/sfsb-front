@@ -1,30 +1,28 @@
 <template>
   <v-container>
-<!--    <technologist-select/>-->
     <technology-list-dialog/>
     <technology-create-dialog/>
   </v-container>
 </template>
 
-<script>
+<script setup>
 
-import TechnologistSelect from "@/components/technology/TechnologistSelect.vue";
+import {onMounted} from 'vue';
+import {useStore} from 'vuex';
 import TechnologyListDialog from "@/components/technology/TechnologyListDialog.vue";
 import TechnologyCreateDialog from "@/components/technology/TechnologyCreateDialog.vue";
-import WorkpieceCreateDialog from "@/components/workpiece/WorkpieceCreateDialog.vue";
 
-export default {
-  name: "technology-component",
-  components: {WorkpieceCreateDialog, TechnologyCreateDialog, TechnologyListDialog, TechnologistSelect},
-  mounted() {
-    this.$store.dispatch("fetchEmployees");
-    this.$store.dispatch("fetchMaterials");
-    this.$store.dispatch("fetchAllUnits");
-    this.$store.dispatch("fetchCutters");
-    this.$store.dispatch("fetchMeasurers");
-    this.$store.dispatch("fetchToolings");
-    this.$store.dispatch("fetchSpecials");
-    this.$store.dispatch("fetchAllItemsData");
-  },
-}
+const store = useStore();
+
+onMounted(() => {
+  store.dispatch("fetchEmployees");
+  store.dispatch("fetchMaterials");
+  store.dispatch("fetchAllUnits");
+  store.dispatch("fetchMeasurers");
+  store.dispatch("fetchToolings");
+  store.dispatch("fetchSpecials");
+  store.dispatch("fetchItems");
+  store.dispatch("fetchOperations");
+});
+
 </script>

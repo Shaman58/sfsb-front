@@ -16,7 +16,7 @@
               <v-select
                 label="Выберите вид:"
                 :items="geometries"
-                item-text="title"
+                item-title="title"
                 item-value="label"
                 v-model="material.geometry"
                 :rules="[rules.required]">
@@ -25,8 +25,32 @@
             <v-col cols="4">
               <v-text-field
                 label="Гост:"
-                v-model="material.gost">
+                v-model="material.gost"
+                :rules="[rules.required]">
               </v-text-field>
+            </v-col>
+            <v-col cols="4">
+              <v-select
+                label="Выберите плотность:"
+                :items="materialDensityTemplates"
+                item-title="materialTypeName"
+                item-value="density"
+                v-model="material.density">
+              </v-select>
+            </v-col>
+            <v-col cols="4">
+              <v-text-field
+                label="Плотность:"
+                v-model="material.density"
+                :rules="[rules.required, rules.numeric]">
+              </v-text-field>
+            </v-col>
+            <v-col cols="4">
+              <v-text-field
+                label="Стоимость килограмма:"
+                v-model="material.price.amount"
+                :rules="[rules.numeric]"
+              ></v-text-field>
             </v-col>
           </v-row>
           <v-card-actions>
@@ -64,10 +88,12 @@ export default {
 
     const form = ref(null);
     const valid = ref(false);
+
     const {formatObjectData, geometries} = materialDataFormatting();
 
     const isMaterialDialogVisible = computed(() => store.getters.getMaterialDialogVisible);
     const material = computed(() => store.getters.getMaterial);
+    const materialDensityTemplates = computed(() => store.getters.getMaterialTemplates);
 
     const hideNewMaterialDialog = (() => {
       store.commit("setMaterialDialogVisible", false);
@@ -96,6 +122,7 @@ export default {
       form,
       formatObjectData,
       geometries,
+      materialDensityTemplates,
       save
     };
   },

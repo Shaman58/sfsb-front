@@ -16,7 +16,7 @@ export default {
   name: "order-component",
   components: {OrderCreateDialog, OrderListDialog, OrderPreviewCard},
   mounted() {
-    this.$store.dispatch("fetchAllOrdersData");
+    this.$store.dispatch("fetchOrders");
     this.$store.dispatch("fetchEmployees");
     this.$store.dispatch("fetchTechnologies");
   }

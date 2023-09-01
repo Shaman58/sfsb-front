@@ -23,22 +23,15 @@ export default {
         state.items.push(payload)
       }
     },
+    deleteItem(state, payload) {
+      state.items = state.items.filter(item => item.id !== payload.id);
+    },
   },
   getters: {
     getItem: (state) => state.item,
     getItems: (state) => state.items,
   },
   actions: {
-    async fetchAllItemsData({dispatch, state}) {
-      try {
-        await dispatch("fetchItems");
-        const items = state.items;
-        const promises = items.map(item => dispatch('fetchSetupsByItemId', item));
-        await Promise.all(promises);
-      } catch (error) {
-        console.error(error);
-      }
-    },
     fetchItems({commit}) {
       return api.get('/item')
         .then(response => commit("setItems", response.data))
@@ -55,43 +48,22 @@ export default {
           console.error(error);
         });
     },
-    async fetchItemById({dispatch, state}, id) {
-      try {
-        await dispatch("fetchItem", id);
-        const promise = dispatch('fetchSetupsByItemId', state.item);
-        await Promise.all([promise]);
-      } catch (error) {
-        console.error(error);
-      }
-    },
-    async saveItem({dispatch}, item) {
+    async saveItem({commit}, item) {
       try {
         const url = !!item.id
           ? `/item/${item.id}`
           : '/item';
-        await (!!item.id ? api.put(url, item) : api.post(url, item));
-        dispatch("fetchItemsByOrderId", item.order)
+        await (!!item.id ? api.put(url, item) : api.post(url, item))
+          .then(response => commit("saveItem", response.data));
       } catch (error) {
         console.log("Позиция не создана");
         console.error(error);
       }
     },
-    fetchItemsByOrderId({commit}, order) {
-      return api.get(`/item/order/${order.id}`)
-        .then(response => {
-          const updatedOrder = {...order, items: response.data};
-          commit("saveOrderToOrders", updatedOrder);
-          commit("setOrder", updatedOrder);
-        })
-        .catch(error => {
-          console.log('Позиции не найдены');
-          console.error(error);
-        });
-    },
-    async deleteItem({dispatch}, item) {
+    async deleteItem({commit}, item) {
       try {
         await api.delete(`/item/${item.id}`);
-        dispatch("fetchItemsByOrderId", item.order);
+        commit("deleteItem", item);
       } catch (error) {
         console.log('Позиция не удалена');
         console.error(error);

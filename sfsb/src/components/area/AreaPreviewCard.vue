@@ -46,18 +46,15 @@
       </v-row>
 
     </v-container>
-    <material-component/>
   </v-card>
 </template>
 
 <script>
 import {useStore} from "vuex";
 import {computed} from "vue";
-import MaterialComponent from "@/components/material/MaterialComponent.vue";
 
 export default {
   name: "area-preview-card",
-  components: {MaterialComponent},
   setup() {
     const store = useStore();
 

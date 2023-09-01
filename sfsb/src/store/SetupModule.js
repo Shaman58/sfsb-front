@@ -58,9 +58,9 @@ export default {
         console.error(error);
       }
     },
-    deleteSetup({commit}, setup) {
+    async deleteSetup({commit}, setup) {
       try {
-        api.delete(`/setup/${setup.id}`).then(() => {
+        await api.delete(`/setup/${setup.id}`).then(() => {
           let setups = store.getters.getSetups;
           setups = setups.filter(item => item.id !== setup.id);
           commit("setSetups", setups);

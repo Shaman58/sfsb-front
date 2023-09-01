@@ -45,7 +45,7 @@
               color="orange-lighten-1"
               icon="mdi-plus"
               variant="text"
-              @click.stop="showNewMaterialDialog({})"
+              @click.stop="showNewMaterialDialog({price:{currency:'RUB', amount:0}})"
             ></v-btn>
           </template>
 

@@ -150,91 +150,46 @@
   </v-dialog>
 </template>
 
-<script>
+<script setup>
+import {useValidationRules} from "@/mixins/FieldValidationRules";
 import {useStore} from "vuex";
 import {computed, ref} from "vue";
 
-export default {
-  name: "company-create-dialog",
-  setup() {
-    const store = useStore();
+const {rules} = useValidationRules();
+const store = useStore();
 
-    const form = ref(null);
-    const valid = ref(false);
+const form = ref(null);
+const valid = ref(false);
 
-    const company = computed(() => store.getters.getSelectedCompany);
-    const isCompanyDialogVisible = computed(() => store.getters.isCompanyDialogVisible);
-    const employees = computed(() => store.getters.getEmployees);
+const company = computed(() => store.getters.getSelectedCompany);
+const isCompanyDialogVisible = computed(() => store.getters.isCompanyDialogVisible);
+const employees = computed(() => store.getters.getEmployees);
 
-    const isCompanyHasDirector = computed(() => {
-      return company.value.hasOwnProperty('director');
-    });
+const isCompanyHasDirector = computed(() => {
+  return company.value.hasOwnProperty('director');
+});
 
-    const isCompanyCreated = computed(() => {
-      return company.value.hasOwnProperty('id');
-    });
+const isCompanyCreated = computed(() => {
+  return company.value.hasOwnProperty('id');
+});
 
-    const hideCompanyDialog = () => {
-      store.commit("setCompanyDialog", false);
-    };
+const hideCompanyDialog = () => {
+  store.commit("setCompanyDialog", false);
+};
 
-    const save = () => {
-      if (form.value.validate()) {
-        if (isCompanyHasDirector.value) {
-          store.dispatch("saveCompany", company.value)
-        } else {
-          store.dispatch("saveCustomer", company.value);
-        }
-        hideCompanyDialog();
-      }
-    };
-
-    const showContacts = () => {
-      store.commit("setContactListDialogVisible", true);
-    };
-
-    const rules = {
-      required: value => !!value || 'Обязательное поле',
-      counter: value => value.length <= 200 || 'Не более 200 символов',
-      emailValidation: value => {
-        const pattern = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/
-        return pattern.test(value) || 'Неверный формат'
-      },
-      phoneValidation: value => {
-        const pattern = /^\+?[78][-\(]?\d{3}\)?-?\d{3}-?\d{2}-?\d{2}$/
-        return pattern.test(value) || 'Неверный формат'
-      },
-      accountValidation: value => {
-        const pattern = /^[0-9]{20}$/
-        return pattern.test(value) || 'Неверный формат, введите 20 цифр'
-      },
-      bikkppValidation: value => {
-        const pattern = /^[0-9]{9}$/
-        return pattern.test(value) || 'Неверный формат, введите 9 цифр'
-      },
-      ogrnValidation: value => {
-        const pattern = /^[0-9]{13}$/
-        return pattern.test(value) || 'Неверный формат, введите 13 цифр'
-      },
-      innValidation: value => {
-        const pattern = /^[0-9]{10}$/
-        return pattern.test(value) || 'Неверный формат, введите 10 цифр'
-      },
-    };
-
-    return {
-      hideCompanyDialog,
-      company,
-      isCompanyDialogVisible,
-      form,
-      valid,
-      rules,
-      save,
-      employees,
-      isCompanyHasDirector,
-      showContacts,
-      isCompanyCreated
+const save = () => {
+  if (form.value.validate()) {
+    if (isCompanyHasDirector.value) {
+      store.dispatch("saveCompany", company.value)
+    } else {
+      store.dispatch("saveCustomer", company.value);
     }
+    hideCompanyDialog();
   }
-}
+};
+
+const showContacts = () => {
+  store.commit("setContactListDialogVisible", true);
+};
+
 </script>

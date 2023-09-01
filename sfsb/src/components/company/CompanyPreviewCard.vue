@@ -31,28 +31,17 @@
   </v-card>
 </template>
 
-<script>
+<script setup>
 import {useStore} from "vuex";
 import {computed} from "vue";
 
-export default {
-  name: "company-preview-card",
-  setup() {
-    const store = useStore();
+const store = useStore();
 
-    const company = computed(() => store.getters.getCompany);
-    const isCompanyCreated = computed(() => !!company.value.id);
+const company = computed(() => store.getters.getCompany);
+const isCompanyCreated = computed(() => !!company.value.id);
 
-    const showCompanyDialog = () => {
-      store.commit("setSelectedCompany", company.value)
-      store.commit("setCompanyDialog", true);
-    };
-
-    return {
-      showCompanyDialog,
-      company,
-      isCompanyCreated
-    }
-  }
-}
+const showCompanyDialog = () => {
+  store.commit("setSelectedCompany", company.value)
+  store.commit("setCompanyDialog", true);
+};
 </script>
