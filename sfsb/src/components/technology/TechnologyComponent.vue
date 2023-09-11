@@ -15,12 +15,11 @@ import TechnologyCreateDialog from "@/components/technology/TechnologyCreateDial
 const store = useStore();
 
 onMounted(() => {
-  store.dispatch("fetchEmployees");
   store.dispatch("fetchMaterials");
-  store.dispatch("fetchAllUnits");
   store.dispatch("fetchMeasurers");
   store.dispatch("fetchToolings");
   store.dispatch("fetchSpecials");
+  store.dispatch("fetchCutters");
   store.dispatch("fetchItems");
   store.dispatch("fetchOperations");
 });

@@ -4,7 +4,8 @@
       <v-form ref="form" v-model="valid" @submit.prevent="save()">
         <v-card class="dialog-content">
           <v-card-title>
-            <span class="text-h5">{{ item.technology.drawingNumber + " " + item.technology.drawingName }}</span>
+            <span class="text-h4">{{ item.technology.drawingNumber + " " + item.technology.drawingName }}</span>
+            {{ item.quantity + "шт." }}
           </v-card-title>
           <v-card-text>
 
@@ -17,7 +18,7 @@
                   @click="showWorkpieceCard">
                   <v-card-item>
                     {{
-                      !!item.technology.workpiece ? formatObjectData(item.technology.workpiece.material) : "Задать заготовку"
+                      !!item.technology.workpiece ? formatMaterialData(item.technology.workpiece.material) : "Задать заготовку"
                     }}
                   </v-card-item>
                 </v-card>
@@ -53,90 +54,117 @@
                   :rules="[rules.required,rules.numeric, rules.minValidation]"
                 />
               </v-col>
+            </v-row>
 
-            </v-row>
-            <v-row justify="end">
-              <v-btn color="orange-darken-1" variant="text" type="submit"
-                     :disabled="!valid || !item.technology.workpiece">
-                Сохранить данные заготовки
-              </v-btn>
-            </v-row>
             <br/>
             <v-divider/>
             <br/>
 
             <v-row>
-              <v-col cols="8">
-                <v-row>
 
-                  <v-col cols="12" v-for="(setup, index) in setups" :key="index">
-                    <v-card v-if="!(setup.isVisible)" @click="setup.isVisible = true">
-                      <v-card-title>
-                        <a>
-                          {{ "№" + setup.setupNumber + " " + setup.operation.operationName }}
-                          <v-spacer>
-                            <a>{{ setup.productionUnit?.unitName }}</a>
-                          </v-spacer>
-                        </a>
-                      </v-card-title>
-                      <v-card-item>
-                        {{ compactInfo(setup) }}
-                      </v-card-item>
-                    </v-card>
-                    <setup-create-card
-                      v-else
-                      :setup="{...setup, technology: item.technology}"
-                      :items-from-workpiece="Number(item.technology.quantityOfPartsFromWorkpiece)"
-                      @hideSetup="hideSetup(setup)"
-                      @deleteSetup="deleteSetup(setup)"/>
-                  </v-col>
+              <v-col cols="12" v-for="(setup, index) in sortedSetups" :key="index">
+                <v-card v-if="!(setup.isVisible)" @click="setup.isVisible = true">
+                  <v-row>
 
-                  <v-col cols="12">
-                    <v-card
-                      title="Новый установ"
-                      v-if="!newSetup.isVisible"
-                      @click="newSetup.isVisible = true">
-                    </v-card>
-                    <setup-create-card
-                      v-else
-                      :setup="{...newSetup, setupNumber: calculateSetupNumber}"
-                      @hideSetup="hideSetup(newSetup)"/>
-                  </v-col>
+                    <v-col cols="3" v-if="!setup.cooperate"> <!-- 1 часть карточки -->
+                      <v-card>
+                        <v-card-title>
+                          <a>
+                            {{ "№" + setup.setupNumber + " " + setup.operation.operationName }}
+                          </a>
+                        </v-card-title>
+                        <v-card-item>
+                          {{ compactInfo(setup) }}
+                        </v-card-item>
+                        <v-list v-if="!!setup.toolings && setup.operation.operationTimeManagement!=='COMPUTED'
+                         && setup.operation.operationTimeManagement!=='NONE'">
+                          <v-list-item v-for="tooling in setup.toolings"
+                                       :title="tooling.toolName"/>
+                        </v-list>
+                      </v-card>
+                    </v-col>
 
-                </v-row>
-              </v-col>
+                    <v-col cols="3" v-if="!setup.cooperate
+                    && setup.operation.operationTimeManagement!=='COMPUTED'
+                    && setup.operation.operationTimeManagement!=='NONE'">
+                      <!-- 2 часть карточки -->
+                      <v-card height="100%" v-if="setup.additionalTools.length!==0">
+                        <v-list density="compact" style="padding: 0;" :lines="false">
+                          <v-list-item v-for="(tool, index) in setup.additionalTools" :key="index"
+                                       :title="tool.toolName"
+                                       :subtitle="formatWorkpieceData(tool.workpiece)">
+                          </v-list-item>
+                        </v-list>
+                      </v-card>
+                    </v-col>
 
-              <v-col cols="4">
-                <v-card title="Расходники:">
-                  <v-card-item v-if="techSpecials.length!==0">
-                    Специнструмент:
-                    <v-list>
-                      <v-list-item
-                        v-for="item in techSpecials"
-                        :key="item.id"
-                        :title="item.toolName +'   '+ item.amount"/>
-                    </v-list>
-                  </v-card-item>
-                  <v-card-item v-if="techMeasurers.length!==0">
-                    Mеритель:
-                    <v-list>
-                      <v-list-item
-                        v-for="item in techMeasurers"
-                        :key="item.id"
-                        :title="item.toolName"/>
-                    </v-list>
-                  </v-card-item>
-                  <v-card-item v-if="techToolings.length!==0">
-                    Оснастка:
-                    <v-list>
-                      <v-list-item
-                        v-for="item in techToolings"
-                        :key="item.id"
-                        :title="item.toolName"/>
-                    </v-list>
-                  </v-card-item>
+                    <v-col cols="3" v-if="!setup.cooperate
+                     && setup.operation.operationTimeManagement!=='COMPUTED'
+                     && setup.operation.operationTimeManagement!=='NONE'">
+                      <!-- 3 часть карточки -->
+                      <v-card height="100%" v-if="setup.cutterToolItems.length!==0&&setup.specialToolItems.length!==0">
+                        <v-list density="compact" style="padding: 0;" :lines="false">
+                          <v-list-item v-for="(tool, index) in setup.cutterToolItems" :key="index"
+                                       :title="tool.tool.toolName"
+                                       :subtitle="tool.amount +'шт.'">
+                          </v-list-item>
+                        </v-list>
+                        <v-list density="compact" style="padding: 0;" :lines="false">
+                          <v-list-item v-for="(tool, index) in setup.specialToolItems" :key="index"
+                                       :title="tool.tool.toolName"
+                                       :subtitle="tool.amount +'шт.'">
+                          </v-list-item>
+                        </v-list>
+                      </v-card>
+                    </v-col>
+
+                    <v-col cols="3" fill-height
+                           v-if="!setup.cooperate
+                           && setup.operation.operationTimeManagement!=='COMPUTED'
+                           && setup.operation.operationTimeManagement!=='NONE'">
+                      <!-- 4 часть карточки -->
+                      <v-card height="100%" v-if="setup.measureTools.length!==0">
+                        <v-list density="compact" style="padding: 0;" :lines="false">
+                          <v-list-item v-for="(tool, index) in setup.measureTools" :key="index"
+                                       :title="tool.toolName"
+                                       :subtitle="tool.description">
+                          </v-list-item>
+                        </v-list>
+                      </v-card>
+                    </v-col>
+                    <v-col cols="12" fill-height v-if="setup.cooperate"> <!-- 234 часть карточки -->
+                      <v-card height="100%"
+                              :title="'№' + setup.setupNumber + ' ' + setup.operation.operationName + ' кооперация'"
+                              color="rgba(161, 48, 13, 0.24)">
+                      </v-card>
+                    </v-col>
+
+                  </v-row>
                 </v-card>
+                <setup-create-card
+                  v-else
+                  :setup="{...setup}"
+                  :quantity-of-parts-from-workpiece="Number(item.technology.quantityOfPartsFromWorkpiece)"
+                  @hideSetup="hideSetup(setup)"
+                  @deleteSetup="deleteSetup(index)"
+                  @save="replaceSetup($event, index)"
+                />
               </v-col>
+
+              <v-col cols="12">
+                <v-card
+                  title="Новый установ"
+                  v-if="!newSetup.isVisible"
+                  @click="newSetup.isVisible=true">
+                </v-card>
+                <setup-create-card
+                  v-else
+                  :setup="{...newSetup}"
+                  :quantity-of-parts-from-workpiece="Number(item.technology.quantityOfPartsFromWorkpiece)"
+                  @hideSetup="hideSetup(newSetup)"
+                  @save="pushSetup"/>
+              </v-col>
+
             </v-row>
 
           </v-card-text>
@@ -146,10 +174,9 @@
                 {{ item.technology.computed ? 'Рассчитан' : 'Не рассчитан' }}
               </a>
             </v-col>
-            <v-btn
-              color="orange-darken-1" variant="text" @click="calculateItem"
-              :disabled="item.technology.computed||!valid||!item.technology.workpiece||item.technology.setups.length===0">
-              Рассчитать
+            <v-btn color="orange-darken-1" variant="text" type="submit"
+                   :disabled="!valid || !item.technology.workpiece">
+              Сохранить
             </v-btn>
             <v-spacer></v-spacer>
             <v-btn color="orange-darken-1" variant="text" @click="hideDialog">
@@ -164,7 +191,7 @@
 
 <script setup>
 import {useStore} from "vuex";
-import {computed, ref, watch} from "vue";
+import {computed, ref} from "vue";
 import TechWorkpieceCard from "@/components/technology/TechWorkpieceCard.vue";
 import SetupCreateCard from "@/components/technology/SetupCreateCard.vue";
 import api from "@/api/instance";
@@ -179,53 +206,24 @@ const toast = useToast();
 const form = ref(null);
 const valid = ref(false);
 const workpieceCardVisible = ref(false);
-const {formatObjectData} = materialDataFormatting();
+const {formatMaterialData, formatWorkpieceData} = materialDataFormatting();
 
 const isDialogVisible = computed(() => store.getters.isTechnologyDialogVisible);
 const item = computed(() => store.getters.getItem);
 const materials = computed(() => store.getters.getMaterials);
-const setups = computed(() => item.value.technology.setups.slice().sort((a, b) => a.setupNumber - b.setupNumber))
+const sortedSetups = computed(() => {
+  return item.value.technology.setups.slice().sort((a, b) => a.setupNumber - b.setupNumber);
+});
 
-const getUniqueItems = (key) => {
-  if (!item.value.technology.setups) {
-    return [];
-  }
-  const combined = item.value.technology.setups.flatMap(setup => setup[key]);
-  return combined.filter((item, index, self) =>
-    index === self.findIndex(t => t.id === item.id)
-  );
-};
-
-const techSpecials = computed(() => getUniqueItems('specialTools'));
-const techMeasurers = computed(() => getUniqueItems('measureTools'));
-const techToolings = computed(() => getUniqueItems('toolings'));
 
 const compactInfo = ((data) => {
-  if (data.operation.operationType === 'FROM_OPERATION_WITH_CALC'
-    || data.operation?.operationType === 'FROM_OPERATION') {
+  if (data.operation?.operationTimeManagement === 'COMPUTED'
+    || data.operation?.operationTimeManagement === 'PROCESS_TIME_ONLY') {
     return `Обработка: ${data.processTime}`
-  } else if (data.operation.operationType === 'FROM_PROCESS_UNIT') {
+  } else if (data.operation?.operationTimeManagement === 'FULL') {
     return `Обработка: ${data.processTime} Наладка: ${data.setupTime} Межоперационка: ${data.interoperativeTime}`
   } else {
     return '';
-  }
-});
-
-const newSetup = ref({
-  isVisible: false,
-  technology: item.value.technology,
-  setupTime: "00:00",
-  processTime: "00:00",
-  interoperativeTime: "00:00",
-  measureTools: [],
-  specialTools: [],
-  toolings: [],
-  additionalTools: [],
-});
-
-watch(item, (newValue) => {
-  if (newValue && newValue.technology) {
-    newSetup.value.technology = newValue.technology;
   }
 });
 
@@ -242,19 +240,49 @@ const calculateSetupNumber = computed(() => {
   return -1;
 });
 
+const createNewSetup = () => ({
+  isVisible: false,
+  setupTime: "00:00",
+  processTime: "00:00",
+  interoperativeTime: "00:00",
+  measureTools: [],
+  specialToolItems: [],
+  cutterToolItems: [],
+  toolings: [],
+  additionalTools: [],
+  setupNumber: calculateSetupNumber,
+  operation: {
+    operationName: ''
+  }
+});
+
+const newSetup = ref(createNewSetup());
+
 const save = async () => {
   await store.dispatch("saveTechnology", item.value.technology);
   await store.dispatch("fetchItem", item.value.id);
 };
 
-const hideSetup = (setup) => {
-  store.dispatch("fetchItem", item.value.id);
-  setup.isVisible = false;
+const pushSetup = ({...setup}) => {
+  hideSetup(setup);
+  item.value.technology.setups.push(setup);
+  item.value.technology.setups = item.value.technology.setups.slice().sort((a, b) => a.setupNumber - b.setupNumber);
 };
 
-const deleteSetup = async (setup) => {
-  await store.dispatch("deleteSetup", setup);
-  await store.dispatch("fetchItem", item.value.id);
+const replaceSetup = (setup, index) => {
+  hideSetup(setup);
+  item.value.technology.setups.splice(index, 1);
+  item.value.technology.setups.push(setup);
+  item.value.technology.setups = item.value.technology.setups.slice().sort((a, b) => a.setupNumber - b.setupNumber);
+};
+
+const hideSetup = (setup) => {
+  setup.isVisible = false;
+  newSetup.value = createNewSetup();
+};
+
+const deleteSetup = async (index) => {
+  item.value.technology.setups.splice(index, 1);
 };
 
 const hideDialog = () => {

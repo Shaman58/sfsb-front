@@ -136,6 +136,7 @@
         </v-container>
       </v-card-text>
       <v-card-actions>
+        <v-spacer></v-spacer>
         <v-btn color="orange-darken-1" variant="text" @click="hide">
           Закрыть
         </v-btn>

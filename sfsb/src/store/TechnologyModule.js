@@ -39,16 +39,6 @@ export default {
           console.error(error);
         });
     },
-    fetchTechnologyById({dispatch}, id) {
-      return api.get(`/technology/${id}`)
-        .then(response => {
-          dispatch('fetchSetupsByTechnologyId', response.data);
-        })
-        .catch(error => {
-          console.log('Технология не найдена');
-          console.error(error);
-        });
-    },
     async saveTechnology({dispatch}, technology) {
       try {
         const url = `/technology/${technology.id}`;

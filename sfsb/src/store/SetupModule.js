@@ -22,30 +22,6 @@ export default {
     getSetups: (state) => state.setups.slice().sort((a, b) => a.setupNumber - b.setupNumber)
   },
   actions: {
-    fetchSetupsByTechnologyId({commit}, technology) {
-      return api.get(`/setup/technology/${technology.id}`)
-        .then(response => {
-          const updatedTechnology = {...technology, setups: response.data};
-          commit("saveTechnology", updatedTechnology);
-          commit("setTechnology", updatedTechnology);
-        })
-        .catch(error => {
-          console.log('Установки не найдены');
-          console.error(error);
-        });
-    },
-    fetchSetupsByItemId({commit}, item) {
-      return api.get(`/setup/technology/${item.technology.id}`)
-        .then(response => {
-          const updatedItem = {...item, technology: {...item.technology, setups: response.data}};
-          commit("saveItem", updatedItem);
-          commit("setItem", updatedItem);
-        })
-        .catch(error => {
-          console.log('Установки не найдены');
-          console.error(error);
-        });
-    },
     async saveSetup({dispatch, commit}, setup) {
       try {
         const url = setup.id

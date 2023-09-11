@@ -1,6 +1,7 @@
 import axios from "axios";
 
 const instanceOptions = {
+  // baseURL: 'http://localhost:9001/api',
   baseURL: 'http://45.12.237.10:9001/api',
   withCredentials: false,
   headers: {

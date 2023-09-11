@@ -14,7 +14,7 @@ export default function useGeometryFormatting() {
     {title: 'Другое', label: 'OTHER'},
   ]);
 
-  const formatObjectData = (data) => {
+  const formatMaterialData = (data) => {
     const {geometry, materialName, gost} = data;
 
     switch (geometry) {
@@ -45,5 +45,35 @@ export default function useGeometryFormatting() {
     return '';
   };
 
-  return {geometries, formatObjectData};
+  const formatWorkpieceData = (data) => {
+    const {geom1, geom2, geom3, material} = data;
+    switch (material.geometry) {
+      case 'CYLINDER':
+        return `${formatMaterialData(material)} ф${geom1}х${geom2}`;
+      case 'BLANK':
+        return `${formatMaterialData(material)} ${geom1}х${geom2}х${geom3}`;
+      case 'HEXAGON':
+        return `${formatMaterialData(material)} ф${geom1}х${geom2}`;
+      case 'ROD':
+        return `${formatMaterialData(material)} ф${geom1}х${geom2}`;
+      case 'TUBE':
+        return `${formatMaterialData(material)} ф${geom1}ф${geom2}х${geom3}`;
+      case 'PROFILE':
+        return `${formatMaterialData(material)} ${geom1}`;
+      case 'LIST':
+        return `${formatMaterialData(material)} ${geom1}х${geom2}х${geom3}`;
+      case 'SQUARE':
+        return `${formatMaterialData(material)} ф${geom1}х${geom2}`;
+      case 'TAPE':
+        return `${formatMaterialData(material)} ф${geom1}х${geom2}`;
+      case 'OTHER':
+        return `${formatMaterialData(material)} ф${geom1}х${geom2}`;
+      default:
+        break;
+    }
+
+    return '';
+  };
+
+  return {geometries, formatMaterialData, formatWorkpieceData};
 }

@@ -1,148 +1,172 @@
 <template>
   <v-card>
-    <v-form ref="form" v-model="valid" @submit.prevent="save()">
+    <v-form ref="form" v-model="valid" @submit.prevent="save(setup)">
       <v-card-title>
         <span class="text-h5">Установка:</span>
       </v-card-title>
       <v-card-text>
         <v-container>
+          <v-row>
+            <v-col cols="5">
+              <v-switch v-model="setup.cooperate"
+                        :true-value="true"
+                        :false-value="false"
+                        :label="setup.cooperate ? 'Кооперация' : 'Не кооперация'">
+              </v-switch>
+            </v-col>
+            <v-col cols="5" v-if="setup?.operation?.operationTimeManagement==='COMPUTED'&&!setup.cooperate">
+              <v-switch v-model="setup.group"
+                        :true-value="true"
+                        :false-value="false"
+                        :label="setup.group ? 'Групповуха' : 'Одиночная'">
+              </v-switch>
+            </v-col>
 
-          <v-col cols="5" v-if="setup?.operation?.operationType==='FROM_PROCESS_UNIT'
-                   || setup?.operation?.operationType==='FROM_OPERATION_WITH_CALC'">
-            <v-switch
-              v-model="setup.group"
-              :true-value="true"
-              :false-value="false"
-              :label="setup.group ? 'Групповуха' : 'Одиночная'">
-            </v-switch>
-          </v-col>
-
+          </v-row>
           <v-row>
             <v-col cols="4">
-              <v-text-field
-                label="Номер установки"
-                v-model="setup.setupNumber"
-                :rules="[unitNumberValidationRule, rules.required]">
+              <v-text-field label="Номер установки"
+                            v-model="setup.setupNumber"
+                            :rules="[unitNumberValidationRule, rules.required]">
               </v-text-field>
             </v-col>
             <v-col cols="4">
-              <v-select
-                label="Название установки"
-                :items="operations"
-                item-title="operationName"
-                return-object
-                v-model="setup.operation"
-                :rules="[rules.required]">
+              <v-select label="Название установки"
+                        :items="operations"
+                        item-title="operationName"
+                        return-object
+                        v-model="setup.operation"
+                        :rules="[rules.required]">
               </v-select>
             </v-col>
 
             <v-col cols="4"
-                   v-if="setup?.operation?.operationType==='FROM_PROCESS_UNIT'
-                   || setup?.operation?.operationType==='FROM_OPERATION'
-                   ||setup?.operation?.operationType==='FROM_OPERATION_WITH_CALC'">
-              <v-text-field
-                label="Время цикла(чч:мм)"
-                v-model="setup.processTime"
-                type="time"
-                :rules="[rules.durationNotZeroValidation]"
+                   v-if="setup?.operation?.operationTimeManagement==='FULL'&&!setup.cooperate
+                   || setup?.operation?.operationTimeManagement==='COMPUTED'&&!setup.cooperate
+                   || setup?.operation?.operationTimeManagement==='PROCESS_TIME_ONLY'">
+              <v-text-field label="Время цикла(чч:мм)"
+                            v-model="setup.processTime"
+                            type="time"
+                            :rules="[rules.durationNotZeroValidation]"
               ></v-text-field>
             </v-col>
-            <v-col cols="4" v-if="setup?.operation?.operationType==='FROM_PROCESS_UNIT'">
-              <v-text-field
-                label="Межоперационное время(чч:мм)"
-                v-model="setup.interoperativeTime"
-                type="time"
-                :rules="[rules.durationNotZeroValidation]"
+            <v-col cols="4" v-if="setup?.operation?.operationTimeManagement==='FULL'&&!setup.cooperate">
+              <v-text-field label="Межоперационное время(чч:мм)"
+                            v-model="setup.interoperativeTime"
+                            type="time"
+                            :rules="[rules.durationNotZeroValidation]"
               ></v-text-field>
             </v-col>
-            <v-col cols="4" v-if="setup?.operation?.operationType==='FROM_PROCESS_UNIT'">
-              <v-text-field
-                label="Наладочное время(чч:мм)"
-                v-model="setup.setupTime"
-                type="time"
-                :rules="[rules.durationNotZeroValidation]"
+            <v-col cols="4" v-if="setup?.operation?.operationTimeManagement==='FULL'&&!setup.cooperate">
+              <v-text-field label="Наладочное время(чч:мм)"
+                            v-model="setup.setupTime"
+                            type="time"
+                            :rules="[rules.durationNotZeroValidation]"
               ></v-text-field>
             </v-col>
 
-            <v-col cols="4" v-if="setup?.operation?.operationType==='FROM_OPERATION_WITH_CALC'">
-              <v-text-field
-                label="Количество за раз"
-                v-model="setup.perTime"
-                type="number"
-                :rules="[rules.numberGreaterThanZero]"
+            <v-col cols="4" v-if="setup?.operation?.operationTimeManagement==='COMPUTED' && setup.group && !setup.cooperate">
+              <v-text-field label="Количество за раз"
+                            v-model="setup.perTime"
+                            type="number"
+                            :rules="[rules.numberGreaterThanZero]"
               ></v-text-field>
             </v-col>
 
-            <v-col cols="4" v-if="setup?.operation?.operationType==='FROM_PROCESS_UNIT'">
-              <v-select
-                :items="units"
-                :item-title="'unitName'"
-                return-object
-                v-model="setup.productionUnit"
-                label="Оборудование"
-                :rules="[rules.required]">
+            <v-col cols="4"
+                   v-if="setup?.operation?.operationTimeManagement==='FULL'&&!setup.cooperate
+                   || setup?.operation?.operationTimeManagement==='PROCESS_TIME_ONLY'">
+              <v-select v-if="!!toolings"
+                        :items="toolings"
+                        item-title='toolName'
+                        return-object
+                        v-model="setup.toolings"
+                        label="Выбрать оснастку"
+                        multiple>
               </v-select>
             </v-col>
 
             <v-col cols="4"
-                   v-if="setup?.operation?.operationType==='FROM_PROCESS_UNIT'
-                   || setup?.operation?.operationType==='FROM_OPERATION'">
-              <v-btn v-if="!specialVisible"
-                     rounded="lg"
-                     tonal
-                     class="ml-2" color="orange-darken-1" variant="text"
-                     @click="specialVisible=true">
-                Специнструмент
-              </v-btn>
-              <tool-create
-                v-else
-                title="Специнструмент"
-                @hide="specialVisible=false"
-                @save="addToSpecials">
-              </tool-create>
-            </v-col>
-
-            <v-col cols="4"
-                   v-if="setup?.operation?.operationType==='FROM_PROCESS_UNIT'
-                   || setup?.operation?.operationType==='FROM_OPERATION'">
-              <v-btn v-if="!toolingVisible"
-                     rounded="lg"
-                     tonal
-                     class="ml-2" color="orange-darken-1" variant="text"
-                     @click="toolingVisible=true">
-                Оснастка
-              </v-btn>
-              <tool-create
-                v-else
-                title="Оснастка"
-                @hide="toolingVisible=false"
-                @save="addToToolings">
-              </tool-create>
-            </v-col>
-
-            <v-col cols="4"
-                   v-if="setup?.operation?.operationType==='FROM_PROCESS_UNIT'
-                   || setup?.operation?.operationType==='FROM_OPERATION'">
-              <v-btn v-if="!measureVisible"
-                     rounded="lg"
-                     tonal
-                     class="ml-2" color="orange-darken-1" variant="text"
+                   v-if="setup?.operation?.operationTimeManagement==='FULL'&&!setup.cooperate
+                   || setup?.operation?.operationTimeManagement==='PROCESS_TIME_ONLY'">
+              <v-btn size="small" variant="text"
+                     v-if="setup.measureTools?.length===0"
                      @click="measureVisible=true">
                 Меритель
               </v-btn>
-              <tool-create
-                v-else
-                title="Меритель"
-                @hide="measureVisible=false"
-                @save="addToMeasures">
-              </tool-create>
+              <v-list v-else @click="measureVisible=true">
+                <v-list-item v-for="tool in setup.measureTools"
+                             :title="tool.toolName"
+                             :subtitle="tool.description"/>
+              </v-list>
+              <measure-create-list title="Меритель"
+                                   :visible="measureVisible"
+                                   :tools="setup.measureTools"
+                                   @hide="measureVisible=false"/>
+            </v-col>
+
+            <v-col cols="4"
+                   v-if="setup?.operation?.operationTimeManagement==='FULL'&&!setup.cooperate
+                   || setup?.operation?.operationTimeManagement==='PROCESS_TIME_ONLY'">
+              <v-btn size="small" variant="text"
+                     v-if="setup.cutterToolItems?.length===0"
+                     @click="cutterVisible=true">
+                Инструмент
+              </v-btn>
+              <v-list v-else @click="cutterVisible=true">
+                <v-list-item v-for="tool in setup.cutterToolItems"
+                             :title="tool.tool.toolName"
+                             :subtitle="tool.amount+'шт.'"/>
+              </v-list>
+              <tool-create title="Инструмент"
+                           :visible="cutterVisible"
+                           :toolItems="setup.cutterToolItems"
+                           :tools="cutters"
+                           @hide="cutterVisible=false"/>
+            </v-col>
+
+            <v-col cols="4"
+                   v-if="setup?.operation?.operationTimeManagement==='FULL'&&!setup.cooperate
+                   || setup?.operation?.operationTimeManagement==='PROCESS_TIME_ONLY'">
+              <v-btn size="small" variant="text"
+                     v-if="setup.specialToolItems?.length===0"
+                     @click="specialVisible=true">
+                Специнструмент
+              </v-btn>
+              <v-list v-else @click="specialVisible=true">
+                <v-list-item v-for="tool in setup.specialToolItems"
+                             :title="tool.tool.toolName"
+                             :subtitle="tool.amount+'шт.'"/>
+              </v-list>
+              <tool-create title="Специнструмент"
+                           :visible="specialVisible"
+                           :toolItems="setup.specialToolItems"
+                           :tools="specials"
+                           @hide="specialVisible=false"/>
+            </v-col>
+
+            <v-col cols="6"
+                   v-if="setup?.operation?.operationTimeManagement==='FULL'&&!setup.cooperate
+                   || setup?.operation?.operationTimeManagement==='PROCESS_TIME_ONLY'">
+              <v-btn size="small" variant="text"
+                     v-if="setup.additionalTools?.length===0"
+                     @click="additionalVisible=true">
+                Приспособление
+              </v-btn>
+              <v-list v-else @click="additionalVisible=true">
+                <v-list-item v-for="tool in setup.additionalTools"
+                             :title="tool.toolName + ' ' + formatWorkpieceData(tool.workpiece)"/>
+              </v-list>
+              <additional-create :visible="additionalVisible"
+                                 :additionals="setup.additionalTools"
+                                 @hide="additionalVisible=false"/>
             </v-col>
 
           </v-row>
         </v-container>
       </v-card-text>
       <v-card-actions>
-        <v-btn color="orange-darken-1" variant="text" @click="deleteSetup" v-if="!!setup.id">
+        <v-btn color="orange-darken-1" variant="text" @click="deleteSetup" v-if="isExist">
           Удалить
         </v-btn>
         <v-btn color="orange-darken-1" variant="text" @click="hideSetup">
@@ -150,7 +174,7 @@
         </v-btn>
         <v-spacer></v-spacer>
         <v-btn color="orange-darken-1" variant="text" type="submit" :disabled="!valid">
-          Сохранить
+          {{ isExist ? 'Изменить' : 'Добавить' }}
         </v-btn>
       </v-card-actions>
     </v-form>
@@ -160,55 +184,64 @@
 <script setup>
 import {ref, reactive, computed} from 'vue';
 import {useStore} from 'vuex';
-import ToolCreate from "@/components/technology/ToolCreate.vue";
 import {useValidationRules} from "@/mixins/FieldValidationRules";
+import ToolCreate from "@/components/technology/ToolCreate.vue";
+import AdditionalCreate from "@/components/technology/AdditionalCreate.vue";
+import materialDataFormatting from "@/mixins/MaterialDataFormatting";
+import MeasureCreateList from "@/components/technology/MeasureCreateList.vue";
 
 const props = defineProps({
   setup: {
     type: Object,
     default: {
       id: 0,
+      setupNumber: Number,
       perTime: 0,
       measureTools: [],
-      specialTools: [],
+      specialToolItems: [],
+      cutterToolItems: [],
       toolings: [],
       additionalTools: [],
-      operation: {operationType: ''}
+      cooperate: false,
+      operation: {
+        operationName: '',
+        paymentPerHour: {},
+        operationTimeManagement: ''
+      }
     },
+    required: true,
+  },
+  quantityOfPartsFromWorkpiece: {
+    type: Number,
+    required: false,
+    default: 1
   }
 });
+
 const emit = defineEmits();
 const setup = reactive(props.setup);
 const store = useStore();
 const {rules} = useValidationRules();
 const valid = ref(false);
 const form = ref(null);
+const cutterVisible = ref(false);
 const measureVisible = ref(false);
-const toolingVisible = ref(false);
 const specialVisible = ref(false);
+const additionalVisible = ref(false);
+const {formatWorkpieceData} = materialDataFormatting();
 
-const units = computed(() => store.getters.getUnits);
-const cutters = computed(() => store.getters.getCutters);
+const isExist = (!!setup.operation?.operationName);
 const measurers = computed(() => store.getters.getMeasurers);
 const specials = computed(() => store.getters.getSpecials);
+const cutters = computed(() => store.getters.getCutters);
 const toolings = computed(() => store.getters.getToolings);
-const setupNumbers = computed(() => store.getters.getSetups.filter(item => item.id !== setup.id).map(obj => obj.setupNumber));
+
+const setupNumbers = computed(() => store.getters.getItem.technology.setups.filter(item => item.setupNumber !== setup.setupNumber).map(obj => obj.setupNumber));
 const operations = computed(() => store.getters.getOperations);
 const unitNumberValidationRule = rules.unitNumberValidation(setupNumbers);
 
-const save = async () => {
-  if (setup?.operation?.operationType === 'FROM_OPERATION_WITH_CALC'
-    || setup?.operation?.operationType === 'FROM_OPERATION') {
-    await store.dispatch("saveSetup", {
-      ...setup,
-      interoperativeTime: '00:00',
-      setupTime: '00:00',
-      productionUnit: null
-    });
-  } else {
-    await store.dispatch("saveSetup", setup);
-  }
-  hideSetup();
+const save = (setup) => {
+  emit("save", setup);
 };
 
 const deleteSetup = () => {
@@ -218,17 +251,5 @@ const deleteSetup = () => {
 const hideSetup = () => {
   emit("hideSetup");
 }
-
-const addToMeasures = (tool) => {
-  setup.measureTools.push(tool);
-};
-
-const addToToolings = (tool) => {
-  setup.toolings.push(tool);
-};
-
-const addToSpecials = (tool) => {
-  setup.specialTools.push(tool);
-};
 
 </script>
