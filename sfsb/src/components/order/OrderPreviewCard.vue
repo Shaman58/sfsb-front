@@ -16,33 +16,23 @@
     </v-list>
   </v-card>
 </template>
-<script>
+<script setup>
 import {computed, reactive} from "vue";
 import {useStore} from "vuex";
 
-export default {
-  name: "order-preview-card",
-  setup() {
-    const store = useStore();
+const store = useStore();
 
-    const orders = computed(() => store.getters.getOrders);
+const orders = computed(() => store.getters.getOrders);
 
-    const lastOrders = computed(() => {
-      return [...orders.value].sort((a, b) => {
-        const aDate = a.updated || a.created;
-        const bDate = b.updated || b.created;
-        return new Date(bDate) - new Date(aDate);
-      }).slice(0, 3);
-    });
+const lastOrders = computed(() => {
+  return [...orders.value].sort((a, b) => {
+    const aDate = a.updated || a.created;
+    const bDate = b.updated || b.created;
+    return new Date(bDate) - new Date(aDate);
+  }).slice(0, 3);
+});
 
-    const showDialog = () => {
-      store.commit("setOrdersListDialog", true);
-    };
-
-    return {
-      lastOrders,
-      showDialog,
-    };
-  },
+const showDialog = () => {
+  store.commit("setOrdersListDialog", true);
 };
 </script>

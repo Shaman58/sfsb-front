@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-card v-if="isComputedVisible">
+    <v-card v-if="isComputedVisible" persistent>
       <v-card-title>
         <span class="text-h5">Технологии на просчет:</span>
       </v-card-title>
@@ -52,4 +52,5 @@ const showTechnologyCreateDialog = (item) => {
   store.commit('setItem', item);
   store.commit('setTechnologyDialogVisible', true);
 };
+
 </script>

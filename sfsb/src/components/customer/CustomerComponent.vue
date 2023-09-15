@@ -6,24 +6,19 @@
   <employee-create-dialog/>
 </template>
 
-<script>
+<script setup>
 import CustomerPreviewCard from "@/components/customer/CustomerPreviewCard.vue";
 import CustomerListDialog from "@/components/customer/CustomerListDialog.vue";
 import CompanyCreateDialog from "@/components/company/CompanyCreateDialog.vue";
 import ContactListDialog from "@/components/contact/ContactListDialog.vue";
 import EmployeeCreateDialog from "@/components/employee/EmployeeCreateDialog.vue";
+import {onMounted} from "vue";
+import {useStore} from "vuex";
 
-export default {
-  name: "customer-component",
-  components: {
-    EmployeeCreateDialog,
-    ContactListDialog,
-    CompanyCreateDialog,
-    CustomerListDialog,
-    CustomerPreviewCard
-  },
-  mounted() {
-    this.$store.dispatch("fetchCustomersData");
-  }
-}
+const store = useStore();
+
+onMounted(() => {
+  store.dispatch("fetchCustomersData");
+});
+
 </script>

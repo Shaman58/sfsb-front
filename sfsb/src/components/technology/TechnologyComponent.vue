@@ -16,7 +16,6 @@ const store = useStore();
 
 onMounted(() => {
   store.dispatch("fetchMaterials");
-  store.dispatch("fetchMeasurers");
   store.dispatch("fetchToolings");
   store.dispatch("fetchSpecials");
   store.dispatch("fetchCutters");

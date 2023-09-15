@@ -30,40 +30,29 @@
     </v-list-item>
   </v-list>
 </template>
-<script>
+<script setup>
 import {computed} from "vue";
 import {useStore} from "vuex";
 
-export default {
-  name: "employees-list-dialog",
-  setup() {
-    const store = useStore();
+const store = useStore();
 
-    const selectDepartment = computed(() => store.getters.getSelectDepartment);
+const selectDepartment = computed(() => store.getters.getSelectDepartment);
 
-    const createEmployeeActive = computed(() => Object.keys(store.getters.getSelectDepartment).length <= 0);
+const createEmployeeActive = computed(() => Object.keys(store.getters.getSelectDepartment).length <= 0);
 
-    const selectEmployee = (employee) => {
-      store.commit("setEmployee", employee);
-      store.commit("setEmployeeDialog", true);
-    };
-
-    const deleteEmployeeFromDepartment = (employee) => {
-      const department = {...selectDepartment.value};
-      department.employees = department.employees.filter((emp) => emp.id !== employee.id);
-      store.commit("setEmployees", department.employees);
-      store.commit("setSelectDepartment", department);
-      store.commit("changeDepartment", department);
-      employee.department = null;
-      store.dispatch("saveEmployee", employee);
-    };
-
-    return {
-      selectDepartment,
-      createEmployeeActive,
-      selectEmployee,
-      deleteEmployeeFromDepartment,
-    };
-  },
+const selectEmployee = (employee) => {
+  store.commit("setEmployee", employee);
+  store.commit("setEmployeeDialog", true);
 };
+
+const deleteEmployeeFromDepartment = (employee) => {
+  const department = {...selectDepartment.value};
+  department.employees = department.employees.filter((emp) => emp.id !== employee.id);
+  store.commit("setEmployees", department.employees);
+  store.commit("setSelectDepartment", department);
+  store.commit("changeDepartment", department);
+  employee.department = null;
+  store.dispatch("saveEmployee", employee);
+};
+
 </script>

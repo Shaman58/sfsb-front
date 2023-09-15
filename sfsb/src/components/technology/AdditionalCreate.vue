@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="props.visible">
+  <v-dialog v-model="props.visible" persistent>
     <v-card>
       <v-form ref="form" v-model="valid" @submit.prevent="save(toolItem)">
         <v-card-title>
@@ -12,7 +12,8 @@
               <v-list-item
                 v-for="(tool, index) in additionals"
                 :key="index"
-                :title="tool.toolName + ' ' + formatWorkpieceData(tool.workpiece)">
+                :title="tool.toolName + ' ' + formatWorkpieceData(tool.workpiece)"
+                :subtitle="tool.amount + 'шт.'">
                 <template v-slot:append>
                   <v-btn
                     color="orange-lighten-1"
@@ -51,7 +52,14 @@
                 <v-text-field
                   label="Название приспособы"
                   v-model="toolItem.toolName"
-                  :rules="[rules.required]"
+                  :rules="[rules.required, rules.nameValidation()]"
+                />
+              </v-col>
+              <v-col cols="3" v-if="!workpieceCardVisible">
+                <v-text-field
+                  label="Количество"
+                  v-model="toolItem.amount"
+                  :rules="[rules.required, rules.minValidation]"
                 />
               </v-col>
             </v-row>
@@ -78,6 +86,7 @@ import {useValidationRules} from "@/mixins/FieldValidationRules";
 import TechWorkpieceCard from "@/components/technology/TechWorkpieceCard.vue";
 import store from "@/store";
 import materialDataFormatting from "@/mixins/MaterialDataFormatting";
+import {ru} from "vuetify/locale";
 
 // ---- ПРОПСЫ ----
 const props = defineProps({
@@ -90,7 +99,8 @@ const props = defineProps({
     required: true,
     default: [{
       workpiece: Object,
-      toolName: String
+      toolName: String,
+      amount: Number
     }]
   },
 });
@@ -102,7 +112,6 @@ const valid = ref(false);
 const toolItem = ref({});
 const {formatWorkpieceData} = materialDataFormatting();
 const workpieceCardVisible = ref(false);
-
 const additionals = reactive(props.additionals);
 const materials = computed(() => store.getters.getMaterials);
 

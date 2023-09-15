@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="isListDialogVisible">
+  <v-dialog v-model="isListDialogVisible" persistent>
     <v-card title="Контакты:">
       <v-list>
         <v-list-item
@@ -37,36 +37,24 @@
   </v-dialog>
 </template>
 
-<script>
+<script setup>
 import {useStore} from "vuex";
 import {computed} from "vue";
 
-export default {
-  name: "contact-list-dialog",
-  setup() {
-    const store = useStore();
+const store = useStore();
 
-    const isListDialogVisible = computed(() => store.getters.isListDialogVisible);
-    const customer = computed(() => store.getters.getSelectedCompany);
+const isListDialogVisible = computed(() => store.getters.isListDialogVisible);
+const customer = computed(() => store.getters.getSelectedCompany);
 
-    const hideDialog = (() => store.commit("setContactListDialogVisible", false));
+const hideDialog = (() => store.commit("setContactListDialogVisible", false));
 
-    const showCreateDialog = ((contact) => {
-      store.commit("setEmployee", contact);
-      store.commit("setEmployeeDialog", true);
-    });
+const showCreateDialog = ((contact) => {
+  store.commit("setEmployee", contact);
+  store.commit("setEmployeeDialog", true);
+});
 
-    const deleteContact = (contact) => {
-      store.dispatch("deleteContact", contact);
-    };
+const deleteContact = (contact) => {
+  store.dispatch("deleteContact", contact);
+};
 
-    return {
-      isListDialogVisible,
-      customer,
-      hideDialog,
-      showCreateDialog,
-      deleteContact
-    };
-  }
-}
 </script>

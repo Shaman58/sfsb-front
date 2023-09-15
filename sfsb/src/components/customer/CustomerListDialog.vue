@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="isCustomerDialogVisible" width="800">
+  <v-dialog v-model="isCustomerDialogVisible" width="800" persistent>
     <v-card title="Контрагенты:">
       <v-list>
         <v-list-item
@@ -37,38 +37,25 @@
   </v-dialog>
 </template>
 
-<script>
+<script setup>
 import {computed} from "vue";
 import {useStore} from "vuex";
 
-export default {
-  name: "customer-list-dialog",
-  setup() {
-    const store = useStore();
+const store = useStore();
 
-    const customers = computed(() => store.getters.getCustomers);
-    const isCustomerDialogVisible = computed(() => store.getters.isCustomerDialogVisible);
+const customers = computed(() => store.getters.getCustomers);
+const isCustomerDialogVisible = computed(() => store.getters.isCustomerDialogVisible);
 
-    const hideDialog = () => {
-      store.commit("setCustomerDialog", false);
-    };
+const hideDialog = () => {
+  store.commit("setCustomerDialog", false);
+};
 
-    const showCompanyDialog = (company) => {
-      store.commit("setSelectedCompany", {...company})
-      store.commit("setCompanyDialog", true);
-    };
+const showCompanyDialog = (company) => {
+  store.commit("setSelectedCompany", {...company})
+  store.commit("setCompanyDialog", true);
+};
 
-    const deleteCustomer = (customer) => {
-      store.dispatch("deleteCustomer", customer);
-    };
-
-    return {
-      customers,
-      isCustomerDialogVisible,
-      hideDialog,
-      showCompanyDialog,
-      deleteCustomer
-    };
-  },
+const deleteCustomer = (customer) => {
+  store.dispatch("deleteCustomer", customer);
 };
 </script>

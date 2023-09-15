@@ -6,16 +6,17 @@
   </v-container>
 </template>
 
-<script>
+<script setup>
 import DepartmentPreviewCard from "@/components/department/DepartmentPreviewCard.vue";
 import DepartmentListDialog from "@/components/department/DepartmentListDialog.vue";
 import DepartmentCreateDialog from "@/components/department/DepartmentCreateDialog.vue";
+import {onMounted} from "vue";
+import {useStore} from "vuex";
 
-export default {
-  name: "department-component",
-  components: {DepartmentCreateDialog, DepartmentListDialog, DepartmentPreviewCard},
-  mounted() {
-    this.$store.dispatch('fetchAllDepartmentData')
-  }
-}
+const store = useStore();
+
+onMounted(() => {
+  store.dispatch('fetchAllDepartmentData')
+});
+
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="props.visible">
+  <v-dialog v-model="props.visible" persistent>
     <v-card>
       <v-form ref="form" v-model="valid" @submit.prevent="save(toolItem)">
         <v-card-title>
@@ -12,7 +12,8 @@
               <v-list-item
                 v-for="(tool, index) in tools"
                 :key="index"
-                :title="tool.toolName +'   '+ tool.description">
+                :title="tool.tool.toolName +'   '+ tool.tool.description"
+                :subtitle="tool.amount+'шт.'">
                 <template v-slot:append>
                   <v-btn
                     color="orange-lighten-1"
@@ -30,7 +31,7 @@
               <v-col cols="4">
                 <v-text-field
                   label="Название:"
-                  v-model="toolItem.toolName"
+                  v-model="toolItem.tool.toolName"
                   :rules="[rules.required, rules.nameValidation]"
                   counter>
                 </v-text-field>
@@ -38,8 +39,16 @@
               <v-col cols="4">
                 <v-text-field
                   label="Описание:"
-                  v-model="toolItem.description"
+                  v-model="toolItem.tool.description"
                   :rules="[rules.required, rules.nameValidation]"
+                  counter>
+                </v-text-field>
+              </v-col>
+              <v-col cols="4">
+                <v-text-field
+                  label="Количество:"
+                  v-model="toolItem.amount"
+                  :rules="[rules.required, rules.minValidation]"
                   counter>
                 </v-text-field>
               </v-col>
@@ -81,7 +90,7 @@ const {rules} = useValidationRules();
 const {emit} = getCurrentInstance();
 const form = ref(null);
 const valid = ref(false);
-const toolItem = ref({});
+const toolItem = ref({tool: {}});
 const tools = ref(props.tools);
 
 const hide = () => {
@@ -90,7 +99,7 @@ const hide = () => {
 
 const save = (savedTool) => {
   tools.value.push({...savedTool});
-  toolItem.value = {};
+  toolItem.value = {tool: {}};
 };
 
 const remove = (index) => {

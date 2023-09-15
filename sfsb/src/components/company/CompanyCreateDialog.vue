@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="isCompanyDialogVisible" width="1024">
+  <v-dialog v-model="isCompanyDialogVisible" width="1024" persistent>
     <v-form ref="form" v-model="valid" v-on:submit.prevent="save()">
       <v-card class="mx-auto my-12">
         <v-card-title>

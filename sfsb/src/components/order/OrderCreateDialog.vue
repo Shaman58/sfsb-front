@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="isDialogVisible" width="768">
+  <v-dialog v-model="isDialogVisible" width="768" persistent>
     <v-form ref="form" v-model="valid" @submit.prevent="save(order)"
             style="height: 800px; overflow-y: auto;">
       <v-card title="Заявка">
@@ -182,132 +182,102 @@
     </v-form>
   </v-dialog>
 </template>
-<script>
+<script setup>
 import {computed, ref} from "vue";
 import {useStore} from "vuex";
 import api from "@/api/instance";
 import {useValidationRules} from "@/mixins/FieldValidationRules";
 import mammoth from 'mammoth';
 
-export default {
-  name: "order-create-dialog",
 
-  setup() {
-    const store = useStore();
-    const {rules} = useValidationRules();
-    const isDialogVisible = computed(() => store.getters.isOrderCreateDialogVisible);
-    const order = computed(() => store.getters.getOrder);
-    const customers = computed(() => store.getters.getCustomers);
-    const employees = computed(() => store.getters.getEmployees);
-    const item = computed(() => store.getters.getItem);
-    const technologies = computed(() => store.getters.getTechnologies);
-    const kpAvailable = computed(() => {
-      if (order.value.items.length === 0) {
-        return true;
-      }
-      const index = order.value.items.findIndex(item => item.technology.computed === false);
-      return index !== -1;
+const store = useStore();
+const {rules} = useValidationRules();
+const isDialogVisible = computed(() => store.getters.isOrderCreateDialogVisible);
+const order = computed(() => store.getters.getOrder);
+const customers = computed(() => store.getters.getCustomers);
+const employees = computed(() => store.getters.getEmployees);
+const item = computed(() => store.getters.getItem);
+const technologies = computed(() => store.getters.getTechnologies);
+const kpAvailable = computed(() => {
+  if (order.value.items.length === 0) {
+    return true;
+  }
+  const index = order.value.items.findIndex(item => item.technology.computed === false);
+  return index !== -1;
+});
+
+const filteredTechnologies = computed(() => {
+  const searchQuery = !!item.value.technology.drawingNumber ? item.value.technology.drawingNumber.toLowerCase() : null;
+  return technologies.value.filter((tech) =>
+    tech.drawingNumber.toLowerCase().includes(searchQuery)
+  ).slice(0, 3);
+});
+
+const form = ref(null);
+const valid = ref(false);
+const formItem = ref(null);
+const validItem = ref(false);
+
+const hideDialog = () => {
+  store.commit("setOrderCreateDialog", false);
+};
+
+const save = () => {
+  if (form.value.validate()) {
+    store.dispatch("saveOrder", order.value);
+  }
+};
+
+const saveItem = () => {
+  store.dispatch("saveItem", {...item.value, order: order.value});
+}
+
+const selectItem = (item) => {
+  store.commit("setItem", item);
+}
+
+const deleteItem = (item) => {
+  store.dispatch("deleteItem", item);
+}
+
+const isFilteredVisible = computed(() => filteredTechnologies.value.length !== 0 && !!!item.value.technology.id);
+
+const getBackgroundColorClass = (item) => {
+  if (item.technology.computed) {
+    return 'computed';
+  } else {
+    return 'not-computed';
+  }
+};
+
+const getItemText = (item) => `${item.firstName} ${item.lastName} (${item.position})`;
+
+const previewCommerce = async () => {
+  try {
+    const response = await api.get("/doc/kp", {
+      params: {orderId: order.value.id},
+      responseType: 'arraybuffer'
     });
 
-    const filteredTechnologies = computed(() => {
-      const searchQuery = !!item.value.technology.drawingNumber ? item.value.technology.drawingNumber.toLowerCase() : null;
-      return technologies.value.filter((tech) =>
-        tech.drawingNumber.toLowerCase().includes(searchQuery)
-      ).slice(0, 3);
-    });
+    const arrayBuffer = response.data;
+    const result = await mammoth.convertToHtml({arrayBuffer: arrayBuffer});
+    const blob = new Blob([response.data], {type: response.headers['content-type']});
+    const objectURL = URL.createObjectURL(blob);
+    const filename = order.value.customer.companyName + "_" + order.value.applicationNumber + '.docx';
 
-    const form = ref(null);
-    const valid = ref(false);
-    const formItem = ref(null);
-    const validItem = ref(false);
-
-    const hideDialog = () => {
-      store.commit("setOrderCreateDialog", false);
-    };
-
-    const save = () => {
-      if (form.value.validate()) {
-        store.dispatch("saveOrder", order.value);
-      }
-    };
-
-    const saveItem = () => {
-      store.dispatch("saveItem", {...item.value, order: order.value});
-    }
-
-    const selectItem = (item) => {
-      store.commit("setItem", item);
-    }
-
-    const deleteItem = (item) => {
-      store.dispatch("deleteItem", item);
-    }
-
-    const isFilteredVisible = computed(() => filteredTechnologies.value.length !== 0 && !!!item.value.technology.id);
-
-    const getBackgroundColorClass = (item) => {
-      if (item.technology.computed) {
-        return 'computed';
-      } else {
-        return 'not-computed';
-      }
-    };
-
-    const getItemText = (item) => `${item.firstName} ${item.lastName} (${item.position})`;
-
-    const previewCommerce = async () => {
-      try {
-        const response = await api.get("/doc/kp", {
-          params: {orderId: order.value.id},
-          responseType: 'arraybuffer'
-        });
-
-        const arrayBuffer = response.data;
-        const result = await mammoth.convertToHtml({arrayBuffer: arrayBuffer});
-        const blob = new Blob([response.data], {type: response.headers['content-type']});
-        const objectURL = URL.createObjectURL(blob);
-        const filename = order.value.customer.companyName + "_" + order.value.applicationNumber + '.docx';
-
-        const downloadButtonHtml = `
+    const downloadButtonHtml = `
       <a href="${objectURL}" download="${filename}" style="display: block; margin: 20px;">
         Скачать
       </a>
     `;
 
-        const newWindow = window.open("", "_blank");
-        newWindow.document.write(downloadButtonHtml);
-        newWindow.document.write(result.value);
-        newWindow.document.close();
-      } catch (error) {
-        console.error("There was an error previewing the DOCX file:", error);
-      }
-    };
-
-    return {
-      isDialogVisible,
-      order,
-      valid,
-      rules,
-      form,
-      formItem,
-      validItem,
-      hideDialog,
-      save,
-      customers,
-      saveItem,
-      item,
-      employees,
-      selectItem,
-      deleteItem,
-      technologies,
-      filteredTechnologies,
-      isFilteredVisible,
-      getBackgroundColorClass,
-      kpAvailable,
-      previewCommerce,
-      getItemText
-    };
-  },
+    const newWindow = window.open("", "_blank");
+    newWindow.document.write(downloadButtonHtml);
+    newWindow.document.write(result.value);
+    newWindow.document.close();
+  } catch (error) {
+    console.error("There was an error previewing the DOCX file:", error);
+  }
 };
 
 </script>

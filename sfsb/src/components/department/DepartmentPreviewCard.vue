@@ -16,25 +16,16 @@
     </v-list>
   </v-card>
 </template>
-<script>
+<script setup>
 import {computed} from "vue";
 import {useStore} from "vuex";
 
-export default {
-  name: "department-preview-card",
-  setup() {
-    const store = useStore();
+const store = useStore();
 
-    const demoDepartments = computed(() => store.getters.getDemoDepartments);
+const demoDepartments = computed(() => store.getters.getDemoDepartments);
 
-    const showMainDialog = () => {
-      store.commit("setMainDialog", true);
-    };
-
-    return {
-      demoDepartments,
-      showMainDialog,
-    };
-  },
+const showMainDialog = () => {
+  store.commit("setMainDialog", true);
 };
+
 </script>

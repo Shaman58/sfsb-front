@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="isMaterialListVisible">
+  <v-dialog v-model="isMaterialListVisible" persistent>
     <v-card>
       <v-card-title>
         <v-row>
@@ -24,7 +24,7 @@
         <v-list-item
           v-for="item in filteredMaterials"
           :key="item.id"
-          :title="formatObjectData(item)"
+          :title="formatMaterialData(item)"
           @click="showNewMaterialDialog({...item})">
 
           <template v-slot:append>
@@ -66,57 +66,39 @@
   </v-dialog>
 </template>
 
-<script>
+<script setup>
 import {computed, ref} from "vue";
 import {useStore} from "vuex";
 import materialDataFormatting from '@/mixins/MaterialDataFormatting'
 
-export default {
-  name: "material-list-dialog",
-  setup() {
-    const store = useStore();
-    const {geometries, formatObjectData} = materialDataFormatting();
+const store = useStore();
+const {geometries, formatMaterialData} = materialDataFormatting();
 
-    const geometry = ref(null);
-    const materialFilter = ref(null);
+const geometry = ref(null);
+const materialFilter = ref(null);
 
-    const isMaterialListVisible = computed(() => store.getters.getMaterialListVisible);
+const isMaterialListVisible = computed(() => store.getters.getMaterialListVisible);
+const materials = computed(() => store.getters.getMaterials);
+const deleteMaterial = ((item) => {
+  store.dispatch("deleteMaterial", item);
+});
 
-    const materials = computed(() => store.getters.getMaterials);
+const hideMaterialList = (() => {
+  store.commit("setMaterialListVisible", false)
+});
 
-    const deleteMaterial = ((item) => {
-      store.dispatch("deleteMaterial", item);
-    });
+const showNewMaterialDialog = ((item) => {
+  store.commit("setMaterial", item);
+  store.commit("setMaterialDialogVisible", true);
+});
 
-    const hideMaterialList = (() => {
-      store.commit("setMaterialListVisible", false)
-    });
+const filteredMaterials = computed(() => {
+  return materials.value.filter((item) => {
+    return (
+      (!geometry.value || item.geometry === geometry.value) &&
+      (!materialFilter.value || item.materialName.toLowerCase().includes(materialFilter.value.toLowerCase()) || item.gost.toLowerCase().includes(materialFilter.value.toLowerCase()))
+    );
+  });
+});
 
-    const showNewMaterialDialog = ((item) => {
-      store.commit("setMaterial", item);
-      store.commit("setMaterialDialogVisible", true);
-    });
-
-    const filteredMaterials = computed(() => {
-      return materials.value.filter((item) => {
-        return (
-          (!geometry.value || item.geometry === geometry.value) &&
-          (!materialFilter.value || item.materialName.toLowerCase().includes(materialFilter.value.toLowerCase()) || item.gost.toLowerCase().includes(materialFilter.value.toLowerCase()))
-        );
-      });
-    });
-
-    return {
-      isMaterialListVisible,
-      filteredMaterials,
-      deleteMaterial,
-      hideMaterialList,
-      showNewMaterialDialog,
-      formatObjectData,
-      geometries,
-      materialFilter,
-      geometry,
-    }
-  }
-}
 </script>

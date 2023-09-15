@@ -59,9 +59,8 @@ export default {
           : '/special';
 
         const response = await (special.id ? api.put(url, special) : api.post(url, special));
-        commit("setSpecial", response.data)
+        commit("setSpecial", response.data);
         commit("saveSpecialToSpecials", response.data);
-        commit("setMapItem", {specialTool: response.data});
         return response.data;
       } catch (error) {
         console.log("Специнструмент не создан");

@@ -13,27 +13,17 @@
   </v-card>
 </template>
 
-<script>
+<script setup>
 import {computed} from "vue";
 import {useStore} from "vuex";
 
-export default {
-  name: "department-preview-card",
-  setup() {
-    const store = useStore();
+const store = useStore();
 
-    const customers = computed(() => store.getters.getCustomers.slice(0, 3));
-    const isCustomerDialogVisible = computed(() => store.getters.isCustomerDialogVisible);
+const customers = computed(() => store.getters.getCustomers.slice(0, 3));
+const isCustomerDialogVisible = computed(() => store.getters.isCustomerDialogVisible);
 
-    const showCustomerDialog = () => {
-      store.commit("setCustomerDialog", true);
-    };
-
-    return {
-      customers,
-      isCustomerDialogVisible,
-      showCustomerDialog
-    };
-  },
+const showCustomerDialog = () => {
+  store.commit("setCustomerDialog", true);
 };
+
 </script>

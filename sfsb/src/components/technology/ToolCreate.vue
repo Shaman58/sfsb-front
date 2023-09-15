@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="props.visible">
+  <v-dialog v-model="props.visible" persistent>
     <v-card>
       <v-form ref="form" v-model="valid" @submit.prevent="save(toolItem)">
         <v-card-title>

@@ -6,19 +6,20 @@
   </v-container>
 </template>
 
-<script>
+<script setup>
 
 import OrderPreviewCard from "@/components/order/OrderPreviewCard.vue";
 import OrderListDialog from "@/components/order/OrderListDialog.vue";
 import OrderCreateDialog from "@/components/order/OrderCreateDialog.vue";
+import {useStore} from "vuex";
+import {onMounted} from "vue";
 
-export default {
-  name: "order-component",
-  components: {OrderCreateDialog, OrderListDialog, OrderPreviewCard},
-  mounted() {
-    this.$store.dispatch("fetchOrders");
-    this.$store.dispatch("fetchEmployees");
-    this.$store.dispatch("fetchTechnologies");
-  }
-}
+const store = useStore();
+
+onMounted(() => {
+  store.dispatch("fetchOrders");
+  store.dispatch("fetchEmployees");
+  store.dispatch("fetchTechnologies");
+});
+
 </script>

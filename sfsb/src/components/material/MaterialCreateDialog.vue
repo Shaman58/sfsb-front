@@ -1,6 +1,6 @@
 <template>
-  <v-dialog v-model="isMaterialDialogVisible">
-    <v-card :title=formatObjectData(material)>
+  <v-dialog v-model="isMaterialDialogVisible" persistent>
+    <v-card :title=formatMaterialData(material)>
       <v-form ref="form" v-model="valid" @submit.prevent="save()">
         <v-card-text>
           <v-row>
@@ -49,7 +49,8 @@
               <v-text-field
                 label="Стоимость килограмма:"
                 v-model="material.price.amount"
-                :rules="[rules.numeric]"
+                :rules="[rules.required,rules.numeric]"
+                type="number"
               ></v-text-field>
             </v-col>
           </v-row>
@@ -74,57 +75,38 @@
   </v-dialog>
 </template>
 
-<script>
+<script setup>
 import {useStore} from "vuex";
 import {computed, ref} from "vue";
 import materialDataFormatting from '@/mixins/MaterialDataFormatting'
 
-export default {
-  name: "material-create-dialog",
+const store = useStore();
 
-  setup() {
+const form = ref(null);
+const valid = ref(false);
 
-    const store = useStore();
+const {formatMaterialData, geometries} = materialDataFormatting();
 
-    const form = ref(null);
-    const valid = ref(false);
+const isMaterialDialogVisible = computed(() => store.getters.getMaterialDialogVisible);
+const material = computed(() => store.getters.getMaterial);
+const materialDensityTemplates = computed(() => store.getters.getMaterialTemplates);
 
-    const {formatObjectData, geometries} = materialDataFormatting();
+const hideNewMaterialDialog = (() => {
+  store.commit("setMaterialDialogVisible", false);
+});
 
-    const isMaterialDialogVisible = computed(() => store.getters.getMaterialDialogVisible);
-    const material = computed(() => store.getters.getMaterial);
-    const materialDensityTemplates = computed(() => store.getters.getMaterialTemplates);
+const rules = {
+  required: (value) => !!value || "Обязательное поле",
+  counter: (value) => value.length <= 200 || "Не более 200 символов",
+  nameValidation: (value) => value.length >= 3 || "Минимальное количество символов: 3",
+  numeric: (value) => !isNaN(value) || "Введите число",
+};
 
-    const hideNewMaterialDialog = (() => {
-      store.commit("setMaterialDialogVisible", false);
-    });
+const save = () => {
+  if (form.value.validate()) {
+    store.dispatch("saveMaterial", material.value);
+    hideNewMaterialDialog();
+  }
+};
 
-    const rules = {
-      required: (value) => !!value || "Обязательное поле",
-      counter: (value) => value.length <= 200 || "Не более 200 символов",
-      nameValidation: (value) => value.length >= 3 || "Минимальное количество символов: 3",
-      numeric: (value) => !isNaN(value) || "Введите число",
-    };
-
-    const save = () => {
-      if (form.value.validate()) {
-        store.dispatch("saveMaterial", material.value);
-        hideNewMaterialDialog();
-      }
-    };
-
-    return {
-      isMaterialDialogVisible,
-      hideNewMaterialDialog,
-      material,
-      valid,
-      rules,
-      form,
-      formatObjectData,
-      geometries,
-      materialDensityTemplates,
-      save
-    };
-  },
-}
 </script>

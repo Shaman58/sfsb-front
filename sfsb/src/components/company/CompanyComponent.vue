@@ -5,16 +5,17 @@
   </v-container>
 </template>
 
-<script>
+<script setup>
 import CompanyPreviewCard from "@/components/company/CompanyPreviewCard.vue";
 import CompanyCreateDialog from "@/components/company/CompanyCreateDialog.vue";
+import {onMounted} from "vue";
+import {useStore} from "vuex";
 
-export default {
-  name: "company-component",
-  components: {CompanyCreateDialog, CompanyPreviewCard},
-  mounted() {
-    this.$store.dispatch("fetchCompanyData");
-    this.$store.dispatch("fetchEmployees")
-  }
-}
+const store = useStore();
+
+onMounted(() => {
+  store.dispatch("fetchCompanyData");
+  store.dispatch("fetchEmployees")
+});
+
 </script>

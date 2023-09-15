@@ -7,19 +7,37 @@
       <v-card-text>
         <v-container>
           <v-row>
-            <v-col cols="5">
+
+            <v-col cols="4">
               <v-switch v-model="setup.cooperate"
                         :true-value="true"
                         :false-value="false"
                         :label="setup.cooperate ? 'Кооперация' : 'Не кооперация'">
               </v-switch>
             </v-col>
-            <v-col cols="5" v-if="setup?.operation?.operationTimeManagement==='COMPUTED'&&!setup.cooperate">
+            <v-col cols="4" v-if="setup?.operation?.operationTimeManagement==='COMPUTED'&&!setup.cooperate">
+              <v-switch v-model="setup.aggregate"
+                        :true-value="true"
+                        :false-value="false"
+                        :label="setup.aggregate ? 'Несколько заготовок' : 'Одна заготовка'">
+              </v-switch>
+            </v-col>
+            <v-col cols="4" v-if="setup?.operation?.operationTimeManagement==='FULL'
+                            && !setup.cooperate
+                            && quantityOfPartsFromWorkpiece!==1">
               <v-switch v-model="setup.group"
                         :true-value="true"
                         :false-value="false"
-                        :label="setup.group ? 'Групповуха' : 'Одиночная'">
+                        :label="setup.group ? 'Групповая' : 'Одиночная'">
               </v-switch>
+            </v-col>
+            <v-col cols="4"
+                   v-if="setup?.operation?.operationTimeManagement==='COMPUTED' && setup.aggregate && !setup.cooperate">
+              <v-text-field label="Количество заготовок за раз"
+                            v-model="setup.perTime"
+                            type="number"
+                            :rules="[rules.numberGreaterThanZero]"
+              ></v-text-field>
             </v-col>
 
           </v-row>
@@ -65,14 +83,6 @@
               ></v-text-field>
             </v-col>
 
-            <v-col cols="4" v-if="setup?.operation?.operationTimeManagement==='COMPUTED' && setup.group && !setup.cooperate">
-              <v-text-field label="Количество за раз"
-                            v-model="setup.perTime"
-                            type="number"
-                            :rules="[rules.numberGreaterThanZero]"
-              ></v-text-field>
-            </v-col>
-
             <v-col cols="4"
                    v-if="setup?.operation?.operationTimeManagement==='FULL'&&!setup.cooperate
                    || setup?.operation?.operationTimeManagement==='PROCESS_TIME_ONLY'">
@@ -90,18 +100,18 @@
                    v-if="setup?.operation?.operationTimeManagement==='FULL'&&!setup.cooperate
                    || setup?.operation?.operationTimeManagement==='PROCESS_TIME_ONLY'">
               <v-btn size="small" variant="text"
-                     v-if="setup.measureTools?.length===0"
+                     v-if="setup.measureToolItems?.length===0"
                      @click="measureVisible=true">
                 Меритель
               </v-btn>
               <v-list v-else @click="measureVisible=true">
-                <v-list-item v-for="tool in setup.measureTools"
-                             :title="tool.toolName"
-                             :subtitle="tool.description"/>
+                <v-list-item v-for="tool in setup.measureToolItems"
+                             :title="tool.tool.toolName + ' ' + tool.tool.description"
+                             :subtitle="tool.amount + 'шт.'"/>
               </v-list>
               <measure-create-list title="Меритель"
                                    :visible="measureVisible"
-                                   :tools="setup.measureTools"
+                                   :tools="setup.measureToolItems"
                                    @hide="measureVisible=false"/>
             </v-col>
 
@@ -155,11 +165,20 @@
               </v-btn>
               <v-list v-else @click="additionalVisible=true">
                 <v-list-item v-for="tool in setup.additionalTools"
-                             :title="tool.toolName + ' ' + formatWorkpieceData(tool.workpiece)"/>
+                             :title="tool.toolName + ' ' + formatWorkpieceData(tool.workpiece)"
+                             :subtitle="tool.amount + 'шт.'"/>
               </v-list>
               <additional-create :visible="additionalVisible"
                                  :additionals="setup.additionalTools"
                                  @hide="additionalVisible=false"/>
+            </v-col>
+
+            <v-col cols="12"
+                   v-if="setup?.operation?.operationTimeManagement==='COMPUTED' && !setup.cooperate">
+              <v-textarea clearable
+                          v-model="setup.text"
+                          label="Коментарии">
+              </v-textarea>
             </v-col>
 
           </v-row>
@@ -197,12 +216,13 @@ const props = defineProps({
       id: 0,
       setupNumber: Number,
       perTime: 0,
-      measureTools: [],
+      measureToolItems: [],
       specialToolItems: [],
       cutterToolItems: [],
       toolings: [],
       additionalTools: [],
       cooperate: false,
+      aggregate: false,
       operation: {
         operationName: '',
         paymentPerHour: {},
@@ -245,6 +265,7 @@ const save = (setup) => {
 };
 
 const deleteSetup = () => {
+  hideSetup();
   emit("deleteSetup");
 };
 

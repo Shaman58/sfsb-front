@@ -9,27 +9,21 @@
   <material-create-dialog/>
 </template>
 
-<script>
+<script setup>
+import {useStore} from "vuex";
+import {onMounted} from "vue";
 import MaterialListDialog from "@/components/material/MaterialListDialog.vue";
-import store from "@/store";
 import MaterialCreateDialog from "@/components/material/MaterialCreateDialog.vue";
 
-export default {
-  name: "material-component",
-  components: {MaterialCreateDialog, MaterialListDialog},
-  setup() {
-
-    const showMaterialList = () => {
-      store.commit("setMaterialListVisible", true);
-    }
-
-    return {
-      showMaterialList
-    }
-  },
-  mounted() {
-    this.$store.dispatch("fetchMaterials");
-    this.$store.dispatch("fetchMaterialTemplates");
-  },
+const showMaterialList = () => {
+  store.commit("setMaterialListVisible", true);
 }
+
+const store = useStore();
+
+onMounted(() => {
+  store.dispatch("fetchMaterials");
+  store.dispatch("fetchMaterialTemplates");
+});
+
 </script>
