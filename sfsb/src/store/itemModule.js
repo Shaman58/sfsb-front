@@ -4,7 +4,9 @@ export default {
   state: {
     items: [],
     item: {
-      technology: {},
+      technology: {
+        outsourcedCosts: {amount: 0, currency: 'RUB'}
+      },
       customerMaterial: false,
     },
   },

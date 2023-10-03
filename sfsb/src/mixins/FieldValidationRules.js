@@ -1,6 +1,6 @@
 export function useValidationRules() {
   const rules = ({
-    required: value => !!value || 'Обязательное поле',
+    required: value => (value === 0 || !!value) || 'Обязательное поле',
     counter: value => value.length <= 200 || 'Не более 200 символов',
     emailValidation: value => {
       const pattern = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/
@@ -38,8 +38,9 @@ export function useValidationRules() {
       const pattern = /^[0-9]{1,5}$/
       return pattern.test(value) || 'Неверный формат, введите 1-5 цифр'
     },
-    numeric: (value) => !isNaN(value) || "Введите число",
+    numeric: (value) => (value === 0 || !isNaN(value)) || "Введите число",
     minValidation: (value) => value > 0 || "Число должно быть больше 0",
+    min0Validation: (value) => value >= 0 || "Число должно быть больше или равно 0",
     geom2LessThanGeom1: (workpiece) => () => {
       if (workpiece.geom1 !== null && workpiece.geom2 !== null && parseFloat(workpiece.geom2) >= parseFloat(workpiece.geom1)) {
         return "Внутренний диаметр должен быть меньше внешнего диаметра";

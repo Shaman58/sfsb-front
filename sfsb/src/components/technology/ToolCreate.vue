@@ -54,6 +54,16 @@
                   maxlength="20">
                 </v-text-field>
               </v-col>
+              <v-col cols="4">
+                <v-text-field
+                  label="Ориентировочная стоимость:"
+                  v-model="toolItem.price.amount"
+                  :rules="[rules.required, rules.counter]"
+                  counter
+                  type="number"
+                  maxlength="20">
+                </v-text-field>
+              </v-col>
             </v-row>
           </v-container>
 
@@ -107,7 +117,7 @@ const store = useStore();
 const form = ref(null);
 const valid = ref(false);
 const filter = ref('');
-const toolItem = ref({});
+const toolItem = ref({price: {currency: 'RUB'}});
 const filteredTools = computed(() => {
   return props.tools.filter(toolItem => {
     // Проверяем, что элемент не добавлен в toolItems
@@ -129,7 +139,7 @@ const hide = () => {
 
 const save = (savedTool) => {
   toolItems.push({...savedTool});
-  toolItem.value = {cutterTool: {}, amount: 0};
+  toolItem.value = {cutterTool: {}, amount: 0, price: {currency: 'RUB'}};
 };
 
 const remove = (index) => {

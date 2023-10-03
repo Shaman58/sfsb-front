@@ -47,6 +47,14 @@ export default {
           console.error(error);
         });
     },
+    fetchOrder({commit}, order) {
+      return api.get(`/order/${order.id}`)
+        .then(response => commit("setOrder", response.data))
+        .catch(error => {
+          console.log('Заказ не найден');
+          console.error(error);
+        });
+    },
     async saveOrder({dispatch, commit}, order) {
       try {
         const url = order.id

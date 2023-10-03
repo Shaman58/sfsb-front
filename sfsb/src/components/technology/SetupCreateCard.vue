@@ -24,11 +24,12 @@
             </v-col>
             <v-col cols="4" v-if="setup?.operation?.operationTimeManagement==='FULL'
                             && !setup.cooperate
-                            && quantityOfPartsFromWorkpiece!==1">
+                            && quantityOfPartsFromWorkpiece!==1
+                            && setup.groupAble">
               <v-switch v-model="setup.group"
                         :true-value="true"
                         :false-value="false"
-                        :label="setup.group ? 'Групповая' : 'Одиночная'">
+                        :label="setup.group ? 'С заготовкой' : 'С деталью'">
               </v-switch>
             </v-col>
             <v-col cols="4"
@@ -56,6 +57,15 @@
                         v-model="setup.operation"
                         :rules="[rules.required]">
               </v-select>
+            </v-col>
+
+            <v-col cols="4"
+                   v-if="setup.cooperate">
+              <v-text-field label="Кооперационная цена"
+                            v-model="setup.cooperatePrice.amount"
+                            type="number"
+                            :rules="[rules.required, rules.numeric, rules.min0Validation]">
+              </v-text-field>
             </v-col>
 
             <v-col cols="4"
@@ -251,7 +261,6 @@ const additionalVisible = ref(false);
 const {formatWorkpieceData} = materialDataFormatting();
 
 const isExist = (!!setup.operation?.operationName);
-const measurers = computed(() => store.getters.getMeasurers);
 const specials = computed(() => store.getters.getSpecials);
 const cutters = computed(() => store.getters.getCutters);
 const toolings = computed(() => store.getters.getToolings);

@@ -1,5 +1,5 @@
 <template>
-  <v-card class="mx-auto" width="400">
+  <v-card>
     <v-list @click="showCustomerDialog()">
       <v-list-subheader>Контрагенты:</v-list-subheader>
       <v-list-item

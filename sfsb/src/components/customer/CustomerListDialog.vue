@@ -13,7 +13,7 @@
               color="orange-lighten-1"
               icon="mdi-delete"
               variant="text"
-              :disabled="item.contacts.length !== 0"
+              :disabled="item.contacts?.length !== 0"
               @click.stop="deleteCustomer(item)"
             ></v-btn>
           </template>

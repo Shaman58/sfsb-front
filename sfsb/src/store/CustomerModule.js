@@ -45,16 +45,6 @@ export default {
     isCustomerCreateDialogVisible: (state) => state.customerCreateDialog,
   },
   actions: {
-    async fetchCustomersData({dispatch, state}) {
-      try {
-        await dispatch("fetchCustomers");
-        const customers = state.customers;
-        const promises = customers.map(customer => dispatch('fetchContactsByCustomerId', customer));
-        await Promise.all(promises);
-      } catch (error) {
-        console.error(error);
-      }
-    },
     fetchCustomers({commit}) {
       return api.get('/customer')
         .then(response => commit("setCustomers", response.data))

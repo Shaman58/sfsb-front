@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <v-dialog v-model="isDialogVisible" fullscreen persistent>
-      <v-form ref="form" v-model="valid" @submit.prevent="save()">
+      <v-form ref="form" v-model="valid" @submit.prevent="save()" style="overflow-y: auto;">
         <v-card class="dialog-content">
           <v-card-title>
             <span class="text-h4">{{ item.technology.drawingNumber + " " + item.technology.drawingName }}</span>
@@ -30,29 +30,56 @@
                   @hide="hideWorkpieceCard"
                 />
               </v-col>
-              <v-col cols="3" v-if="!workpieceCardVisible">
-                <v-text-field
-                  label="Из заготовки"
-                  v-model="item.technology.quantityOfPartsFromWorkpiece"
-                  type="number"
-                  :rules="[rules.required,rules.numeric, rules.minValidation]"
-                />
-              </v-col>
-              <v-col cols="3" v-if="!workpieceCardVisible">
-                <v-text-field
-                  label="Наладочных"
-                  v-model="item.technology.quantityOfSetUpParts"
-                  type="number"
-                  :rules="[rules.required,rules.numeric, rules.minValidation]"
-                />
-              </v-col>
-              <v-col cols="3" v-if="!workpieceCardVisible">
-                <v-text-field
-                  label="На брак"
-                  v-model="item.technology.quantityOfDefectiveParts"
-                  type="number"
-                  :rules="[rules.required,rules.numeric, rules.minValidation]"
-                />
+              <v-col cols="9" v-if="!workpieceCardVisible">
+                <v-row>
+                  <v-col cols="4">
+                    <v-text-field
+                      label="Из заготовки"
+                      v-model="item.technology.quantityOfPartsFromWorkpiece"
+                      type="number"
+                      :rules="[rules.required,rules.numeric, rules.minValidation]"
+                    />
+                  </v-col>
+                  <v-col cols="4">
+                    <v-text-field
+                      label="Наладочных"
+                      v-model="item.technology.quantityOfSetUpParts"
+                      type="number"
+                      :rules="[rules.required,rules.numeric, rules.minValidation]"
+                    />
+                  </v-col>
+                  <v-col cols="4">
+                    <v-text-field
+                      label="На брак"
+                      v-model="item.technology.quantityOfDefectiveParts"
+                      type="number"
+                      :rules="[rules.required,rules.numeric, rules.minValidation]"
+                    />
+                  </v-col>
+                  <v-col cols="7">
+                    <v-textarea clearable
+                                label="Описание доп. расходов"
+                                v-model="item.technology.outsourcedCostsDescription"
+                                rows="2"
+                    />
+                  </v-col>
+                  <v-col cols="2">
+                    <v-text-field
+                      label="Сумма"
+                      v-model="item.technology.outsourcedCosts.amount"
+                      type="number"
+                      :rules="[rules.required, rules.numeric, rules.min0Validation]"
+                    />
+                  </v-col>
+                  <v-col cols="3">
+                    <v-text-field
+                      label="Время технолога"
+                      v-model="item.technology.technologistTime"
+                      type="time"
+                      :rules="[rules.durationNotZeroValidation]"
+                    />
+                  </v-col>
+                </v-row>
               </v-col>
             </v-row>
 
@@ -80,7 +107,8 @@
                         <v-card-item>
                           {{ compactInfo(setup) }}
                         </v-card-item>
-                        <v-list v-if="!!setup.toolings && setup.operation.operationTimeManagement!=='COMPUTED'
+                        <v-list density="compact" style="padding: 0;" :lines="false"
+                                v-if="!!setup.toolings && setup.operation.operationTimeManagement!=='COMPUTED'
                          && setup.operation.operationTimeManagement!=='NONE'">
                           <v-list-item v-for="tooling in setup.toolings"
                                        :title="tooling.toolName"/>
@@ -106,7 +134,7 @@
                     <v-col cols="3" v-if="!setup.cooperate
                      && setup.operation.operationTimeManagement!=='COMPUTED'
                      && setup.operation.operationTimeManagement!=='NONE'">
-                      <v-card height="100%" v-if="setup.cutterToolItems.length!==0&&setup.specialToolItems.length!==0">
+                      <v-card height="100%" v-if="setup.cutterToolItems.length!==0||setup.specialToolItems.length!==0">
                         <v-list density="compact" style="padding: 0;" :lines="false">
                           <v-list-item v-for="(tool, index) in setup.cutterToolItems" :key="index"
                                        :title="tool.tool.toolName + ' ' + tool.amount +'шт.'"
@@ -137,7 +165,7 @@
                       </v-card>
                     </v-col>
 
-                    <!-- 234 часть карточки кооперация -->
+                    <!-- 1234 часть карточки кооперация -->
                     <v-col cols="12" fill-height v-if="setup.cooperate">
                       <v-card height="100%"
                               :title="'№' + setup.setupNumber + ' ' + setup.operation.operationName + ' кооперация'"
@@ -146,7 +174,7 @@
                     </v-col>
 
                     <!-- 234 часть карточки текст-->
-                    <v-col cols="9" fill-height v-if="setup.operation.operationTimeManagement==='COMPUTED'">
+                    <v-col cols="9" fill-height v-else-if="setup.operation.operationTimeManagement==='COMPUTED'">
                       <v-card height="100%"
                               :title="setup.aggregate? 'Групповая по ' + setup.perTime + 'шт.' : '' ">
                         {{ setup.text }}
@@ -189,6 +217,11 @@
                    :disabled="!valid || !item.technology.workpiece">
               Сохранить
             </v-btn>
+            <v-btn color="orange-darken-1" variant="text"
+                   :disabled="!valid || item.technology.computed"
+                   @click.stop="calculateItem">
+              Рассчитать
+            </v-btn>
             <v-spacer></v-spacer>
             <v-btn color="orange-darken-1" variant="text" @click="hideDialog">
               Закрыть
@@ -222,12 +255,34 @@ const activeSetupIndex = ref(null);
 
 
 const isDialogVisible = computed(() => store.getters.isTechnologyDialogVisible);
-const item = computed(() => store.getters.getItem);
-const materials = computed(() => store.getters.getMaterials);
-const sortedSetups = computed(() => {
-  return item.value.technology.setups.slice().sort((a, b) => a.setupNumber - b.setupNumber);
+const item = computed(() => {
+  const item = store.getters.getItem;
+  if (!item.technology.technologistTime) {
+    item.technology.technologistTime = '00:00';
+  }
+  return item;
 });
+const materials = computed(() => store.getters.getMaterials);
 
+const sortedSetups = computed(() => {
+  if (item.value.technology.setups.length !== 0) {
+    const setups = item.value.technology.setups.slice().sort((a, b) => a.setupNumber - b.setupNumber);
+
+    setups[0].groupAble = true;
+
+    for (let i = 1; i < setups.length; i++) {
+      setups[i].groupAble = setups[i - 1].groupAble && setups[i - 1].group; // Добавляем поле groupAble
+      if (!setups[i].groupAble) {
+        setups[i].group = false;
+      }
+      if (setups[i].operation.operationTimeManagement === 'COMPUTED') {
+        setups[i].group = setups[i - 1].group;
+      }
+    }
+    return setups;
+  }
+  return [];
+});
 
 const compactInfo = ((data) => {
   if (data.operation?.operationTimeManagement === 'COMPUTED'
@@ -265,14 +320,16 @@ const createNewSetup = () => ({
   setupNumber: calculateSetupNumber,
   operation: {
     operationName: ''
-  }
+  },
+  cooperatePrice: {amount: 0, currency: 'RUB'}
 });
 
 const newSetup = ref(createNewSetup());
 
 const save = async () => {
+  item.value.technology.computed = false;
   await store.dispatch("saveTechnology", item.value.technology);
-  await store.dispatch("fetchItem", item.value.id);
+  await store.dispatch("fetchItems");
 };
 
 const pushSetup = ({...setup}) => {
@@ -308,13 +365,15 @@ const hideDialog = () => {
 };
 
 const calculateItem = async () => {
-  await save();
+  item.value.technology.computed = false;
+  await store.dispatch("saveTechnology", item.value.technology);
   await api.get("/doc/calculate", {
     params: {itemId: item.value.id},
   })
     .then(async () => {
       toast.info("Успешно!", {position: "top-right"});
       await store.dispatch("fetchItem", item.value.id);
+      await store.dispatch("fetchItems");
     })
     .catch(error => {
       toast.error(error.response.data.info, {position: "top-right"});

@@ -27,6 +27,6 @@ export default new Vuex.Store({
     itemModule,
     technologyModule,
     operationModule,
-    cutterModule
+    cutterModule,
   }
 })

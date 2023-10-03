@@ -3,12 +3,9 @@ import api from "@/api/instance";
 export default {
   state: {
     specials: [],
-    special: {
-      price: {}
-    },
+    special: {},
+    specialListVisible: false,
     specialDialogVisible: false,
-    specialCreateDialogVisible: false,
-    specialDialogFromItem: true
   },
   mutations: {
     setSpecials(state, payload) {
@@ -17,30 +14,29 @@ export default {
     setSpecial(state, payload) {
       state.special = payload;
     },
-    setSpecialDialogVisible(state, payload) {
-      state.specialDialogVisible = payload
-    },
-    setSpecialCreateDialogVisible(state, payload) {
-      state.specialCreateDialogVisible = payload;
-    },
-    setSpecialDialogFromItem(state, payload) {
-      state.specialDialogFromItem = payload;
-    },
-    saveSpecialToSpecials(state, payload) {
-      const index = state.specials.findIndex((special) => special.id === payload.id);
+    saveSpecial(state, payload) {
+      const index = state.specials.findIndex(item => item.id === payload.id);
       if (index !== -1) {
         state.specials.splice(index, 1, payload);
       } else {
-        state.specials.push(payload);
+        state.specials.push(payload)
       }
+    },
+    setSpecialListVisible(state, payload) {
+      state.specialListVisible = payload;
+    },
+    setSpecialDialogVisible(state, payload) {
+      state.specialDialogVisible = payload;
+    },
+    deleteSpecial(state, payload) {
+      state.specials = state.specials.filter(special => special.id !== payload.id);
     },
   },
   getters: {
     getSpecials: (state) => state.specials,
     getSpecial: (state) => state.special,
-    isSpecialCreateDialogVisible: (state) => state.specialCreateDialogVisible,
-    isSpecialDialogVisible: (state) => state.specialDialogVisible,
-    isSpecialDialogFromItem: (state) => state.specialDialogFromItem,
+    getSpecialListVisible: (state) => state.specialListVisible,
+    getSpecialDialogVisible: (state) => state.specialDialogVisible,
   },
   actions: {
     async fetchSpecials({commit}) {
@@ -59,11 +55,19 @@ export default {
           : '/special';
 
         const response = await (special.id ? api.put(url, special) : api.post(url, special));
-        commit("setSpecial", response.data);
-        commit("saveSpecialToSpecials", response.data);
+        commit("saveSpecial", response.data);
         return response.data;
       } catch (error) {
         console.log("Специнструмент не создан");
+        console.error(error);
+      }
+    },
+    async deleteSpecial({commit}, special) {
+      try {
+        await api.delete(`/special/${special.id}`);
+        commit("deleteSpecial", special);
+      } catch (error) {
+        console.log("Специнструмент не удален");
         console.error(error);
       }
     },

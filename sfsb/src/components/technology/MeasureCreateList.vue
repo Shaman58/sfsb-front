@@ -52,6 +52,16 @@
                   counter>
                 </v-text-field>
               </v-col>
+              <v-col cols="4">
+                <v-text-field
+                  label="Ориентировочная стоимость:"
+                  v-model="toolItem.price.amount"
+                  :rules="[rules.required, rules.counter]"
+                  counter
+                  type="number"
+                  maxlength="20">
+                </v-text-field>
+              </v-col>
             </v-row>
           </v-container>
 
@@ -90,7 +100,7 @@ const {rules} = useValidationRules();
 const {emit} = getCurrentInstance();
 const form = ref(null);
 const valid = ref(false);
-const toolItem = ref({tool: {}});
+const toolItem = ref({tool: {}, price: {currency: "RUB"}});
 const tools = ref(props.tools);
 
 const hide = () => {
@@ -99,7 +109,7 @@ const hide = () => {
 
 const save = (savedTool) => {
   tools.value.push({...savedTool});
-  toolItem.value = {tool: {}};
+  toolItem.value = {tool: {}, price: {currency: "RUB"}};
 };
 
 const remove = (index) => {

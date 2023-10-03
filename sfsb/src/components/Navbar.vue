@@ -1,11 +1,11 @@
 <template>
   <v-container class="pa-4">
-    <v-app-bar color="orange" density="compact" title="SFSB">
+    <v-app-bar color="orange">
       <template v-slot:prepend>
-        <v-app-bar-nav-icon/>
+        <impuls-hub/>
       </template>
 
-      <v-toolbar-items class="ml-5">
+      <v-toolbar-items class="ml-5" style="overflow-x: auto;">
 
         <v-btn
           v-for="item in navItems"
@@ -24,9 +24,11 @@
 
 <script>
 import {ref} from "vue";
+import ImpulsHub from "@/components/ImpulsHub.vue";
 
 export default {
   name: "navbar",
+  components: {ImpulsHub},
   setup() {
 
     const navItems = ref([

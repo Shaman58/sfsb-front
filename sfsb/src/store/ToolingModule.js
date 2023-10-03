@@ -3,12 +3,9 @@ import api from "@/api/instance";
 export default {
   state: {
     toolings: [],
-    tooling: {
-      price: {}
-    },
+    tooling: {},
+    toolingListVisible: false,
     toolingDialogVisible: false,
-    toolingCreateDialogVisible: false,
-    toolingDialogFromItem: true
   },
   mutations: {
     setToolings(state, payload) {
@@ -17,16 +14,7 @@ export default {
     setTooling(state, payload) {
       state.tooling = payload;
     },
-    setToolingDialogVisible(state, payload) {
-      state.toolingDialogVisible = payload
-    },
-    setToolingCreateDialogVisible(state, payload) {
-      state.toolingCreateDialogVisible = payload;
-    },
-    setToolingDialogFromItem(state, payload) {
-      state.toolingDialogFromItem = payload;
-    },
-    saveToolingToToolings(state, payload) {
+    saveTooling(state, payload) {
       const index = state.toolings.findIndex((tooling) => tooling.id === payload.id);
       if (index !== -1) {
         state.toolings.splice(index, 1, payload);
@@ -34,13 +22,21 @@ export default {
         state.toolings.push(payload);
       }
     },
+    setToolingListVisible(state, payload) {
+      state.toolingListVisible = payload
+    },
+    setToolingDialogVisible(state, payload) {
+      state.toolingDialogVisible = payload
+    },
+    deleteTooling(state, payload) {
+      state.toolings = state.toolings.filter(tooling => tooling.id !== payload.id);
+    },
   },
   getters: {
     getToolings: (state) => state.toolings,
     getTooling: (state) => state.tooling,
-    isToolingCreateDialogVisible: (state) => state.toolingCreateDialogVisible,
-    isToolingDialogVisible: (state) => state.toolingDialogVisible,
-    isToolingDialogFromItem: (state) => state.toolingDialogFromItem,
+    getToolingListVisible: (state) => state.toolingListVisible,
+    getToolingDialogVisible: (state) => state.toolingDialogVisible,
   },
   actions: {
     async fetchToolings({commit}) {
@@ -59,11 +55,18 @@ export default {
           : '/tooling';
 
         const response = await (tooling.id ? api.put(url, tooling) : api.post(url, tooling));
-        commit("setTooling", response.data)
-        commit("saveToolingToToolings", response.data);
-        commit("setMapItem", {tooling: response.data});
+        commit("saveTooling", response.data);
       } catch (error) {
         console.log("Оснастка не создана");
+        console.error(error);
+      }
+    },
+    async deleteTooling({commit}, tooling) {
+      try {
+        await api.delete(`/tooling/${tooling.id}`);
+        commit("deleteTooling", tooling);
+      } catch (error) {
+        console.log("Оснастка не удалена");
         console.error(error);
       }
     },

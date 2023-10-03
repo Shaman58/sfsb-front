@@ -1,6 +1,6 @@
 <template>
   <v-dialog v-model="createDialogVisible" width="768" persistent>
-    <v-form ref="formDep" v-model="validDep" @submit.prevent="saveDepartment()">
+    <v-form ref="formDep" v-model="validDep" @submit.prevent="saveDepartment()" style="overflow-y: auto;">
       <v-card>
         <v-card-title>
           <span class="text-h5">{{ selectDepartment.departmentName }}</span>

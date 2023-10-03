@@ -61,7 +61,7 @@ const showCreateDialog = (order) => {
 const showCreateDialogNewOrder = () => {
   const appNumber = orders.value.reduce((max, item) => {
     return item.applicationNumber > max ? item.applicationNumber : max
-  }, 1);
+  }, 0);
   store.commit("setOrder", {applicationNumber: appNumber + 1, items: []});
   store.commit("setOrderCreateDialog", true);
 };

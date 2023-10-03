@@ -52,7 +52,7 @@
                 <v-text-field
                   label="Название приспособы"
                   v-model="toolItem.toolName"
-                  :rules="[rules.required, rules.nameValidation()]"
+                  :rules="[rules.required, rules.nameValidation]"
                 />
               </v-col>
               <v-col cols="3" v-if="!workpieceCardVisible">

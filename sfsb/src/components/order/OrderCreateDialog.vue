@@ -1,8 +1,10 @@
 <template>
   <v-dialog v-model="isDialogVisible" width="768" persistent>
-    <v-form ref="form" v-model="valid" @submit.prevent="save(order)"
+    <v-form ref="form" v-model="valid" @submit.prevent="save()"
             style="height: 800px; overflow-y: auto;">
-      <v-card title="Заявка">
+      <v-card
+        title="Заявка"
+        subtitle="Переработать интерфейс. Понять как сделать проще и логичнее">
         <v-card-text>
           <v-container>
             <v-row>
@@ -32,7 +34,6 @@
                   :item-title=getItemText
                   return-object
                   v-model="order.contact"
-                  :rules="[rules.required]"
                   label="Контакт">
                 </v-select>
               </v-col>
@@ -62,8 +63,7 @@
               <v-divider/>
               <v-container v-if="!!order.id">
                 <v-col cols="12">
-                  <v-form ref="formItem" v-model="validItem" v-on:submit.prevent="saveItem()"
-                          label="Добавить позицию">
+                  <v-form ref="formItem" v-model="validItem" v-on:submit.prevent="saveItem()">
                     <v-row>
                       <v-col cols="4">
                         <v-text-field
@@ -74,19 +74,6 @@
                           :disabled="!!item.technology.id"
                         ></v-text-field>
                       </v-col>
-                      <v-dialog v-model="isFilteredVisible" width="300" :persistent="true">
-                        <v-form style="height: 150px; overflow-y: auto;">
-                          <v-list>
-                            <v-list-item
-                              v-for="filteredItem in filteredTechnologies"
-                              @click="selectItem({technology:filteredItem})">
-                              <v-list-item-title>
-                                {{ filteredItem.drawingNumber + " " + filteredItem.drawingName }}
-                              </v-list-item-title>
-                            </v-list-item>
-                          </v-list>
-                        </v-form>
-                      </v-dialog>
                       <v-col cols="4">
                         <v-text-field
                           label="Название чертежа:"
@@ -100,7 +87,8 @@
                         <v-text-field
                           label="Количество:"
                           v-model="item.quantity"
-                          :rules="[rules.required, rules.numberValidate, rules.min1]"
+                          :rules="[rules.required, rules.numberValidate]"
+                          type="number"
                         ></v-text-field>
                       </v-col>
                       <v-col cols="3">
@@ -111,17 +99,17 @@
                           :label="item.customerMaterial ? 'Материал заказчика' : 'Наш материал'">
                         </v-switch>
                       </v-col>
-                      <v-col cols="5">
-                        <v-select
-                          v-if="!!employees"
-                          :items="employees"
-                          :item-title=getItemText
-                          return-object
-                          v-model="item.technology.employee"
-                          :rules="[rules.required]"
-                          label="Назначить технолога">
-                        </v-select>
-                      </v-col>
+                      <!--                      <v-col cols="5">-->
+                      <!--                        <v-select-->
+                      <!--                          v-if="!!employees"-->
+                      <!--                          :items="employees"-->
+                      <!--                          :item-title=getItemText-->
+                      <!--                          return-object-->
+                      <!--                          v-model="item.technology.employee"-->
+                      <!--                          :rules="[rules.required]"-->
+                      <!--                          label="Назначить технолога">-->
+                      <!--                        </v-select>-->
+                      <!--                      </v-col>-->
                       <v-spacer/>
                       <v-btn
                         :disabled="!validItem"
@@ -134,7 +122,9 @@
                     <v-card-title>
                       <div class="d-flex align-center">
                         <div class="flex-grow-1">Позиции:</div>
-                        <a @click="selectItem({ technology: {} })" style="color: orange;">
+                        <a
+                          @click="dropItem()"
+                          style="color: orange;">
                           новая позиция</a>
                       </div>
                       <v-list>
@@ -206,13 +196,6 @@ const kpAvailable = computed(() => {
   return index !== -1;
 });
 
-const filteredTechnologies = computed(() => {
-  const searchQuery = !!item.value.technology.drawingNumber ? item.value.technology.drawingNumber.toLowerCase() : null;
-  return technologies.value.filter((tech) =>
-    tech.drawingNumber.toLowerCase().includes(searchQuery)
-  ).slice(0, 3);
-});
-
 const form = ref(null);
 const valid = ref(false);
 const formItem = ref(null);
@@ -225,25 +208,44 @@ const hideDialog = () => {
 const save = () => {
   if (form.value.validate()) {
     store.dispatch("saveOrder", order.value);
+    store.commit("setOrderCreateDialog", false);
   }
 };
 
-const saveItem = () => {
-  store.dispatch("saveItem", {...item.value, order: order.value});
+const saveItem = async () => {
+  if (formItem.value.validate()) {
+    item.value.technology.computed = false;
+    await store.dispatch("saveItem", {
+      ...item.value,
+      order: order.value
+    });
+    await store.dispatch("fetchOrder", order.value);
+  }
 }
 
 const selectItem = (item) => {
   store.commit("setItem", item);
+  validItem.value = !!formItem.value.validate()
 }
 
-const deleteItem = (item) => {
-  store.dispatch("deleteItem", item);
+const dropItem = () => {
+  store.commit("setItem", {
+    technology: {
+      drawingName: undefined,
+      drawingNumber: undefined,
+      outsourcedCosts: {amount: 0, currency: 'RUB'}
+    }
+  });
+  validItem.value = false;
 }
 
-const isFilteredVisible = computed(() => filteredTechnologies.value.length !== 0 && !!!item.value.technology.id);
+const deleteItem = async (item) => {
+  await store.dispatch("deleteItem", item);
+  await store.dispatch("fetchOrder", order.value);
+}
 
 const getBackgroundColorClass = (item) => {
-  if (item.technology.computed) {
+  if (!!item?.technology?.computed && item?.technology?.computed) {
     return 'computed';
   } else {
     return 'not-computed';

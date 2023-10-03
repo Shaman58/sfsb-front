@@ -18,7 +18,7 @@ import {useStore} from "vuex";
 const store = useStore();
 
 onMounted(() => {
-  store.dispatch("fetchCustomersData");
+  store.dispatch("fetchCustomers");
 });
 
 </script>

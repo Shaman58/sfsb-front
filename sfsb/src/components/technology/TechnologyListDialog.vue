@@ -10,7 +10,7 @@
           :key="item.id"
           :value="item"
           :title="`${item.technology.drawingName} ${item.technology.drawingNumber}`"
-          @click="showTechnologyCreateDialog({...item})">
+          @click="showTechnologyCreateDialog(cloneItem(item))">
         </v-list-item>
       </v-list>
     </v-card>
@@ -29,7 +29,7 @@
           :key="item.id"
           :value="item"
           :title="`${item.technology.drawingName} ${item.technology.drawingNumber}`"
-          @click="showTechnologyCreateDialog({...item})">
+          @click="showTechnologyCreateDialog(cloneItem(item))">
         </v-list-item>
       </v-list>
     </v-card>
@@ -51,6 +51,10 @@ const isNotComputedVisible = computed(() => employeeItemsNotComputed.value.lengt
 const showTechnologyCreateDialog = (item) => {
   store.commit('setItem', item);
   store.commit('setTechnologyDialogVisible', true);
+};
+
+const cloneItem = (originalItem) => {
+  return JSON.parse(JSON.stringify(originalItem));
 };
 
 </script>

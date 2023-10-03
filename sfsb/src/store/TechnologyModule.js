@@ -45,7 +45,7 @@ export default {
         const response = await api.put(url, technology);
         return response.data;
       } catch (error) {
-        console.log("Заготовка не создана");
+        console.log("Технология не создана");
         console.error(error);
       }
     },

@@ -1,6 +1,6 @@
 <template>
   <v-dialog v-model="employeeDialogVisible" width="768" persistent>
-    <v-form ref="form" v-model="valid" @submit.prevent="save()">
+    <v-form ref="form" v-model="valid" @submit.prevent="save()" style="overflow-y: auto;">
       <v-card>
         <v-card-title>
           <span v-if="isObjectHasDepartment" class="text-h5">Сотрудник</span>
@@ -72,6 +72,7 @@
 <script setup>
 import {computed, ref} from "vue";
 import {useStore} from "vuex";
+import {useValidationRules} from "@/mixins/FieldValidationRules";
 
 const store = useStore();
 
@@ -81,18 +82,7 @@ const employee = computed(() => store.getters.getEmployee);
 const form = ref(null);
 const valid = ref(false);
 
-const rules = {
-  required: (value) => !!value || "Обязательное поле",
-  counter: (value) => value.length <= 200 || "Не более 200 символов",
-  emailValidation: value => {
-    const pattern = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/
-    return pattern.test(value) || 'Неверный формат'
-  },
-  phoneValidation: value => {
-    const pattern = /^\+7\s\(\d{4}\)\s\d{2}-\d{2}-\d{2}$/
-    return pattern.test(value) || 'Неверный формат +X (XXXX) XX-XX-XX'
-  },
-};
+const {rules} = useValidationRules();
 
 const hideEmployeeDialog = () => {
   store.commit("setEmployeeDialog", false);
