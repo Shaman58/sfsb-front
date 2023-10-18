@@ -3,16 +3,10 @@ import api from "@/api/instance";
 export default {
   state: {
     specials: [],
-    special: {},
-    specialListVisible: false,
-    specialDialogVisible: false,
   },
   mutations: {
     setSpecials(state, payload) {
       state.specials = payload;
-    },
-    setSpecial(state, payload) {
-      state.special = payload;
     },
     saveSpecial(state, payload) {
       const index = state.specials.findIndex(item => item.id === payload.id);
@@ -22,21 +16,12 @@ export default {
         state.specials.push(payload)
       }
     },
-    setSpecialListVisible(state, payload) {
-      state.specialListVisible = payload;
-    },
-    setSpecialDialogVisible(state, payload) {
-      state.specialDialogVisible = payload;
-    },
     deleteSpecial(state, payload) {
       state.specials = state.specials.filter(special => special.id !== payload.id);
     },
   },
   getters: {
     getSpecials: (state) => state.specials,
-    getSpecial: (state) => state.special,
-    getSpecialListVisible: (state) => state.specialListVisible,
-    getSpecialDialogVisible: (state) => state.specialDialogVisible,
   },
   actions: {
     async fetchSpecials({commit}) {

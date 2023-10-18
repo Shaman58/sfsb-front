@@ -10,29 +10,26 @@
           <v-row>
 
             <v-col cols="4">
-              <v-select
-                label="Выберите вид:"
-                :items="geometries"
-                item-text="title"
-                item-value="label"
-                v-model="geometry"
+              <v-select label="Выберите вид:"
+                        :items="geometries"
+                        item-text="title"
+                        item-value="label"
+                        v-model="geometry"
               >
               </v-select>
-              <v-text-field
-                label="Фильтр:"
-                v-model="materialFilter">
+              <v-text-field label="Фильтр:"
+                            v-model="materialFilter">
               </v-text-field>
             </v-col>
 
             <v-col cols="4">
-              <v-select
-                v-if="materials"
-                label="Выберите материал:"
-                :items="filteredMaterials"
-                :item-title="formatObjectData"
-                return-object
-                v-model="workpiece.material"
-                :rules="[rules.required]">
+              <v-select v-if="materials"
+                        label="Выберите материал:"
+                        :items="filteredMaterials"
+                        :item-title="formatObjectData"
+                        return-object
+                        v-model="workpiece.material"
+                        :rules="[rules.required]">
               </v-select>
             </v-col>
 
@@ -42,47 +39,41 @@
                    workpiece?.material?.geometry==='TAPE' ||
                    workpiece?.material?.geometry==='LIST' ||
                    workpiece?.material?.geometry==='OTHER'">
-              <v-text-field
-                label="Длина"
-                v-model="workpiece.geom1"
-                :rules="[rules.required, rules.numeric, rules.minValidation]"
-                counter
-                numeric>
+              <v-text-field label="Длина"
+                            v-model="workpiece.geom1"
+                            :rules="[rules.required, rules.numeric, rules.minValidation]"
+                            counter
+                            numeric>
               </v-text-field>
-              <v-text-field
-                label="Ширина"
-                v-model="workpiece.geom2"
-                :rules="[rules.required, rules.numeric, rules.minValidation]"
-                counter>
+              <v-text-field label="Ширина"
+                            v-model="workpiece.geom2"
+                            :rules="[rules.required, rules.numeric, rules.minValidation]"
+                            counter>
               </v-text-field>
-              <v-text-field
-                label="Толщина"
-                v-model="workpiece.geom3"
-                :rules="[rules.required, rules.numeric, rules.minValidation]"
-                counter>
+              <v-text-field label="Толщина"
+                            v-model="workpiece.geom3"
+                            :rules="[rules.required, rules.numeric, rules.minValidation]"
+                            counter>
               </v-text-field>
             </v-col>
 
             <v-col cols="4"
                    v-if="workpiece?.material?.geometry==='TUBE'">
-              <v-text-field
-                label="Внешний диаметр:"
-                v-model="workpiece.geom1"
-                :rules="[rules.required, rules.numeric, rules.minValidation]"
-                counter
-                numeric>
+              <v-text-field label="Внешний диаметр:"
+                            v-model="workpiece.geom1"
+                            :rules="[rules.required, rules.numeric, rules.minValidation]"
+                            counter
+                            numeric>
               </v-text-field>
-              <v-text-field
-                label="Внутренний диаметр:"
-                v-model="workpiece.geom2"
-                :rules="[rules.required, rules.numeric, rules.minValidation, geom2LessThanGeom1]"
-                counter>
+              <v-text-field label="Внутренний диаметр:"
+                            v-model="workpiece.geom2"
+                            :rules="[rules.required, rules.numeric, rules.minValidation, geom2LessThanGeom1]"
+                            counter>
               </v-text-field>
-              <v-text-field
-                label="Длина:"
-                v-model="workpiece.geom3"
-                :rules="[rules.required, rules.numeric, rules.minValidation]"
-                counter>
+              <v-text-field label="Длина:"
+                            v-model="workpiece.geom3"
+                            :rules="[rules.required, rules.numeric, rules.minValidation]"
+                            counter>
               </v-text-field>
             </v-col>
 
@@ -91,44 +82,39 @@
                    workpiece?.material?.geometry==='CYLINDER' ||
                    workpiece?.material?.geometry==='HEXAGON'||
                    workpiece?.material?.geometry==='ROD'">
-              <v-text-field
-                label="Диаметр:"
-                v-model="workpiece.geom1"
-                :rules="[rules.required, rules.numeric, rules.minValidation]"
-                counter
-                numeric>
+              <v-text-field label="Диаметр:"
+                            v-model="workpiece.geom1"
+                            :rules="[rules.required, rules.numeric, rules.minValidation]"
+                            counter
+                            numeric>
               </v-text-field>
-              <v-text-field
-                label="Длина:"
-                v-model="workpiece.geom2"
-                :rules="[rules.required, rules.numeric, rules.minValidation]"
-                counter>
+              <v-text-field label="Длина:"
+                            v-model="workpiece.geom2"
+                            :rules="[rules.required, rules.numeric, rules.minValidation]"
+                            counter>
               </v-text-field>
             </v-col>
 
             <v-col cols="4"
                    v-if="workpiece?.material?.geometry==='SQUARE'">
-              <v-text-field
-                label="Сторона:"
-                v-model="workpiece.geom1"
-                :rules="[rules.required, rules.numeric, rules.minValidation]"
-                counter
-                numeric>
+              <v-text-field label="Сторона:"
+                            v-model="workpiece.geom1"
+                            :rules="[rules.required, rules.numeric, rules.minValidation]"
+                            counter
+                            numeric>
               </v-text-field>
-              <v-text-field
-                label="Длина:"
-                v-model="workpiece.geom2"
-                :rules="[rules.required, rules.numeric, rules.minValidation]"
-                counter>
+              <v-text-field label="Длина:"
+                            v-model="workpiece.geom2"
+                            :rules="[rules.required, rules.numeric, rules.minValidation]"
+                            counter>
               </v-text-field>
             </v-col>
 
             <v-col cols="4" v-if="workpiece?.material?.geometry==='PROFILE'">
-              <v-text-field
-                label="Длина:"
-                v-model="workpiece.geom2"
-                :rules="[rules.required, rules.numeric, rules.minValidation]"
-                counter>
+              <v-text-field label="Длина:"
+                            v-model="workpiece.geom2"
+                            :rules="[rules.required, rules.numeric, rules.minValidation]"
+                            counter>
               </v-text-field>
             </v-col>
 
@@ -195,7 +181,8 @@ const filteredMaterials = computed(() => {
   return props.materials.filter((item) => {
     return (
       (!geometry.value || item.geometry === geometry.value) &&
-      (!materialFilter.value || item.materialName.toLowerCase().includes(materialFilter.value.toLowerCase()) || item.gost.toLowerCase().includes(materialFilter.value.toLowerCase()))
+      (!materialFilter.value || item.materialName.toLowerCase().includes(materialFilter.value.toLowerCase()) ||
+        item.gost.toLowerCase().includes(materialFilter.value.toLowerCase()))
     );
   });
 });

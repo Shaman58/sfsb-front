@@ -3,47 +3,27 @@ import api from "@/api/instance";
 export default {
   state: {
     employees: [],
-    employee: {},
-    employeeDialog: false,
   },
   mutations: {
     setEmployees(state, payload) {
       state.employees = payload
     },
-    setEmployeeDialog(state, payload) {
-      state.employeeDialog = payload
+    saveEmployee(state, payload) {
+      const index = state.employees.findIndex(item => item.id === payload.id);
+      if (index !== -1) {
+        state.employees.splice(index, 1, payload);
+      } else {
+        state.employees.push(payload)
+      }
     },
-    setEmployee(state, payload) {
-      state.employee = payload
+    deleteEmployee(state, payload) {
+      state.employees = state.employees.filter(item => item.id !== payload.id);
     },
   },
   getters: {
     getEmployees: (state) => state.employees,
-    getEmployee: (state) => state.employee,
-    getEmployeeDialogVisible: (state) => state.employeeDialog,
   },
   actions: {
-    async saveEmployee({commit}, employee) {
-      if (employee.id !== undefined) {
-        return api.put(`/employee/${employee.id}`, employee)
-          .then(response => {
-            if (employee.department !== null) {
-              commit("changeEmployee", response.data)
-            }
-          })
-          .catch(error => {
-            console.error(error)
-          })
-      } else {
-        return api.post(`/employee`, employee)
-          .then(response => {
-            commit("addEmployee", response.data)
-          })
-          .catch(error => {
-            console.error(error)
-          })
-      }
-    },
     async fetchEmployees({commit}) {
       try {
         const url = `/employee`
@@ -53,16 +33,28 @@ export default {
         console.error(error);
       }
     },
-    fetchEmployeesByDepId({commit}, department) {
-      return api.get(`/employee/department/${department.id}`)
-        .then(response => {
-          const updatedDepartment = {...department, employees: response.data};
-          commit("changeDepartment", updatedDepartment);
-        })
-        .catch(error => {
-          console.log('Отделы не найдены');
-          console.error(error);
-        });
+    async saveEmployee({commit}, employee) {
+      try {
+        const url = employee.id
+          ? `/employee/${employee.id}`
+          : '/employee';
+
+        const response = await (employee.id ? api.put(url, employee) : api.post(url, employee));
+        commit("saveEmployee", response.data);
+        return response.data;
+      } catch (error) {
+        console.log("Сотрудник не создан");
+        console.error(error);
+      }
+    },
+    async deleteEmployee({commit}, employee) {
+      try {
+        await api.delete(`/employee/${employee.id}`);
+        commit("deleteEmployee", employee);
+      } catch (error) {
+        console.log("Сотрудник не удален");
+        console.error(error);
+      }
     },
   }
 }

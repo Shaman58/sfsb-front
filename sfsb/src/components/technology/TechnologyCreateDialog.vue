@@ -89,8 +89,11 @@
 
             <v-row>
 
-              <v-col cols="12" v-for="(setup, index) in sortedSetups" :key="index">
-                <v-card v-if="activeSetupIndex !== index" @click="showSetupCard(index)">
+              <v-col cols="12"
+                     v-for="(setup, index) in sortedSetups"
+                     :key="index">
+                <v-card v-if="activeSetupIndex !== index"
+                        @click="showSetupCard(index)">
                   <v-row>
 
                     <!-- 1 часть карточки -->
@@ -253,7 +256,6 @@ const workpieceCardVisible = ref(false);
 const {formatMaterialData, formatWorkpieceData} = materialDataFormatting();
 const activeSetupIndex = ref(null);
 
-
 const isDialogVisible = computed(() => store.getters.isTechnologyDialogVisible);
 const item = computed(() => {
   const item = store.getters.getItem;
@@ -262,6 +264,7 @@ const item = computed(() => {
   }
   return item;
 });
+
 const materials = computed(() => store.getters.getMaterials);
 
 const sortedSetups = computed(() => {

@@ -3,24 +3,12 @@ import api from '../api/instance'
 export default {
   state: {
     customers: [],
-    customer: {},
-    customerDialog: false,
-    customerCreateDialog: false,
   },
   mutations: {
     setCustomers(state, payload) {
       state.customers = payload
     },
-    setCustomer(state, payload) {
-      state.customer = payload
-    },
-    setCustomerDialog(state, payload) {
-      state.customerDialog = payload;
-    },
-    setCustomerCreateDialog(state, payload) {
-      state.customerCreateDialog = payload;
-    },
-    saveCustomerToCustomers(state, payload) {
+    saveCustomer(state, payload) {
       const index = state.customers.findIndex((customer) => customer.id === payload.id);
       if (index !== -1) {
         state.customers.splice(index, 1, payload);
@@ -31,35 +19,32 @@ export default {
     deleteCustomer(state, payload) {
       state.customers = state.customers.filter(customer => customer.id !== payload.id)
     },
-    changeCustomer(state, payload) {
-      const index = state.customers.findIndex(customer => customer.id === payload.id);
-      if (index !== -1) {
-        state.customers.splice(index, 1, payload);
-      }
-    },
   },
   getters: {
     getCustomers: (state) => state.customers,
-    getCustomer: (state) => state.customer,
-    isCustomerDialogVisible: (state) => state.customerDialog,
-    isCustomerCreateDialogVisible: (state) => state.customerCreateDialog,
   },
   actions: {
-    fetchCustomers({commit}) {
-      return api.get('/customer')
-        .then(response => commit("setCustomers", response.data))
+    async fetchCustomers({commit}) {
+      api.get('/customer')
+        .then(response =>
+          commit("setCustomers", response.data))
         .catch(error => {
-          if (error.response && error.response.status === 404) {
-            console.log('Заказчики не найдены');
-          }
+          console.log("Инструмент не найден");
+          console.error(error);
         });
     },
     async saveCustomer({commit}, customer) {
       try {
-        const url = customer.id !== undefined ? `/customer/${customer.id}` : '/customer';
-        const response = customer.id !== undefined ? await api.put(url, customer) : await api.post(url, customer);
-        commit('saveCustomerToCustomers', response.data);
+        const url = customer.id
+          ? `/customer/${customer.id}`
+          : '/customer';
+
+        const response = customer.id
+          ? await api.put(url, customer)
+          : await api.post(url, customer);
+        commit('saveCustomer', response.data);
       } catch (error) {
+        console.log("Контрагент не создан");
         console.error(error);
       }
     },
@@ -68,7 +53,7 @@ export default {
         await api.delete(`/customer/${customer.id}`);
         commit('deleteCustomer', customer);
       } catch (error) {
-        console.log('Контакты не удален');
+        console.log('Контрагент не удален');
         console.error(error);
       }
     },

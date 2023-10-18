@@ -1,73 +1,125 @@
 <template>
-  <v-dialog v-model="isDialogVisible" width="800" persistent>
+  <v-dialog v-model="props.visible" width="800" persistent>
     <v-card>
       <v-card-title>
         <span class="text-h5">Заявки</span>
       </v-card-title>
       <v-list density="compact">
-        <v-list-item
-          v-for="item in orders"
-          :key="item.id"
-          :value="item"
-          :title="`№${item.applicationNumber} ${item.customer.companyName}`"
-          @click.stop="showCreateDialog(item)">
+        <v-list-item v-for="(item, index) in props.orders"
+                     :key="index"
+                     :value="item"
+                     :title="`№${item.applicationNumber} ${item.customer.companyName}`"
+                     @click.stop="active=item.id">
+
           <template v-slot:append>
-            <v-btn
-              color="orange-lighten-1"
-              icon="mdi-delete"
-              variant="text"
-              :disabled="item.items.length!==0"
-              @click.stop="deleteOrder(item)"
-            ></v-btn>
+            <v-btn color="orange-lighten-1"
+                   icon="mdi-delete"
+                   variant="text"
+                   :disabled="item.items && item.items.length!==0"
+                   @click.stop="remove(item)"
+            />
           </template>
+
+          <order-create-dialog v-if="active===item.id"
+                               :visible="active===item.id"
+                               :order="item"
+                               :customers="props.customers"
+                               :employees="employees"
+                               @hide="active=-1"
+                               @save="save($event)"
+          />
+
         </v-list-item>
         <v-list-item title="...">
           <template v-slot:append>
-            <v-btn
-              color="orange-lighten-1"
-              icon="mdi-plus"
-              variant="text"
-              @click.stop="showCreateDialogNewOrder"
+            <v-btn color="orange-lighten-1"
+                   icon="mdi-plus"
+                   variant="text"
+                   @click.stop="showOrder"
             ></v-btn>
           </template>
+
+          <order-create-dialog v-if="order"
+                               :visible="active==='new'"
+                               :order="order"
+                               :customers="props.customers"
+                               :employees="employees"
+                               @hide="hideOrder"
+                               @save="save($event)"
+          />
+
         </v-list-item>
       </v-list>
       <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn color="orange-darken-1" variant="text" @click="hideDialog">Закрыть</v-btn>
+        <v-spacer/>
+        <v-btn color="orange-darken-1"
+               variant="text"
+               @click="hide"
+        >Закрыть
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
 
 <script setup>
-import {computed} from "vue";
-import {useStore} from "vuex";
 
-const store = useStore();
+import {ref, watch} from "vue";
+import OrderCreateDialog from "@/components/order/OrderCreateDialog.vue";
 
-const orders = computed(() => store.getters.getOrders);
-const isDialogVisible = computed(() => store.getters.isOrderDialogVisible);
+const emit = defineEmits();
 
-const hideDialog = () => {
-  store.commit("setOrdersListDialog", false);
-};
+const props = defineProps({
+  orders: {
+    type: Array,
+    required: true
+  },
+  employees: {
+    type: Array,
+    required: true
+  },
+  customers: {
+    type: Array,
+    required: true
+  },
+  visible: {
+    type: Boolean,
+    required: true
+  },
+  active: {
+    type: [Number, String],
+    required: true
+  }
+});
 
-const showCreateDialog = (order) => {
-  store.commit("setOrder", order);
-  store.commit("setOrderCreateDialog", true);
-};
+const order = ref(null);
+const active = ref(props.active);
 
-const showCreateDialogNewOrder = () => {
-  const appNumber = orders.value.reduce((max, item) => {
+watch(() => props.active, (newValue) => {
+  active.value = newValue;
+});
+
+const calculateAppNumber = () => {
+  const appNumber = props.orders.reduce((max, item) => {
     return item.applicationNumber > max ? item.applicationNumber : max
   }, 0);
-  store.commit("setOrder", {applicationNumber: appNumber + 1, items: []});
-  store.commit("setOrderCreateDialog", true);
+  order.value = {applicationNumber: appNumber + 1, items: [], employee: null, contact: null};
 };
 
-const deleteOrder = (order) => {
-  store.dispatch("deleteOrder", order);
-}
+const showOrder = () => {
+  calculateAppNumber();
+  active.value = 'new';
+};
+
+const hideOrder = () => {
+  order.value = null;
+  active.value = -1;
+};
+
+const remove = (data) => emit("remove", data);
+
+const hide = () => emit("hide");
+
+const save = (data) => emit("save", data);
 
 </script>

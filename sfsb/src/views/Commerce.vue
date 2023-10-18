@@ -12,13 +12,19 @@
   </v-container>
 </template>
 
-<script>
+<script setup>
 
 import CustomerComponent from "@/components/customer/CustomerComponent.vue";
 import OrderComponent from "@/components/order/OrderComponent.vue";
+import {onMounted} from "vue";
+import {useStore} from "vuex";
 
-export default {
-  name: "Commerce",
-  components: {OrderComponent, CustomerComponent},
-}
+const store = useStore();
+
+onMounted(() => {
+  store.dispatch("fetchCustomers");
+  store.dispatch("fetchOrders");
+  store.dispatch("fetchEmployees");
+});
+
 </script>

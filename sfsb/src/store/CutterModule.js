@@ -3,16 +3,10 @@ import api from "@/api/instance";
 export default {
   state: {
     cutters: [],
-    cutter: {},
-    cutterListVisible: false,
-    cutterDialogVisible: false,
   },
   mutations: {
     setCutters(state, payload) {
       state.cutters = payload;
-    },
-    setCutter(state, payload) {
-      state.cutter = payload;
     },
     saveCutter(state, payload) {
       const index = state.cutters.findIndex(item => item.id === payload.id);
@@ -22,21 +16,12 @@ export default {
         state.cutters.push(payload)
       }
     },
-    setCutterListVisible(state, payload) {
-      state.cutterListVisible = payload;
-    },
-    setCutterDialogVisible(state, payload) {
-      state.cutterDialogVisible = payload;
-    },
     deleteCutter(state, payload) {
-      state.cutters = state.cutters.filter(cutter => cutter.id !== payload.id);
+      state.cutters = state.cutters.filter(item => item.id !== payload.id);
     },
   },
   getters: {
     getCutters: (state) => state.cutters,
-    getCutter: (state) => state.cutter,
-    getCutterListVisible: (state) => state.cutterListVisible,
-    getCutterDialogVisible: (state) => state.cutterDialogVisible,
   },
   actions: {
     async fetchCutters({commit}) {
@@ -54,9 +39,10 @@ export default {
           ? `/cutter/${cutter.id}`
           : '/cutter';
 
-        const response = await (cutter.id ? api.put(url, cutter) : api.post(url, cutter));
+        const response = await (cutter.id
+          ? api.put(url, cutter)
+          : api.post(url, cutter));
         commit("saveCutter", response.data);
-        return response.data;
       } catch (error) {
         console.log("Инструмент не создан");
         console.error(error);

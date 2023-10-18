@@ -1,21 +1,36 @@
 <template>
   <v-container>
-    <company-preview-card/>
-    <company-create-dialog/>
+    <company-preview-card :company="company"
+                          @click.stop="visible=true"
+    />
+    <company-create-dialog v-if="company.id"
+                           :company="company"
+                           :employees="employees"
+                           :visible="visible"
+                           @hide="visible=false"
+                           @save="save($event)"
+    />
   </v-container>
 </template>
 
 <script setup>
 import CompanyPreviewCard from "@/components/company/CompanyPreviewCard.vue";
 import CompanyCreateDialog from "@/components/company/CompanyCreateDialog.vue";
-import {onMounted} from "vue";
+import {computed, onMounted, ref} from "vue";
 import {useStore} from "vuex";
 
 const store = useStore();
 
 onMounted(() => {
   store.dispatch("fetchCompanyData");
-  store.dispatch("fetchEmployees")
 });
+
+const company = computed(() => store.getters.getCompany);
+const employees = computed(() => store.getters.getEmployees);
+const visible = ref(false);
+
+const save = (data) => {
+  store.dispatch("saveCompany", data);
+};
 
 </script>

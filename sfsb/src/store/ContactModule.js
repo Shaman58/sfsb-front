@@ -1,17 +1,6 @@
 import api from "@/api/instance";
 
 export default {
-  state: {
-    listDialog: false,
-  },
-  mutations: {
-    setContactListDialogVisible(state, payload) {
-      state.listDialog = payload;
-    },
-  },
-  getters: {
-    isListDialogVisible: (state) => state.listDialog,
-  },
   actions: {
     async saveContact({dispatch, commit}, contact) {
       try {

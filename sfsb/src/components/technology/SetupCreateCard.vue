@@ -214,7 +214,7 @@
 import {ref, reactive, computed} from 'vue';
 import {useStore} from 'vuex';
 import {useValidationRules} from "@/mixins/FieldValidationRules";
-import ToolCreate from "@/components/technology/ToolCreate.vue";
+import ToolCreate from "@/components/technology/ToolItemCreate.vue";
 import AdditionalCreate from "@/components/technology/AdditionalCreate.vue";
 import materialDataFormatting from "@/mixins/MaterialDataFormatting";
 import MeasureCreateList from "@/components/technology/MeasureCreateList.vue";
@@ -269,17 +269,14 @@ const setupNumbers = computed(() => store.getters.getItem.technology.setups.filt
 const operations = computed(() => store.getters.getOperations);
 const unitNumberValidationRule = rules.unitNumberValidation(setupNumbers);
 
-const save = (setup) => {
-  emit("save", setup);
-};
+const save = (setup) => emit("save", setup);
+
 
 const deleteSetup = () => {
   hideSetup();
   emit("deleteSetup");
 };
 
-const hideSetup = () => {
-  emit("hideSetup");
-}
+const hideSetup = () => emit("hideSetup");
 
 </script>

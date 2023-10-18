@@ -4,10 +4,7 @@ export default {
   state: {
     setupPrice: {},
     techPrice: {},
-    operation: {},
     operations: [],
-    operationListVisible: false,
-    operationDialogVisible: false,
   },
   mutations: {
     setSetupPrice(state, payload) {
@@ -16,17 +13,8 @@ export default {
     setTechPrice(state, payload) {
       state.techPrice = payload;
     },
-    setOperation(state, payload) {
-      state.operation = payload;
-    },
     setOperations(state, payload) {
       state.operations = payload;
-    },
-    setOperationListVisible(state, payload) {
-      state.operationListVisible = payload;
-    },
-    setOperationDialogVisible(state, payload) {
-      state.operationDialogVisible = payload;
     },
     saveOperation(state, payload) {
       const index = state.operations.findIndex(item => item.id === payload.id);
@@ -43,10 +31,7 @@ export default {
   getters: {
     getSetupPrice: (state) => state.setupPrice,
     getTechPrice: (state) => state.techPrice,
-    getOperation: (state) => state.operation,
     getOperations: (state) => state.operations,
-    getOperationListVisible: (state) => state.operationListVisible,
-    getOperationDialogVisible: (state) => state.operationDialogVisible,
   },
   actions: {
     async fetchOperations({commit}) {

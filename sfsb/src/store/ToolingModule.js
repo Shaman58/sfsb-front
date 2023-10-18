@@ -3,16 +3,10 @@ import api from "@/api/instance";
 export default {
   state: {
     toolings: [],
-    tooling: {},
-    toolingListVisible: false,
-    toolingDialogVisible: false,
   },
   mutations: {
     setToolings(state, payload) {
       state.toolings = payload;
-    },
-    setTooling(state, payload) {
-      state.tooling = payload;
     },
     saveTooling(state, payload) {
       const index = state.toolings.findIndex((tooling) => tooling.id === payload.id);
@@ -22,21 +16,12 @@ export default {
         state.toolings.push(payload);
       }
     },
-    setToolingListVisible(state, payload) {
-      state.toolingListVisible = payload
-    },
-    setToolingDialogVisible(state, payload) {
-      state.toolingDialogVisible = payload
-    },
     deleteTooling(state, payload) {
       state.toolings = state.toolings.filter(tooling => tooling.id !== payload.id);
     },
   },
   getters: {
     getToolings: (state) => state.toolings,
-    getTooling: (state) => state.tooling,
-    getToolingListVisible: (state) => state.toolingListVisible,
-    getToolingDialogVisible: (state) => state.toolingDialogVisible,
   },
   actions: {
     async fetchToolings({commit}) {

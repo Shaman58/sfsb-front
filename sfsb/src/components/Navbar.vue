@@ -4,7 +4,7 @@
       <template v-slot:prepend>
         <impuls-hub/>
       </template>
-
+      v-0.1.0
       <v-toolbar-items class="ml-5" style="overflow-x: auto;">
 
         <v-btn

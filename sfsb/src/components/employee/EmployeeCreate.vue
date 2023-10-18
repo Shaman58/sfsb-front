@@ -1,11 +1,7 @@
 <template>
-  <v-dialog v-model="employeeDialogVisible" width="768" persistent>
-    <v-form ref="form" v-model="valid" @submit.prevent="save()" style="overflow-y: auto;">
+  <v-dialog v-model="props.visible" width="768" persistent>
+    <v-form ref="form" v-model="valid" @submit.prevent="save(employee)" style="overflow-y: auto;">
       <v-card>
-        <v-card-title>
-          <span v-if="isObjectHasDepartment" class="text-h5">Сотрудник</span>
-          <span v-else class="text-h5">Контакт</span>
-        </v-card-title>
         <v-card-text>
           <v-container>
             <v-row>
@@ -27,7 +23,7 @@
                   maxlength="20"
                 ></v-text-field>
               </v-col>
-              <v-col cols="12">
+              <v-col cols="6">
                 <v-text-field
                   label="Должность"
                   v-model="employee.position"
@@ -35,6 +31,16 @@
                   counter
                   maxlength="20"
                 ></v-text-field>
+              </v-col>
+              <v-col cols="6">
+                <v-select v-if="departments"
+                          label="Отдел"
+                          :items="departments"
+                          item-title="departmentName"
+                          return-object
+                          v-model="employee.department"
+                          :rules="[rules.required]"
+                />
               </v-col>
               <v-col cols="12">
                 <v-text-field
@@ -58,7 +64,7 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="orange-darken-1" variant="text" @click="hideEmployeeDialog">
+          <v-btn color="orange-darken-1" variant="text" @click="hide">
             Закрыть
           </v-btn>
           <v-btn color="orange-darken-1" variant="text" type="submit" :disabled="!valid">
@@ -70,34 +76,44 @@
   </v-dialog>
 </template>
 <script setup>
-import {computed, ref} from "vue";
+import {ref} from "vue";
 import {useStore} from "vuex";
 import {useValidationRules} from "@/mixins/FieldValidationRules";
 
-const store = useStore();
+const props = defineProps({
+  visible: {
+    type: Boolean,
+    required: true
+  },
+  employee: {
+    type: Object,
+    required: true
+  },
+  departments: {
+    type: Object,
+    required: false
+  }
+});
 
-const employeeDialogVisible = computed(() => store.getters.getEmployeeDialogVisible);
-const employee = computed(() => store.getters.getEmployee);
+const store = useStore();
+const emit = defineEmits();
 
 const form = ref(null);
 const valid = ref(false);
+const employee = ref({...props.employee});
 
 const {rules} = useValidationRules();
 
-const hideEmployeeDialog = () => {
-  store.commit("setEmployeeDialog", false);
-};
-
-const isObjectHasDepartment = computed(() => {
-  return 'department' in employee.value || employee.value.hasOwnProperty('department');
-});
-
-const save = () => {
+const save = (data) => {
   if (form.value.validate()) {
-    isObjectHasDepartment.value ?
-      store.dispatch("saveEmployee", employee.value) :
-      store.dispatch("saveContact", employee.value);
-    hideEmployeeDialog();
+    emit("save", data);
+    hide();
   }
 };
+
+const hide = () => {
+  emit("hide");
+  employee.value = {...props.employee};
+};
+
 </script>

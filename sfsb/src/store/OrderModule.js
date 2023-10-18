@@ -2,25 +2,13 @@ import api from "@/api/instance";
 
 export default {
   state: {
-    orders: [],
-    order: {},
-    listDialog: false,
-    createDialog: false,
+    orders: []
   },
   mutations: {
     setOrders(state, payload) {
       state.orders = payload
     },
-    setOrder(state, payload) {
-      state.order = payload
-    },
-    setOrdersListDialog(state, payload) {
-      state.listDialog = payload;
-    },
-    setOrderCreateDialog(state, payload) {
-      state.createDialog = payload;
-    },
-    saveOrderToOrders(state, payload) {
+    saveOrder(state, payload) {
       const index = state.orders.findIndex((order) => order.id === payload.id);
       if (index !== -1) {
         state.orders.splice(index, 1, payload);
@@ -28,15 +16,12 @@ export default {
         state.orders.push(payload);
       }
     },
-    deleteOrderFormOrders(state, payload) {
+    deleteOrder(state, payload) {
       state.orders = state.orders.filter(order => order.id !== payload.id);
     },
   },
   getters: {
     getOrders: (state) => state.orders,
-    getOrder: (state) => state.order,
-    isOrderDialogVisible: (state) => state.listDialog,
-    isOrderCreateDialogVisible: (state) => state.createDialog,
   },
   actions: {
     fetchOrders({commit}) {
@@ -47,21 +32,16 @@ export default {
           console.error(error);
         });
     },
-    fetchOrder({commit}, order) {
-      return api.get(`/order/${order.id}`)
-        .then(response => commit("setOrder", response.data))
-        .catch(error => {
-          console.log('Заказ не найден');
-          console.error(error);
-        });
-    },
     async saveOrder({dispatch, commit}, order) {
       try {
         const url = order.id
           ? `/order/${order.id}`
           : '/order';
-        const response = await (order.id ? api.put(url, order) : api.post(url, order));
-        commit("saveOrderToOrders", response.data);
+        const response = await (order.id
+          ? api.put(url, order)
+          : api.post(url, order));
+        commit("saveOrder", response.data);
+        return response.data;
       } catch (error) {
         console.log("Заявка не создана");
         console.error(error);
@@ -70,7 +50,7 @@ export default {
     async deleteOrder({commit}, order) {
       try {
         await api.delete(`/order/${order.id}`);
-        commit("deleteOrderFormOrders", order);
+        commit("deleteOrder", order);
       } catch (error) {
         console.log('Заявка не удалена');
         console.error(error);
