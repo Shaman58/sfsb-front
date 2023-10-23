@@ -221,7 +221,7 @@
               Сохранить
             </v-btn>
             <v-btn color="orange-darken-1" variant="text"
-                   :disabled="!valid || item.technology.computed"
+                   :disabled="!saveActive && ( !valid || item.technology.computed )"
                    @click.stop="calculateItem">
               Рассчитать
             </v-btn>
@@ -255,6 +255,7 @@ const valid = ref(false);
 const workpieceCardVisible = ref(false);
 const {formatMaterialData, formatWorkpieceData} = materialDataFormatting();
 const activeSetupIndex = ref(null);
+const saveActive = ref(true);
 
 const isDialogVisible = computed(() => store.getters.isTechnologyDialogVisible);
 const item = computed(() => {
@@ -329,12 +330,6 @@ const createNewSetup = () => ({
 
 const newSetup = ref(createNewSetup());
 
-const save = async () => {
-  item.value.technology.computed = false;
-  await store.dispatch("saveTechnology", item.value.technology);
-  await store.dispatch("fetchItems");
-};
-
 const pushSetup = ({...setup}) => {
   hideSetup(setup);
   item.value.technology.setups.push(setup);
@@ -367,7 +362,19 @@ const hideDialog = () => {
   store.commit("setTechnologyDialogVisible", false);
 };
 
+const save = async () => {
+  if (!saveActive.value) return;
+  saveActive.value = false;
+  item.value.technology.computed = false;
+  await store.dispatch("saveTechnology", item.value.technology);
+  await store.dispatch("fetchItem", item.value.id);
+  await store.dispatch("fetchItems");
+  saveActive.value = true;
+};
+
 const calculateItem = async () => {
+  if (!saveActive.value) return;
+  saveActive.value = false;
   item.value.technology.computed = false;
   await store.dispatch("saveTechnology", item.value.technology);
   await api.get("/doc/calculate", {
@@ -375,12 +382,13 @@ const calculateItem = async () => {
   })
     .then(async () => {
       toast.info("Успешно!", {position: "top-right"});
-      await store.dispatch("fetchItem", item.value.id);
-      await store.dispatch("fetchItems");
     })
     .catch(error => {
       toast.error(error.response.data.info, {position: "top-right"});
     });
+  await store.dispatch("fetchItem", item.value.id);
+  await store.dispatch("fetchItems");
+  saveActive.value = true;
 };
 
 const saveWorkpiece = (validWorkpiece) => {

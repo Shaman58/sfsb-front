@@ -88,7 +88,8 @@
         </v-card-text>
 
         <v-card-actions>
-          <v-btn @click="previewCommerce(order)" :disabled="kpAvailable">Вывести компред</v-btn>
+          <v-btn @click="previewCommerce(order)" :disabled="kpAvailable">компред</v-btn>
+          <v-btn @click="previewToolOrder(order,1,2)" :disabled="kpAvailable">заявка на инструмент</v-btn>
           <v-spacer></v-spacer>
           <v-btn color="orange-darken-1" variant="text" @click="hide">
             Закрыть
@@ -131,7 +132,7 @@ const props = defineProps({
 
 const store = useStore();
 const {rules} = useValidationRules();
-const {previewCommerce} = useOfferGenerator();
+const {previewCommerce, previewToolOrder} = useOfferGenerator();
 
 const form = ref(null);
 const valid = ref(false);
