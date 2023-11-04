@@ -1,4 +1,7 @@
 import api from "@/api/instance";
+import {useToast} from "vue-toast-notification";
+
+const toast = useToast();
 
 export default {
   state: {
@@ -43,7 +46,9 @@ export default {
           ? api.put(url, cutter)
           : api.post(url, cutter));
         commit("saveCutter", response.data);
+        toast.info("Успешно сохранено!", {position: "top-right"});
       } catch (error) {
+        toast.error(error.response.data.info, {position: "top-right"});
         console.log("Инструмент не создан");
         console.error(error);
       }
@@ -52,7 +57,9 @@ export default {
       try {
         await api.delete(`/cutter/${cutter.id}`);
         commit("deleteCutter", cutter);
+        toast.info("Успешно удален!", {position: "top-right"});
       } catch (error) {
+        toast.error(error.response.data.info, {position: "top-right"});
         console.log("Инструмент не удален");
         console.error(error);
       }

@@ -1,5 +1,7 @@
 import api from '../api/instance'
+import {useToast} from "vue-toast-notification";
 
+const toast = useToast();
 export default {
   state: {
     company: {},
@@ -29,7 +31,9 @@ export default {
         const url = '/company';
         const response = await api.put(url, company);
         commit('setCompany', response.data);
+        toast.info("Успешно сохранено!", {position: "top-right"});
       } catch (error) {
+        toast.error(error.response.data.info, {position: "top-right"});
         console.error(error);
       }
     }

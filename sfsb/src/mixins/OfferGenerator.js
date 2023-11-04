@@ -1,12 +1,16 @@
 import api from "@/api/instance";
 import mammoth from "mammoth";
+import {useToast} from "vue-toast-notification";
+import {saveAs} from 'file-saver';
+
+const toast = useToast();
 
 export const useOfferGenerator = () => {
   const generateDocument = async (url, params, filename) => {
     try {
       const response = await api.get(url, {
         params,
-        responseType: 'arraybuffer'
+        responseType: "arraybuffer"
       });
 
       const arrayBuffer = response.data;
@@ -25,7 +29,8 @@ export const useOfferGenerator = () => {
       newWindow.document.write(result.value);
       newWindow.document.close();
     } catch (error) {
-      console.error("There was an error previewing the DOCX file:", error);
+      toast.error("Ошибка, проверьте расчет! Возможно нет инструментов для формирования заявки!", {position: "top-right"});
+      console.error("There was an error previewing the DOCX file:", error.message);
     }
   }
 
@@ -50,5 +55,47 @@ export const useOfferGenerator = () => {
     await generateDocument(url, params, filename);
   }
 
-  return {previewCommerce, previewToolOrder};
+  const previewPlan1 = async (order) => {
+    const url = "/doc/manufacturing-report";
+    const params = {
+      orderId: order.id,
+    };
+    const filename = "План на заказ №" + order.applicationNumber + ".xlsx";
+
+    try {
+      const response = await api.get(url, {
+        params,
+        responseType: "arraybuffer"
+      });
+
+      const blob = new Blob([response.data], {type: response.headers['content-type']});
+      saveAs(blob, filename);
+
+    } catch (error) {
+      console.error("There was an error downloading the file:", error.message);
+    }
+  };
+
+  const previewPlan2 = async (order) => {
+    const url = "/doc/operation-report";
+    const params = {
+      orderId: order.id,
+    };
+    const filename = "План на заказ №" + order.applicationNumber + ".xlsx";
+
+    try {
+      const response = await api.get(url, {
+        params,
+        responseType: "arraybuffer"
+      });
+
+      const blob = new Blob([response.data], {type: response.headers['content-type']});
+      saveAs(blob, filename);
+
+    } catch (error) {
+      console.error("There was an error downloading the file:", error.message);
+    }
+  };
+
+  return {previewCommerce, previewToolOrder, previewPlan1, previewPlan2};
 };

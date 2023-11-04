@@ -5,7 +5,7 @@
         <v-card-text>
           <v-row>
             <v-col cols="4">
-              <v-text-field label="Название:"
+              <v-text-field label="Название операции:"
                             v-model="operation.operationName"
                             :rules="[rules.required, rules.nameValidation]"
                             counter
@@ -22,7 +22,7 @@
               </v-select>
             </v-col>
             <v-col cols="4">
-              <v-text-field label="Стоимость:"
+              <v-text-field label="Стоимость за час:"
                             v-model="operation.paymentPerHour.amount"
                             :rules="[rules.required,rules.numeric]"
                             type="number"
@@ -43,6 +43,35 @@
             </v-btn>
           </v-card-actions>
         </v-card-text>
+        <v-container v-if="!operation.id||operation.id>=3">
+          <v-row>
+            <v-col cols="3">
+              <v-card>
+                Станочная - применяется для назначения машинных операций с временем <a class="text-cyan">операции</a>,
+                <a class="text-cyan">наладки</a> и
+                <a class="text-cyan">межоперационки</a>
+              </v-card>
+            </v-col>
+            <v-col cols="3">
+              <v-card>
+                Ручная - применяется для назначения ручных операций с временем <a class="text-cyan">операции</a> БЕЗ <a
+                class="text-red">наладки</a> и
+                <a class="text-red">межоперационки</a>
+              </v-card>
+            </v-col>
+            <v-col cols="3">
+              <v-card>Вычисляемая - применяется для назначения операции с временем <a class="text-cyan">операции</a> и
+                возможностью обработки по
+                <a class="text-cyan">несколько ЗАГОТОВОК</a>
+              </v-card>
+            </v-col>
+            <v-col cols="3">
+              <v-card>Без вычислений - применяется для назначения операции где нет расчета и нужно обозначить операцию
+                или расчет невозможен, может пригодиться
+              </v-card>
+            </v-col>
+          </v-row>
+        </v-container>
       </v-form>
     </v-card>
   </v-dialog>

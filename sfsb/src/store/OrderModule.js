@@ -1,5 +1,7 @@
 import api from "@/api/instance";
+import {useToast} from "vue-toast-notification";
 
+const toast = useToast();
 export default {
   state: {
     orders: []
@@ -41,8 +43,10 @@ export default {
           ? api.put(url, order)
           : api.post(url, order));
         commit("saveOrder", response.data);
+        toast.info("Успешно сохранено!", {position: "top-right"});
         return response.data;
       } catch (error) {
+        toast.error(error.response.data.info, {position: "top-right"});
         console.log("Заявка не создана");
         console.error(error);
       }
@@ -51,7 +55,9 @@ export default {
       try {
         await api.delete(`/order/${order.id}`);
         commit("deleteOrder", order);
+        toast.info("Успешно удален!", {position: "top-right"});
       } catch (error) {
+        toast.error(error.response.data.info, {position: "top-right"});
         console.log('Заявка не удалена');
         console.error(error);
       }

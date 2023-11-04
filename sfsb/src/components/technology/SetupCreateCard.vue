@@ -61,7 +61,7 @@
 
             <v-col cols="4"
                    v-if="setup.cooperate">
-              <v-text-field label="Кооперационная цена"
+              <v-text-field label="Кооперационная цена на деталь"
                             v-model="setup.cooperatePrice.amount"
                             type="number"
                             :rules="[rules.required, rules.numeric, rules.min0Validation]">
@@ -71,7 +71,7 @@
             <v-col cols="4"
                    v-if="setup?.operation?.operationTimeManagement==='FULL'&&!setup.cooperate
                    || setup?.operation?.operationTimeManagement==='COMPUTED'&&!setup.cooperate
-                   || setup?.operation?.operationTimeManagement==='PROCESS_TIME_ONLY'">
+                   || setup?.operation?.operationTimeManagement==='PROCESS_TIME_ONLY'&&!setup.cooperate">
               <v-text-field label="Время цикла(чч:мм)"
                             v-model="setup.processTime"
                             type="time"
@@ -95,7 +95,7 @@
 
             <v-col cols="4"
                    v-if="setup?.operation?.operationTimeManagement==='FULL'&&!setup.cooperate
-                   || setup?.operation?.operationTimeManagement==='PROCESS_TIME_ONLY'">
+                   || setup?.operation?.operationTimeManagement==='PROCESS_TIME_ONLY'&&!setup.cooperate">
               <v-select v-if="!!toolings"
                         :items="toolings"
                         item-title='toolName'
@@ -108,7 +108,7 @@
 
             <v-col cols="4"
                    v-if="setup?.operation?.operationTimeManagement==='FULL'&&!setup.cooperate
-                   || setup?.operation?.operationTimeManagement==='PROCESS_TIME_ONLY'">
+                   || setup?.operation?.operationTimeManagement==='PROCESS_TIME_ONLY'&&!setup.cooperate">
               <v-btn size="small" variant="text"
                      v-if="setup.measureToolItems?.length===0"
                      @click="measureVisible=true">
@@ -127,7 +127,7 @@
 
             <v-col cols="4"
                    v-if="setup?.operation?.operationTimeManagement==='FULL'&&!setup.cooperate
-                   || setup?.operation?.operationTimeManagement==='PROCESS_TIME_ONLY'">
+                   || setup?.operation?.operationTimeManagement==='PROCESS_TIME_ONLY'&&!setup.cooperate">
               <v-btn size="small" variant="text"
                      v-if="setup.cutterToolItems?.length===0"
                      @click="cutterVisible=true">
@@ -147,7 +147,7 @@
 
             <v-col cols="4"
                    v-if="setup?.operation?.operationTimeManagement==='FULL'&&!setup.cooperate
-                   || setup?.operation?.operationTimeManagement==='PROCESS_TIME_ONLY'">
+                   || setup?.operation?.operationTimeManagement==='PROCESS_TIME_ONLY'&&!setup.cooperate">
               <v-btn size="small" variant="text"
                      v-if="setup.specialToolItems?.length===0"
                      @click="specialVisible=true">
@@ -167,7 +167,7 @@
 
             <v-col cols="6"
                    v-if="setup?.operation?.operationTimeManagement==='FULL'&&!setup.cooperate
-                   || setup?.operation?.operationTimeManagement==='PROCESS_TIME_ONLY'">
+                   || setup?.operation?.operationTimeManagement==='PROCESS_TIME_ONLY'&&!setup.cooperate">
               <v-btn size="small" variant="text"
                      v-if="setup.additionalTools?.length===0"
                      @click="additionalVisible=true">

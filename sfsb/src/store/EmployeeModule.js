@@ -1,4 +1,7 @@
 import api from "@/api/instance";
+import {useToast} from "vue-toast-notification";
+
+const toast = useToast();
 
 export default {
   state: {
@@ -41,8 +44,9 @@ export default {
 
         const response = await (employee.id ? api.put(url, employee) : api.post(url, employee));
         commit("saveEmployee", response.data);
-        return response.data;
+        toast.info("Успешно сохранено!", {position: "top-right"});
       } catch (error) {
+        toast.error(error.response.data.info, {position: "top-right"});
         console.log("Сотрудник не создан");
         console.error(error);
       }
@@ -51,7 +55,9 @@ export default {
       try {
         await api.delete(`/employee/${employee.id}`);
         commit("deleteEmployee", employee);
+        toast.info("Успешно удален!", {position: "top-right"});
       } catch (error) {
+        toast.error(error.response.data.info, {position: "top-right"});
         console.log("Сотрудник не удален");
         console.error(error);
       }

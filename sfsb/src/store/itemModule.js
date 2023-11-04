@@ -1,5 +1,7 @@
 import api from "@/api/instance";
+import {useToast} from "vue-toast-notification";
 
+const toast = useToast();
 export default {
   state: {
     items: [],
@@ -50,26 +52,16 @@ export default {
           console.error(error);
         });
     },
-    async saveItem({commit}, item) {
-      try {
-        const url = !!item.id
-          ? `/item/${item.id}`
-          : '/item';
-        await (!!item.id ? api.put(url, item) : api.post(url, item))
-          .then(response => commit("saveItem", response.data));
-      } catch (error) {
-        console.log("Позиция не создана");
-        console.error(error);
-      }
-    },
-    async deleteItem({commit}, item) {
-      try {
-        await api.delete(`/item/${item.id}`);
-        commit("deleteItem", item);
-      } catch (error) {
-        console.log('Позиция не удалена');
-        console.error(error);
-      }
+    async calculateItem({commit}, id) {
+      await api.get("/doc/calculate", {
+        params: {itemId: id},
+      })
+        .then(async () => {
+          toast.info("Успешно расчитано!", {position: "top-right"});
+        })
+        .catch(error => {
+          toast.error(error.response.data.info, {position: "top-right"});
+        });
     },
   }
 }

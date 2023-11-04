@@ -1,4 +1,7 @@
 import api from "@/api/instance";
+import {useToast} from "vue-toast-notification";
+
+const toast = useToast();
 
 export default {
   state: {
@@ -79,8 +82,9 @@ export default {
 
         const response = await api.put(url, operation);
         commit("setSetupPrice", response.data);
-        return response.data;
+        toast.info("Успешно сохранено!", {position: "top-right"});
       } catch (error) {
+        toast.error(error.response.data.info, {position: "top-right"});
         console.log("Операция не сохранена");
         console.error(error);
       }
@@ -93,8 +97,9 @@ export default {
 
         const response = await (operation.id ? api.put(url, operation) : api.post(url, operation));
         commit("saveOperation", response.data);
-        return response.data;
+        toast.info("Успешно сохранено!", {position: "top-right"});
       } catch (error) {
+        toast.error(error.response.data.info, {position: "top-right"});
         console.log("Операция не создана");
         console.error(error);
       }
@@ -103,7 +108,9 @@ export default {
       try {
         await api.delete(`/operation/${operation.id}`);
         commit("deleteOperation", operation);
+        toast.info("Успешно удален!", {position: "top-right"});
       } catch (error) {
+        toast.error(error.response.data.info, {position: "top-right"});
         console.log("Операция не удалена");
         console.error(error);
       }

@@ -1,4 +1,7 @@
 import api from "@/api/instance";
+import {useToast} from "vue-toast-notification";
+
+const toast = useToast();
 
 export default {
   state: {
@@ -41,8 +44,9 @@ export default {
 
         const response = await (special.id ? api.put(url, special) : api.post(url, special));
         commit("saveSpecial", response.data);
-        return response.data;
+        toast.info("Успешно сохранено!", {position: "top-right"});
       } catch (error) {
+        toast.error(error.response.data.info, {position: "top-right"});
         console.log("Специнструмент не создан");
         console.error(error);
       }
@@ -51,7 +55,9 @@ export default {
       try {
         await api.delete(`/special/${special.id}`);
         commit("deleteSpecial", special);
+        toast.info("Успешно удален!", {position: "top-right"});
       } catch (error) {
+        toast.error(error.response.data.info, {position: "top-right"});
         console.log("Специнструмент не удален");
         console.error(error);
       }

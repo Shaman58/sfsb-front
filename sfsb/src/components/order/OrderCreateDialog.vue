@@ -78,7 +78,8 @@
               </v-col>
               <v-col cols="12">
                 <v-textarea label="КП"
-                            v-model="order.businessProposal">
+                            v-model="order.businessProposal"
+                            :rules="[rules.required]">
                 </v-textarea>
               </v-col>
               <v-divider/>
@@ -90,6 +91,8 @@
         <v-card-actions>
           <v-btn @click="previewCommerce(order)" :disabled="kpAvailable">компред</v-btn>
           <v-btn @click="previewToolOrder(order,1,2)" :disabled="kpAvailable">заявка на инструмент</v-btn>
+          <v-btn @click="previewPlan1(order)" :disabled="kpAvailable">План 1</v-btn>
+          <v-btn @click="previewPlan2(order)" :disabled="kpAvailable">План 2</v-btn>
           <v-spacer></v-spacer>
           <v-btn color="orange-darken-1" variant="text" @click="hide">
             Закрыть
@@ -132,7 +135,7 @@ const props = defineProps({
 
 const store = useStore();
 const {rules} = useValidationRules();
-const {previewCommerce, previewToolOrder} = useOfferGenerator();
+const {previewCommerce, previewToolOrder, previewPlan1, previewPlan2} = useOfferGenerator();
 
 const form = ref(null);
 const valid = ref(false);

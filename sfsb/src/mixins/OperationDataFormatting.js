@@ -4,7 +4,7 @@ export default function useOperationFormatting() {
   const operations = ref([
     {title: 'Станочная', label: 'FULL'},
     {title: 'Ручная', label: 'PROCESS_TIME_ONLY'},
-    {title: 'Вычисляемая(термичка)', label: 'COMPUTED'},
+    {title: 'Вычисляемая', label: 'COMPUTED'},
     {title: 'Без вычислений', label: 'NONE'},
   ]);
 
@@ -15,7 +15,7 @@ export default function useOperationFormatting() {
       case 'PROCESS_TIME_ONLY':
         return `Ручная`;
       case 'COMPUTED':
-        return `Вычисляемая(термичка)`;
+        return `Вычисляемая`;
       case 'NONE':
         return `Без вычислений`;
       default:

@@ -11,9 +11,14 @@
 
             <v-row>
               <v-col>
+                <v-switch v-model="item.technology.assembly"
+                          :true-value="true"
+                          :false-value="false"
+                          :label="item.technology.assembly ? 'Сборка' : 'Деталь'">
+                </v-switch>
                 <v-card
                   width="200"
-                  v-if="!workpieceCardVisible"
+                  v-if="!workpieceCardVisible && !item.technology.assembly"
                   title="Заготовка:"
                   @click="showWorkpieceCard">
                   <v-card-item>
@@ -23,7 +28,7 @@
                   </v-card-item>
                 </v-card>
                 <tech-workpiece-card
-                  v-else
+                  v-else-if="!item.technology.assembly"
                   :workpiece="{...item.technology.workpiece}"
                   :materials="materials"
                   @validatedWorkpiece="saveWorkpiece"
@@ -34,6 +39,7 @@
                 <v-row>
                   <v-col cols="4">
                     <v-text-field
+                      v-if="!item.technology.assembly"
                       label="Из заготовки"
                       v-model="item.technology.quantityOfPartsFromWorkpiece"
                       type="number"
@@ -217,11 +223,11 @@
               </a>
             </v-col>
             <v-btn color="orange-darken-1" variant="text" type="submit"
-                   :disabled="!valid || !item.technology.workpiece">
+                   :disabled="isSaveActive">
               Сохранить
             </v-btn>
             <v-btn color="orange-darken-1" variant="text"
-                   :disabled="!saveActive && ( !valid || item.technology.computed )"
+                   :disabled="isSaveActive"
                    @click.stop="calculateItem">
               Рассчитать
             </v-btn>
@@ -241,15 +247,12 @@ import {useStore} from "vuex";
 import {computed, ref} from "vue";
 import TechWorkpieceCard from "@/components/technology/TechWorkpieceCard.vue";
 import SetupCreateCard from "@/components/technology/SetupCreateCard.vue";
-import api from "@/api/instance";
 import 'vue-toast-notification/dist/theme-bootstrap.css'
-import {useToast} from 'vue-toast-notification';
 import materialDataFormatting from '@/mixins/MaterialDataFormatting'
 import {useValidationRules} from "@/mixins/FieldValidationRules";
 
 const {rules} = useValidationRules();
 const store = useStore();
-const toast = useToast();
 const form = ref(null);
 const valid = ref(false);
 const workpieceCardVisible = ref(false);
@@ -311,6 +314,9 @@ const calculateSetupNumber = computed(() => {
   }
   return -1;
 });
+
+const isSaveActive = computed(() => !valid.value || !saveActive.value || (!item.value.technology.workpiece && !item.value.technology.assembly)
+);
 
 const createNewSetup = () => ({
   setupTime: "00:00",
@@ -377,15 +383,7 @@ const calculateItem = async () => {
   saveActive.value = false;
   item.value.technology.computed = false;
   await store.dispatch("saveTechnology", item.value.technology);
-  await api.get("/doc/calculate", {
-    params: {itemId: item.value.id},
-  })
-    .then(async () => {
-      toast.info("Успешно!", {position: "top-right"});
-    })
-    .catch(error => {
-      toast.error(error.response.data.info, {position: "top-right"});
-    });
+  await store.dispatch("calculateItem", item.value.id);
   await store.dispatch("fetchItem", item.value.id);
   await store.dispatch("fetchItems");
   saveActive.value = true;
@@ -414,6 +412,12 @@ const showWorkpieceCard = () => {
 
 .v-toast {
   z-index: 9999 !important;
+}
+
+.computed {
+  border: 1px solid #97ffa0;
+  border-radius: 10px;
+  margin: 2px;
 }
 
 </style>
