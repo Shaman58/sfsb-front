@@ -62,6 +62,15 @@
                   :rules="[rules.required, rules.minValidation]"
                 />
               </v-col>
+              <v-col cols="3" v-if="!workpieceCardVisible">
+                <v-text-field
+                  label="Время изготовления(чч:мм)"
+                  v-model="toolItem.processTime"
+                  type="time"
+                  @focus="toolItem.processTime='00:00'"
+                  :rules="[rules.required, rules.durationNotZeroValidation]"
+                ></v-text-field>
+              </v-col>
             </v-row>
           </v-container>
 
@@ -100,7 +109,8 @@ const props = defineProps({
     default: [{
       workpiece: Object,
       toolName: String,
-      amount: Number
+      amount: Number,
+      processTime: "00:00"
     }]
   },
 });

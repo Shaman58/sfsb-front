@@ -1,8 +1,7 @@
 import axios from "axios";
 
 const instanceOptions = {
-  // baseURL: 'http://localhost:9001/api',
-  baseURL: 'http://45.12.237.10:9001/api',
+  baseURL: import.meta.env.VITE_APP_BASE_API_URL,
   withCredentials: false,
   headers: {
     accept: 'application/json'

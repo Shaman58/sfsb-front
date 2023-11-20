@@ -15,29 +15,29 @@ export default function useGeometryFormatting() {
   ]);
 
   const formatMaterialData = (data) => {
-    const {geometry, materialName, gost} = data;
+    const {geometry, materialName, gost1, gost2} = data;
 
     switch (geometry) {
       case 'CYLINDER':
-        return `Круг ${materialName} ${gost}`;
+        return `Круг ${materialName} ${gost1 ? gost1 : ''} ${gost2 ? gost2 : ''}`;
       case 'BLANK':
-        return `Плита ${materialName} ${gost}`;
+        return `Плита ${materialName} ${gost1 ? gost1 : ''} ${gost2 ? gost2 : ''}`;
       case 'HEXAGON':
-        return `Шестигранник ${materialName} ${gost}`;
+        return `Шестигранник ${materialName} ${gost1 ? gost1 : ''} ${gost2 ? gost2 : ''}`;
       case 'ROD':
-        return `Пруток ${materialName} ${gost}`;
+        return `Пруток ${materialName} ${gost1 ? gost1 : ''} ${gost2 ? gost2 : ''}`;
       case 'TUBE':
-        return `Труба ${materialName} ${gost}`;
+        return `Труба ${materialName} ${gost1 ? gost1 : ''} ${gost2 ? gost2 : ''}`;
       case 'PROFILE':
-        return `Профиль ${materialName} ${gost}`;
+        return `Профиль ${materialName} ${gost1 ? gost1 : ''} ${gost2 ? gost2 : ''}`;
       case 'LIST':
-        return `Лист ${materialName} ${gost}`;
+        return `Лист ${materialName} ${gost1 ? gost1 : ''} ${gost2 ? gost2 : ''}`;
       case 'SQUARE':
-        return `Квадрат ${materialName} ${gost}`;
+        return `Квадрат ${materialName} ${gost1 ? gost1 : ''} ${gost2 ? gost2 : ''}`;
       case 'TAPE':
-        return `Лента ${materialName} ${gost}`;
+        return `Лента ${materialName} ${gost1 ? gost1 : ''} ${gost2 ? gost2 : ''}`;
       case 'OTHER':
-        return `${materialName} ${gost}`;
+        return `${materialName} ${gost1 ? gost1 : ''} ${gost2 ? gost2 : ''}`;
       default:
         break;
     }

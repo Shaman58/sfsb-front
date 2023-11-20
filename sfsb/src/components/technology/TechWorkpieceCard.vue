@@ -15,6 +15,7 @@
                         item-text="title"
                         item-value="label"
                         v-model="geometry"
+                        clearable
               >
               </v-select>
               <v-text-field label="Фильтр:"
@@ -23,13 +24,17 @@
             </v-col>
 
             <v-col cols="4">
-              <v-select v-if="materials"
-                        label="Выберите материал:"
-                        :items="filteredMaterials"
-                        :item-title="formatObjectData"
-                        return-object
-                        v-model="workpiece.material"
-                        :rules="[rules.required]">
+              <v-select
+                v-if="materials"
+                label="Выберите материал:"
+                :items="filteredMaterials"
+                :item-title="formatObjectData"
+                return-object
+                v-model="workpiece.material"
+                :rules="[rules.required]">
+                <template v-slot:item="{ props, item }">
+                  <v-list-item v-bind="props" :subtitle="item.raw.gost2"></v-list-item>
+                </template>
               </v-select>
             </v-col>
 
@@ -173,8 +178,8 @@ const save = () => {
 };
 
 const formatObjectData = (data) => {
-  const {materialName, gost} = data;
-  return `${materialName} ${gost}`;
+  const {materialName, gost1} = data;
+  return `${materialName} ${gost1}`;
 };
 
 const filteredMaterials = computed(() => {
@@ -182,7 +187,8 @@ const filteredMaterials = computed(() => {
     return (
       (!geometry.value || item.geometry === geometry.value) &&
       (!materialFilter.value || item.materialName.toLowerCase().includes(materialFilter.value.toLowerCase()) ||
-        item.gost.toLowerCase().includes(materialFilter.value.toLowerCase()))
+        item.gost1.toLowerCase().includes(materialFilter.value.toLowerCase())||
+        item.gost2.toLowerCase().includes(materialFilter.value.toLowerCase()))
     );
   });
 });
@@ -191,7 +197,7 @@ const hide = () => emit('hide');
 const validatedWorkpiece = (validWorkpiece) => emit('validatedWorkpiece', validWorkpiece);
 
 watch(geometry, () => {
-  workpiece.material = null; // Сбросить material при изменении geometry
+  workpiece.material = null;
 });
 
 </script>

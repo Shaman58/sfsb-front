@@ -17,13 +17,12 @@
                           :label="item.technology.assembly ? 'Сборка' : 'Деталь'">
                 </v-switch>
                 <v-card
-                  width="200"
-                  v-if="!workpieceCardVisible && !item.technology.assembly"
+                  v-if="!workpieceCardVisible && !item.technology.assembly" width="200"
                   title="Заготовка:"
                   @click="showWorkpieceCard">
                   <v-card-item>
                     {{
-                      !!item.technology.workpiece ? formatMaterialData(item.technology.workpiece.material) : "Задать заготовку"
+                      !!item.technology.workpiece ? formatWorkpieceData(item.technology.workpiece) : "Задать заготовку"
                     }}
                   </v-card-item>
                 </v-card>
@@ -129,11 +128,15 @@
                     <v-col cols="3" v-if="!setup.cooperate
                     && setup.operation.operationTimeManagement!=='COMPUTED'
                     && setup.operation.operationTimeManagement!=='NONE'">
-                      <v-card height="100%" v-if="setup.additionalTools.length!==0">
+                      <v-card height="100%"
+                              v-if="setup.additionalTools.length!==0|| setup.additionalComments!==null && setup.additionalComments.length>0">
                         <v-list density="compact" style="padding: 0;" :lines="false">
                           <v-list-item v-for="(tool, index) in setup.additionalTools" :key="index"
                                        :title="tool.toolName + ' ' + tool.amount + 'шт.'"
                                        :subtitle="formatWorkpieceData(tool.workpiece)">
+                          </v-list-item>
+                          <v-list-item
+                            :title="setup.additionalComments">
                           </v-list-item>
                         </v-list>
                       </v-card>
@@ -195,6 +198,7 @@
                 <setup-create-card v-else
                                    :setup="{...setup}"
                                    :quantity-of-parts-from-workpiece="Number(item.technology.quantityOfPartsFromWorkpiece)"
+                                   :additionalTexts="additionalTexts"
                                    @hideSetup="hideSetup()"
                                    @deleteSetup="deleteSetup(index)"
                                    @save="replaceSetup($event, index)"
@@ -209,6 +213,7 @@
                 <setup-create-card v-else
                                    :setup="{...newSetup}"
                                    :quantity-of-parts-from-workpiece="Number(item.technology.quantityOfPartsFromWorkpiece)"
+                                   :additionalTexts="additionalTexts"
                                    @hideSetup="hideSetup()"
                                    @save="pushSetup"/>
               </v-col>
@@ -290,6 +295,20 @@ const sortedSetups = computed(() => {
   }
   return [];
 });
+
+const additionalTexts = computed(() => {
+  if (sortedSetups.value.length > 0) {
+    return sortedSetups.value.flatMap(setup => additionalTextGenerator(setup));
+  }
+  return [];
+});
+
+const additionalTextGenerator = (setup) => {
+  if (setup.additionalTools.length > 0) {
+    return setup.additionalTools.flatMap(tool => `Использовать ПБ '${tool.toolName}' с установки  ${setup.setupNumber}`);
+  }
+  return [];
+}
 
 const compactInfo = ((data) => {
   if (data.operation?.operationTimeManagement === 'COMPUTED'

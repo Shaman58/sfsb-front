@@ -184,6 +184,22 @@
             </v-col>
 
             <v-col cols="12"
+                   v-if="setup?.operation?.operationTimeManagement==='FULL'&&!setup.cooperate
+                   || setup?.operation?.operationTimeManagement==='PROCESS_TIME_ONLY'&&!setup.cooperate">
+              <v-combobox
+                label="Приспособление"
+                v-model="setup.additionalComments"
+                :items="additionalTexts"
+                class="flex-full-width"
+                density="comfortable"
+                menu-icon=""
+                placeholder="Выберите из списка или введите свой коментарий"
+                prepend-inner-icon="mdi-magnify"
+                hide-details
+              />
+            </v-col>
+
+            <v-col cols="12"
                    v-if="setup?.operation?.operationTimeManagement==='COMPUTED' && !setup.cooperate">
               <v-textarea clearable
                           v-model="setup.text"
@@ -237,7 +253,8 @@ const props = defineProps({
         operationName: '',
         paymentPerHour: {},
         operationTimeManagement: ''
-      }
+      },
+      additionalComments: ''
     },
     required: true,
   },
@@ -245,11 +262,16 @@ const props = defineProps({
     type: Number,
     required: false,
     default: 1
+  },
+  additionalTexts: {
+    type: Array,
+    required: true
   }
 });
 
 const emit = defineEmits();
 const setup = reactive(props.setup);
+const additionalTexts = reactive(props.additionalTexts);
 const store = useStore();
 const {rules} = useValidationRules();
 const valid = ref(false);
@@ -270,7 +292,6 @@ const operations = computed(() => store.getters.getOperations);
 const unitNumberValidationRule = rules.unitNumberValidation(setupNumbers);
 
 const save = (setup) => emit("save", setup);
-
 
 const deleteSetup = () => {
   hideSetup();

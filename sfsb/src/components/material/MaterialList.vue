@@ -109,7 +109,7 @@ const filtered = computed(() => {
   return props.materials.filter((item) => {
     return (
       (!geometry.value || item.geometry === geometry.value) &&
-      (!filter.value || item.materialName.toLowerCase().includes(filter.value.toLowerCase()) || item.gost.toLowerCase().includes(filter.value.toLowerCase()))
+      (!filter.value || item.materialName.toLowerCase().includes(filter.value.toLowerCase()) || item.gost1.toLowerCase().includes(filter.value.toLowerCase()) || item.gost2.toLowerCase().includes(filter.value.toLowerCase()))
     );
   });
 });

@@ -21,8 +21,8 @@
               </v-select>
             </v-col>
             <v-col cols="4">
-              <v-text-field label="Гост:"
-                            v-model="material.gost"
+              <v-text-field label="Гост на метериал:"
+                            v-model="material.gost1"
                             :rules="[rules.required]">
               </v-text-field>
             </v-col>
@@ -34,18 +34,24 @@
                         v-model="material.density">
               </v-select>
             </v-col>
-            <v-col cols="4">
+            <v-col cols="2">
               <v-text-field label="Плотность:"
                             v-model="material.density"
                             :rules="[rules.required, rules.numeric]">
               </v-text-field>
             </v-col>
-            <v-col cols="4">
+            <v-col cols="2">
               <v-text-field label="Стоимость килограмма:"
                             v-model="material.price.amount"
                             :rules="[rules.required,rules.numeric]"
                             type="number"
               ></v-text-field>
+            </v-col>
+            <v-col cols="4">
+              <v-text-field label="Гост на сортамент:"
+                            v-model="material.gost2"
+                            :rules="[rules.required]">
+              </v-text-field>
             </v-col>
           </v-row>
           <v-card-actions>

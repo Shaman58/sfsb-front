@@ -5,7 +5,6 @@ export default function useOperationFormatting() {
     {title: 'Станочная', label: 'FULL'},
     {title: 'Ручная', label: 'PROCESS_TIME_ONLY'},
     {title: 'Вычисляемая', label: 'COMPUTED'},
-    {title: 'Без вычислений', label: 'NONE'},
   ]);
 
   const formatOperationData = (data) => {
@@ -16,8 +15,6 @@ export default function useOperationFormatting() {
         return `Ручная`;
       case 'COMPUTED':
         return `Вычисляемая`;
-      case 'NONE':
-        return `Без вычислений`;
       default:
         break;
     }

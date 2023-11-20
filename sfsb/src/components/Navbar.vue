@@ -4,7 +4,7 @@
       <template v-slot:prepend>
         <impuls-hub/>
       </template>
-      v-0.1.1
+      {{ version }}
       <v-toolbar-items class="ml-5" style="overflow-x: auto;">
 
         <v-btn
@@ -22,25 +22,16 @@
   </v-container>
 </template>
 
-<script>
+<script setup>
 import {ref} from "vue";
 import ImpulsHub from "@/components/ImpulsHub.vue";
 
-export default {
-  name: "navbar",
-  components: {ImpulsHub},
-  setup() {
+const navItems = ref([
+  {path: "/", label: "Данные"},
+  {path: "/commerce", label: "Комерция"},
+  {path: "/technology", label: "Технология"}
+]);
 
-    const navItems = ref([
-      {path: "/", label: "Данные"},
-      {path: "/commerce", label: "Комерция"},
-      {path: "/technology", label: "Технология"}
-    ]);
+const version = ref(import.meta.env.VITE_APP_VERSION);
 
-    return {
-      navItems,
-    };
-
-  }
-};
 </script>
