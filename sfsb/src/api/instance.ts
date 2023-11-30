@@ -1,7 +1,9 @@
 import axios from "axios";
 
+const baseURL = import.meta.env.VITE_APP_BASE_API_URL;
+
 const instanceOptions = {
-  baseURL: import.meta.env.VITE_APP_BASE_API_URL,
+  baseURL,
   withCredentials: false,
   headers: {
     accept: 'application/json'
