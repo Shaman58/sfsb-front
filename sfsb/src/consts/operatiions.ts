@@ -1,4 +1,4 @@
-  const OPERATIONS = [
+  const OPERATIONS: Therm[] = [
     {title: 'Станочная', label: 'FULL'},
     {title: 'Ручная', label: 'PROCESS_TIME_ONLY'},
     {title: 'Вычисляемая', label: 'COMPUTED'},

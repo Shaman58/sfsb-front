@@ -1,4 +1,4 @@
- const GEOMETRIES = [
+ const GEOMETRIES: Therm[] = [
   { title: "Круг", label: "CYLINDER" },
   { title: "Плита", label: "BLANK" },
   { title: "Шестигранник", label: "HEXAGON" },
