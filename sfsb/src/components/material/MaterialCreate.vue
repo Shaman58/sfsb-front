@@ -78,6 +78,7 @@ import {useStore} from "vuex";
 import {ref} from "vue";
 import materialDataFormatting from '@/mixins/MaterialDataFormatting'
 import {useValidationRules} from "@/mixins/FieldValidationRules";
+import CONST from "@/consts"
 
 const props = defineProps({
   material: {
@@ -96,7 +97,8 @@ const props = defineProps({
 const emit = defineEmits();
 const store = useStore();
 const {rules} = useValidationRules();
-const {formatMaterialData, geometries} = materialDataFormatting();
+const {formatMaterialData} = materialDataFormatting();
+const geometries = CONST.GEOMETRIES
 
 const form = ref(null);
 const valid = ref(false);

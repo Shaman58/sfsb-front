@@ -114,7 +114,7 @@ const props = defineProps({
   },
 });
 
-const store = useStore();
+// const store = useStore();
 const emit = defineEmits();
 const {formatOperationData} = useOperationFormatting();
 

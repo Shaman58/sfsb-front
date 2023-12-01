@@ -81,6 +81,7 @@ import {computed, ref} from "vue";
 import {useStore} from "vuex";
 import materialDataFormatting from '@/mixins/MaterialDataFormatting'
 import MaterialCreate from "@/components/material/MaterialCreate.vue";
+import CONSTS from "@/consts";
 
 const props = defineProps({
   visible: {
@@ -99,7 +100,8 @@ const props = defineProps({
 
 const store = useStore();
 const emit = defineEmits();
-const {geometries, formatMaterialData} = materialDataFormatting();
+const { formatMaterialData} = materialDataFormatting();
+const geometries = CONSTS.GEOMETRIES
 
 const geometry = ref(null);
 const active = ref(null);

@@ -75,7 +75,8 @@
 <script setup>
 import {useStore} from "vuex";
 import {useValidationRules} from "@/mixins/FieldValidationRules";
-import useOperationFormatting from "@/mixins/OperationDataFormatting"
+// import useOperationFormatting from "@/mixins/OperationDataFormatting"
+import CONST from "@/consts"
 import {ref} from "vue";
 
 const props = defineProps({
@@ -92,7 +93,8 @@ const props = defineProps({
 const emit = defineEmits();
 const store = useStore();
 const {rules} = useValidationRules();
-const {operations} = useOperationFormatting();
+// const {operations} = useOperationFormatting();
+const operations = CONST.OPERATIONS
 
 const form = ref(null);
 const valid = ref(false);

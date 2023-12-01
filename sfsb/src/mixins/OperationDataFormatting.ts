@@ -10,5 +10,5 @@ export default function useOperationFormatting() {
 
   };
 
-  return {OPERATIONS, formatOperationData};
+  return { formatOperationData };
 }
