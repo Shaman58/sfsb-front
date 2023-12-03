@@ -36,3 +36,6 @@ export default defineConfig({
     port: 3000,
   },
 })
+
+//TODO: интегрировать import Components from 'unplugin-vue-components/vite'
+//TODO: https://www.npmjs.com/package/unplugin-vue-components#configuration

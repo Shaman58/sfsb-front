@@ -112,6 +112,8 @@ import {useValidationRules} from "@/mixins/FieldValidationRules";
 import ItemCard from "@/components/order/ItemCard.vue";
 import {useOfferGenerator} from "@/mixins/OfferGenerator";
 
+//TODO: возможно надо перенести логику получения данных в слой store actions
+
 const emit = defineEmits();
 
 const props = defineProps({

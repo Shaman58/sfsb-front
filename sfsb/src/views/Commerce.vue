@@ -12,7 +12,7 @@
   </v-container>
 </template>
 
-<script setup>
+<script setup lang="ts">
 
 import CustomerComponent from "@/components/customer/CustomerComponent.vue";
 import OrderComponent from "@/components/order/OrderComponent.vue";
@@ -21,10 +21,13 @@ import {useStore} from "vuex";
 
 const store = useStore();
 
+//TODO: возможно перенести в App.vue
+
 onMounted(() => {
   store.dispatch("fetchCustomers");
   store.dispatch("fetchOrders");
   store.dispatch("fetchEmployees");
 });
+
 
 </script>
