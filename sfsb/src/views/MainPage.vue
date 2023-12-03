@@ -19,7 +19,7 @@
   </v-container>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import CompanyComponent from "@/components/company/CompanyComponent.vue";
 import MaterialComponent from "@/components/material/MaterialComponent.vue";
 import CutterComponent from "@/components/tool/CutterComponent.vue";
