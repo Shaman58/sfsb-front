@@ -1,6 +1,6 @@
 <template>
-  <v-container class="pa-4">
-    <v-app-bar color="orange">
+  <v-container>
+    <v-app-bar color="orange" class="navbar">
       <template v-slot:prepend>
         <impuls-hub/>
       </template>
@@ -35,3 +35,8 @@ const navItems = ref([
 const version = ref(import.meta.env.VITE_APP_VERSION);
 
 </script>
+
+<style lang="sass">
+.navbar
+  padding: 4px
+</style>

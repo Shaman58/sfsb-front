@@ -24,6 +24,7 @@
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.0.0",
     "axios": "^1.4.0",
+    "sass": "^1.69.5",
     "vite": "^4.2.0",
     "vite-plugin-vuetify": "^1.0.0"
   }
