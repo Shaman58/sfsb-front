@@ -22,8 +22,7 @@
             </v-col>
             <v-col cols="4">
               <v-text-field label="Гост на метериал:"
-                            v-model="material.gost1"
-                            :rules="[rules.required]">
+                            v-model="material.gost1">
               </v-text-field>
             </v-col>
             <v-col cols="4">
@@ -49,8 +48,7 @@
             </v-col>
             <v-col cols="4">
               <v-text-field label="Гост на сортамент:"
-                            v-model="material.gost2"
-                            :rules="[rules.required]">
+                            v-model="material.gost2">
               </v-text-field>
             </v-col>
           </v-row>

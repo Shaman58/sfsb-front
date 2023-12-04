@@ -62,10 +62,11 @@
                     />
                   </v-col>
                   <v-col cols="7">
-                    <v-textarea clearable
-                                label="Описание доп. расходов"
-                                v-model="item.technology.outsourcedCostsDescription"
-                                rows="2"
+                    <v-textarea
+                      clearable
+                      label="Описание доп. расходов"
+                      v-model="item.technology.outsourcedCostsDescription"
+                      rows="2"
                     />
                   </v-col>
                   <v-col cols="2">
@@ -77,10 +78,9 @@
                     />
                   </v-col>
                   <v-col cols="3">
-                    <v-text-field
-                      label="Время технолога"
+                    <duration-picker
                       v-model="item.technology.technologistTime"
-                      type="time"
+                      label="Продолжительность"
                       :rules="[rules.durationNotZeroValidation]"
                     />
                   </v-col>
@@ -255,6 +255,7 @@ import SetupCreateCard from "@/components/technology/SetupCreateCard.vue";
 import 'vue-toast-notification/dist/theme-bootstrap.css'
 import materialDataFormatting from '@/mixins/MaterialDataFormatting'
 import {useValidationRules} from "@/mixins/FieldValidationRules";
+import DurationPicker from "@/components/technology/DurationPicker.vue";
 
 const {rules} = useValidationRules();
 const store = useStore();
@@ -382,6 +383,7 @@ const deleteSetup = async (index) => {
 const showSetupCard = (index) => {
   activeSetupIndex.value = index;
 };
+
 
 const hideDialog = () => {
   store.commit("setTechnologyDialogVisible", false);

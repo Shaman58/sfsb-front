@@ -29,7 +29,7 @@ export const useOfferGenerator = () => {
       newWindow.document.write(result.value);
       newWindow.document.close();
     } catch (error) {
-      toast.error("Ошибка, проверьте расчет! Возможно нет инструментов для формирования заявки!", {position: "top-right"});
+      toast.error("Ошибка", {position: "top-right"});
       console.error("There was an error previewing the DOCX file:", error.message);
     }
   }
