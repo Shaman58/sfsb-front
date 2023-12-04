@@ -12,6 +12,9 @@ class Service {
     });
   }
 
+  getTocken(){
+    return this.keycloak.token
+  }
   hasRoleTech() {
     return this.keycloak.hasRealmRole('technologist');
   }

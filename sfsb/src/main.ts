@@ -9,6 +9,7 @@ const app = createApp(App)
 keycloakService.init().then(() => {
   registerPlugins(app);
   app.mount("#app");
+  console.log(keycloakService.getTocken());
 }).catch(console.log);
 
 app.config.globalProperties.$keycloakService = keycloakService;

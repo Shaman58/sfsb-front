@@ -1,4 +1,5 @@
 import axios from "axios";
+import Service from "@/plugins/keycloak/service"
 
 const baseURL = import.meta.env.VITE_APP_BASE_API_URL;
 
@@ -22,7 +23,8 @@ api.interceptors.response.use(
 );
 
 api.interceptors.request.use((config)=>{
-  console.log(config);
+  console.log("config", config);
+  console.log("document.cookie",document.cookie)
   return config
 }, error=>Promise.reject(error))
 
