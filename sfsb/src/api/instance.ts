@@ -23,8 +23,10 @@ api.interceptors.response.use(
 );
 
 api.interceptors.request.use((config)=>{
-  console.log("config", config);
-  console.log("document.cookie",document.cookie)
+  const token = Service.getTocken()
+  if( token && !Service.isTockenExpired){
+    config.headers.Authorization=`Bearer ${token}`
+  }
   return config
 }, error=>Promise.reject(error))
 

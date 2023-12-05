@@ -2,8 +2,10 @@ import Keycloak from 'keycloak-js';
 import config from "@/plugins/keycloak/config";
 
 class Service {
+  isTockenExpired = false
   constructor() {
     this.keycloak = new Keycloak(config);
+    this.isTockenExpired = this.keycloak.isTokenExpired
   }
 
   async init() {
@@ -12,9 +14,12 @@ class Service {
     });
   }
 
+
+
   getTocken(){
     return this.keycloak.token
   }
+
   hasRoleTech() {
     return this.keycloak.hasRealmRole('technologist');
   }
