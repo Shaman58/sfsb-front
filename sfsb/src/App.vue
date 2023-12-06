@@ -8,3 +8,9 @@
 <script setup>
 import Navbar from "@/components/Navbar.vue";
 </script>
+
+
+<style lang="sass">
+.v-toolbar__content
+  height: 32px !important
+</style>
