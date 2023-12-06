@@ -1,6 +1,6 @@
 <template>
   <div>
-    <br> //TODO: ???
+    <br>
     <technology-component/>
   </div>
 </template>
