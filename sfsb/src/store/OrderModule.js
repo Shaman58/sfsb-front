@@ -34,7 +34,7 @@ export default {
           console.error(error);
         });
     },
-    async saveOrder({dispatch, commit}, order) {
+    async saveOrder({commit}, order) {
       try {
         const url = order.id
           ? `/order/${order.id}`

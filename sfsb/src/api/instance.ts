@@ -24,7 +24,7 @@ api.interceptors.response.use(
 
 api.interceptors.request.use((config)=>{
   const token = Service.getTocken()
-  if( token && !Service.isTockenExpired){
+  if( token ){
     config.headers.Authorization=`Bearer ${token}`
   }
   return config
