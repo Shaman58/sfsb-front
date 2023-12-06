@@ -7,3 +7,8 @@ declare interface Therm {
   title: string;
   label: string;
 }
+
+declare interface NavItem{
+  path: string,
+  label: string
+}
