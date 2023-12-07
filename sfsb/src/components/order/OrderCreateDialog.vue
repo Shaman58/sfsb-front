@@ -194,14 +194,7 @@ const getBackgroundColorClass = (item) => {
     border-radius: 10px
     margin: 2px
 
-.file-link
-    display: flex
-    align-items: center
-    gap: 1rem
 
-    &__delete
-        color: red
-        cursor: pointer
 
 
 

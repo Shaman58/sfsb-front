@@ -1,31 +1,40 @@
 <template>
   <v-col cols="12">
-    <v-file-input clearable label="File input" @change="addFile($event)" ref="fileInput"></v-file-input>
-    <v-list>
+    <v-file-input clearable label="Выберите файл" @change="saveFile" ref="fileInput" ></v-file-input>
+    <ul class="list">
 
-      <v-list-item v-for="n in localFiles" :key="n">
+      <li v-for="n in files" :key="n.filename" class="list-item">
+        <v-icon>mdi-file-outline</v-icon>
         <div class="file-link">
           <a :href="n.link" class="file-link__link">
             {{ n.filename }}
           </a>
-          <v-icon class="file-link__delete" @click="deleteFile(n)">mdi-close</v-icon>
+          <v-icon class="file-link__delete" @click="deleteFile(n)" title="удалить">mdi-close</v-icon>
         </div>
-      </v-list-item>
+      </li>
 
-    </v-list>
+    </ul>
   </v-col>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
+// import api from '../../api/instance';
+import { useStore } from 'vuex';
+
+const {dispatch,getters,commit} = useStore()
 
 const {order: orderId} = defineProps<{order: string|number}>()
 
-const fileInput = ref(null)
+const fileInput = ref<HTMLInputElement|null>(null)
 
-const localFiles = ref<OrderFile[]>([])
-const newFiles = ref<OrderFile[]>([])
-const deletedFiles = ref<OrderFile[]>([])
+const files = computed<OrderFile[]>(() => getters.getAllFiles)
+
+onMounted(async ()=>{
+
+ dispatch("getAllFilesByOrder",orderId)
+
+})
 
 const createOrderFileElement = (name: string, file: File): OrderFile & { file: File } => {
   return {
@@ -38,35 +47,72 @@ const createOrderFileElement = (name: string, file: File): OrderFile & { file: F
   }
 }
 
-const saveFiles = async () => {
+const saveFile = () => {
   const fd = new FormData()
-  // newFiles.value.length && newFiles.value.forEach(e=>fd.append("addedFile[]",e.file))
-  // deletedFiles.value.length && deletedFiles.value.forEach(e=>fd.append("deletedFile[]",e.file))
-
-
-  if (fileInput.value) {
-    const fileElement = fileInput.value as HTMLInputElement
-    // fileElement.files && [...fileElement.files].forEach(file=> fd.append("file[]",file))
-    fileElement.files && fd.append("file", fileElement.files[0])
-
-    await api.post(`/file/${order.value.id}`, fd)
-  }
-
+  fileInput.value && fileInput.value.files  && fd.append("file", fileInput.value.files[0])
+  dispatch("addFile", fd)
 }
-
-const addFile = (event: Event) => {
-  const { value, files } = event.target as HTMLInputElement
-  files && localFiles.value.push(createOrderFileElement(files[0].name, files[0]))
-  files && newFiles.value.push(createOrderFileElement(files[0].name, files[0]))
-
-  // saveFiles()
-};
 
 const deleteFile = (n: OrderFile) => {
-  const fileToDelete = props.order.files.find(e => e.filename === n.filename)
-  fileToDelete && deletedFiles.value.push(fileToDelete)
-  localFiles.value = localFiles.value.filter(e => e.id !== n.id)
-
-  console.log(deletedFiles, newFiles);
+  console.log("n",n);
+  dispatch("deleteFile",n.id)
 }
 </script>
+
+<style scoped lang="sass">
+.file-link
+    display: flex
+    align-items: center
+    width: fit-content
+    gap: 0.5rem
+
+    &__delete
+        color: red
+        cursor: pointer
+        scale: 1
+        transition: scale 0.5s
+
+    &__link
+        display: block
+        color: var(--v-theme-primary)
+        text-decoration: none
+        font-style: italic
+        transition: color 0.5s
+
+    &:hover
+        color: -webkit-link
+
+.list
+    display: flex
+    flex-wrap: wrap
+    list-style: none
+    padding-left: 0
+    gap: 0.5rem 1rem
+.list-item
+    flex: 1 1 calc(50% - 1rem)
+    min-height: 24px
+    position: relative
+    display: flex
+    align-items: center
+    column-gap: 4px
+
+    &:hover
+        & .file-link__delete
+            scale: 1.3
+
+        &::before
+            width: 100%
+            left: 0
+
+    &::before
+        content: ""
+        position: absolute
+        left: 50%
+        top: 100%
+        width: 0%
+        height: 1px
+        background: linear-gradient(to right, #0000,blue,#0000)
+        transition: width 0.5s, left 0.5s
+
+
+</style>
