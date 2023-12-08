@@ -1,20 +1,22 @@
 <template>
-  <v-col cols="12">
-    <v-file-input clearable label="Выберите файл" @change="saveFile" ref="fileInput" ></v-file-input>
-    <ul class="list">
+
+  <v-card cols="12" class="files-card">
+    <template #title>Прикрепленые файлы</template>
+    <v-file-input clearable label="Выберите файл" @change="saveFile" ref="fileInput" class="file-input"></v-file-input>
+    <transition-group tag="ul" class="list" name="files">
 
       <li v-for="n in files" :key="n.filename" class="list-item">
         <v-icon>mdi-file-outline</v-icon>
         <div class="file-link">
-          <a :href="n.link" class="file-link__link">
+          <a :href="n.link" class="file-link__link" target="_blank" type="image/*">
             {{ n.filename }}
           </a>
           <v-icon class="file-link__delete" @click="deleteFile(n)" title="удалить">mdi-close</v-icon>
         </div>
       </li>
 
-    </ul>
-  </v-col>
+    </transition-group>
+  </v-card>
 </template>
 
 <script setup lang="ts">
@@ -22,7 +24,7 @@ import { computed, onMounted, ref } from 'vue';
 // import api from '../../api/instance';
 import { useStore } from 'vuex';
 
-const {dispatch,getters,commit} = useStore()
+const {dispatch,getters} = useStore()
 
 const {order: orderId} = defineProps<{order: string|number}>()
 
@@ -60,6 +62,12 @@ const deleteFile = (n: OrderFile) => {
 </script>
 
 <style scoped lang="sass">
+
+.files-move
+    transition: transform 0.5s
+.files-card
+    padding: 1rem
+    width: 100%
 .file-link
     display: flex
     align-items: center

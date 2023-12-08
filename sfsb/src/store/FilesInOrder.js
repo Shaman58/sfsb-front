@@ -10,7 +10,6 @@ export default {
   },
   mutations: {
     setAllFiles(state, data) {
-      if (!data || !data.length) return;
       state.files = data;
     },
     setCurrenOrderTo(state,orderId){
