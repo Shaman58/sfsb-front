@@ -8,7 +8,6 @@
             {{ item.quantity + "шт." }}
           </v-card-title>
           <v-card-text>
-
             <v-row>
               <v-col>
                 <v-switch v-model="item.technology.assembly"
