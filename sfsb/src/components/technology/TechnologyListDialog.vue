@@ -13,11 +13,15 @@
         </v-list>
         <v-list>
           <v-list-item v-for="item in items" key="item.id">
-            <div v-for="i in item" class="item-row" @click="showTechnologyCreateDialog(i)">
-              <v-icon>{{ i.technology.computed ? "mdi-star" : "mdi-arm-flex" }}</v-icon>
-              <span>{{ i.technology.drawingName }}</span>
-              <span>{{ i.technology.drawingNumber }}</span>
-            </div>
+            <v-list>
+              <v-list-item v-for="i in item" @click="showTechnologyCreateDialog(i)">
+                <div class="item-row">
+                  <v-icon>{{ i.technology.computed ? "mdi-star" : "mdi-arm-flex" }}</v-icon>
+                  <span>{{ i.technology.drawingName }}</span>
+                  <span>{{ i.technology.drawingNumber }}</span>
+                </div>
+              </v-list-item>
+            </v-list>
           </v-list-item>
         </v-list>
       </v-row>
@@ -71,8 +75,8 @@ const setCurrentOrder = (x: number) => {
   currentOrder.value = x
 }
 
-watch(()=>orders.value,()=> currentOrder.value = orders.value[0].id)
-watch(()=> filteredOrders.value, ()=>setCurrentOrder(filteredOrders.value[0].id))
+watch(() => orders.value, () => currentOrder.value = orders.value[0].id)
+watch(() => filteredOrders.value, () => setCurrentOrder(filteredOrders.value[0].id))
 
 
 </script>
@@ -81,7 +85,9 @@ watch(()=> filteredOrders.value, ()=>setCurrentOrder(filteredOrders.value[0].id)
 .item-row
   display: flex
   gap: 1rem
+  cursor: pointer
 .list-dialog
+    padding: 1rem
     gap: 1rem
     & > *
       flex: 1 1 calc(50% - 1rem)
