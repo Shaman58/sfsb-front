@@ -35,7 +35,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted, watchEffect, watch } from 'vue';
+import { computed, ref, onMounted, watch } from 'vue';
 import { useStore } from 'vuex';
 
 const store = useStore();
@@ -75,8 +75,8 @@ const setCurrentOrder = (x: number) => {
   currentOrder.value = x
 }
 
-watch(() => orders.value, () => currentOrder.value = orders.value[0].id)
-watch(() => filteredOrders.value, () => setCurrentOrder(filteredOrders.value[0].id))
+watch(() => orders.value, () => orders.value[0] && (currentOrder.value = orders.value[0].id))
+watch(() => filteredOrders.value, () => filteredOrders.value[0] && setCurrentOrder(filteredOrders.value[0].id))
 
 
 </script>
