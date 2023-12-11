@@ -1,3 +1,9 @@
+declare module "*.vue" {
+  import { defineComponent } from "vue";
+  const Component: ReturnType<typeof defineComponent>;
+  export default Component;
+}
+
 declare interface ImportMeta {
   env: {
     VITE_APP_BASE_API_URL: string;
@@ -12,8 +18,6 @@ declare interface NavItem {
   path: string;
   label: string;
 }
-
-
 
 declare interface OrderFile {
   created: string;
@@ -93,13 +97,13 @@ declare interface Tool {
   toolName: string;
   description: string;
 }
-declare interface ToolItem{
-      id: number;
-      created: string;
-      updated: null;
-      amount: number;
-      price: ItemPrice;
-      tool: Tool
+declare interface ToolItem {
+  id: number;
+  created: string;
+  updated: null;
+  amount: number;
+  price: ItemPrice;
+  tool: Tool;
 }
 
 declare interface Operation {
@@ -107,7 +111,7 @@ declare interface Operation {
   created: null;
   updated: string;
   operationName: string;
-  paymentPerHour: ItemPrice
+  paymentPerHour: ItemPrice;
   operationTimeManagement: string;
 }
 declare interface Setup {
@@ -115,7 +119,7 @@ declare interface Setup {
   created: string;
   updated: string;
   setupNumber: number;
-  operation: Operation
+  operation: Operation;
   setupTime: string;
   processTime: string;
   interoperativeTime: string;
@@ -126,7 +130,7 @@ declare interface Setup {
   toolings: [];
   perTime: string | null;
   text: string | null;
-  cooperatePrice: ItemPrice
+  cooperatePrice: ItemPrice;
   additionalComments: string;
   group: false;
   cooperate: false;
@@ -168,7 +172,7 @@ declare interface Order {
   customer: Customer;
   description: string;
   employee: Employee;
-  files: OrderFile[]
+  files: OrderFile[];
   id: number;
   items: Item[];
   updated: string | null;
