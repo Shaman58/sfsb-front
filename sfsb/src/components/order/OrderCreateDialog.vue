@@ -80,12 +80,9 @@
 
 <script setup>
 import { computed, ref } from "vue";
-// import { useStore } from "vuex";
 import { useValidationRules } from "@/mixins/FieldValidationRules";
 import ItemCard from "@/components/order/ItemCard.vue";
 import { useOfferGenerator } from "@/mixins/OfferGenerator";
-import { onMounted } from "vue";
-import api from "@/api/instance";
 import OrderFiles from "./OrderFiles.vue";
 
 
