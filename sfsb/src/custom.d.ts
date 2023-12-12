@@ -201,3 +201,10 @@ declare interface Company {
     director: string | null;
     departments: Department[];
 }
+ declare interface Cutter{
+    id:number,
+    created: string | null,
+    updated: string | null,
+    toolName: string,
+    description: string
+}
