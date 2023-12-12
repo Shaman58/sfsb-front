@@ -6,6 +6,8 @@ import {createApp} from 'vue'
 import {registerPlugins} from '@/plugins'
 import keycloakService from './plugins/keycloak/service';
 import FallbackApp from './FallbackApp.vue';
+
+
 const app = createApp(App)
 const errorPage = createApp(ErrorKeycloack);
 const fallback = createApp(FallbackApp);

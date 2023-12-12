@@ -8,10 +8,13 @@
 import vuetify from './vuetify'
 import router from '../router'
 import store from '../store'
+import pinia from "./pinia-plugin"
+import { App } from 'vue'
 
-export function registerPlugins(app) {
+export function registerPlugins(app: App<Element> ) {
   app
     .use(vuetify)
     .use(router)
     .use(store)
+    .use(pinia)
 }
