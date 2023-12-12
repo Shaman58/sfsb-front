@@ -20,8 +20,12 @@ export default {
     getAllFiles: (state) => state.files,
   },
   actions: {
-    async getAllFilesByOrder({ commit }, orderId) {
+    async getAllFilesByOrder({ commit, state }, orderId) {
       try {
+        if(orderId === undefined){
+          console.error("orderId is undefined");
+          return
+        }
         const { data } = await api.get(`/file/order/${orderId}`);
         commit("setCurrenOrderTo", orderId);
         commit("setAllFiles", data);

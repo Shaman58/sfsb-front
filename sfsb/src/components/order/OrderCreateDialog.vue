@@ -53,7 +53,7 @@
                             </v-col>
                             <v-divider />
 
-                            <order-files :order="props.order.id"/>
+                            <order-files :order="props.order.id" v-if="props.order.id"/>
 
                         </v-row>
                     </v-container>
@@ -61,20 +61,20 @@
                 </v-card-text>
 
               </v-card>
+              <v-card-actions class="card-actions">
+                  <v-btn @click="previewCommerce(order)" :disabled="kpAvailable">компред</v-btn>
+                  <v-btn @click="previewToolOrder(order, 1, 2)" :disabled="kpAvailable">заявка на инструмент</v-btn>
+                  <v-btn @click="previewPlan1(order)" :disabled="kpAvailable">План 1</v-btn>
+                  <v-btn @click="previewPlan2(order)" :disabled="kpAvailable">План 2</v-btn>
+                  <v-spacer></v-spacer>
+                  <v-btn color="orange-darken-1" variant="text" @click="hide">
+                      Закрыть
+                  </v-btn>
+                  <v-btn color="orange-darken-1" variant="text" type="submit" :disabled="!valid">
+                      {{ order.id ? 'Изменить' : 'Создать' }}
+                  </v-btn>
+              </v-card-actions>
             </v-form>
-            <v-card-actions class="card-actions">
-                <v-btn @click="previewCommerce(order)" :disabled="kpAvailable">компред</v-btn>
-                <v-btn @click="previewToolOrder(order, 1, 2)" :disabled="kpAvailable">заявка на инструмент</v-btn>
-                <v-btn @click="previewPlan1(order)" :disabled="kpAvailable">План 1</v-btn>
-                <v-btn @click="previewPlan2(order)" :disabled="kpAvailable">План 2</v-btn>
-                <v-spacer></v-spacer>
-                <v-btn color="orange-darken-1" variant="text" @click="hide">
-                    Закрыть
-                </v-btn>
-                <v-btn color="orange-darken-1" variant="text" type="submit" :disabled="!valid">
-                    {{ order.id ? 'Изменить' : 'Создать' }}
-                </v-btn>
-            </v-card-actions>
     </v-dialog>
 </template>
 
@@ -137,7 +137,7 @@ const hide = () => {
 const save = (data) => {
     if (form.value.validate()) {
         emit("save", data);
-        saveFiles()
+        // saveFiles()
         if (!data.id) {
             emit("hide");
         }
