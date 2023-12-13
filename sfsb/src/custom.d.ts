@@ -1,5 +1,5 @@
-declare module "*.vue" {
-  import { defineComponent } from "vue";
+declare module string {
+  import { defineComponent } from string;
   const Component: ReturnType<typeof defineComponent>;
   export default Component;
 }
@@ -177,3 +177,18 @@ declare interface Order {
   items: Item[];
   updated: string | null;
 }
+
+declare interface Person {
+    id: number;
+    prependAvatar: string;
+    firstName: string;
+    lastName: string;
+    userName: string;
+    email: string;
+    phoneNumber: string;
+    password: string;
+    roles: string[];
+}
+
+declare type Role = string;
+declare type Roles = string[];
