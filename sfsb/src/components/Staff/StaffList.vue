@@ -3,7 +3,7 @@ v-progress-linear(v-if="!items.length", indeterminate, color="blue")
 v-container
     .title
         slot(name="title")
-        v-icon.title__icon(@click="edit(-1)") mdi-plus
+        v-icon.title__icon(@click="edit(-1)", color="red", title="Добавьте нового пользователя") mdi-plus
     v-card
         v-list
             v-list-item.person(v-for="person in items" :key="person.id" @click="edit(person.id)")

@@ -26,8 +26,8 @@ v-container
 
         .person-card__footer
             v-btn(prepend-icon="$success" variant="plain" @click="save" ) Сохранить
-            v-btn(prepend-icon="$error" variant="plain") Отменить изменения
-            v-btn(prepend-icon="$info" variant="plain") Удалить пользователя
+            v-btn(prepend-icon="$error" variant="plain"  @click="reset") Отменить изменения
+            v-btn(prepend-icon="$info" variant="plain"  @click="deletePerson") Удалить пользователя
             v-btn(prepend-icon="$next" variant="plain" @click="emit('exit')") Выйти
 
         v-dialog(v-model="showChangePass")
@@ -54,7 +54,7 @@ const staffStore = useStaffStore();
 const { person } = defineProps<{ person: Person }>()
 const emit = defineEmits(["exit"])
 
-const personLocal: Person | null = reactive(person)
+let personLocal: Person  = reactive({...person})
 
 const showChangePass = ref(false)
 
@@ -81,6 +81,15 @@ const changeAvatar = (e: Event) => {
 const save = async () => {
     console.log("personLocal from component", personLocal);
     await staffStore.saveStaff(personLocal)
+    emit("exit")
+}
+
+const reset = () => {
+    personLocal = reactive({ ...person })
+}
+
+const deletePerson = async () => {
+    await staffStore.deleteStaff(personLocal)
     emit("exit")
 }
 

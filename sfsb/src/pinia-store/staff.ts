@@ -35,10 +35,23 @@ export const useStaffStore = defineStore("staff", ()=>{
         }
     }
 
+    const deleteStaff = async (staff: Person) => {
+         try {
+             const response = await api.delete(`/user/${staff.id}`);
+             if (response.status >= 400)
+                 throw new Error("Ошибка при сохранении данных пользователя");
+             toast.success("Данные удалены");
+             await getAllStaff();
+         } catch (error) {
+             toast.error("Ошибка при удалении данных пользователя " + error);
+         }
+    }
+
     return {
         staff,
         getAllStaff,
         saveStaff,
+        deleteStaff
     };
 });
 
