@@ -4,7 +4,7 @@
       <template v-slot:prepend>
         <impuls-hub/>
       </template>
-      {{ version }}
+      {{ name }} {{ version }}
       <v-toolbar-items class="ml-5" style="overflow-x: auto;">
 
         <v-btn
@@ -22,7 +22,7 @@
   </v-container>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {ref} from "vue";
 import ImpulsHub from "@/components/ImpulsHub.vue";
 import CONSTS from "@/consts"
@@ -31,6 +31,8 @@ import keycloakService from '@/plugins/keycloak/service';
 const version = import.meta.env.VITE_APP_VERSION;
 
 const logout = ( ) => keycloakService.logout()
+
+const name = keycloakService.keycloak.tokenParsed.preferred_username;
 
 </script>
 
