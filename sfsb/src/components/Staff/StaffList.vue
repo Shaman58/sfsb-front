@@ -4,16 +4,16 @@ v-container
         v-list
             v-list-item.person(v-for="person in items" :key="person.id" @click="edit(person.id)")
                 template(#prepend)
-                    img.person__img(:src="person.prependAvatar" alt="person")
+                    img.person__img(:src="person.prependAvatar ? person.prependAvatar : '/images/default-avatar.jpg'" alt="person")
                 .person__right
                     h3.person__title {{ person.firstName }} {{ person.lastName }}
                     .person__hidden
                         div
                             .person__links
-                                a.person__link(href="`mailto:${person.email}`")
+                                a.person__link(href="`mailto:${person.email}`", v-if="person.email")
                                     v-icon mdi-email
                                     span {{ person.email }}
-                                a.person__link(href="`tel:${person.phoneNumber}`")
+                                a.person__link(href="`tel:${person.phoneNumber}`", v-if="person.phoneNumber")
                                     v-icon mdi-phone
                                     span {{ person.phoneNumber }}
                             div.person__roles
@@ -30,23 +30,40 @@ import type {Ref} from "vue"
 import StaffCard from "./StaffCard.vue"
 import {useStaffStore} from "@/pinia-store/staff"
 import {storeToRefs} from "pinia"
-import Items from "./fakePersonalData"
+import DefaultAvatar from "@/assets/default-avatar.png"
+// import Items from "./fakePersonalData"
 
 // const items = Items as Person[]
 
 const staffStore = useStaffStore()
 
-const {staff: items} = storeToRefs(staffStore)
+const {staff: itemsRaw} = storeToRefs(staffStore)
 const {getAllStaff} = staffStore
 
 getAllStaff()
+
+const items = computed(() => itemsRaw.value.map(person => ({...person, roles: Array.isArray(person.roles)? person.roles : [person.roles] })))
 
 const show = ref(false)
 const editingPerson: Ref<Person | undefined> = ref(undefined)
 
 const edit = (id: number) => {
   show.value = true
-  editingPerson.value = items.find(person => person.id === id)
+  editingPerson.value = items.value.find(person => person.id === id)
+}
+
+const newPerson = (): Person => {
+    return {
+        id: 0,
+        firstName: "",
+        lastName: "",
+        email: "",
+        phoneNumber: "",
+        roles: [],
+        prependAvatar: "",
+        userName: "",
+        password: ""
+    }
 }
 </script>
 

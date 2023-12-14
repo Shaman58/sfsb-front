@@ -1,3 +1,16 @@
+declare module "*.png" {
+  const value: string;
+  export default value;
+}
+declare module "*.jpg" {
+  const value: string;
+  export default value;
+}
+declare module "*.jpeg" {
+  const value: string;
+  export default value;
+}
+
 declare module string {
   import { defineComponent } from string;
   const Component: ReturnType<typeof defineComponent>;
@@ -187,7 +200,7 @@ declare interface Person {
     email: string;
     phoneNumber: string;
     password: string;
-    roles: string[];
+    roles: Roles;
 }
 
 declare type Role = string;

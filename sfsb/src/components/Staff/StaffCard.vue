@@ -2,7 +2,9 @@
 v-container
     .person-card
         .person-card__header
-            img.person-card__img(:src="personLocal.prependAvatar" alt="avatar" title="Заменить аватар")
+            label(for="avatar")
+                img.person-card__img(:src="person.prependAvatar ? person.prependAvatar : '/images/default-avatar.jpg'" alt="avatar" title="Заменить аватар")
+                input.person-card__input(type="file" id="avatar" @change="changeAvatar($event)" hidden)
             h2.person-card__title
                 span {{ personLocal.firstName }}
                 span {{ personLocal.lastName }}
@@ -17,7 +19,7 @@ v-container
                     v-text-field(label="Email" v-model="personLocal.email")
                     v-text-field(label="Телефон" v-model="personLocal.phoneNumber")
                 .person-card__form-roles
-                    v-checkbox(v-for="role in roles" :label="role" v-model="personLocal.roles" :value="role")
+                    v-checkbox(v-for="role in roles" :label="role" v-model="personLocal.roles" :value="role" name="role")
             v-card.person-card__pass
                 v-btn.person-card__pass-btn(variant="plain" @click="showChangePass=true") Изменить пароль
 
@@ -61,6 +63,17 @@ const changePass = () => {
     personLocal.password = newPass.value
     showChangePass.value = false
 }
+
+const changeAvatar = (e: Event) => {
+    const target = e.target as HTMLInputElement
+    target && target.files &&  console.log(target.files[0])
+
+    const reader = new FileReader()
+    reader.onload = (e: any) => {
+        personLocal.prependAvatar = e.target.result
+    }
+    target && target.files && reader.readAsDataURL(target.files[0])
+};
 
 watch(personLocal, (person: Person) => {
     console.log(person);
