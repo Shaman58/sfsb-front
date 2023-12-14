@@ -25,12 +25,21 @@ v-container
 </template>
 
 <script setup lang="ts">
-import {ref} from "vue"
+import {computed, ref} from "vue"
 import type {Ref} from "vue"
 import StaffCard from "./StaffCard.vue"
+import {useStaffStore} from "@/pinia-store/staff"
+import {storeToRefs} from "pinia"
 import Items from "./fakePersonalData"
 
-const items = Items as Person[]
+// const items = Items as Person[]
+
+const staffStore = useStaffStore()
+
+const {staff: items} = storeToRefs(staffStore)
+const {getAllStaff} = staffStore
+
+getAllStaff()
 
 const show = ref(false)
 const editingPerson: Ref<Person | undefined> = ref(undefined)

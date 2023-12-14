@@ -3,6 +3,7 @@ import App from './App.vue'
 import ErrorKeycloack from './ErrorKeycloack.vue'
 import {createApp} from 'vue'
 
+
 import {registerPlugins} from '@/plugins'
 import keycloakService from './plugins/keycloak/service';
 import FallbackApp from './FallbackApp.vue';
@@ -11,7 +12,6 @@ const errorPage = createApp(ErrorKeycloack);
 const fallback = createApp(FallbackApp);
 
 fallback.mount("#app")
-
 
 keycloakService.init().then(() => {
   fallback.unmount()
