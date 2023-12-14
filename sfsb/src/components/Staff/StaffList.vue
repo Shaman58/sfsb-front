@@ -1,5 +1,9 @@
 <template lang="pug">
+v-progress-linear(v-if="!items.length", indeterminate, color="blue")
 v-container
+    .title
+        slot(name="title")
+        v-icon.title__icon(@click="edit(-1)") mdi-plus
     v-card
         v-list
             v-list-item.person(v-for="person in items" :key="person.id" @click="edit(person.id)")
@@ -49,7 +53,12 @@ const editingPerson: Ref<Person | undefined> = ref(undefined)
 
 const edit = (id: number) => {
   show.value = true
-  editingPerson.value = items.value.find(person => person.id === id)
+  if(id===-1){
+    editingPerson.value = newPerson()
+  } else {
+
+      editingPerson.value = items.value.find(person => person.id === id)
+  }
 }
 
 const newPerson = (): Person => {
@@ -68,6 +77,14 @@ const newPerson = (): Person => {
 </script>
 
 <style lang="sass" scoped>
+.title
+    display: flex
+    align-items: center
+    justify-content: space-between
+
+    &__icon
+        cursor: pointer
+
 .person
     padding: 0.5rem
     display: flex

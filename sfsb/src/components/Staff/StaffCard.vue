@@ -13,6 +13,7 @@ v-container
         v-card.person-card__main
             form.person-card__form
                 .person-card__form-name
+                    v-text-field(label="username" v-model="personLocal.userName")
                     v-text-field(label="Имя" v-model="personLocal.firstName")
                     v-text-field(label="Фамилия" v-model="personLocal.lastName")
                 .person-card__form-contacts
@@ -24,7 +25,7 @@ v-container
                 v-btn.person-card__pass-btn(variant="plain" @click="showChangePass=true") Изменить пароль
 
         .person-card__footer
-            v-btn(prepend-icon="$success" variant="plain") Сохранить
+            v-btn(prepend-icon="$success" variant="plain" @click="save" ) Сохранить
             v-btn(prepend-icon="$error" variant="plain") Отменить изменения
             v-btn(prepend-icon="$info" variant="plain") Удалить пользователя
             v-btn(prepend-icon="$next" variant="plain" @click="emit('exit')") Выйти
@@ -44,9 +45,11 @@ v-container
 <script setup lang="ts">
 import { reactive, watch, ref } from 'vue';
 import roles from "./fakeRolesData"
-import {useToast} from 'vue-toast-notification';
+import { useToast } from 'vue-toast-notification';
+import { useStaffStore } from '@/pinia-store/staff'
 
 const toast = useToast();
+const staffStore = useStaffStore();
 
 const { person } = defineProps<{ person: Person }>()
 const emit = defineEmits(["exit"])
@@ -59,14 +62,14 @@ const newPass = ref("")
 const newPassRepeat = ref("")
 
 const changePass = () => {
-    if(newPass.value!==newPassRepeat.value) return toast.error("Пароли не совпадают")
+    if (newPass.value !== newPassRepeat.value) return toast.error("Пароли не совпадают")
     personLocal.password = newPass.value
     showChangePass.value = false
 }
 
 const changeAvatar = (e: Event) => {
     const target = e.target as HTMLInputElement
-    target && target.files &&  console.log(target.files[0])
+    target && target.files && console.log(target.files[0])
 
     const reader = new FileReader()
     reader.onload = (e: any) => {
@@ -74,6 +77,12 @@ const changeAvatar = (e: Event) => {
     }
     target && target.files && reader.readAsDataURL(target.files[0])
 };
+
+const save = async () => {
+    console.log("personLocal from component", personLocal);
+    await staffStore.saveStaff(personLocal)
+    emit("exit")
+}
 
 watch(personLocal, (person: Person) => {
     console.log(person);

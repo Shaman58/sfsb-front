@@ -20,6 +20,7 @@ keycloakService.init().then(() => {
   console.log(keycloakService.getTocken());
 }).catch((error:unknown) => {
   fallback.unmount()
+  console.log(error);
   errorPage.mount("#app")
 });
 

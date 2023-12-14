@@ -11,5 +11,5 @@ import store from '../store'
 import piniaStore from "./piniaStore"
 
 export function registerPlugins(app) {
-  app.use(vuetify).use(router).use(store).use(piniaStore);
+  app.use(vuetify).use(router).use(store).use(piniaStore)
 }

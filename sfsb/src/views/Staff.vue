@@ -1,7 +1,8 @@
 <template lang="pug">
 v-container
-    h1 Управление пользователями
     staff-list
+        template(v-slot:title)
+            h1 Управление пользователями
 </template>
 
 <script setup lang="ts">
