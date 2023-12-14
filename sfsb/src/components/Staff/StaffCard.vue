@@ -19,7 +19,7 @@ v-container
                 .person-card__form-roles
                     v-checkbox(v-for="role in roles" :label="role" v-model="personLocal.roles" :value="role")
             v-card.person-card__pass
-                    v-btn.person-card__pass-btn(variant="plain" ) Обновить пароль
+                v-btn.person-card__pass-btn(variant="plain" @click="showChangePass=true") Изменить пароль
 
         .person-card__footer
             v-btn(prepend-icon="$success" variant="plain") Сохранить
@@ -27,18 +27,42 @@ v-container
             v-btn(prepend-icon="$info" variant="plain") Удалить пользователя
             v-btn(prepend-icon="$next" variant="plain" @click="emit('exit')") Выйти
 
+        v-dialog(v-model="showChangePass")
+            v-card
+                v-card-title Заменить пароль
+                v-card-text
+                    v-text-field(label="Новый пароль" v-model="newPass" type="password")
+                    v-text-field(label="Повторите новый пароль" v-model="newPassRepeat" type="password"  :rules="[newPassRepeat===newPass||'Ошибка! Пароли не совпадают']")
+                v-card-actions
+                    v-btn(color="primary" variant="plain" @click="changePass") Сохранить
+                    v-btn(color="error" variant="plain" @click="showChangePass=false") Отменить
+
 </template>
 
 <script setup lang="ts">
-import {  reactive, watch } from 'vue';
+import { reactive, watch, ref } from 'vue';
 import roles from "./fakeRolesData"
+import {useToast} from 'vue-toast-notification';
 
-const {person} = defineProps<{person: Person}>()
+const toast = useToast();
+
+const { person } = defineProps<{ person: Person }>()
 const emit = defineEmits(["exit"])
 
 const personLocal: Person | null = reactive(person)
 
-watch(personLocal,(person: Person)=>{
+const showChangePass = ref(false)
+
+const newPass = ref("")
+const newPassRepeat = ref("")
+
+const changePass = () => {
+    if(newPass.value!==newPassRepeat.value) return toast.error("Пароли не совпадают")
+    personLocal.password = newPass.value
+    showChangePass.value = false
+}
+
+watch(personLocal, (person: Person) => {
     console.log(person);
 })
 

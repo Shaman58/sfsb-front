@@ -1,10 +1,3 @@
-
-import { format } from 'path';
-
-import { spawn } from 'child_process';
-
-import { log } from 'console';
-
 <template lang="pug">
 v-container
     v-card

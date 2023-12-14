@@ -5,7 +5,7 @@ v-container
 </template>
 
 <script setup lang="ts">
-import StaffList from "@/components/Staff/StaffList.vue"
+import StaffList from "@/components/staff/StaffList.vue"
 </script>
 
 <style lang="sass" scoped>
