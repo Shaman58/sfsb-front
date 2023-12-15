@@ -3,7 +3,7 @@ v-container
     .person-card
         .person-card__header
             label(for="avatar")
-                img.person-card__img(:src="person.prependAvatar ? person.prependAvatar : '/images/default-avatar.jpg'" alt="avatar" title="Заменить аватар")
+                img.person-card__img(:src="personLocal.picture ? personLocal.picture : '/images/default-avatar.jpg'" alt="avatar" title="Заменить аватар")
                 input.person-card__input(type="file" id="avatar" @change="changeAvatar($event)" hidden)
             h2.person-card__title
                 span {{ personLocal.firstName }}
@@ -25,10 +25,10 @@ v-container
                 v-btn.person-card__pass-btn(variant="plain" @click="showChangePass=true") Изменить пароль
 
         .person-card__footer
-            v-btn(prepend-icon="$success" variant="plain" @click="save" ) Сохранить
+            v-btn(prepend-icon="$success" variant="plain" @click="save" color="green" ) Сохранить
             v-btn(prepend-icon="$error" variant="plain"  @click="reset") Отменить изменения
-            v-btn(prepend-icon="$info" variant="plain"  @click="deletePerson") Удалить пользователя
-            v-btn(prepend-icon="$next" variant="plain" @click="emit('exit')") Выйти
+            v-btn(prepend-icon="$info" variant="plain"  @click="deletePerson" color="red") Удалить пользователя
+            v-btn(prepend-icon="$next" variant="plain" @click="emit('exit')" color="blue") Выйти
 
         v-dialog(v-model="showChangePass")
             v-card
@@ -73,7 +73,8 @@ const changeAvatar = (e: Event) => {
 
     const reader = new FileReader()
     reader.onload = (e: any) => {
-        personLocal.prependAvatar = e.target.result
+        console.log(e.target.result);
+        personLocal.picture = e.target.result
     }
     target && target.files && reader.readAsDataURL(target.files[0])
 };

@@ -26,7 +26,7 @@ export const useStaffStore = defineStore("staff", ()=>{
         const method = staff.id? "put" : "post";
 
         try {
-            const response = await api[method](url, {body:fd});
+            const response = await api[method](url, {body:fd}, {headers:{"Content-Type": "multipart/form-data"}});
             if(response.status >= 400) throw new Error("Ошибка при сохранении данных пользователя");
             toast.success("Данные сохранены");
             await getAllStaff()

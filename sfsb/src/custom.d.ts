@@ -193,7 +193,7 @@ declare interface Order {
 
 declare interface Person {
     id: number;
-    prependAvatar: string;
+    picture: string;
     firstName: string;
     lastName: string;
     userName: string;
