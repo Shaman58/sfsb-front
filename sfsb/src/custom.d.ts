@@ -192,11 +192,11 @@ declare interface Order {
 }
 
 declare interface Person {
-    id: number;
+    id: string;
     picture: string;
     firstName: string;
     lastName: string;
-    userName: string;
+    username: string;
     email: string;
     phoneNumber: string;
     password: string;

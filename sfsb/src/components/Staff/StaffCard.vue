@@ -1,65 +1,82 @@
 <template lang="pug">
 v-container
-    .person-card
-        .person-card__header
-            label(for="avatar")
-                img.person-card__img(:src="personLocal.picture ? personLocal.picture : '/images/default-avatar.jpg'" alt="avatar" title="Заменить аватар")
-                input.person-card__input(type="file" id="avatar" @change="changeAvatar($event)" hidden)
-            h2.person-card__title
-                span {{ personLocal.firstName }}
-                span {{ personLocal.lastName }}
-                span.person-card__username [ {{ personLocal.userName }} ]
-            .person-card__id id: {{ personLocal.id }}
-        v-card.person-card__main
-            form.person-card__form
-                .person-card__form-name
-                    v-text-field(label="username" v-model="personLocal.userName")
-                    v-text-field(label="Имя" v-model="personLocal.firstName")
-                    v-text-field(label="Фамилия" v-model="personLocal.lastName")
-                .person-card__form-contacts
-                    v-text-field(label="Email" v-model="personLocal.email")
-                    v-text-field(label="Телефон" v-model="personLocal.phoneNumber")
-                .person-card__form-roles
-                    v-checkbox(v-for="role in roles" :label="role" v-model="personLocal.roles" :value="role" name="role")
-            v-card.person-card__pass
-                v-btn.person-card__pass-btn(variant="plain" @click="showChangePass=true") Изменить пароль
+    v-form(id="person-form" ref="personForm")
+        .person-card
+            .person-card__header
+                label(for="avatar")
+                    img.person-card__img(:src="personLocal.picture ? personLocal.picture : '/images/default-avatar.jpg'" alt="avatar" title="Заменить аватар")
+                    input.person-card__input(type="file" id="avatar" @change="changeAvatar($event)" hidden)
+                h2.person-card__title
+                    span {{ personLocal.firstName }}
+                    span {{ personLocal.lastName }}
+                    span.person-card__username [ {{ personLocal.userName }} ]
+                .person-card__id id: {{ personLocal.id }}
+            v-card.person-card__main
+                form.person-card__form
+                    .person-card__form-name
+                        v-text-field(label="username" v-model="personLocal.username" :rules="[required]")
+                        v-text-field(label="Имя" v-model="personLocal.firstName" :rules="[required]")
+                        v-text-field(label="Фамилия" v-model="personLocal.lastName" :rules="[required]")
+                    .person-card__form-contacts
+                        v-text-field(label="Email" v-model="personLocal.email")
+                        v-text-field(label="Телефон" v-model="personLocal.phoneNumber")
+                    .person-card__form-roles
+                        v-checkbox(v-for="role in roles" :label="role" v-model="personLocal.roles" :value="role")
+                v-card.person-card__pass
+                    v-btn.person-card__pass-btn(variant="plain" @click="showChangePass=true") Изменить пароль
 
-        .person-card__footer
-            v-btn(prepend-icon="$success" variant="plain" @click="save" color="green" ) Сохранить
-            v-btn(prepend-icon="$error" variant="plain"  @click="reset") Отменить изменения
-            v-btn(prepend-icon="$info" variant="plain"  @click="deletePerson" color="red") Удалить пользователя
-            v-btn(prepend-icon="$next" variant="plain" @click="emit('exit')" color="blue") Выйти
+            .person-card__footer
+                v-btn(prepend-icon="$success" variant="plain" @click="save" color="green" :disabled="!wasPersonChanged") Сохранить
+                v-btn(prepend-icon="$error" variant="plain"  @click="reset") Отменить изменения
+                v-btn(prepend-icon="$info" variant="plain"  @click="deletePerson" color="red") Удалить пользователя
+                v-btn(prepend-icon="$next" variant="plain" @click="emit('exit')" color="blue") Выйти
 
-        v-dialog(v-model="showChangePass")
-            v-card
-                v-card-title Заменить пароль
-                v-card-text
-                    v-text-field(label="Новый пароль" v-model="newPass" type="password")
-                    v-text-field(label="Повторите новый пароль" v-model="newPassRepeat" type="password"  :rules="[newPassRepeat===newPass||'Ошибка! Пароли не совпадают']")
-                v-card-actions
-                    v-btn(color="primary" variant="plain" @click="changePass") Сохранить
-                    v-btn(color="error" variant="plain" @click="showChangePass=false") Отменить
+            v-dialog(v-model="showChangePass")
+                v-card
+                    v-card-title Заменить пароль
+                    v-card-text
+                        v-text-field(label="Новый пароль" v-model="newPass" type="password")
+                        v-text-field(label="Повторите новый пароль" v-model="newPassRepeat" type="password"  :rules="[newPassRepeat===newPass||'Ошибка! Пароли не совпадают']")
+                    v-card-actions
+                        v-btn(color="primary" variant="plain" @click="changePass") Сохранить
+                        v-btn(color="error" variant="plain" @click="showChangePass=false") Отменить
 
 </template>
 
 <script setup lang="ts">
 import { reactive, watch, ref } from 'vue';
-import roles from "./fakeRolesData"
+import type { Ref } from "vue"
+// import roles from "./fakeRolesData"
 import { useToast } from 'vue-toast-notification';
 import { useStaffStore } from '@/pinia-store/staff'
+import { useRolesStore } from '@/pinia-store/roles'
+import { storeToRefs } from 'pinia'
+
+const personForm = ref(null)
+const newAvatarFD: Ref<string | Blob | null> = ref(null)
 
 const toast = useToast();
-const staffStore = useStaffStore();
+const staffStore = useStaffStore()
+
+const rolesStore = useRolesStore()
+const { roles } = storeToRefs(rolesStore)
 
 const { person } = defineProps<{ person: Person }>()
 const emit = defineEmits(["exit"])
 
-let personLocal: Person  = reactive({...person})
+let personLocal: Person = reactive({ ...person })
+
+const wasPersonChanged = ref(false)
+const wasAvatarChanged = ref(false)
 
 const showChangePass = ref(false)
 
 const newPass = ref("")
 const newPassRepeat = ref("")
+
+const required = (v: string) => !!v.length || "Поле обязательно для заполнения"
+
+const isValidForm = () => !!personLocal.username.length && !!personLocal.firstName.length && !!personLocal.lastName.length
 
 const changePass = () => {
     if (newPass.value !== newPassRepeat.value) return toast.error("Пароли не совпадают")
@@ -67,21 +84,32 @@ const changePass = () => {
     showChangePass.value = false
 }
 
-const changeAvatar = (e: Event) => {
+const changeAvatar = async (e: Event) => {
     const target = e.target as HTMLInputElement
     target && target.files && console.log(target.files[0])
 
+    newAvatarFD.value = target.files && target.files[0]
+
     const reader = new FileReader()
-    reader.onload = (e: any) => {
+    reader.onload = async (e: any) => {
         console.log(e.target.result);
         personLocal.picture = e.target.result
+        wasAvatarChanged.value = true
     }
     target && target.files && reader.readAsDataURL(target.files[0])
 };
 
 const save = async () => {
     console.log("personLocal from component", personLocal);
-    await staffStore.saveStaff(personLocal)
+    if (!isValidForm()) return toast.error("Поля не заполнены")
+    const isSuccess = await staffStore.saveStaff(personLocal)
+
+
+    if (wasAvatarChanged.value) {
+        const fd = new FormData()
+        newAvatarFD.value && fd.append("file", newAvatarFD.value)
+        isSuccess && await staffStore.saveAvatar(personLocal.id, fd)
+    }
     emit("exit")
 }
 
@@ -95,6 +123,7 @@ const deletePerson = async () => {
 }
 
 watch(personLocal, (person: Person) => {
+    wasPersonChanged.value = true
     console.log(person);
 })
 
