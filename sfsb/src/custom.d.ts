@@ -19,8 +19,9 @@ declare module string {
 
 declare interface ImportMeta {
   env: {
-VITE_APP_VERSION: any;
+    VITE_APP_VERSION: any;
     VITE_APP_BASE_API_URL: string;
+    VITE_APP_BASE_FS_URL: string;
   };
 }
 declare interface Therm {
@@ -99,9 +100,9 @@ declare interface Workpiece {
   created: string;
   updated: null;
   material: Material;
-  geom1: number;
-  geom2: number;
-  geom3: number;
+  geom1: string;
+  geom2: string;
+  geom3: string;
 }
 
 declare interface Tool {

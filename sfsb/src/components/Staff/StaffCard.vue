@@ -13,6 +13,7 @@ v-container.person-card__container
             v-card.person-card__main
                 form.person-card__form
                     .person-card__form-name
+                        v-text-field(label="username" v-model="personLocal.username" :rules="[required]" v-if="!person.id")
                         v-text-field(label="Имя" v-model="personLocal.firstName" :rules="[required]")
                         v-text-field(label="Фамилия" v-model="personLocal.lastName" :rules="[required]")
                     .person-card__form-contacts
@@ -75,8 +76,7 @@ const newPassRepeat = ref("")
 const required = (v: string) => !!v.length || "Поле обязательно для заполнения"
 const { rules:{emailValidation} } = useValidationRules()
 
-const isValidForm = computed(() => !!personLocal.username.length
-                            && !!personLocal.firstName.length
+const isValidForm = computed(() => !!personLocal.firstName.length
                             && !!personLocal.lastName.length
                             && emailValidation(personLocal.email)===true)
 
@@ -108,6 +108,7 @@ const changeAvatar = async (e: Event) => {
 const save = async () => {
     console.log("personLocal from component", personLocal);
     if (!isValidForm) return toast.error("Поля не заполнены")
+    if(!person.username && !personLocal.password) return toast.error("Вы забыли задать пароль")
     const isSuccess = await staffStore.saveStaff(personLocal)
     emit("exit")
 }

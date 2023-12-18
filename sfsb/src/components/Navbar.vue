@@ -29,7 +29,7 @@
 <script setup lang="ts">
 import {ref, onMounted} from "vue";
 import ImpulsHub from "@/components/ImpulsHub.vue";
-import CONSTS from "@/consts"
+import CONSTS from "@consts"
 import keycloakService from '@/plugins/keycloak/service';
 import { useToast } from "vue-toast-notification";
 
@@ -44,7 +44,7 @@ const picture = ref()
 
 onMounted(async ()=>{
     const user = await keycloakService.keycloak.loadUserProfile()
-    picture.value = import.meta.env.VITE_APP_BASE_FS_URL +user.attributes.picture[0]
+    picture.value = import.meta.env.VITE_APP_BASE_FS_URL + user.attributes.picture[0]
     name.value = user.firstName + " " + user.lastName
 })
 </script>

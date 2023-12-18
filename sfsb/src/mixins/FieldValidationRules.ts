@@ -43,7 +43,7 @@ export function useValidationRules() {
     numeric: (value: number) => (value === 0 || !isNaN(value)) || "Введите число",
     minValidation: (value: number) => value > 0 || "Число должно быть больше 0",
     min0Validation: (value: number) => value >= 0 || "Число должно быть больше или равно 0",
-    geom2LessThanGeom1: (workpiece:{geom1: string | null, geom2: string | null, geom3: string | null}) => () => {
+    geom2LessThanGeom1: (workpiece:Workpiece) => () => {
       if (workpiece.geom1 !== null && workpiece.geom2 !== null && parseFloat(workpiece.geom2) >= parseFloat(workpiece.geom1)) {
         return "Внутренний диаметр должен быть меньше внешнего диаметра";
       }
