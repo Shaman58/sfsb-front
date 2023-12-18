@@ -19,6 +19,7 @@ declare module string {
 
 declare interface ImportMeta {
   env: {
+VITE_APP_VERSION: any;
     VITE_APP_BASE_API_URL: string;
   };
 }

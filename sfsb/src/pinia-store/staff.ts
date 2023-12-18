@@ -25,7 +25,7 @@ export const useStaffStore = defineStore("staff", () => {
         try {
             const response = await api[method](
                 url,
-                staff,
+                {...staff, picture:""},
                 { headers: { "Content-Type": "application/json" } }
             );
             if (response.status >= 400)

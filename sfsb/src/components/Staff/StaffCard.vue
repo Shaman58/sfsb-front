@@ -95,6 +95,10 @@ const changeAvatar = async (e: Event) => {
         console.log(e.target.result);
         personLocal.picture = e.target.result
         wasAvatarChanged.value = true
+
+        const fd = new FormData()
+        newAvatarFD.value && fd.append("file", newAvatarFD.value)
+        await staffStore.saveAvatar(personLocal.id, fd)
     }
     target && target.files && reader.readAsDataURL(target.files[0])
 };
@@ -103,13 +107,6 @@ const save = async () => {
     console.log("personLocal from component", personLocal);
     if (!isValidForm()) return toast.error("Поля не заполнены")
     const isSuccess = await staffStore.saveStaff(personLocal)
-
-
-    if (wasAvatarChanged.value) {
-        const fd = new FormData()
-        newAvatarFD.value && fd.append("file", newAvatarFD.value)
-        isSuccess && await staffStore.saveAvatar(personLocal.id, fd)
-    }
     emit("exit")
 }
 
