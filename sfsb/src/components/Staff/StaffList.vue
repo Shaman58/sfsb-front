@@ -3,12 +3,12 @@ v-progress-linear(v-if="!items.length", indeterminate, color="blue")
 v-container
     .title
         slot(name="title")
-        v-icon.title__icon(@click="edit(-1)", color="red", title="Добавьте нового пользователя") mdi-plus
+        v-btn.title__icon(@click="edit('-1')", color="orange-lighten-1", icon="mdi-plus", variant="text", title="Добавьте нового пользователя")
     v-card
         v-list
             v-list-item.person(v-for="person in items" :key="person.id" @click="edit(person.id)")
                 template(#prepend)
-                    img.person__img(:src="person.prependAvatar ? person.prependAvatar : '/images/default-avatar.jpg'" alt="person")
+                    img.person__img(:src="person.picture ? person.picture : '/images/default-avatar.jpg'" alt="person")
                 .person__right
                     h3.person__title {{ person.firstName }} {{ person.lastName }}
                     .person__hidden
@@ -35,9 +35,14 @@ import StaffCard from "./StaffCard.vue"
 import {useStaffStore} from "@/pinia-store/staff"
 import {storeToRefs} from "pinia"
 import DefaultAvatar from "@/assets/default-avatar.png"
+import { useRolesStore } from '@/pinia-store/roles'
 // import Items from "./fakePersonalData"
 
 // const items = Items as Person[]
+
+const rolesStore = useRolesStore();
+const { getAllRoles } = rolesStore
+getAllRoles()
 
 const staffStore = useStaffStore()
 
@@ -51,26 +56,25 @@ const items = computed(() => itemsRaw.value.map(person => ({...person, roles: Ar
 const show = ref(false)
 const editingPerson: Ref<Person | undefined> = ref(undefined)
 
-const edit = (id: number) => {
+const edit = (id: string) => {
   show.value = true
-  if(id===-1){
+  if(id==="-1"){
     editingPerson.value = newPerson()
   } else {
-
       editingPerson.value = items.value.find(person => person.id === id)
   }
 }
 
 const newPerson = (): Person => {
     return {
-        id: 0,
+        id: "",
         firstName: "",
         lastName: "",
         email: "",
         phoneNumber: "",
         roles: [],
-        prependAvatar: "",
-        userName: "",
+        picture: "",
+        username: "",
         password: ""
     }
 }
@@ -81,6 +85,7 @@ const newPerson = (): Person => {
     display: flex
     align-items: center
     justify-content: space-between
+    margin-bottom: 1rem
 
     &__icon
         cursor: pointer
