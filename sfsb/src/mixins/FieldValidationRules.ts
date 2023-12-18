@@ -5,7 +5,7 @@ export function useValidationRules() {
     required: (value: number) => (value === 0 || !!value) || 'Обязательное поле',
     counter: (value: string) => value.length <= 200 || 'Не более 200 символов',
     emailValidation: (value: string) => {
-      const pattern = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/
+      const pattern = /^\w+([.-]?\w+){2,}@\w+([.-]?\w+)*(\.\w{2,5})+$/
       return pattern.test(value) || 'Неверный формат'
     },
     phoneValidation: (value: string) => {

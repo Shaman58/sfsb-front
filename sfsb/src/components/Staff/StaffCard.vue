@@ -3,7 +3,7 @@ v-container.person-card__container
     v-form(id="person-form" ref="personForm")
         .person-card
             .person-card__header
-                label(for="avatar")
+                label.person-card__picture(for="avatar")
                     img.person-card__img(:src="personLocal.picture ? personLocal.picture : '/images/default-avatar.jpg'" alt="avatar" title="Заменить аватар")
                     input.person-card__input(type="file" id="avatar" @change="changeAvatar($event)" hidden)
                 h2.person-card__title
@@ -23,7 +23,7 @@ v-container.person-card__container
                     v-btn.person-card__pass-btn(variant="plain" @click="showChangePass=true") Изменить пароль
 
             .person-card__footer
-                v-btn(prepend-icon="$success" variant="plain" @click="save" color="green" :disabled="!wasPersonChanged") Сохранить
+                v-btn(prepend-icon="$success" variant="plain" @click="save" color="green" :disabled="!wasPersonChanged || !isValidForm") Сохранить
                 v-btn(prepend-icon="$error" variant="plain"  @click="reset") Отменить изменения
                 v-btn(prepend-icon="$info" variant="plain"  @click="deletePerson" color="red") Удалить пользователя
                 v-btn(prepend-icon="$next" variant="plain" @click="emit('exit')" color="blue") Выйти
@@ -41,7 +41,7 @@ v-container.person-card__container
 </template>
 
 <script setup lang="ts">
-import { reactive, watch, ref } from 'vue';
+import { reactive, watch, ref, computed } from 'vue';
 import type { Ref } from "vue"
 // import roles from "./fakeRolesData"
 import { useToast } from 'vue-toast-notification';
@@ -75,7 +75,10 @@ const newPassRepeat = ref("")
 const required = (v: string) => !!v.length || "Поле обязательно для заполнения"
 const { rules:{emailValidation} } = useValidationRules()
 
-const isValidForm = () => !!personLocal.username.length && !!personLocal.firstName.length && !!personLocal.lastName.length
+const isValidForm = computed(() => !!personLocal.username.length
+                            && !!personLocal.firstName.length
+                            && !!personLocal.lastName.length
+                            && emailValidation(personLocal.email)===true)
 
 const changePass = () => {
     if (newPass.value !== newPassRepeat.value) return toast.error("Пароли не совпадают")
@@ -104,13 +107,18 @@ const changeAvatar = async (e: Event) => {
 
 const save = async () => {
     console.log("personLocal from component", personLocal);
-    if (!isValidForm()) return toast.error("Поля не заполнены")
+    if (!isValidForm) return toast.error("Поля не заполнены")
     const isSuccess = await staffStore.saveStaff(personLocal)
     emit("exit")
 }
 
 const reset = () => {
-    personLocal = reactive({ ...person })
+    // debugger
+    // personLocal = reactive({ ...person })
+    Object.keys(personLocal).forEach((e: string) =>{
+        personLocal[e as keyof Person]=person[e as keyof Person]
+    })
+
 }
 
 const deletePerson = async () => {
@@ -118,9 +126,9 @@ const deletePerson = async () => {
     emit("exit")
 }
 
-watch(personLocal, (person: Person) => {
+watch(personLocal, (personValue: Person) => {
     wasPersonChanged.value = true
-    console.log(person);
+    console.log(personValue);
 })
 
 </script>
@@ -134,16 +142,21 @@ watch(personLocal, (person: Person) => {
 
 
     &__header
-        display: flex
-        align-items: center
-        justify-content: space-evenly
+        display: grid
+        grid-template-columns: 120px 1fr
+        place-items: center
+
+    &__picture
+        flex: 0 0 40%
 
     &__img
+        display: block
         border-radius: 50%
         cursor: pointer
         width: 120px
         height: 120px
         object-fit: cover
+        margin-inline: auto
 
     &__title
         display: flex
