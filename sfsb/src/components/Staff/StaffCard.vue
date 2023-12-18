@@ -90,6 +90,9 @@ const changeAvatar = async (e: Event) => {
     const target = e.target as HTMLInputElement
     target && target.files && console.log(target.files[0])
 
+    debugger
+    if(target.files && target.files[0] && target.files[0].size>1024 * 1024) return toast.error("Максимальный размер файла 1MB")
+
     newAvatarFD.value = target.files && target.files[0]
 
     const reader = new FileReader()

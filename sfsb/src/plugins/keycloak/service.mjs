@@ -14,8 +14,6 @@ class Service {
     });
   }
 
-
-
   getTocken(){
     return this.keycloak.token
   }

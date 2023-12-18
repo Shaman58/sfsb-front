@@ -5,7 +5,7 @@ import {createApp} from 'vue'
 
 
 import {registerPlugins} from '@/plugins'
-import keycloakService from './plugins/keycloak/service';
+import keycloakService from '@/plugins/keycloak/service.mjs';
 import FallbackApp from './FallbackApp.vue';
 
 const app = createApp(App)
