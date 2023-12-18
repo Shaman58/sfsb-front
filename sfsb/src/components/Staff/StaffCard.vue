@@ -147,6 +147,7 @@ watch(personLocal, (person: Person) => {
         cursor: pointer
         width: 120px
         height: 120px
+        object-fit: cover
 
     &__title
         display: flex

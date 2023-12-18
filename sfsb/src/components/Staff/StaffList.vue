@@ -130,10 +130,11 @@ const newPerson = (): Person => {
     &__img
         width: 60px
         height: 60px
-        border-radius: 50%
         box-shadow: 0 0 0 #7777
+        border-radius: 50%
         scale: 1
         transition: box-shadow 0.5s, scale 0.5s
+        object-fit: cover
 
 
     &__links
