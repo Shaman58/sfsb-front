@@ -1,5 +1,5 @@
 <template lang="pug">
-v-container
+v-container.person-card__container
     v-form(id="person-form" ref="personForm")
         .person-card
             .person-card__header
@@ -9,17 +9,14 @@ v-container
                 h2.person-card__title
                     span {{ personLocal.firstName }}
                     span {{ personLocal.lastName }}
-                    span.person-card__username [ {{ personLocal.userName }} ]
-                .person-card__id id: {{ personLocal.id }}
+                    span.person-card__username [ {{ personLocal.username }} ]
             v-card.person-card__main
                 form.person-card__form
                     .person-card__form-name
-                        v-text-field(label="username" v-model="personLocal.username" :rules="[required]")
                         v-text-field(label="Имя" v-model="personLocal.firstName" :rules="[required]")
                         v-text-field(label="Фамилия" v-model="personLocal.lastName" :rules="[required]")
                     .person-card__form-contacts
-                        v-text-field(label="Email" v-model="personLocal.email")
-                        v-text-field(label="Телефон" v-model="personLocal.phoneNumber")
+                        v-text-field(label="Email" v-model="personLocal.email" :rules="[required, emailValidation]")
                     .person-card__form-roles
                         v-checkbox(v-for="role in roles" :label="role" v-model="personLocal.roles" :value="role")
                 v-card.person-card__pass
@@ -51,6 +48,7 @@ import { useToast } from 'vue-toast-notification';
 import { useStaffStore } from '@/pinia-store/staff'
 import { useRolesStore } from '@/pinia-store/roles'
 import { storeToRefs } from 'pinia'
+import { useValidationRules } from "@/mixins/FieldValidationRules";
 
 const personForm = ref(null)
 const newAvatarFD: Ref<string | Blob | null> = ref(null)
@@ -75,6 +73,7 @@ const newPass = ref("")
 const newPassRepeat = ref("")
 
 const required = (v: string) => !!v.length || "Поле обязательно для заполнения"
+const { rules:{emailValidation} } = useValidationRules()
 
 const isValidForm = () => !!personLocal.username.length && !!personLocal.firstName.length && !!personLocal.lastName.length
 
@@ -137,7 +136,7 @@ watch(personLocal, (person: Person) => {
     &__header
         display: flex
         align-items: center
-        justify-content: space-between
+        justify-content: space-evenly
 
     &__img
         border-radius: 50%
