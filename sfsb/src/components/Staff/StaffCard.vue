@@ -113,12 +113,14 @@ const save = async () => {
 }
 
 const reset = () => {
-    // debugger
-    // personLocal = reactive({ ...person })
-    Object.keys(personLocal).forEach((e: string) =>{
-        personLocal[e as keyof Person]=person[e as keyof Person]
+    Object.keys(personLocal).forEach((e) => {
+        const val = e as keyof Person
+        if (val === "roles") {
+            personLocal.roles = person.roles
+        } else {
+            personLocal[val] = person[val]
+        }
     })
-
 }
 
 const deletePerson = async () => {
