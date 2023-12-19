@@ -6,6 +6,7 @@ class Service {
   constructor() {
     this.keycloak = new Keycloak(config);
     this.isTockenExpired = this.keycloak.isTokenExpired
+    
   }
 
   async init() {

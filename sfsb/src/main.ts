@@ -5,6 +5,7 @@ import {createApp} from 'vue'
 
 
 import {registerPlugins} from '@/plugins'
+import {registerDirectives} from '@/directives'
 import keycloakService from '@/plugins/keycloak/service.mjs';
 import FallbackApp from './FallbackApp.vue';
 
@@ -17,6 +18,7 @@ fallback.mount("#app")
 keycloakService.init().then(() => {
   fallback.unmount()
   registerPlugins(app);
+  registerDirectives(app);
   app.mount("#app");
   console.log(keycloakService.getTocken());
 }).catch((error:unknown) => {
