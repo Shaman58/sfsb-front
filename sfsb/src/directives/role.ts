@@ -10,7 +10,7 @@ const role: Directive<HTMLElement> = {
 
         const isMatch = user.roles.some((role: string) => role === userRole);
 
-        if (!isMatch) {
+        if (isNot ? isMatch :!isMatch) {
             el.style.display = "none";
         }
     },
