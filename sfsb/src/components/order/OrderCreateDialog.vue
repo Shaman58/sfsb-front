@@ -20,12 +20,7 @@
                                     :item-title=getItemText return-object v-model="order.contact" label="Контакт">
                                 </v-select>
                             </v-col>
-                            <v-col cols="6">
-                                <v-select v-if="!!props.employees" :items="props.employees" :item-title=getItemText
-                                    return-object v-model="order.employee" :rules="[rules.required]"
-                                    label="Менеджер заказа">
-                                </v-select>
-                            </v-col>
+
 
                             <v-row v-if="order.id">
 
