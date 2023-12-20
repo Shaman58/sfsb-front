@@ -26,7 +26,6 @@ const store = useStore();
 onMounted(() => {
   store.dispatch("fetchCustomers");
   store.dispatch("fetchOrders");
-  store.dispatch("fetchEmployees");
 });
 
 

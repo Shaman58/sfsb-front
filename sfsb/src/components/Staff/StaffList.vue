@@ -21,7 +21,7 @@ v-container
                                     v-icon mdi-phone
                                     span {{ person.phoneNumber }}
                             div.person__roles
-                                span.person__role(v-for="role in person.roles") {{ role }}
+                                span.person__role(v-for="role in availableRolesByPerson(person)") {{ role }}
 
     v-dialog(v-model="show")
         v-card
@@ -36,12 +36,9 @@ import {useStaffStore} from "@/pinia-store/staff"
 import {storeToRefs} from "pinia"
 import DefaultAvatar from "@/assets/default-avatar.png"
 import { useRolesStore } from '@/pinia-store/roles'
-// import Items from "./fakePersonalData"
-
-// const items = Items as Person[]
 
 const rolesStore = useRolesStore();
-const { getAllRoles } = rolesStore
+const { getAllRoles,roles } = rolesStore
 getAllRoles()
 
 const staffStore = useStaffStore()
@@ -64,6 +61,8 @@ const edit = (id: string) => {
       editingPerson.value = items.value.find(person => person.id === id)
   }
 }
+
+const availableRolesByPerson =(person: Person) => person.roles.filter(r=>roles.includes(r))
 
 const newPerson = (): Person => {
     return {

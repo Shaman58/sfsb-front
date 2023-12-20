@@ -10,7 +10,6 @@
                        :visible="visible"
                        :orders="orders"
                        :customers="customers"
-                       :employees="employees"
                        :active="active"
                        @hide="visible=false"
                        @save="save($event)"
@@ -30,7 +29,6 @@ const store = useStore();
 
 const orders = computed(() => store.getters.getOrders);
 const customers = computed(() => store.getters.getCustomers);
-const employees = computed(() => store.getters.getEmployees);
 const visible = ref(false);
 const active = ref(-1);
 

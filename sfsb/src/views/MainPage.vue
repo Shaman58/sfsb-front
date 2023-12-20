@@ -5,9 +5,7 @@
       <v-col cols="6">
         <company-component/>
       </v-col>
-      <v-col cols="6">
-        <employee-component/>
-      </v-col>
+
     </v-row>
     <v-card class="center-card">
       <material-component/>
@@ -26,7 +24,6 @@ import CutterComponent from "@/components/tool/CutterComponent.vue";
 import SpecialComponent from "@/components/tool/SpecialComponent.vue";
 import ToolingComponent from "@/components/tool/ToolingComponent.vue";
 import OperationComponent from "@/components/operation/OperationComponent.vue";
-import EmployeeComponent from "@/components/employee/EmployeeComponent.vue";
 </script>
 
 <style scoped>

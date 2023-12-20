@@ -134,17 +134,13 @@
 import {useValidationRules} from "@/mixins/FieldValidationRules";
 import {useStore} from "vuex";
 import {computed, ref, watch} from "vue";
-import EmployeeList from "@/components/employee/EmployeeList.vue";
 
 const props = defineProps({
   company: {
     type: Object,
     required: true
   },
-  employees: {
-    type: Array,
-    required: false
-  },
+
   visible: {
     type: Boolean,
     required: true

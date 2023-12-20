@@ -1,6 +1,5 @@
 import Vuex from 'vuex'
 import departmentModule from "@/store/DepartmentModule";
-import employeeModule from "@/store/EmployeeModule";
 import companyModule from "@/store/CompanyModule";
 import toolingModule from "@/store/ToolingModule";
 import specialsModule from "@/store/SpecialsModule"
@@ -17,7 +16,6 @@ import filesInOrders from "@/store/FilesInOrder";
 export default new Vuex.Store({
   modules: {
     departmentModule,
-    employeeModule,
     companyModule,
     toolingModule,
     specialsModule,

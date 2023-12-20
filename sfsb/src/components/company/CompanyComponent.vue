@@ -5,7 +5,6 @@
     />
     <company-create-dialog v-if="company.id"
                            :company="company"
-                           :employees="employees"
                            :visible="visible"
                            @hide="visible=false"
                            @save="save($event)"
@@ -26,7 +25,6 @@ onMounted(() => {
 });
 
 const company = computed(() => store.getters.getCompany);
-const employees = computed(() => store.getters.getEmployees);
 const visible = ref(false);
 
 const save = (data) => {

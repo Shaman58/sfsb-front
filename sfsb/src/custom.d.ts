@@ -67,17 +67,6 @@ declare interface Department {
   updated: string | null;
   departmentName: string;
 }
-declare interface Employee {
-  created: string;
-  department: Department;
-  email: string;
-  firstName: string;
-  id: number;
-  lastName: string;
-  phoneNumber: string;
-  position: string;
-  updated: string;
-}
 
 declare interface ItemPrice {
   amount: number;
@@ -187,7 +176,7 @@ declare interface Order {
   created: string;
   customer: Customer;
   description: string;
-  employee: Employee;
+  user: Person;
   files: OrderFile[];
   id: number;
   items: Item[];

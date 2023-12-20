@@ -24,7 +24,6 @@
                                :visible="active===item.id"
                                :order="item"
                                :customers="props.customers"
-                               :employees="employees"
                                @hide="active=-1"
                                @save="save($event)"
           />
@@ -43,7 +42,6 @@
                                :visible="active==='new'"
                                :order="order"
                                :customers="props.customers"
-                               :employees="employees"
                                @hide="hideOrder"
                                @save="save($event)"
           />
@@ -74,10 +72,7 @@ const props = defineProps({
     type: Array,
     required: true
   },
-  employees: {
-    type: Array,
-    required: true
-  },
+
   customers: {
     type: Array,
     required: true
@@ -103,7 +98,7 @@ const calculateAppNumber = () => {
   const appNumber = props.orders.reduce((max, item) => {
     return item.applicationNumber > max ? item.applicationNumber : max
   }, 0);
-  order.value = {applicationNumber: appNumber + 1, items: [], employee: null, contact: null};
+  order.value = {applicationNumber: appNumber + 1, items: [], contact: null};
 };
 
 const showOrder = () => {
