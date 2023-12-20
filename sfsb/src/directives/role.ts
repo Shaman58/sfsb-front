@@ -2,19 +2,21 @@ import { Directive } from "vue";
 import keycloakService from "@/plugins/keycloak/service";
 
 const role: Directive<HTMLElement> = {
-    async mounted(el, {value,arg}) {
+    async mounted(el, { value: userRole, arg }) {
         const isNot = arg === "not";
-        const userRole = value; //TODO: возможно передача значения как массива?
 
+        let isMatch = false;
         const user = await keycloakService.keycloak.loadUserProfile();
+        if (Array.isArray(userRole)) {
+            isMatch = user.roles.every((role) => userRole.includes(role));
+        } else {
+            isMatch = user.roles.some((role: string) => role === userRole);
+        }
 
-        const isMatch = user.roles.some((role: string) => role === userRole);
-
-        if (isNot ? isMatch :!isMatch) {
+        if (isNot ? isMatch : !isMatch) {
             el.style.display = "none";
         }
     },
 };
 
 export default role;
-
