@@ -38,8 +38,9 @@ import DefaultAvatar from "@/assets/default-avatar.png"
 import { useRolesStore } from '@/pinia-store/roles'
 
 const rolesStore = useRolesStore();
-const { getAllRoles,roles } = rolesStore
+const { getAllRoles} = rolesStore
 getAllRoles()
+const {roles} = storeToRefs(rolesStore)
 
 const staffStore = useStaffStore()
 
@@ -62,7 +63,10 @@ const edit = (id: string) => {
   }
 }
 
-const availableRolesByPerson =(person: Person) => person.roles.filter(r=>roles.includes(r))
+
+const availableRolesByPerson =(person: Person) => {
+    return person.roles.filter(r=>roles.value.includes(r))
+}
 
 const newPerson = (): Person => {
     return {
