@@ -1,7 +1,10 @@
 import axios from "axios";
+import Service from "@/plugins/keycloak/service"
+
+const baseURL = import.meta.env.VITE_APP_BASE_API_URL;
 
 const instanceOptions = {
-  baseURL: import.meta.env.VITE_APP_BASE_API_URL,
+  baseURL,
   withCredentials: false,
   headers: {
     accept: 'application/json'
@@ -18,5 +21,13 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+api.interceptors.request.use((config)=>{
+  const token = Service.getTocken()
+  if( token ){
+    config.headers.Authorization=`Bearer ${token}`
+  }
+  return config
+}, error=>Promise.reject(error))
 
 export default api;

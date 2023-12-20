@@ -5,11 +5,10 @@
   </div>
 </template>
 
-<script>
+<script setup lang="ts">
 import TechnologyComponent from "@/components/technology/TechnologyComponent.vue";
 
-export default {
-  name: "Technology",
-  components: {TechnologyComponent},
-}
+//TODO: зачем ннужен этот компонент?
+
+
 </script>

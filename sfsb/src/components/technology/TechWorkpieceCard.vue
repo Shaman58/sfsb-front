@@ -143,6 +143,7 @@
 import {ref, getCurrentInstance, reactive, computed, watch} from 'vue';
 import materialDataFormatting from '@/mixins/MaterialDataFormatting'
 import {useValidationRules} from "@/mixins/FieldValidationRules";
+import CONSTS from '@/consts';
 // ---- ПРОПСЫ ----
 const props = defineProps({
   workpiece: {
@@ -159,7 +160,8 @@ const valid = ref(false);
 const geometry = ref(null);
 const materialFilter = ref(null);
 const {emit} = getCurrentInstance();
-const {geometries} = materialDataFormatting();
+// const {geometries} = materialDataFormatting();
+const geometries = CONSTS.GEOMETRIES
 const {rules} = useValidationRules();
 const geom2LessThanGeom1 = rules.geom2LessThanGeom1(workpiece);
 // ---- ФУНКЦИИ ----

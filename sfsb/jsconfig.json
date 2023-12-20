@@ -9,6 +9,7 @@
         "src/*"
       ]
     },
+    "allowJs": false,
     "lib": [
       "esnext",
       "dom",

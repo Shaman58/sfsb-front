@@ -108,26 +108,6 @@
                               counter>
                 </v-text-field>
               </v-col>
-              <v-col v-if="employees" cols="8" sm="8">
-                <v-select :items="employees"
-                          :item-title="'lastName'"
-                          return-object
-                          v-model="company.director"
-                          label="Директор">
-                </v-select>
-              </v-col>
-              <v-col v-else-if="company.id" cols="8" sm="8">
-                <v-btn @click.stop="visible=true"
-                >Контакты
-                </v-btn>
-
-                <employee-list :employees="company.contacts"
-                               :visible="visible"
-                               @hide="visible=false"
-                               @save="saveContact($event)"
-                               @remove="removeContact($event)"
-                />
-              </v-col>
             </v-row>
           </v-container>
         </v-card-text>

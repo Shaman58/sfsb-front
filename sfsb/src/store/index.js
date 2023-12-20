@@ -12,6 +12,7 @@ import itemModule from "@/store/itemModule";
 import technologyModule from "@/store/TechnologyModule";
 import operationModule from "@/store/OperationModule";
 import cutterModule from "@/store/CutterModule";
+import filesInOrders from "@/store/FilesInOrder";
 
 export default new Vuex.Store({
   modules: {
@@ -28,5 +29,6 @@ export default new Vuex.Store({
     technologyModule,
     operationModule,
     cutterModule,
+    filesInOrders
   }
 })

@@ -3,14 +3,8 @@
          color="orange-darken-1" variant="text">
     Редактировать базу материалов
   </v-btn>
-  <material-list-dialog v-if="materials && materials.length && templates && templates.length"
-                        :visible="visible"
-                        :materials="materials"
-                        :templates="templates"
-                        @hide="visible=false"
-                        @save="save($event)"
-                        @remove="remove($event)"
-  />
+
+  <material-list-dialog1 v-model:visible="visible"/>
 
 </template>
 
@@ -18,6 +12,7 @@
 import {useStore} from "vuex";
 import {computed, onMounted, ref} from "vue";
 import MaterialListDialog from "@/components/material/MaterialList.vue";
+import MaterialListDialog1 from "@/components/material/MaterialList1.vue";
 import ToolList from "@/components/tool/ToolList.vue";
 
 onMounted(() => {

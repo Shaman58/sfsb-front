@@ -15,12 +15,13 @@
   background-color: black;
   color: black;
   border-radius: 10px;
+  height: 100%;
 }
 
 .impuls, .hub {
   font-family: 'Roboto', sans-serif;
   font-size: 1em;
-  padding: 5px;
+  padding: 0px 5px;
 }
 
 .impuls {

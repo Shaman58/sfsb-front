@@ -20,7 +20,8 @@ export default defineConfig({
   define: { 'process.env': {} },
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      '@consts': fileURLToPath(new URL('./src/consts', import.meta.url)),
     },
     extensions: [
       '.js',
@@ -36,3 +37,6 @@ export default defineConfig({
     port: 3000,
   },
 })
+
+//TODO: интегрировать import Components from 'unplugin-vue-components/vite'
+//TODO: https://www.npmjs.com/package/unplugin-vue-components#configuration

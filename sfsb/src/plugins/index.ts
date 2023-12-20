@@ -8,12 +8,9 @@
 import vuetify from './vuetify'
 import router from '../router'
 import store from '../store'
-import keycloak from "@/plugins/keycloak";
+import piniaStore from "./piniaStore"
+import { App } from 'vue'
 
-export function registerPlugins(app) {
-  app
-    .use(vuetify)
-    .use(router)
-    .use(store)
-    .use(keycloak)
+export function registerPlugins(app: App<Element>) {
+  app.use(vuetify).use(router).use(store).use(piniaStore)
 }
