@@ -74,21 +74,8 @@
             </v-card-actions>
         </v-form>
     </v-dialog>
-    <v-dialog v-model="showAlert" width="500">
-        <v-card color="orange">
-            <v-card-title>
-                <span class="headline">Вы не являетесь автором данной заявки</span>
-            </v-card-title>
-            <v-card-text>
-                При изменении данных данной заявки Вы автоматически станете ее автором.
-            </v-card-text>
-            <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="blue" text @click="showAlert = false; changeAgree = false">Отмена</v-btn>
-                <v-btn color="white" text @click="showAlert = false; changeAgree = true">Ок</v-btn>
-            </v-card-actions>
-        </v-card>
-    </v-dialog>
+
+    <AlertDialog ref="alertDialog" />
 </template>
 
 <script setup lang="ts">
@@ -98,9 +85,8 @@ import ItemCard from "@/components/order/ItemCard.vue";
 import { useOfferGenerator } from "@/mixins/OfferGenerator";
 import OrderFiles from "./OrderFiles.vue";
 import keycloakService from "@/plugins/keycloak/service.mjs";
-
-
-
+import AlertDialog from "@/components/common/AlertDialog.vue";
+import  useCurrentUser  from "@/mixins/CurrentUser"
 
 interface Props {
     order: Order
@@ -108,16 +94,14 @@ interface Props {
     visible: boolean
 }
 
-
 const props = defineProps<Props>();
 const emit = defineEmits(["save","hide"]);
 
-const userRaw = ref(null)
-const user = computed(() => userRaw.value || { lastName: "", firstName: "", id: "" });
-onMounted(async () => {
-    const data = await keycloakService.keycloak.loadUserProfile()
-    userRaw.value = data
-})
+const {user} = useCurrentUser()
+
+const alertDialog = ref< typeof AlertDialog | null>(null)
+
+
 // const store = useStore();
 const { rules } = useValidationRules();
 const { previewCommerce, previewToolOrder, previewPlan1, previewPlan2 } = useOfferGenerator();
@@ -125,14 +109,9 @@ const { previewCommerce, previewToolOrder, previewPlan1, previewPlan2 } = useOff
 const form = ref(null);
 const valid = ref(false);
 const active = ref(-1);
-const showAlert = ref(false);
-const changeAgree = ref(false);
 
 
 const order = ref(JSON.parse(JSON.stringify(props.order)));
-
-const orderTitle = computed(() => 'Заявка ' + props.order && props.order.user && (props.order.user.firstName || '' + ' ' + props.order.user.lastName || ''));
-
 
 const hide = () => {
     order.value = JSON.parse(JSON.stringify(props.order));
@@ -144,25 +123,17 @@ const isSameUser = () => {
 }
 
 
-let dialogResolve = (val: unknown) => { }
-let dialogReject = () => { }
-
-const runDialogAlert = () => new Promise((resolve, reject) => {
-    showAlert.value = true
-    dialogResolve = resolve;
-    dialogReject = reject;
-})
-
-watchEffect(() => {
-    changeAgree.value ? dialogResolve(changeAgree.value) : dialogReject()
-})
 
 const save = async (data: Order) => {
-    if (!isSameUser()) {
+    if (!isSameUser() && alertDialog.value) {
         try {
-            await runDialogAlert()
+            alertDialog.value.show()
+            const res = await alertDialog.value.getAnswer()
+            console.log("res", res);
         } catch (error) {
             return
+        } finally {
+            alertDialog.value.hide()
         }
     }
     emit("save", data);
