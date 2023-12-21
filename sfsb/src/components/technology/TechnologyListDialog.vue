@@ -37,9 +37,14 @@
 <script setup lang="ts">
 import { computed, ref, onMounted, watch } from 'vue';
 import { useStore } from 'vuex';
+import { useTechnologyStore } from '@/pinia-store/technology';
+import { storeToRefs } from 'pinia';
 
 const store = useStore();
 const filterText = ref("")
+
+const {dialogVisible,currentTechnology} = storeToRefs(useTechnologyStore());
+const {getTechnologyById} = useTechnologyStore();
 
 onMounted(() => {
   store.dispatch('fetchOrders')
@@ -65,9 +70,12 @@ const orders = computed<Order[]>(() => store.getters.getOrders);
 
 const items = computed(() => orders.value && orders.value.filter((e: Order) => e.id === currentOrder.value).map((e: Order) => e.items))
 
-const showTechnologyCreateDialog = (item: Item) => {
+const showTechnologyCreateDialog = async (item: Item) => {
   store.commit('setItem', item);
   store.commit('setTechnologyDialogVisible', true);
+  await getTechnologyById(item.technology.id);
+  dialogVisible.value = true;
+//   currentTechnology.value = item.technology
 };
 
 

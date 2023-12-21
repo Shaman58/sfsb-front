@@ -159,6 +159,7 @@ declare interface Technology {
   outsourcedCostsDescription: string | null;
   assembly: boolean;
   computed: boolean;
+  user: Person
 }
 declare interface Item {
   created: string;
