@@ -1,5 +1,5 @@
 <template lang="pug">
-v-progress-linear(v-if="!items.length", indeterminate, color="blue")
+//- v-progress-linear(v-if="!items.length", indeterminate, color="blue")
 v-container
     .title
         slot(name="title")
@@ -25,7 +25,7 @@ v-container
 
     v-dialog(v-model="show")
         v-card
-            staff-card(:person="editingPerson" @exit="show=false")
+            StaffCard(:person="editingPerson" @exit="show=false")
 </template>
 
 <script setup lang="ts">
@@ -39,7 +39,9 @@ import { useRolesStore } from '@/pinia-store/roles'
 
 const rolesStore = useRolesStore();
 const { getAllRoles} = rolesStore
-getAllRoles()
+
+await getAllRoles()
+
 const {roles} = storeToRefs(rolesStore)
 
 const staffStore = useStaffStore()
@@ -47,7 +49,7 @@ const staffStore = useStaffStore()
 const {staff: itemsRaw} = storeToRefs(staffStore)
 const {getAllStaff} = staffStore
 
-getAllStaff()
+await getAllStaff()
 
 const items = computed(() => itemsRaw.value.map(person => ({...person, roles: Array.isArray(person.roles)? person.roles : [person.roles] })))
 

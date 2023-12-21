@@ -1,8 +1,11 @@
 <template lang="pug">
 v-container
-    staff-list
-        template(v-slot:title)
-            h1 Управление пользователями
+    Suspense
+        template(v-slot:fallback) Загружаем список пользователей ...
+        template(v-slot:default)
+            staff-list
+                template(v-slot:title)
+                    h1 Управление пользователями
 </template>
 
 <script setup lang="ts">
