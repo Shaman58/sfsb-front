@@ -33,7 +33,7 @@ v-container
 import { ref } from 'vue';
 import { storeToRefs } from 'pinia'
 import { useSupplyStore } from '@/pinia-store/supply'
-import MaterialCreate from '@/components/material/materialCreate.vue'
+import MaterialCreate from '@/components/material/MaterialCreate.vue'
 
 const { materialsAll, materialsDateExpired, materialsNoCost } = storeToRefs(useSupplyStore())
 const { getMaterialsAll, getMaterialsDateExpired, getMaterialsNoCost, saveMaterial } = useSupplyStore()
