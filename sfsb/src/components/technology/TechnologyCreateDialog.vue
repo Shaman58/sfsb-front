@@ -213,7 +213,7 @@
 
 <script setup lang="ts">
 import { useStore } from "vuex";
-import { computed, ref, watchEffect } from "vue";
+import { Ref, computed, ref, watchEffect } from "vue";
 import TechWorkpieceCard from "@/components/technology/TechWorkpieceCard.vue";
 import SetupCreateCard from "@/components/technology/SetupCreateCard.vue";
 import 'vue-toast-notification/dist/theme-bootstrap.css'
@@ -241,14 +241,14 @@ const form = ref(null);
 const valid = ref(false);
 const workpieceCardVisible = ref(false);
 const { formatMaterialData, formatWorkpieceData } = materialDataFormatting();
-const activeSetupIndex = ref(null);
+const activeSetupIndex: Ref<number | null> = ref(null);
 const saveActive = ref(true);
 
 const isDialogVisible = computed(() => store.getters.isTechnologyDialogVisible);
 const item = computed(() => {
     const item = store.getters.getItem;
-    if (!currentTechnology.technologistTime) {
-        currentTechnology.technologistTime = '00:00';
+    if (!currentTechnology.value.technologistTime) {
+        currentTechnology.value.technologistTime = '00:00';
     }
     return item;
 });
@@ -289,7 +289,7 @@ const additionalTextGenerator = (setup) => {
     return [];
 }
 
-const compactInfo = ((data) => {
+const compactInfo = (({ data }) => {
     if (data.operation?.operationTimeManagement === 'COMPUTED'
         || data.operation?.operationTimeManagement === 'PROCESS_TIME_ONLY') {
         return `Обработка: ${data.processTime}`
@@ -358,7 +358,7 @@ const deleteSetup = async (index) => {
     }
 };
 
-const showSetupCard = (index) => {
+const showSetupCard = (index: number) => {
     activeSetupIndex.value = index;
 };
 
