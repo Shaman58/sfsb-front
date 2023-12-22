@@ -257,7 +257,7 @@ const materials = computed(() => store.getters.getMaterials);
 
 const sortedSetups = computed(() => {
     if (item.value.technology.setups.length !== 0) {
-        const setups = item.value.technology.setups.slice().sort((a, b) => a.setupNumber - b.setupNumber);
+        const setups = item.value.technology.setups.slice().sort((a: { setupNumber: number; }, b: { setupNumber: number; }) => a.setupNumber - b.setupNumber);
 
         setups[0].groupAble = true;
 
@@ -277,19 +277,19 @@ const sortedSetups = computed(() => {
 
 const additionalTexts = computed(() => {
     if (sortedSetups.value.length > 0) {
-        return sortedSetups.value.flatMap(setup => additionalTextGenerator(setup));
+        return sortedSetups.value.flatMap((setup: any) => additionalTextGenerator(setup));
     }
     return [];
 });
 
-const additionalTextGenerator = (setup) => {
+const additionalTextGenerator = (setup: { additionalTools: any[]; setupNumber: any; }) => {
     if (setup.additionalTools.length > 0) {
-        return setup.additionalTools.flatMap(tool => `Использовать ПБ '${tool.toolName}' с установки  ${setup.setupNumber}`);
+        return setup.additionalTools.flatMap((tool: { toolName: any; }) => `Использовать ПБ '${tool.toolName}' с установки  ${setup.setupNumber}`);
     }
     return [];
 }
 
-const compactInfo = (({ data }) => {
+const compactInfo = ((data: { operation: { operationTimeManagement: string; }; processTime: any; setupTime: any; interoperativeTime: any; }) => {
     if (data.operation?.operationTimeManagement === 'COMPUTED'
         || data.operation?.operationTimeManagement === 'PROCESS_TIME_ONLY') {
         return `Обработка: ${data.processTime}`
@@ -304,7 +304,7 @@ const calculateSetupNumber = computed(() => {
     if (!item.value.technology.setups) {
         return -1
     }
-    const setupNumbers = item.value.technology.setups.map(setup => setup.setupNumber);
+    const setupNumbers = item.value.technology.setups.map((setup: { setupNumber: any; }) => setup.setupNumber);
     for (let i = 10; i <= Number.MAX_SAFE_INTEGER; i = i + 10) {
         if (!setupNumbers.includes(i)) {
             return i;
@@ -340,7 +340,7 @@ const pushSetup = ({ ...setup }) => {
     newSetup.value = createNewSetup();
 };
 
-const replaceSetup = async (setup, index) => {
+const replaceSetup = async (setup: { [x: string]: any; }, index: any) => {
     await deleteSetup(index);
     pushSetup(setup);
 };
@@ -349,9 +349,9 @@ const hideSetup = () => {
     activeSetupIndex.value = null;
 };
 
-const deleteSetup = async (index) => {
+const deleteSetup = async (index: string | number) => {
     const setupNumberToDelete = sortedSetups.value[index].setupNumber;
-    const indexInOriginalList = item.value.technology.setups.findIndex(setup => setup.setupNumber === setupNumberToDelete);
+    const indexInOriginalList = item.value.technology.setups.findIndex((setup: { setupNumber: any; }) => setup.setupNumber === setupNumberToDelete);
 
     if (indexInOriginalList !== -1) {
         item.value.technology.setups.splice(indexInOriginalList, 1);
@@ -403,7 +403,7 @@ const calculateItem = async () => {
     saveActive.value = true;
 };
 
-const saveWorkpiece = (validWorkpiece) => {
+const saveWorkpiece = (validWorkpiece: any) => {
     item.value.technology.workpiece = validWorkpiece;
 };
 

@@ -1,20 +1,23 @@
 import { Directive } from "vue";
-import keycloakService from "@/plugins/keycloak/service";
+import { useCurrentUserStore } from "@/pinia-store/currentUser";
 
 const role: Directive<HTMLElement> = {
     async mounted(el, { value: userRole, arg }) {
         const isNot = arg === "not";
 
         let isMatch = false;
-        const user = await keycloakService.keycloak.loadUserProfile();
+        const { user } = useCurrentUserStore();
+
         if (Array.isArray(userRole)) {
-            isMatch = user.roles.every((role) => userRole.includes(role));
+            isMatch =
+                !!user && userRole.some((role) => user.roles?.includes(role));
         } else {
-            isMatch = user.roles.some((role: string) => role === userRole);
+            isMatch =
+                !!user && user.roles.some((role: string) => role === userRole);
         }
 
         if (isNot ? isMatch : !isMatch) {
-            el.style.display = "none";
+            el.setAttribute("untouchable", "true");
         }
     },
 };

@@ -1,8 +1,9 @@
 const navItems: NavItem[] = [
-  { path: "/staff", label: "Пользователи" },
-  { path: "/", label: "Данные" },
-  { path: "/commerce", label: "Комерция" },
-  { path: "/technology", label: "Технология" },
+    { path: "/staff", label: "Пользователи" },
+    { path: "/supplier", label: "Снабжение" },
+    { path: "/", label: "Данные" },
+    { path: "/commerce", label: "Комерция" },
+    { path: "/technology", label: "Технология" },
 ];
 
-export default navItems
+export default navItems;

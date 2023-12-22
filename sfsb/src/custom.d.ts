@@ -71,7 +71,7 @@ declare interface Department {
 declare interface ItemPrice {
   amount: number;
   currency: string;
-  formatted: string;
+  formatted?: string;
 }
 
 declare interface Material {
@@ -124,7 +124,7 @@ declare interface Setup {
   created: string;
   updated: string;
   setupNumber: number;
-  operation: Operation;
+  operation: Partial<Operation>;
   setupTime: string;
   processTime: string;
   interoperativeTime: string;
