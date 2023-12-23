@@ -45,7 +45,7 @@ router.beforeEach((to, from, next) => {
         const { user } = useCurrentUserStore();
         if (
             user &&
-            user.roles.map((e) => e.toLowerCase()).includes("supplier")
+            user.roles.some((e) => e.toLowerCase().includes("supplier"))
         ) {
             return next();
         } else {
