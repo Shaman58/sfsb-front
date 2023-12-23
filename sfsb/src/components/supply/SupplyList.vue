@@ -3,29 +3,12 @@ v-container
     v-card.supply
         v-card-title.supply__title SUPPLY
         v-card.supply__main
-            v-card(title="Без цены:").supply__nocost
-                v-list.supply__list
-                    v-list-item(v-for="material in materialsNoCost" @click="selectMaterial(material)" :key="material.id")
-                        span {{ material.materialName }}
-                        .supply__dates
-                            span создан: {{ material.created }}
-                            span обновлен: {{ material.updated }}
-            v-card(title="Просроченные:").supply__dataexpired
-                v-list.supply__list
-                    v-list-item(v-for="material in materialsDateExpired" @click="selectMaterial(material)"  :key="material.id")
-                        span {{ material.materialName }}
-                        .supply__dates
-                            span создан: {{ material.created }}
-                            span обновлен: {{ material.updated }}
-            v-card(title="Все:").supply__alllist
-                v-list.supply__list
-                    v-list-item(v-for="material in materialsAll" @click="selectMaterial(material)"  :key="material.id")
-                        span {{ material.materialName }}
-                        .supply__dates
-                            span создан: {{ material.created }}
-                            span обновлен: {{ material.updated }}
+            SupplyCard.supply__nocost(title="Без цены: " :materialList="materialsNoCost" @select="selectMaterial($event)")
+            SupplyCard.supply__dataexpired(title="Просроченные: " :materialList="materialsDateExpired" @select="selectMaterial($event)")
+            SupplyCard.supply__alllist(title="Все: " :materialList="materialsAll" @select="selectMaterial($event)")
+
         v-dialog(v-model="selectedMaterial")
-            material-create(:material="selectedMaterial" :visible="true" :templates="[]" @hide="selectMaterial(null)" @save="save($event)")
+            MaterialCreate(:material="selectedMaterial" :visible="true" :templates="[]" @hide="selectMaterial(null)" @save="save($event)")
 
 </template>
 
@@ -33,8 +16,8 @@ v-container
 import { ref } from 'vue';
 import { storeToRefs } from 'pinia'
 import { useSupplyStore } from '@/pinia-store/supply'
-import MaterialCreate from '@/components/material/MaterialCreate.vue'
-
+import SupplyCard from "./SupplyCard.vue"
+import MaterialCreate from "@/components/material/MaterialCreate.vue"
 const { materialsAll, materialsDateExpired, materialsNoCost } = storeToRefs(useSupplyStore())
 const { getMaterialsAll, getMaterialsDateExpired, getMaterialsNoCost, saveMaterial } = useSupplyStore()
 
@@ -73,17 +56,4 @@ const save = async (material: Material) => {
 
     &__alllist
         grid-area: all-list
-
-    &__dates
-        display: flex
-        align-items: center
-        gap: 1rem
-        font-size: 0.9em
-        color: #777
-
-    &__list
-        max-height: 100%
-        overflow-y: auto
-
-
 </style>

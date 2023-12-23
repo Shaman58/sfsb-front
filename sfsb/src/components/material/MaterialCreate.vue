@@ -52,7 +52,7 @@
     </v-dialog>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { useStore } from "vuex";
 import { ref } from "vue";
 import materialDataFormatting from '@/mixins/MaterialDataFormatting'
@@ -63,19 +63,7 @@ import useCurrentUser from "@/mixins/CurrentUser";
 
 const { user } = useCurrentUser();
 
-const props = defineProps({
-    material: {
-        type: Object,
-    },
-    visible: {
-        type: Boolean,
-        required: true
-    },
-    templates: {
-        type: Array,
-        required: true
-    }
-});
+const props = defineProps<{ material: Material, visible: boolean, templates: unknown[] }>();
 
 const emit = defineEmits();
 
@@ -88,12 +76,12 @@ const { rules } = useValidationRules();
 const { formatMaterialData } = materialDataFormatting();
 const geometries = CONST.GEOMETRIES
 
-const form = ref(null);
+const form = ref<HTMLFormElement | null>(null);
 const valid = ref(false);
 const material = ref({ ...props.material, price: { ...props.material.price } })
 
-const save = (material) => {
-    if (form.value.validate()) {
+const save = (material: Material) => {
+    if (form.value && form.value.validate()) {
         emit("save", material);
         emit("hide");
     }
