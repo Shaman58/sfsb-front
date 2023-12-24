@@ -1,8 +1,18 @@
-import { Directive } from "vue";
+import { Directive, DirectiveBinding } from "vue";
 import { useCurrentUserStore } from "@/pinia-store/currentUser";
 
+const effectMap: { [key: string]: (el: HTMLElement) => void } = {
+    ["contarst"]: (el: HTMLElement) => {
+        el.setAttribute("untouchable", "true");
+    },
+    ["hide"]: (el: HTMLElement) => {
+        el.setAttribute("hidden", "hidden");
+    },
+};
+
 const role: Directive<HTMLElement> = {
-    async mounted(el, { value: userRole, arg }) {
+    async mounted(el, { value: userRole, arg, modifiers }: DirectiveBinding) {
+        console.log(modifiers);
         const isNot = arg === "not";
 
         let isMatch = false;
@@ -17,7 +27,9 @@ const role: Directive<HTMLElement> = {
         }
 
         if (isNot ? isMatch : !isMatch) {
-            el.setAttribute("untouchable", "true");
+            Object.keys(modifiers).forEach((key) => {
+                if (key in effectMap) effectMap[key](el);
+            });
         }
     },
 };
