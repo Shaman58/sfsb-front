@@ -6,6 +6,7 @@ import Staff from "@/views/Staff.vue";
 import Supplier from "@/views/Supplier.vue";
 import { useCurrentUserStore } from "@/pinia-store/currentUser";
 import { useToast } from "vue-toast-notification";
+import { storeToRefs } from "pinia";
 
 const toast = useToast();
 
@@ -40,16 +41,27 @@ const router = createRouter({
     routes,
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
+    const { fetchUser } = useCurrentUserStore();
+    const { user } = storeToRefs(useCurrentUserStore());
+
+    await fetchUser();
+
     if (to.path === "/supplier") {
-        const { user } = useCurrentUserStore();
+        if (!user.value) {
+            toast.error("Текущий пользователь не определен");
+            return next(false);
+        }
         if (
-            user &&
-            user.roles.some((e) => e.toLowerCase().includes("supplier"))
-        ) {
+            user.value &&
+            user.value.roles.some((e) => e.toLowerCase().includes("supplier"))
+        )
             return next();
-        } else {
-            user && toast.error("У вас нет прав доступа к этой странице");
+        if (
+            user.value &&
+            !user.value.roles.some((e) => e.toLowerCase().includes("supplier"))
+        ) {
+            toast.error("У вас нет прав доступа к этой странице");
             return next(false);
         }
     }

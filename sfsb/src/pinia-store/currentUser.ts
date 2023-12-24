@@ -11,12 +11,11 @@ export const useCurrentUserStore = defineStore("current-user", () => {
 
     const fetchUser = async () => {
         try {
-            const response = await api.get<Person[]>("/user");
+            const { data } = await api.get<Person[]>("/user");
             const userKeycloak =
                 await keycloakService.keycloak.loadUserProfile();
             const fetchedUser =
-                userKeycloak &&
-                response.data.find((e) => e.id === userKeycloak.id);
+                userKeycloak && data.find((e) => e.id === userKeycloak.id);
             user.value = fetchedUser || null;
         } catch (error) {
             toast.error("Ошибка при загрузке данных пользователя " + error);
