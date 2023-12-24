@@ -12,7 +12,7 @@
             <v-toolbar-items class="ml-5" style="overflow-x: auto;">
 
                 <v-btn v-for="navitem in CONSTS.MAINMENU" :key="navitem.path" :to="navitem.path" rounded="xs" tonal
-                    :hidden="navitem.role && !user?.roles.some(e => e === navitem.role)">
+                    :hidden="navitem.role && navitem.role.length && !user?.roles.some(e => navitem.role?.includes(e))">
                     {{ navitem.label }}
                 </v-btn>
                 <v-menu open-on-hover>
