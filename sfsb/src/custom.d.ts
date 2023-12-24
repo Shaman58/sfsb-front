@@ -33,6 +33,7 @@ declare interface Therm {
 declare interface NavItem {
   path: string;
   label: string;
+  role?: string;
 }
 
 declare interface OrderFile {

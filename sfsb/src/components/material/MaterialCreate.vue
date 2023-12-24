@@ -4,26 +4,26 @@
             <v-form ref="form" v-model="valid" @submit.prevent="save(material)">
                 <v-card-text>
                     <v-row>
-                        <v-col cols="4" v-role:not="['SUPPLIER']">
+                        <v-col cols="4" v-role:not.contarst="['SUPPLIER']">
                             <v-text-field label="Название:" v-model="material.materialName"
                                 :rules="[rules.required, rules.nameValidation]" counter>
                             </v-text-field>
                         </v-col>
-                        <v-col cols="4" v-role:not="['SUPPLIER']">
+                        <v-col cols="4" v-role:not.contarst="['SUPPLIER']">
                             <v-select label="Выберите вид:" :items="geometries" item-title="title" item-value="label"
                                 v-model="material.geometry" :rules="[rules.required]">
                             </v-select>
                         </v-col>
-                        <v-col cols="4" v-role:not="['SUPPLIER']">
+                        <v-col cols="4" v-role:not.contarst="['SUPPLIER']">
                             <v-text-field label="Гост на метериал:" v-model="material.gost1">
                             </v-text-field>
                         </v-col>
-                        <v-col cols="4" v-role:not="['SUPPLIER']">
+                        <v-col cols="4" v-role:not.contarst="['SUPPLIER']">
                             <v-select label="Выберите плотность:" :items="props.templates" item-title="materialTypeName"
                                 item-value="density" v-model="material.density">
                             </v-select>
                         </v-col>
-                        <v-col cols="2" v-role:not="['SUPPLIER']">
+                        <v-col cols="2" v-role:not.contarst="['SUPPLIER']">
                             <v-text-field label="Плотность:" v-model="material.density"
                                 :rules="[rules.required, rules.numeric]">
                             </v-text-field>
@@ -32,7 +32,7 @@
                             <v-text-field label="Стоимость килограмма:" v-model="material.price.amount"
                                 :rules="[rules.required, rules.numeric]" type="number"></v-text-field>
                         </v-col>
-                        <v-col cols="4" v-role:not="['SUPPLIER']">
+                        <v-col cols="4" v-role:not.contarst="['SUPPLIER']">
                             <v-text-field label="Гост на сортамент:" v-model="material.gost2">
                             </v-text-field>
                         </v-col>

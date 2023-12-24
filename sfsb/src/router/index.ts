@@ -49,7 +49,7 @@ router.beforeEach((to, from, next) => {
         ) {
             return next();
         } else {
-            toast.error("У вас нет прав доступа к этой странице");
+            user && toast.error("У вас нет прав доступа к этой странице");
             return false;
         }
     }
