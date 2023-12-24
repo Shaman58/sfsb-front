@@ -2,19 +2,36 @@
     <v-container>
         <v-app-bar color="orange" class="navbar">
             <template v-slot:prepend>
-                <impuls-hub />
+
+                <v-btn :to="'/'">
+                    <impuls-hub />
+                </v-btn>
             </template>
-            <div class="navbar__user-data">
-                <img class="navbar__img" :src="picture" alt="avatar" />
-                <span class="navbar__name">{{ name }}</span>
-            </div>
+
             {{ version }}
             <v-toolbar-items class="ml-5" style="overflow-x: auto;">
 
-                <v-btn v-for="item in CONSTS.MAINMENU" :key="item.path" :to="item.path" rounded="xs" tonal>
-                    {{ item.label }}
+                <v-btn v-for="navitem in CONSTS.MAINMENU" :key="navitem.path" :to="navitem.path" rounded="xs" tonal
+                    :hidden="navitem.role && !user?.roles.some(e => e === navitem.role)">
+                    {{ navitem.label }}
                 </v-btn>
-                <v-btn class="navbar__logout" elevation="4" icon="mdi-exit-to-app" title="выход" @click="logout"></v-btn>
+                <v-menu open-on-hover>
+                    <template v-slot:activator="{ props }">
+                        <v-btn color="primary" v-bind="props">
+                            <div class="navbar__user-data">
+                                <img class="navbar__img" :src="picture" alt="avatar" />
+                                <span class="navbar__name">{{ name }}</span>
+                            </div>
+                        </v-btn>
+                    </template>
+
+                    <v-list>
+                        <v-list-item @click="logout" class="d-flex justify-center align-center navbar-exit">
+                            <span color="red">ВЫХОД</span>
+                            <v-icon icon="mdi-exit-to-app" class="ml-2" color="red"></v-icon>
+                        </v-list-item>
+                    </v-list>
+                </v-menu>
             </v-toolbar-items>
         </v-app-bar>
     </v-container>
@@ -26,8 +43,12 @@ import ImpulsHub from "@/components/ImpulsHub.vue";
 import CONSTS from "@consts/index"
 import keycloakService from '@/plugins/keycloak/service';
 import { useToast } from "vue-toast-notification";
+import { useCurrentUserStore } from "@/pinia-store/currentUser";
+import { storeToRefs } from "pinia";
 
 const toast = useToast();
+
+const { user } = storeToRefs(useCurrentUserStore())
 
 const version = import.meta.env.VITE_APP_VERSION;
 
@@ -61,5 +82,10 @@ onMounted(async () => {
         height: 30px
         border-radius: 50%
         object-fit: cover
+
+.navbar-exit
+    display: flex
+    align-items: center
+
 
 </style>
