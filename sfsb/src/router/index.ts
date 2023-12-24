@@ -50,7 +50,7 @@ router.beforeEach((to, from, next) => {
             return next();
         } else {
             user && toast.error("У вас нет прав доступа к этой странице");
-            return false;
+            return next(false);
         }
     }
     next();
