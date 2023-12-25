@@ -2,10 +2,10 @@ import { Directive, DirectiveBinding } from "vue";
 import { useCurrentUserStore } from "@/pinia-store/currentUser";
 
 const effectMap: { [key: string]: (el: HTMLElement) => void } = {
-    ["contarst"]: (el: HTMLElement) => {
+    contarst: (el: HTMLElement) => {
         el.setAttribute("untouchable", "true");
     },
-    ["hide"]: (el: HTMLElement) => {
+    hide: (el: HTMLElement) => {
         el.setAttribute("hidden", "hidden");
     },
 };
@@ -23,7 +23,10 @@ const role: Directive<HTMLElement> = {
                 !!user && userRole.some((role) => user.roles?.includes(role));
         } else {
             isMatch =
-                !!user && user.roles.some((role: string) => role === userRole);
+                userRole === "*"
+                    ? true
+                    : !!user &&
+                      user.roles.some((role: string) => role === userRole);
         }
 
         if (isNot ? isMatch : !isMatch) {
