@@ -1,11 +1,20 @@
 <template lang="pug">
 v-container
     v-card.supply
-        v-card-title.supply__title SUPPLY
+        v-card-title.supply__title СНАБЖЕНИЕ
         v-card.supply__main
-            SupplyCard.supply__nocost(title="Без цены: " :materialList="materialsNoCost" @select="selectMaterial($event)")
-            SupplyCard.supply__dataexpired(title="Просроченные: " :materialList="materialsDateExpired" @select="selectMaterial($event)")
-            SupplyCard.supply__alllist(title="Все: " :materialList="materialsAll" @select="selectMaterial($event)")
+            Suspense
+                template(v-slot:fallback)
+                    div.supply__loader
+                SupplyCard.supply__nocost(title="Без цены: " :materials="'materialsNoCost'" @select="selectMaterial($event)" :getData="getMaterialsNoCost")
+            Suspense
+                template(v-slot:fallback)
+                    div.supply__loader
+                SupplyCard.supply__dataexpired(title="Просроченные: " :materials="'materialsDateExpired'" @select="selectMaterial($event)" :getData="getMaterialsDateExpired")
+            Suspense
+                template(v-slot:fallback)
+                    div.supply__loader
+                SupplyCard.supply__alllist(title="Все: " :materials="'materialsAll'" @select="selectMaterial($event)" :getData="getMaterialsAll")
 
         v-dialog(v-model="selectedMaterial")
             MaterialCreate(:material="selectedMaterial" :visible="true" :templates="[]" @hide="selectMaterial(null)" @save="save($event)")
@@ -18,12 +27,8 @@ import { storeToRefs } from 'pinia'
 import { useSupplyStore } from '@/pinia-store/supply'
 import SupplyCard from "./SupplyCard.vue"
 import MaterialCreate from "@/components/material/MaterialCreate.vue"
-const { materialsAll, materialsDateExpired, materialsNoCost } = storeToRefs(useSupplyStore())
 const { getMaterialsAll, getMaterialsDateExpired, getMaterialsNoCost, saveMaterial } = useSupplyStore()
 
-await getMaterialsAll();
-await getMaterialsDateExpired();
-await getMaterialsNoCost();
 
 const selectedMaterial = ref<Material | null>(null)
 
@@ -56,4 +61,21 @@ const save = async (material: Material) => {
 
     &__alllist
         grid-area: all-list
+
+    &__loader
+        --x: 0%
+        width: 100%
+        height: 30vh
+        border-radius: 10px
+        background: linear-gradient(45deg, #7777 0% var(--x), #9997 var(--x) calc(var(--x) + 2%) ,#7777 calc(var(--x) + 2%) 100%)
+        animation: anim 1s infinite ease-in-out
+
+    @keyframes anim
+        0%
+            --x: 0%
+        50%
+            --x: 100%
+        100%
+            --x: 0%
+
 </style>

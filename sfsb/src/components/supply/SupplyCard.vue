@@ -8,20 +8,31 @@ v-card.supply-card
         v-list-item.supply-card__item(v-for="material in filteredList" @click="$emit('select',material)" :key="material.id")
             span {{ material.materialName }}
             .supply-card__dates
-                span создан: {{ material.created }}
                 span обновлен: {{ material.updated }}
 </template>
 
 <script setup lang="ts">
+import { useSupplyStore } from "@/pinia-store/supply";
+import { storeToRefs } from "pinia";
 import { ref, computed } from "vue"
 interface Props {
     title: string
-    materialList: Material[]
+    materials: string
+    getData: () => Promise<void>
 }
-const { materialList, title = "" } = defineProps<Props>()
+const { materials, getData, title = "" } = defineProps<Props>()
 const emit = defineEmits(["select"])
 const filterText = ref("")
-const filteredList = computed(() => materialList.filter(e => e.materialName.includes(filterText.value)))
+
+console.log("SupplyCard title", title, materials)
+const supplyStore = storeToRefs(useSupplyStore())
+
+await getData()
+
+const materialList = supplyStore[materials as keyof typeof supplyStore]
+console.log("🚀 ~ file: SupplyCard.vue:33 ~ materialList:", materialList)
+
+const filteredList = computed(() => materialList.value.filter(e => e.materialName.includes(filterText.value)))
 
 </script>
 
