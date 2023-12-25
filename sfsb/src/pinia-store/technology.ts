@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import api from "@/api/instance";
 import { useToast } from "vue-toast-notification";
 import { Ref, ref } from "vue";
+import { useCurrentUserStore } from "./currentUser";
 
 const toast = useToast();
 
@@ -38,11 +39,33 @@ export const useTechnologyStore = defineStore("technology", () => {
         dialogVisible.value = visible;
     };
 
+    const changeBlocked = async (status: boolean) => {
+        const url = status
+            ? `/technology/${currentTechnology.value.id}/block`
+            : `/technology/${currentTechnology.value.id}/unblock`;
+        try {
+            const resp = await api.get(url);
+            if (resp.status > 400)
+                throw new Error("Ошибка при изменении блокировки");
+            await getTechnologyById(currentTechnology.value.id);
+        } catch (error) {
+            toast.error("Ошибка при изменении блокировки " + error);
+        }
+    };
+
+    const isEqualTechnolgyUserAndCurrentUser = async () => {
+        const { user: currentUser } = useCurrentUserStore();
+        const user = currentTechnology.value.user;
+        return user.id === currentUser?.id;
+    };
+
     return {
         dialogVisible,
         currentTechnology,
+        isEqualTechnolgyUserAndCurrentUser,
         getTechnologyById,
         saveTechnology,
         setTechnologyDialogVisible,
+        changeBlocked,
     };
 });

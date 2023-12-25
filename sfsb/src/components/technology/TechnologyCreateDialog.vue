@@ -10,9 +10,12 @@
                                     currentTechnology && currentTechnology.drawingName }}</span>
                                 {{ item.quantity + "шт." }}
                             </div>
-                            <div class="technology-card__owner">
-                                Автор: {{ currentTechnology.user.firstName }} {{ currentTechnology.user.lastName }}
-                            </div>
+                            <Suspense>
+                                <template #fallback>Loading ...</template>
+                                <template #default>
+                                    <technology-card-owner :user="currentTechnology.user" @change="changeOwner" />
+                                </template>
+                            </Suspense>
                         </div>
                     </v-card-title>
                     <v-card-text>
@@ -213,27 +216,27 @@
 
 <script setup lang="ts">
 import { useStore } from "vuex";
-import { Ref, computed, ref, watchEffect } from "vue";
+import { Ref, computed, ref } from "vue";
 import TechWorkpieceCard from "@/components/technology/TechWorkpieceCard.vue";
 import SetupCreateCard from "@/components/technology/SetupCreateCard.vue";
 import 'vue-toast-notification/dist/theme-bootstrap.css'
 import materialDataFormatting from '@/mixins/MaterialDataFormatting'
 import { useValidationRules } from "@/mixins/FieldValidationRules";
 import DurationPicker from "@/components/technology/DurationPicker.vue";
+import TechnologyCardOwner from "./TechnologyCardOwner.vue";
 import { useTechnologyStore } from "@/pinia-store/technology";
 import { storeToRefs } from "pinia"
 import AlertDialog from "../common/AlertDialog.vue";
-import useCurrentUser from "@/mixins/CurrentUser";
+import { useCurrentUserStore } from "@/pinia-store/currentUser";
 
 const { dialogVisible, currentTechnology } = storeToRefs(useTechnologyStore());
-const { saveTechnology } = useTechnologyStore();
-console.log("🚀 ~ file: TechnologyCreateDialog.vue:262 ~ currentTechnology:", currentTechnology)
-
-watchEffect(() => console.log("dialogVisible", dialogVisible))
+const { saveTechnology, changeBlocked } = useTechnologyStore();
 
 const alertDialog = ref<typeof AlertDialog | null>(null)
 
-const { user } = useCurrentUser()
+const { user } = storeToRefs(useCurrentUserStore())
+
+
 
 const { rules } = useValidationRules();
 const store = useStore();
@@ -254,6 +257,10 @@ const item = computed(() => {
 });
 
 const materials = computed(() => store.getters.getMaterials);
+
+const changeOwner = (event: boolean) => {
+    console.log("changeOwner", event)
+}
 
 const sortedSetups = computed(() => {
     if (item.value.technology.setups.length !== 0) {
@@ -431,6 +438,13 @@ const showWorkpieceCard = () => {
     border: 1px solid #97ffa0;
     border-radius: 10px;
     margin: 2px;
+}
+
+.technology-card__owner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: .5rem
 }
 
 .technology-card__title {

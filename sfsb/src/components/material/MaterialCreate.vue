@@ -59,9 +59,10 @@ import materialDataFormatting from '@/mixins/MaterialDataFormatting'
 import { useValidationRules } from "@/mixins/FieldValidationRules";
 import CONST from "@/consts"
 import { useRolesStore } from "@/pinia-store/roles";
-import useCurrentUser from "@/mixins/CurrentUser";
+import { useCurrentUserStore } from "@/pinia-store/currentUser";
+import { storeToRefs } from "pinia";
 
-const { user } = useCurrentUser();
+const { user } = storeToRefs(useCurrentUserStore())
 
 const props = defineProps<{ material: Material, visible: boolean, templates: unknown[] }>();
 

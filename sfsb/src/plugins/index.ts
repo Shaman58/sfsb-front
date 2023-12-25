@@ -16,7 +16,6 @@ const currentUser: Plugin = {
     install: (app: App) => {
         app.config.globalProperties.$user = { id: "kjlkjlkjlkjlkj" };
         // app.config.globalProperties.$user = await keycloakService.keycloak.loadUserProfile();
-        console.log("from plugin", app.config.globalProperties.$user);
     },
 };
 

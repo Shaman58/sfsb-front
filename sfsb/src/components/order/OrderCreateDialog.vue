@@ -86,7 +86,9 @@ import { useOfferGenerator } from "@/mixins/OfferGenerator";
 import OrderFiles from "./OrderFiles.vue";
 import keycloakService from "@/plugins/keycloak/service.mjs";
 import AlertDialog from "@/components/common/AlertDialog.vue";
-import  useCurrentUser  from "@/mixins/CurrentUser"
+import { storeToRefs } from "pinia";
+import { useCurrentUserStore } from "@/pinia-store/currentUser";
+
 
 interface Props {
     order: Order
@@ -95,11 +97,11 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits(["save","hide"]);
+const emit = defineEmits(["save", "hide"]);
 
-const {user} = useCurrentUser()
+const { user } = storeToRefs(useCurrentUserStore())
 
-const alertDialog = ref< typeof AlertDialog | null>(null)
+const alertDialog = ref<typeof AlertDialog | null>(null)
 
 
 // const store = useStore();
@@ -119,13 +121,11 @@ const hide = () => {
 };
 
 const isSameUser = () => {
-    return props.order.user.id === user.value.id;
+    return props.order.user && props.order.user.id === user.value?.id;
 }
 
-
-
 const save = async (data: Order) => {
-    if (!isSameUser() && alertDialog.value) {
+    if (props.order.user && !isSameUser() && alertDialog.value) {
         try {
             alertDialog.value.show()
             const res = await alertDialog.value.getAnswer()
