@@ -4,6 +4,7 @@ import Technology from "@/views/Technology.vue";
 import MainPage from "@/views/MainPage.vue";
 import Staff from "@/views/Staff.vue";
 import Supplier from "@/views/Supplier.vue";
+import NotFound from "@/views/NotFound.vue";
 import { useCurrentUserStore } from "@/pinia-store/currentUser";
 import { useToast } from "vue-toast-notification";
 import { storeToRefs } from "pinia";
@@ -33,6 +34,10 @@ const routes = [
     {
         path: "/technology",
         component: Technology,
+    },
+    {
+        path: "/:catchAll(.*)",
+        component: NotFound,
     },
 ];
 
