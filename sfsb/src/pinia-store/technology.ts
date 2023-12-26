@@ -9,7 +9,7 @@ const toast = useToast();
 export const useTechnologyStore = defineStore("technology", () => {
     const dialogVisible: Ref<boolean> = ref(false);
     const currentTechnology: Ref<Technology> = ref({} as Technology);
-    const isEqualTechnolgyUserAndCurrentUser: Ref<boolean> = ref(false);
+    const isBlockedByCurrentUser: Ref<boolean> = ref(false);
 
     const getTechnologyById = async (id: string | number) => {
         try {
@@ -17,8 +17,8 @@ export const useTechnologyStore = defineStore("technology", () => {
             const res = await api.get<Technology>(url);
             res.status === 200
                 ? ((currentTechnology.value = res.data),
-                  (isEqualTechnolgyUserAndCurrentUser.value =
-                      compareTechnolgyUserAndCurrentUser()))
+                  (isBlockedByCurrentUser.value =
+                      compareBlockedAndCurrentUser()))
                 : toast.error(
                       "Ошибка при получении технологии " + res.statusText
                   );
@@ -38,6 +38,11 @@ export const useTechnologyStore = defineStore("technology", () => {
         }
     };
 
+    const setCurrentTechnology = (technology: Technology) => {
+        currentTechnology.value = technology;
+        setTechnologyDialogVisible(true);
+        isBlockedByCurrentUser.value = compareBlockedAndCurrentUser();
+    };
     const setTechnologyDialogVisible = (visible: boolean) => {
         dialogVisible.value = visible;
     };
@@ -51,22 +56,24 @@ export const useTechnologyStore = defineStore("technology", () => {
             if (resp.status > 400)
                 throw new Error("Ошибка при изменении блокировки");
             await getTechnologyById(currentTechnology.value.id);
+            isBlockedByCurrentUser.value = compareBlockedAndCurrentUser();
         } catch (error) {
             toast.error("Ошибка при изменении блокировки " + error);
         }
     };
 
-    const compareTechnolgyUserAndCurrentUser = () => {
+    const compareBlockedAndCurrentUser = () => {
         const { user: currentUser } = useCurrentUserStore();
-        const user = currentTechnology.value.user;
-        return user.id === currentUser?.id;
+        const blocked = currentTechnology.value.blocked;
+        return blocked === currentUser?.id;
     };
 
     return {
         dialogVisible,
         currentTechnology,
-        isEqualTechnolgyUserAndCurrentUser,
+        isBlockedByCurrentUser,
         getTechnologyById,
+        setCurrentTechnology,
         saveTechnology,
         setTechnologyDialogVisible,
         changeBlocked,

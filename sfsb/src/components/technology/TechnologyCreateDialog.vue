@@ -13,12 +13,12 @@
                             <Suspense>
                                 <template #fallback>Loading ...</template>
                                 <template #default>
-                                    <technology-card-owner :user="currentTechnology.user" @change="changeOwner" />
+                                    <technology-card-owner @change="changeOwner" />
                                 </template>
                             </Suspense>
                         </div>
                     </v-card-title>
-                    <v-card-text :untouchable="!isEqualTechnolgyUserAndCurrentUser">
+                    <v-card-text :untouchable="!isBlockedByCurrentUser">
                         <v-row>
                             <v-col>
                                 <v-switch v-model="currentTechnology.assembly" :true-value="true" :false-value="false"
@@ -171,11 +171,11 @@
                             </a>
                         </v-col>
                         <v-btn color="orange-darken-1" variant="text" type="submit" :disabled="isSaveActive"
-                            :untouchable="!isEqualTechnolgyUserAndCurrentUser">
+                            :untouchable="!isBlockedByCurrentUser">
                             Сохранить
                         </v-btn>
                         <v-btn color="orange-darken-1" variant="text" :disabled="isSaveActive" @click.stop="calculateItem"
-                            :untouchable="!isEqualTechnolgyUserAndCurrentUser">
+                            :untouchable="!isBlockedByCurrentUser">
                             Рассчитать
                         </v-btn>
                         <v-spacer></v-spacer>
@@ -206,14 +206,14 @@ import AlertDialog from "../common/AlertDialog.vue";
 import { useCurrentUserStore } from "@/pinia-store/currentUser";
 import TechnologyCardMainOptions from "./TechnologyCardMainOptions.vue";
 
-const { dialogVisible, currentTechnology, isEqualTechnolgyUserAndCurrentUser } = storeToRefs(useTechnologyStore());
+const { dialogVisible, currentTechnology, isBlockedByCurrentUser } = storeToRefs(useTechnologyStore());
 const { saveTechnology, changeBlocked } = useTechnologyStore();
 
 const alertDialog = ref<typeof AlertDialog | null>(null)
 
 const { user } = storeToRefs(useCurrentUserStore())
 
-
+const emit = defineEmits(["close"])
 
 const { rules } = useValidationRules();
 const store = useStore();
@@ -237,11 +237,12 @@ const materials = computed(() => store.getters.getMaterials);
 
 const changeOwner = (event: boolean) => {
     console.log("changeOwner", event)
+    // changeBlocked(event);
 }
 
 const sortedSetups = computed(() => {
-    if (item.value.technology.setups.length !== 0) {
-        const setups = item.value.technology.setups.slice().sort((a: { setupNumber: number; }, b: { setupNumber: number; }) => a.setupNumber - b.setupNumber);
+    if (currentTechnology.value.setups.length !== 0) {
+        const setups = currentTechnology.value.setups.slice().sort((a: { setupNumber: number; }, b: { setupNumber: number; }) => a.setupNumber - b.setupNumber);
 
         setups[0].groupAble = true;
 
@@ -319,7 +320,7 @@ const createNewSetup = () => ({
 const newSetup = ref(createNewSetup());
 
 const pushSetup = ({ ...setup }) => {
-    hideSetup(setup);
+    hideSetup();
     item.value.technology.setups.push(setup);
     newSetup.value = createNewSetup();
 };
@@ -330,7 +331,7 @@ const replaceSetup = async (setup: { [x: string]: any; }, index: any) => {
 };
 
 const hideSetup = () => {
-    isEqualTechnolgyUserAndCurrentUser.value && (activeSetupIndex.value = null);
+    isBlockedByCurrentUser.value && (activeSetupIndex.value = null);
 };
 
 const deleteSetup = async (index: string | number) => {
@@ -343,13 +344,14 @@ const deleteSetup = async (index: string | number) => {
 };
 
 const showSetupCard = (index: number) => {
-    isEqualTechnolgyUserAndCurrentUser.value && (activeSetupIndex.value = index)
+    isBlockedByCurrentUser.value && (activeSetupIndex.value = index)
 }
 
 
 const hideDialog = () => {
     store.commit("setTechnologyDialogVisible", false);
     dialogVisible.value = false;
+    emit("close")
 };
 
 const save = async () => {

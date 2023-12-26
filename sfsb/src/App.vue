@@ -16,7 +16,7 @@ import { useCurrentUserStore } from "@/pinia-store/currentUser";
 <style lang="sass">
 .v-toolbar__content
   height: 32px !important
-[untouchable]
+[untouchable="true"]
     pointer-events: none
     // filter: contrast(0)
     opacity: 0.5

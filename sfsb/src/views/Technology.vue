@@ -1,14 +1,15 @@
 <template>
-  <div>
-    <br>
-    <technology-component/>
-  </div>
+    <Suspense>
+        <template #fallback> Loading ...</template>
+        <technology-dialog />
+    </Suspense>
 </template>
 
 <script setup lang="ts">
-import TechnologyComponent from "@/components/technology/TechnologyComponent.vue";
+import TechnologyDialog from '@/components/technology/TechnologyDialog.vue';
 
-//TODO: зачем ннужен этот компонент?
+// import TechnologyComponent from "@/components/technology/TechnologyComponent.vue";
+
 
 
 </script>

@@ -5,7 +5,7 @@ import { Ref, ref } from "vue";
 
 const toast = useToast();
 
-export const useItemStore = defineStore("roles", () => {
+export const useItemStore = defineStore("items", () => {
     const items: Ref<Item[]> = ref([] as Item[]);
     const item: Ref<Item> = ref({} as Item);
 

@@ -1,7 +1,9 @@
 <template lang="pug">
 .technology-card__owner
-    .technology-card__owner-title Автор: {{ user.firstName }} {{user.lastName }}
-    v-switch.technology-card__owner-switcher(v-model="model" :label="model?'В работе':'Взять в работу'" color="red")
+    .technology-card__owner-title
+        span(v-if="technologyUser") Последние изменения внесены: {{ technologyUser.firstName }} {{technologyUser.lastName }}
+        span(v-else="technologyUser" ) Данные не были внесены
+    v-switch.technology-card__owner-switcher(v-model="model" :label="model?'В работе':'Взять в работу'" color="red" :untouchable="currentTechnology.blocked!=='' || !isBlockedByCurrentUser")
 
 </template>
 
@@ -11,20 +13,18 @@ import { useTechnologyStore } from "@/pinia-store/technology"
 import { useCurrentUserStore } from '@/pinia-store/currentUser';
 import { storeToRefs } from 'pinia';
 
-interface Props {
-    user: Person
-}
-const { user } = defineProps<Props>()
 const emit = defineEmits(["change"])
-const model = ref(false)
 
-const { isEqualTechnolgyUserAndCurrentUser } = storeToRefs(useTechnologyStore())
+const { isBlockedByCurrentUser, currentTechnology } = storeToRefs(useTechnologyStore())
 const { changeBlocked } = useTechnologyStore()
 const { user: currentUser } = storeToRefs(useCurrentUserStore())
 
+const model = ref(isBlockedByCurrentUser.value)
+
+const technologyUser = currentTechnology.value.user
+
 // model.value = user.id === currentUser.value?.id
-model.value = isEqualTechnolgyUserAndCurrentUser.value
-console.log("🚀 ~ file: TechnologyCardOwner.vue:25 ~ model.value:", model.value, user.id, currentUser.value)
+model.value = isBlockedByCurrentUser.value
 
 watch(() => model.value, async (newVal: boolean) => {
     emit("change", newVal)
