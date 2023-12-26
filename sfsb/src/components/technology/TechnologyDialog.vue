@@ -5,14 +5,14 @@ v-container.technology-dialog
         v-card-title
             span(class="text-h5") Заявки
         v-list
-            v-list-item(v-for="item in orders" :key="item.id" @click="currentOrder=item") {{ item.id }} {{ item.customer.companyName }}
+            v-list-item(v-for="item in orders" :key="item.id" @click="currentOrder=item" :class="{'active-order ': item.id === currentOrder?.id}") {{ item.id }} {{ item.customer.companyName }}
 
 
     v-card.technology-dialog__technologies
         v-card-title
             span(class="text-h5") Технологии
         v-list
-            v-list-item(v-for="item in currentOrder?.items" :key="item.id" @click="setCurrentTechnology(item.technology)")
+            v-list-item(v-for="item in currentOrder?.items" :key="item.id" @click="setCurrentTechnology(item.technology)" )
                 span {{ item.technology.drawingNumber }} {{ item.technology.drawingName }}
 
 
@@ -41,9 +41,10 @@ import { useItemStore } from '@/pinia-store/item';
 const { orders } = storeToRefs(useOrdersStore())
 const { getOrders } = useOrdersStore()
 
+
 const { user } = storeToRefs(useCurrentUserStore())
 
-const { dialogVisible } = storeToRefs(useTechnologyStore())
+const { dialogVisible, currentTechnology } = storeToRefs(useTechnologyStore())
 const { setCurrentTechnology } = useTechnologyStore()
 
 await getOrders()
@@ -53,7 +54,8 @@ const { fetchItems } = useItemStore()
 
 await fetchItems()
 
-const currentOrder: Ref<Order | null> = ref(null)
+const currentOrder: Ref<Order | null> = ref(orders.value[0] || null)
+
 const technologiesByUser = computed(() => currentOrder && currentOrder.value?.items.filter(item => item.technology.blocked === user.value?.id))
 
 const refresh = async () => {
@@ -67,4 +69,6 @@ const refresh = async () => {
 .technology-dialog
     display: grid
     grid-template-columns: repeat(3, 1fr)
+.active-order
+    text-decoration: underline
 </style>
