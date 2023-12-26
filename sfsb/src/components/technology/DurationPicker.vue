@@ -3,22 +3,18 @@
         persistent-hint placeholder="00:00" maxlength="5" />
 </template>
 
-<script setup>
-import { computed, ref, watch } from 'vue';
+<script setup lang="ts">
+import { ComputedRef, computed, ref, watch } from 'vue';
+
+interface Props {
+    modelValue: string
+    label: string
+    rules: ((value: string) => boolean | string)[]
+}
 
 const emit = defineEmits();
 
-const props = defineProps({
-    modelValue: {
-        type: String,
-        default: '00:00'
-    },
-    label: String,
-    rules: {
-        type: Array,
-        default: () => [],
-    },
-});
+const props = defineProps<Props>();
 
 const internalDuration = ref(props.modelValue);
 
@@ -50,15 +46,15 @@ const handleInput = () => {
     }
 }
 
-const computedRules = computed(() => {
-    return [...props.rules, value => {
+const computedRules: ComputedRef<((value: string) => boolean | string)[]> = computed(() => {
+    return [...props.rules, (value: string) => {
         const pattern = /^([0-9]{2}):([0-5][0-9])$/;
         return pattern.test(value) || 'Неверный формат ЧЧ:ММ'
     }];
 });
 
-const validateDuration = (value) => {
-    return computedRules.value.every(rule => rule(value) === true);
+const validateDuration = (value: string) => {
+    return computedRules.value.every((rule => rule(value) === true));
 };
 
 watch(() => props.modelValue, (newValue) => {
