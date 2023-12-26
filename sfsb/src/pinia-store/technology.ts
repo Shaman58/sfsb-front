@@ -9,13 +9,16 @@ const toast = useToast();
 export const useTechnologyStore = defineStore("technology", () => {
     const dialogVisible: Ref<boolean> = ref(false);
     const currentTechnology: Ref<Technology> = ref({} as Technology);
+    const isEqualTechnolgyUserAndCurrentUser: Ref<boolean> = ref(false);
 
     const getTechnologyById = async (id: string | number) => {
         try {
             const url = `/technology/${id}`;
             const res = await api.get<Technology>(url);
             res.status === 200
-                ? (currentTechnology.value = res.data)
+                ? ((currentTechnology.value = res.data),
+                  (isEqualTechnolgyUserAndCurrentUser.value =
+                      compareTechnolgyUserAndCurrentUser()))
                 : toast.error(
                       "Ошибка при получении технологии " + res.statusText
                   );
@@ -53,7 +56,7 @@ export const useTechnologyStore = defineStore("technology", () => {
         }
     };
 
-    const isEqualTechnolgyUserAndCurrentUser = async () => {
+    const compareTechnolgyUserAndCurrentUser = () => {
         const { user: currentUser } = useCurrentUserStore();
         const user = currentTechnology.value.user;
         return user.id === currentUser?.id;

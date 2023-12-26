@@ -20,7 +20,7 @@
 
     &__title
         font-size: 10vmax
-        background: linear-gradient(45deg, orange,#f707, orange)
+        background: linear-gradient(45deg, orange,#f702, orange)
         background-clip: text
         color: transparent
         margin: 0

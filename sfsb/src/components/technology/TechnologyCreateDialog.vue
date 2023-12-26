@@ -18,7 +18,7 @@
                             </Suspense>
                         </div>
                     </v-card-title>
-                    <v-card-text>
+                    <v-card-text :untouchable="!isEqualTechnolgyUserAndCurrentUser">
                         <v-row>
                             <v-col>
                                 <v-switch v-model="currentTechnology.assembly" :true-value="true" :false-value="false"
@@ -38,33 +38,7 @@
                                     @validatedWorkpiece="saveWorkpiece" @hide="hideWorkpieceCard" />
                             </v-col>
                             <v-col cols="9" v-if="!workpieceCardVisible">
-                                <v-row>
-                                    <v-col cols="4">
-                                        <v-text-field v-if="!currentTechnology.assembly" label="Из заготовки"
-                                            v-model="currentTechnology.quantityOfPartsFromWorkpiece" type="number"
-                                            :rules="[rules.required, rules.numeric, rules.minValidation]" />
-                                    </v-col>
-                                    <v-col cols="4">
-                                        <v-text-field label="Наладочных" v-model="currentTechnology.quantityOfSetUpParts"
-                                            type="number" :rules="[rules.required, rules.numeric, rules.minValidation]" />
-                                    </v-col>
-                                    <v-col cols="4">
-                                        <v-text-field label="На брак" v-model="currentTechnology.quantityOfDefectiveParts"
-                                            type="number" :rules="[rules.required, rules.numeric, rules.minValidation]" />
-                                    </v-col>
-                                    <v-col cols="7">
-                                        <v-textarea clearable label="Описание доп. расходов"
-                                            v-model="currentTechnology.outsourcedCostsDescription" rows="2" />
-                                    </v-col>
-                                    <v-col cols="2">
-                                        <v-text-field label="Сумма" v-model="currentTechnology.outsourcedCosts.amount"
-                                            type="number" :rules="[rules.required, rules.numeric, rules.min0Validation]" />
-                                    </v-col>
-                                    <v-col cols="3">
-                                        <duration-picker v-model="currentTechnology.technologistTime"
-                                            label="Продолжительность" :rules="[rules.durationNotZeroValidation]" />
-                                    </v-col>
-                                </v-row>
+                                <TechnologyCardMainOptions />
                             </v-col>
                         </v-row>
 
@@ -196,10 +170,12 @@
                                 {{ currentTechnology.computed ? 'Рассчитан' : 'Не рассчитан' }}
                             </a>
                         </v-col>
-                        <v-btn color="orange-darken-1" variant="text" type="submit" :disabled="isSaveActive">
+                        <v-btn color="orange-darken-1" variant="text" type="submit" :disabled="isSaveActive"
+                            :untouchable="!isEqualTechnolgyUserAndCurrentUser">
                             Сохранить
                         </v-btn>
-                        <v-btn color="orange-darken-1" variant="text" :disabled="isSaveActive" @click.stop="calculateItem">
+                        <v-btn color="orange-darken-1" variant="text" :disabled="isSaveActive" @click.stop="calculateItem"
+                            :untouchable="!isEqualTechnolgyUserAndCurrentUser">
                             Рассчитать
                         </v-btn>
                         <v-spacer></v-spacer>
@@ -222,14 +198,15 @@ import SetupCreateCard from "@/components/technology/SetupCreateCard.vue";
 import 'vue-toast-notification/dist/theme-bootstrap.css'
 import materialDataFormatting from '@/mixins/MaterialDataFormatting'
 import { useValidationRules } from "@/mixins/FieldValidationRules";
-import DurationPicker from "@/components/technology/DurationPicker.vue";
+
 import TechnologyCardOwner from "./TechnologyCardOwner.vue";
 import { useTechnologyStore } from "@/pinia-store/technology";
 import { storeToRefs } from "pinia"
 import AlertDialog from "../common/AlertDialog.vue";
 import { useCurrentUserStore } from "@/pinia-store/currentUser";
+import TechnologyCardMainOptions from "./TechnologyCardMainOptions.vue";
 
-const { dialogVisible, currentTechnology } = storeToRefs(useTechnologyStore());
+const { dialogVisible, currentTechnology, isEqualTechnolgyUserAndCurrentUser } = storeToRefs(useTechnologyStore());
 const { saveTechnology, changeBlocked } = useTechnologyStore();
 
 const alertDialog = ref<typeof AlertDialog | null>(null)
@@ -353,7 +330,7 @@ const replaceSetup = async (setup: { [x: string]: any; }, index: any) => {
 };
 
 const hideSetup = () => {
-    activeSetupIndex.value = null;
+    isEqualTechnolgyUserAndCurrentUser.value && (activeSetupIndex.value = null);
 };
 
 const deleteSetup = async (index: string | number) => {
@@ -366,8 +343,8 @@ const deleteSetup = async (index: string | number) => {
 };
 
 const showSetupCard = (index: number) => {
-    activeSetupIndex.value = index;
-};
+    isEqualTechnolgyUserAndCurrentUser.value && (activeSetupIndex.value = index)
+}
 
 
 const hideDialog = () => {

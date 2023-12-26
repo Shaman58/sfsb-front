@@ -1,7 +1,7 @@
 <template lang="pug">
 .technology-card__owner
     .technology-card__owner-title Автор: {{ user.firstName }} {{user.lastName }}
-    v-switch.technology-card__owner-switcher(v-model="model" label="Взять в работу" color="red")
+    v-switch.technology-card__owner-switcher(v-model="model" :label="model?'В работе':'Взять в работу'" color="red")
 
 </template>
 
@@ -18,11 +18,12 @@ const { user } = defineProps<Props>()
 const emit = defineEmits(["change"])
 const model = ref(false)
 
-const { changeBlocked, isEqualTechnolgyUserAndCurrentUser } = useTechnologyStore()
+const { isEqualTechnolgyUserAndCurrentUser } = storeToRefs(useTechnologyStore())
+const { changeBlocked } = useTechnologyStore()
 const { user: currentUser } = storeToRefs(useCurrentUserStore())
 
 // model.value = user.id === currentUser.value?.id
-model.value = await isEqualTechnolgyUserAndCurrentUser()
+model.value = isEqualTechnolgyUserAndCurrentUser.value
 console.log("🚀 ~ file: TechnologyCardOwner.vue:25 ~ model.value:", model.value, user.id, currentUser.value)
 
 watch(() => model.value, async (newVal: boolean) => {

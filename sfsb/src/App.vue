@@ -18,6 +18,7 @@ import { useCurrentUserStore } from "@/pinia-store/currentUser";
   height: 32px !important
 [untouchable]
     pointer-events: none
-    filter: contrast(0)
+    // filter: contrast(0)
+    opacity: 0.5
     user-select: none
 </style>
