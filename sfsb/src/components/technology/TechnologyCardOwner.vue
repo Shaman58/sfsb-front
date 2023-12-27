@@ -3,7 +3,7 @@
     .technology-card__owner-title
         span(v-if="technologyUser") Последние изменения внесены: {{ technologyUser.firstName }} {{technologyUser.lastName }}
         span(v-else="technologyUser" ) Данные не были внесены
-    v-switch.technology-card__owner-switcher(v-model="model" :label="model?'В работе':'Взять в работу'" color="red" :untouchable="currentTechnology.blocked!=='' || !isBlockedByCurrentUser")
+    v-switch.technology-card__owner-switcher(v-model="model" :label="model?'В работе':'Взять в работу'" color="red" :untouchable="currentItem.technology.blocked!=='' || !isBlockedByCurrentUser")
 
 </template>
 
@@ -15,13 +15,13 @@ import { storeToRefs } from 'pinia';
 
 const emit = defineEmits(["change"])
 
-const { isBlockedByCurrentUser, currentTechnology } = storeToRefs(useTechnologyStore())
+const { isBlockedByCurrentUser, currentItem } = storeToRefs(useTechnologyStore())
 const { changeBlocked } = useTechnologyStore()
 const { user: currentUser } = storeToRefs(useCurrentUserStore())
 
 const model = ref(isBlockedByCurrentUser.value)
 
-const technologyUser = currentTechnology.value.user
+const technologyUser = currentItem.value.technology.user
 
 // model.value = user.id === currentUser.value?.id
 model.value = isBlockedByCurrentUser.value

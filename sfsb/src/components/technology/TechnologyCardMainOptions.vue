@@ -20,9 +20,12 @@ import DurationPicker from "@/components/technology/DurationPicker.vue";
 import { useValidationRules } from '@/mixins/FieldValidationRules';
 import { useTechnologyStore } from '@/pinia-store/technology';
 import { storeToRefs } from 'pinia';
+import { computed } from "vue";
 
-const { currentTechnology, isEqualTechnolgyUserAndCurrentUser } = storeToRefs(useTechnologyStore())
+const { currentItem } = storeToRefs(useTechnologyStore())
 const { rules } = useValidationRules();
+
+const currentTechnology = computed(() => currentItem.value.technology)
 </script>
 
 <style lang="sass" scoped>

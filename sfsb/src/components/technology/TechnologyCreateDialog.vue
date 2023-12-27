@@ -1,14 +1,14 @@
 <template>
-    <v-container fluid v-if="currentTechnology">
+    <v-container fluid v-if="currentItem">
         <v-dialog v-model="dialogVisible" fullscreen persistent>
             <v-form ref="form" v-model="valid" @submit.prevent="save()" style="overflow-y: auto;">
                 <v-card class="dialog-content">
                     <v-card-title>
                         <div class="technology-card__title">
                             <div class="technology-card__title-main">
-                                <span class="text-h4">{{ currentTechnology && currentTechnology.drawingNumber + " " +
-                                    currentTechnology && currentTechnology.drawingName }}</span>
-                                {{ item.quantity + "шт." }}
+                                <span class="text-h4">{{ currentItem && currentItem.technology.drawingNumber + " " +
+                                    currentItem && currentItem.technology.drawingName }}</span>
+                                {{ currentItem.quantity + "шт." }}
                             </div>
                             <Suspense>
                                 <template #fallback>Loading ...</template>
@@ -21,20 +21,21 @@
                     <v-card-text :untouchable="!isBlockedByCurrentUser">
                         <v-row>
                             <v-col>
-                                <v-switch v-model="currentTechnology.assembly" :true-value="true" :false-value="false"
-                                    :label="currentTechnology.assembly ? 'Сборка' : 'Деталь'">
+                                <v-switch v-model="currentItem.technology.assembly" :true-value="true" :false-value="false"
+                                    :label="currentItem.technology.assembly ? 'Сборка' : 'Деталь'">
                                 </v-switch>
-                                <v-card v-if="!workpieceCardVisible && !currentTechnology.assembly" width="200"
+                                <v-card v-if="!workpieceCardVisible && !currentItem.technology.assembly" width="200"
                                     title="Заготовка:" @click="showWorkpieceCard">
                                     <v-card-item>
                                         {{
-                                            !!currentTechnology.workpiece ? formatWorkpieceData(currentTechnology.workpiece) :
+                                            !!currentItem.technology.workpiece ?
+                                            formatWorkpieceData(currentItem.technology.workpiece) :
                                             "Задать заготовку"
                                         }}
                                     </v-card-item>
                                 </v-card>
-                                <tech-workpiece-card v-else-if="!currentTechnology.assembly"
-                                    :workpiece="{ ...currentTechnology.workpiece }" :materials="materials"
+                                <tech-workpiece-card v-else-if="!currentItem.technology.assembly"
+                                    :workpiece="{ ...currentItem.technology.workpiece }" :materials="materials"
                                     @validatedWorkpiece="saveWorkpiece" @hide="hideWorkpieceCard" />
                             </v-col>
                             <v-col cols="9" v-if="!workpieceCardVisible">
@@ -60,7 +61,7 @@
                                                         {{ "№" + setup.setupNumber + " " + setup.operation.operationName }}
                                                     </a>
                                                     <p
-                                                        v-if="setup.group && Number(currentTechnology.quantityOfPartsFromWorkpiece) !== 1">
+                                                        v-if="setup.group && Number(currentItem.technology.quantityOfPartsFromWorkpiece) !== 1">
                                                         Групповая
                                                     </p>
                                                 </v-card-title>
@@ -80,7 +81,7 @@
                                             && setup.operation.operationTimeManagement !== 'COMPUTED'
                                             && setup.operation.operationTimeManagement !== 'NONE'">
                                             <v-card height="100%"
-                                                v-if="setup.additionalTools.length !== 0 || setup.additionalComments !== null && setup.additionalComments.length > 0">
+                                                v-if="setup.additionalTools.length !== 0 || setup.additionalComments !== null && setup.additionalComments?.length > 0">
                                                 <v-list density="compact" style="padding: 0;" :lines="false">
                                                     <v-list-item v-for="(tool, index) in setup.additionalTools" :key="index"
                                                         :title="tool.toolName + ' ' + tool.amount + 'шт.'"
@@ -147,7 +148,7 @@
                                     </v-row>
                                 </v-card>
                                 <setup-create-card v-else :setup="{ ...setup }"
-                                    :quantity-of-parts-from-workpiece="Number(currentTechnology.quantityOfPartsFromWorkpiece)"
+                                    :quantity-of-parts-from-workpiece="Number(currentItem.technology.quantityOfPartsFromWorkpiece)"
                                     :additionalTexts="additionalTexts" @hideSetup="hideSetup()"
                                     @deleteSetup="deleteSetup(index)" @save="replaceSetup($event, index)" />
                             </v-col>
@@ -157,7 +158,7 @@
                                     @click="activeSetupIndex = 'new'">
                                 </v-card>
                                 <setup-create-card v-else :setup="{ ...newSetup }"
-                                    :quantity-of-parts-from-workpiece="Number(currentTechnology.quantityOfPartsFromWorkpiece)"
+                                    :quantity-of-parts-from-workpiece="Number(currentItem.technology.quantityOfPartsFromWorkpiece)"
                                     :additionalTexts="additionalTexts" @hideSetup="hideSetup()" @save="pushSetup" />
                             </v-col>
 
@@ -167,7 +168,7 @@
                     <v-card-actions>
                         <v-col cols="2">
                             <a>
-                                {{ currentTechnology.computed ? 'Рассчитан' : 'Не рассчитан' }}
+                                {{ currentItem.technology.computed ? 'Рассчитан' : 'Не рассчитан' }}
                             </a>
                         </v-col>
                         <v-btn color="orange-darken-1" variant="text" type="submit" :disabled="isSaveActive"
@@ -206,7 +207,7 @@ import AlertDialog from "../common/AlertDialog.vue";
 import { useCurrentUserStore } from "@/pinia-store/currentUser";
 import TechnologyCardMainOptions from "./TechnologyCardMainOptions.vue";
 
-const { dialogVisible, currentTechnology, isBlockedByCurrentUser } = storeToRefs(useTechnologyStore());
+const { dialogVisible, currentItem, isBlockedByCurrentUser } = storeToRefs(useTechnologyStore());
 const { saveTechnology, changeBlocked } = useTechnologyStore();
 
 const alertDialog = ref<typeof AlertDialog | null>(null)
@@ -226,9 +227,9 @@ const saveActive = ref(true);
 
 const isDialogVisible = computed(() => store.getters.isTechnologyDialogVisible);
 const item = computed(() => {
-    const item = store.getters.getItem;
-    if (!currentTechnology.value.technologistTime) {
-        currentTechnology.value.technologistTime = '00:00';
+    const item = currentItem;
+    if (!currentItem.value.technology.technologistTime) {
+        currentItem.value.technology.technologistTime = '00:00';
     }
     return item;
 });
@@ -241,8 +242,8 @@ const changeOwner = (event: boolean) => {
 }
 
 const sortedSetups = computed(() => {
-    if (currentTechnology.value.setups.length !== 0) {
-        const setups = currentTechnology.value.setups.slice().sort((a: { setupNumber: number; }, b: { setupNumber: number; }) => a.setupNumber - b.setupNumber);
+    if (currentItem.value.technology.setups.length !== 0) {
+        const setups = currentItem.value.technology.setups.slice().sort((a: { setupNumber: number; }, b: { setupNumber: number; }) => a.setupNumber - b.setupNumber);
 
         setups[0].groupAble = true;
 
@@ -286,10 +287,10 @@ const compactInfo = ((data: { operation: { operationTimeManagement: string; }; p
 });
 
 const calculateSetupNumber = computed(() => {
-    if (!item.value.technology.setups) {
+    if (!currentItem.value.technology.setups) {
         return -1
     }
-    const setupNumbers = item.value.technology.setups.map((setup: { setupNumber: any; }) => setup.setupNumber);
+    const setupNumbers = currentItem.value.technology.setups.map((setup: { setupNumber: any; }) => setup.setupNumber);
     for (let i = 10; i <= Number.MAX_SAFE_INTEGER; i = i + 10) {
         if (!setupNumbers.includes(i)) {
             return i;
@@ -298,7 +299,7 @@ const calculateSetupNumber = computed(() => {
     return -1;
 });
 
-const isSaveActive = computed(() => !valid.value || !saveActive.value || (!item.value.technology.workpiece && !item.value.technology.assembly)
+const isSaveActive = computed(() => !valid.value || !saveActive.value || (!currentItem.value.technology.workpiece && !currentItem.value.technology.assembly)
 );
 
 const createNewSetup = () => ({
@@ -321,7 +322,7 @@ const newSetup = ref(createNewSetup());
 
 const pushSetup = ({ ...setup }) => {
     hideSetup();
-    item.value.technology.setups.push(setup);
+    currentItem.value.technology.setups.push(setup);
     newSetup.value = createNewSetup();
 };
 
@@ -336,10 +337,10 @@ const hideSetup = () => {
 
 const deleteSetup = async (index: string | number) => {
     const setupNumberToDelete = sortedSetups.value[index].setupNumber;
-    const indexInOriginalList = item.value.technology.setups.findIndex((setup: { setupNumber: any; }) => setup.setupNumber === setupNumberToDelete);
+    const indexInOriginalList = currentItem.value.technology.setups.findIndex((setup: { setupNumber: any; }) => setup.setupNumber === setupNumberToDelete);
 
     if (indexInOriginalList !== -1) {
-        item.value.technology.setups.splice(indexInOriginalList, 1);
+        currentItem.value.technology.setups.splice(indexInOriginalList, 1);
     }
 };
 
@@ -355,7 +356,7 @@ const hideDialog = () => {
 };
 
 const save = async () => {
-    if (alertDialog.value && currentTechnology.value.user.id !== user.value?.id) {
+    if (alertDialog.value && currentItem.value.technology.user.id !== user.value?.id) {
         alertDialog.value.show();
         try {
             const res = await alertDialog.value.getAnswer()
@@ -369,28 +370,28 @@ const save = async () => {
     }
     if (!saveActive.value) return;
     saveActive.value = false;
-    item.value.technology.computed = false;
-    //   await store.dispatch("saveTechnology", item.value.technology);
-    await store.dispatch("fetchItem", item.value.id);
+    currentItem.value.technology.computed = false;
+    //   await store.dispatch("saveTechnology", currentItem.value.technology);
+    await store.dispatch("fetchItem", currentItem.value.id);
     await store.dispatch("fetchItems");
     saveActive.value = true;
-    saveTechnology(item.value.technology);
+    saveTechnology(currentItem.value.technology);
 
 };
 
 const calculateItem = async () => {
     if (!saveActive.value) return;
     saveActive.value = false;
-    item.value.technology.computed = false;
-    await store.dispatch("saveTechnology", item.value.technology);
-    await store.dispatch("calculateItem", item.value.id);
-    await store.dispatch("fetchItem", item.value.id);
+    currentItem.value.technology.computed = false;
+    await store.dispatch("saveTechnology", currentItem.value.technology);
+    await store.dispatch("calculateItem", currentItem.value.id);
+    await store.dispatch("fetchItem", currentItem.value.id);
     await store.dispatch("fetchItems");
     saveActive.value = true;
 };
 
 const saveWorkpiece = (validWorkpiece: any) => {
-    item.value.technology.workpiece = validWorkpiece;
+    currentItem.value.technology.workpiece = validWorkpiece;
 };
 
 const hideWorkpieceCard = () => {

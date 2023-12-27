@@ -8,15 +8,15 @@ const toast = useToast();
 
 export const useTechnologyStore = defineStore("technology", () => {
     const dialogVisible: Ref<boolean> = ref(false);
-    const currentTechnology: Ref<Technology> = ref({} as Technology);
+    const currentItem: Ref<Item> = ref({} as Item);
     const isBlockedByCurrentUser: Ref<boolean> = ref(false);
 
     const getTechnologyById = async (id: string | number) => {
         try {
-            const url = `/technology/${id}`;
-            const res = await api.get<Technology>(url);
+            const url = `/item/${id}`;
+            const res = await api.get<Item>(url);
             res.status === 200
-                ? ((currentTechnology.value = res.data),
+                ? ((currentItem.value = res.data),
                   (isBlockedByCurrentUser.value =
                       compareBlockedAndCurrentUser()))
                 : toast.error(
@@ -38,8 +38,8 @@ export const useTechnologyStore = defineStore("technology", () => {
         }
     };
 
-    const setCurrentTechnology = (technology: Technology) => {
-        currentTechnology.value = technology;
+    const setCurrentItem = (item: Item) => {
+        currentItem.value = item;
         setTechnologyDialogVisible(true);
         isBlockedByCurrentUser.value = compareBlockedAndCurrentUser();
     };
@@ -49,13 +49,13 @@ export const useTechnologyStore = defineStore("technology", () => {
 
     const changeBlocked = async (status: boolean) => {
         const url = status
-            ? `/technology/${currentTechnology.value.id}/block`
-            : `/technology/${currentTechnology.value.id}/unblock`;
+            ? `/technology/${currentItem.value.technology.id}/block`
+            : `/technology/${currentItem.value.technology.id}/unblock`;
         try {
             const resp = await api.get(url);
             if (resp.status > 400)
                 throw new Error("Ошибка при изменении блокировки");
-            await getTechnologyById(currentTechnology.value.id);
+            await getTechnologyById(currentItem.value.id);
             isBlockedByCurrentUser.value = compareBlockedAndCurrentUser();
         } catch (error) {
             toast.error("Ошибка при изменении блокировки " + error);
@@ -64,16 +64,16 @@ export const useTechnologyStore = defineStore("technology", () => {
 
     const compareBlockedAndCurrentUser = () => {
         const { user: currentUser } = useCurrentUserStore();
-        const blocked = currentTechnology.value.blocked;
+        const blocked = currentItem.value.technology.blocked;
         return blocked === currentUser?.id;
     };
 
     return {
         dialogVisible,
-        currentTechnology,
+        currentItem,
         isBlockedByCurrentUser,
         getTechnologyById,
-        setCurrentTechnology,
+        setCurrentItem,
         saveTechnology,
         setTechnologyDialogVisible,
         changeBlocked,
