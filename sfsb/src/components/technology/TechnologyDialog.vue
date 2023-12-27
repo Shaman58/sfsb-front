@@ -18,6 +18,7 @@ v-container.technology-dialog
                     th(width="10%") РАСЧИТАН
                     th НОМЕР
                     th НАИМЕНОВАНИЕ
+                    th Работает
             tbody
                 tr.technology-dialog__order-item(v-for="item in currentOrder?.items" :key="item.id" @click="setCurrentItem(item)")
                     td(width="10%")
@@ -25,6 +26,7 @@ v-container.technology-dialog
                     td
                         span {{ item.technology.drawingNumber }}
                     td {{ item.technology.drawingName }}
+                    td {{ staffUser(item.technology.blocked) ?staffUser(item.technology.blocked).lastName+" "+staffUser(item.technology.blocked).firstName:"свободен для расчета" }}
 
     v-card.technology-dialog__self.technology-dialog__card
         v-card-title
@@ -46,6 +48,7 @@ import { computed, onMounted, ref } from 'vue';
 import type { Ref } from 'vue'
 import { useCurrentUserStore } from '@/pinia-store/currentUser';
 import { useTechnologyStore } from '@/pinia-store/technology';
+import { useStaffStore } from '@/pinia-store/staff';
 import { useItemStore } from '@/pinia-store/item';
 
 const { orders } = storeToRefs(useOrdersStore())
@@ -64,12 +67,23 @@ const { fetchItems } = useItemStore()
 
 await fetchItems()
 
+const { staff } = storeToRefs(useStaffStore())
+const { getAllStaff } = useStaffStore()
+await getAllStaff()
+
 const currentOrder: Ref<Order | null> = ref(orders.value[0] || null)
 
 const technologiesByUser = computed(() => currentOrder && currentOrder.value?.items.filter(item => item.technology.blocked === user.value?.id))
 
+const staffUser = (uuid: string) => {
+    const res = staff.value.find(user => user.id === uuid)
+    return res
+}
+
+
 const refresh = async () => {
     await fetchItems()
+    await getOrders()
     currentOrder.value = orders.value.find(order => order.id == currentOrder.value?.id) || null
 }
 //--- LEGASY ---
