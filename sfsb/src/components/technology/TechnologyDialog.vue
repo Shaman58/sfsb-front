@@ -5,9 +5,8 @@ v-container.technology-dialog
         v-card-title
             span(class="text-h5") Заявки
         v-list
-            v-list-item(v-for="item in orders" :key="item.id" @click="currentOrder=item" :class="{'active-order ': item.id === currentOrder?.id}") {{ item.id }} {{ item.customer.companyName }}
-
-
+            v-list-item(v-for="item in filteredOrders" :key="item.id" @click="currentOrder=item" :class="{'active-order ': item.id === currentOrder?.id}") {{ item.applicationNumber }} {{ item.customer.companyName }}
+        v-text-field(label="Поиск по заявкам" v-model="filterText")
 
     v-card.technology-dialog__technologies.technology-dialog__card
         v-card-title
@@ -44,7 +43,7 @@ import TechnologyCreateDialog from "@/components/technology/TechnologyCreateDial
 import { useStore } from 'vuex';
 import { useOrdersStore } from '@/pinia-store/orders';
 import { storeToRefs } from 'pinia';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import type { Ref } from 'vue'
 import { useCurrentUserStore } from '@/pinia-store/currentUser';
 import { useTechnologyStore } from '@/pinia-store/technology';
@@ -75,10 +74,23 @@ const currentOrder: Ref<Order | null> = ref(orders.value[0] || null)
 
 const technologiesByUser = computed(() => currentOrder && currentOrder.value?.items.filter(item => item.technology.blocked === user.value?.id))
 
-const staffUser = (uuid: string) => {
-    const res = staff.value.find(user => user.id === uuid)
-    return res
-}
+const staffUser = (uuid: string) => staff.value.find(user => user.id === uuid)
+
+const filterText = ref("")
+
+const filteredOrders = computed(() => orders.value.filter((e: Order) => {
+    if (!filterText.value) return orders.value
+
+    const isIncludesInOrderId = !!e.applicationNumber.toString().includes(filterText.value.toLowerCase())
+    // const isIncludesInDrawingName = !!e.items.filter(e => e.technology.drawingName.toLowerCase().includes(filterText.value.toLowerCase())).length
+    // const isIncludesInDrawingNumber = !!e.items.filter(e => e.technology.drawingNumber.toString().includes(filterText.value.toLowerCase())).length
+    return isIncludesInOrderId
+    // || isIncludesInDrawingName
+    // || isIncludesInDrawingNumber
+
+}))
+
+watch([filteredOrders, filterText], console.log)
 
 
 const refresh = async () => {
@@ -116,6 +128,10 @@ onMounted(() => {
 
         &:hover
             background-color: #f7f7f7
+
+    &__orders
+        display: grid
+        grid-template-rows: auto 1fr auto
 
 
 .active-order
