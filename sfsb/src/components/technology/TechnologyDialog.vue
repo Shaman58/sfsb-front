@@ -79,7 +79,7 @@ const staffUser = (uuid: string) => staff.value.find(user => user.id === uuid)
 const filterText = ref("")
 
 const filteredOrders = computed(() => orders.value.filter((e: Order) => {
-    if (!filterText.value) return orders.value
+    if (!filterText.value) return true
 
     const isIncludesInOrderId = !!e.applicationNumber.toString().includes(filterText.value.toLowerCase())
     // const isIncludesInDrawingName = !!e.items.filter(e => e.technology.drawingName.toLowerCase().includes(filterText.value.toLowerCase())).length
