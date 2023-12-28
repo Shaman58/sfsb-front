@@ -5,7 +5,7 @@ v-container.technology-dialog
         v-card-title
             span(class="text-h5") Заявки
         v-list
-            v-list-item(v-for="item in filteredOrders" :key="item.id" @click="currentOrder=item" :class="{'active-order ': item.id === currentOrder?.id}") {{ item.applicationNumber }} {{ item.customer.companyName }}
+            v-list-item(v-for="i in orders" :key="i.id" @click="currentOrder=i" :class="{'active-order ': i.id === currentOrder?.id}") {{ i.applicationNumber }} {{ i.customer.companyName }}
         v-text-field(label="Поиск по заявкам" v-model="filterText")
 
     v-card.technology-dialog__technologies.technology-dialog__card
@@ -19,20 +19,20 @@ v-container.technology-dialog
                     th НАИМЕНОВАНИЕ
                     th Работает
             tbody
-                tr.technology-dialog__order-item(v-for="item in currentOrder?.items" :key="item.id" @click="setCurrentItem(item)")
+                tr.technology-dialog__order-item(v-for="i in currentOrder?.items" :key="i.id" @click="setCurrentItem(i)")
                     td(width="10%")
-                        v-icon(:icon="item.technology?.computed?'mdi-check-circle':'mdi-radiobox-blank'" )
+                        v-icon(:icon="i.technology?.computed?'mdi-check-circle':'mdi-radiobox-blank'" )
                     td
-                        span {{ item.technology.drawingNumber }}
-                    td {{ item.technology.drawingName }}
-                    td {{ staffUser(item.technology.blocked) ?staffUser(item.technology.blocked).lastName+" "+staffUser(item.technology.blocked).firstName:"свободен для расчета" }}
+                        span {{ i.technology.drawingNumber }}
+                    td {{ i.technology.drawingName }}
+                    td {{ staffUser(i.technology.blocked) ?staffUser(i.technology.blocked).lastName+" "+staffUser(i.technology.blocked).firstName:"свободен для расчета" }}
 
     v-card.technology-dialog__self.technology-dialog__card
         v-card-title
             span(class="text-h5") У меня в работе:
         v-list
-            v-list-item(v-for="item in items||[]" :key="item.id" @click="setCurrentItem(item)")
-                span {{ item.technology.drawingNumber }} {{ item.technology.drawingName }}
+            v-list-item(v-for="i in items||[]" :key="i.id" @click="setCurrentItem(i)")
+                span {{ i.technology.drawingNumber }} {{ i.technology.drawingName }}
 
     <TechnologyCreateDialog @close="refresh"/>
 </template>
@@ -43,7 +43,7 @@ import TechnologyCreateDialog from "@/components/technology/TechnologyCreateDial
 import { useStore } from 'vuex';
 import { useOrdersStore } from '@/pinia-store/orders';
 import { storeToRefs } from 'pinia';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch, watchEffect } from 'vue';
 import type { Ref } from 'vue'
 import { useCurrentUserStore } from '@/pinia-store/currentUser';
 import { useTechnologyStore } from '@/pinia-store/technology';
@@ -70,7 +70,7 @@ const { staff } = storeToRefs(useStaffStore())
 const { getAllStaff } = useStaffStore()
 await getAllStaff()
 
-const currentOrder: Ref<Order | null> = ref(orders.value[0] || null)
+const currentOrder: Ref<Order | null> = computed(() => (orders.value[0] || null))
 
 const technologiesByUser = computed(() => currentOrder && currentOrder.value?.items.filter(item => item.technology.blocked === user.value?.id))
 
@@ -78,20 +78,9 @@ const staffUser = (uuid: string) => staff.value.find(user => user.id === uuid)
 
 const filterText = ref("")
 
-const filteredOrders = computed(() => orders.value.filter((e: Order) => {
-    if (!filterText.value) return true
-
-    const isIncludesInOrderId = !!e.applicationNumber.toString().includes(filterText.value.toLowerCase())
-    // const isIncludesInDrawingName = !!e.items.filter(e => e.technology.drawingName.toLowerCase().includes(filterText.value.toLowerCase())).length
-    // const isIncludesInDrawingNumber = !!e.items.filter(e => e.technology.drawingNumber.toString().includes(filterText.value.toLowerCase())).length
-    return isIncludesInOrderId
-    // || isIncludesInDrawingName
-    // || isIncludesInDrawingNumber
-
-}))
-
-watch([filteredOrders, filterText], console.log)
-
+watchEffect(async () => {
+    await getOrders(filterText.value)
+})
 
 const refresh = async () => {
     await fetchItems()
@@ -101,11 +90,11 @@ const refresh = async () => {
 //--- LEGASY ---
 const store = useStore();
 onMounted(() => {
-    store.dispatch("fetchMaterials");
+    // store.dispatch("fetchMaterials");
     store.dispatch("fetchToolings");
     store.dispatch("fetchSpecials");
     store.dispatch("fetchCutters");
-    store.dispatch("fetchItems");
+    // store.dispatch("fetchItems");
     store.dispatch("fetchOperations");
 });
 

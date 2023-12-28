@@ -8,9 +8,10 @@ const toast = useToast();
 export const useOrdersStore = defineStore("orders", () => {
     const orders: Ref<Order[]> = ref([]);
 
-    const getOrders = async () => {
+    const getOrders = async (search?: string) => {
+        const url = search ? "/order/find" : "/order";
         try {
-            const response = await api.get("/order");
+            const response = await api.get(url, { params: { search } });
             if (response.status > 400) throw new Error(response.statusText);
             orders.value = response.data;
         } catch (error) {

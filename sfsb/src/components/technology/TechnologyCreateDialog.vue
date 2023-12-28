@@ -206,6 +206,7 @@ import { storeToRefs } from "pinia"
 import AlertDialog from "../common/AlertDialog.vue";
 import { useCurrentUserStore } from "@/pinia-store/currentUser";
 import TechnologyCardMainOptions from "./TechnologyCardMainOptions.vue";
+import { useMaterialsStore } from "@/pinia-store/materials";
 
 const { dialogVisible, currentItem, isBlockedByCurrentUser } = storeToRefs(useTechnologyStore());
 const { saveTechnology, changeBlocked } = useTechnologyStore();
@@ -234,7 +235,9 @@ const item = computed(() => {
     return item;
 });
 
-const materials = computed(() => store.getters.getMaterials);
+const { materials } = storeToRefs(useMaterialsStore())
+const { fetchMaterials } = useMaterialsStore()
+await fetchMaterials()
 
 const changeOwner = (event: boolean) => {
     console.log("changeOwner", event)
