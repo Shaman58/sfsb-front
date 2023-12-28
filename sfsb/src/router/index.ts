@@ -20,20 +20,29 @@ const routes = [
         path: "/supplier",
         component: Supplier,
         meta: {
-            onlyFor: "supplier",
+            onlyFor: ["SUPPLIER", "ADMIN"],
         },
     },
     {
         path: "/staff",
         component: Staff,
+        meta: {
+            onlyFor: ["HR", "ADMIN"],
+        },
     },
     {
         path: "/commerce",
         component: Commerce,
+        meta: {
+            onlyFor: ["COMMERCE", "ADMIN"],
+        },
     },
     {
         path: "/technology",
         component: Technology,
+        meta: {
+            onlyFor: ["TECHNOLOGIST", "ADMIN"],
+        },
     },
     {
         path: "/:catchAll(.*)",
@@ -52,24 +61,23 @@ router.beforeEach(async (to, from, next) => {
 
     await fetchUser();
 
-    if (to.path === "/supplier") {
-        if (!user.value) {
-            toast.error("Текущий пользователь не определен");
-            return next(false);
-        }
-        if (
-            user.value &&
-            user.value.roles.some((e) => e.toLowerCase().includes("supplier"))
-        )
-            return next();
-        if (
-            user.value &&
-            !user.value.roles.some((e) => e.toLowerCase().includes("supplier"))
-        ) {
-            toast.error("У вас нет прав доступа к этой странице");
-            return next(false);
-        }
+    if (!user.value) {
+        toast.error("Текущий пользователь не определен");
+        return next(false);
     }
+    if (user.value && !to.meta.onlyFor) return next();
+    if (
+        user.value &&
+        user.value.roles.some((role) =>
+            (to.meta?.onlyFor as string[]).some((e: string) => e === role)
+        )
+    ) {
+        return next();
+    } else {
+        toast.error("У вас нет прав доступа к этой странице");
+        return next("/");
+    }
+
     next();
 });
 
