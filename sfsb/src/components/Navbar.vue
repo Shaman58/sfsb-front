@@ -19,7 +19,7 @@
                     <template v-slot:activator="{ props }">
                         <v-btn color="primary" v-bind="props">
                             <div class="navbar__user-data">
-                                <img class="navbar__img" :src="picture" alt="avatar" />
+                                <img class="navbar__img" :src="picture || 'images/default-avatar.jpg'" alt="" />
                                 <span class="navbar__name">{{ name }}</span>
                             </div>
                         </v-btn>
