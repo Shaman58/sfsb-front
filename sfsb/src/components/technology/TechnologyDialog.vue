@@ -70,7 +70,7 @@ const { staff } = storeToRefs(useStaffStore())
 const { getAllStaff } = useStaffStore()
 await getAllStaff()
 
-const currentOrder: Ref<Order | null> = computed(() => (orders.value[0] || null))
+const currentOrder: Ref<Order | null> = ref(orders.value[0] || null)
 
 const technologiesByUser = computed(() => currentOrder && currentOrder.value?.items.filter(item => item.technology.blocked === user.value?.id))
 
@@ -80,6 +80,7 @@ const filterText = ref("")
 
 watchEffect(async () => {
     await getOrders(filterText.value)
+    currentOrder.value = orders.value[0] || null
 })
 
 const refresh = async () => {

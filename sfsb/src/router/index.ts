@@ -1,10 +1,11 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Commerce from "@/views/Commerce.vue";
 import Technology from "@/views/Technology.vue";
-import MainPage from "@/views/MainPage.vue";
+import DatePage from "@/views/DatePage.vue";
 import Staff from "@/views/Staff.vue";
 import Supplier from "@/views/Supplier.vue";
 import NotFound from "@/views/NotFound.vue";
+import StartPage from "@/views/StartPage.vue";
 import { useCurrentUserStore } from "@/pinia-store/currentUser";
 import { useToast } from "vue-toast-notification";
 import { storeToRefs } from "pinia";
@@ -14,7 +15,14 @@ const toast = useToast();
 const routes = [
     {
         path: "/",
-        component: MainPage,
+        component: StartPage,
+    },
+    {
+        path: "/date",
+        component: DatePage,
+        meta: {
+            onlyFor: ["TECHNOLOGIST", "ADMIN"],
+        },
     },
     {
         path: "/supplier",

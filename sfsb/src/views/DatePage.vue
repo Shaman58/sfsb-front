@@ -1,20 +1,15 @@
 <template>
-  <br>
-  <v-container>
-    <v-row>
-      <v-col cols="6">
-        <company-component/>
-      </v-col>
+    <br>
+    <v-container>
 
-    </v-row>
-    <v-card class="center-card">
-      <material-component/>
-      <cutter-component/>
-      <special-component/>
-      <tooling-component/>
-      <operation-component/>
-    </v-card>
-  </v-container>
+        <v-card class="center-card">
+            <material-component />
+            <cutter-component />
+            <special-component />
+            <tooling-component />
+            <operation-component />
+        </v-card>
+    </v-container>
 </template>
 
 <script setup lang="ts">
@@ -28,8 +23,8 @@ import OperationComponent from "@/components/operation/OperationComponent.vue";
 
 <style scoped>
 .center-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 </style>

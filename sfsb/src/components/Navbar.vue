@@ -59,7 +59,7 @@ const picture = ref()
 
 onMounted(async () => {
     const user = await keycloakService.keycloak.loadUserProfile()
-    picture.value = import.meta.env.VITE_APP_BASE_FS_URL + user.attributes.picture[0]
+    picture.value = user.attributes.picture && user.attributes.picture.length > 0 && import.meta.env.VITE_APP_BASE_FS_URL + user.attributes.picture[0]
     name.value = user.firstName + " " + user.lastName
 })
 </script>
