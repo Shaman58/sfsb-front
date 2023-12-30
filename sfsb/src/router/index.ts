@@ -9,6 +9,7 @@ import StartPage from "@/views/StartPage.vue";
 import { useCurrentUserStore } from "@/pinia-store/currentUser";
 import { useToast } from "vue-toast-notification";
 import { storeToRefs } from "pinia";
+import CompanyPage from "@/views/CompanyPage.vue";
 
 const toast = useToast();
 
@@ -16,6 +17,13 @@ const routes = [
     {
         path: "/",
         component: StartPage,
+    },
+    {
+        path: "/company",
+        component: CompanyPage,
+        meta: {
+            onlyFor: ["ADMIN"],
+        },
     },
     {
         path: "/date",

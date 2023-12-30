@@ -198,5 +198,23 @@ declare interface Person {
     roles: Roles;
 }
 
+declare interface Company {
+    id:number,
+    created:string|null,
+    updated:string|null,
+    companyName:string,
+    address:string,
+    inn:number,
+    kpp:number,
+    ogrn:number,
+    paymentAccount:number,
+    bank:string,
+    bik:number,
+    correspondentAccount:number,
+    phoneNumber:string,
+    email:string
+}
+
+
 declare type Role = string;
 declare type Roles = string[];
