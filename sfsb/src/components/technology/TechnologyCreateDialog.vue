@@ -166,19 +166,21 @@
 
                     </v-card-text>
                     <v-card-actions>
-                        <v-col cols="2">
-                            <a>
-                                {{ currentItem.technology.computed ? 'Рассчитан' : 'Не рассчитан' }}
-                            </a>
+                        <v-col cols="2" class="technology-card__calculate">
+
+                            <span>{{ calculated ? 'Рассчитан' : 'Не рассчитан' }}</span>
+                            <v-switch class="technology-card__switch" v-model="calculate"></v-switch>
+
                         </v-col>
                         <v-btn color="orange-darken-1" variant="text" type="submit" :disabled="isSaveActive"
                             :untouchable="!isBlockedByCurrentUser">
                             Сохранить
                         </v-btn>
-                        <v-btn color="orange-darken-1" variant="text" :disabled="isSaveActive" @click.stop="calculateItem"
+                        <!-- <v-btn color="orange-darken-1" variant="text" :disabled="isSaveActive" @click.stop="calculateItem"
                             :untouchable="!isBlockedByCurrentUser">
                             Рассчитать
-                        </v-btn>
+                        </v-btn> -->
+
                         <v-spacer></v-spacer>
                         <v-btn color="orange-darken-1" variant="text" @click="hideDialog">
                             Закрыть
@@ -193,7 +195,7 @@
 
 <script setup lang="ts">
 import { useStore } from "vuex";
-import { Ref, computed, ref } from "vue";
+import { Ref, computed, ref, watch } from "vue";
 import TechWorkpieceCard from "@/components/technology/TechWorkpieceCard.vue";
 import SetupCreateCard from "@/components/technology/SetupCreateCard.vue";
 import 'vue-toast-notification/dist/theme-bootstrap.css'
@@ -208,8 +210,8 @@ import { useCurrentUserStore } from "@/pinia-store/currentUser";
 import TechnologyCardMainOptions from "./TechnologyCardMainOptions.vue";
 import { useMaterialsStore } from "@/pinia-store/materials";
 
-const { dialogVisible, currentItem, isBlockedByCurrentUser } = storeToRefs(useTechnologyStore());
-const { saveTechnology, changeBlocked } = useTechnologyStore();
+const { dialogVisible, currentItem, isBlockedByCurrentUser, calculated } = storeToRefs(useTechnologyStore());
+const { saveTechnology, changeBlocked, calculateTechnology } = useTechnologyStore();
 
 const alertDialog = ref<typeof AlertDialog | null>(null)
 
@@ -225,6 +227,9 @@ const workpieceCardVisible = ref(false);
 const { formatMaterialData, formatWorkpieceData } = materialDataFormatting();
 const activeSetupIndex: Ref<number | null> = ref(null);
 const saveActive = ref(true);
+
+const calculate = ref(calculated)
+watch([calculate], () => calculateTechnology(currentItem.value.technology.id, calculate.value))
 
 const isDialogVisible = computed(() => store.getters.isTechnologyDialogVisible);
 const item = computed(() => {
@@ -382,16 +387,16 @@ const save = async () => {
 
 };
 
-const calculateItem = async () => {
-    if (!saveActive.value) return;
-    saveActive.value = false;
-    currentItem.value.technology.computed = false;
-    await store.dispatch("saveTechnology", currentItem.value.technology);
-    await store.dispatch("calculateItem", currentItem.value.id);
-    await store.dispatch("fetchItem", currentItem.value.id);
-    await store.dispatch("fetchItems");
-    saveActive.value = true;
-};
+// const calculateItem = async () => {
+//     if (!saveActive.value) return;
+//     saveActive.value = false;
+//     currentItem.value.technology.computed = false;
+//     await store.dispatch("saveTechnology", currentItem.value.technology);
+//     await store.dispatch("calculateItem", currentItem.value.id);
+//     await store.dispatch("fetchItem", currentItem.value.id);
+//     await store.dispatch("fetchItems");
+//     saveActive.value = true;
+// };
 
 const saveWorkpiece = (validWorkpiece: any) => {
     currentItem.value.technology.workpiece = validWorkpiece;
@@ -434,5 +439,15 @@ const showWorkpieceCard = () => {
     display: flex;
     align-items: center;
     justify-content: space-between;
+}
+
+.technology-card__calculate {
+    display: flex;
+    align-items: center;
+    gap: .5rem
+}
+
+.technology-card__switch .v-input__details {
+    display: none;
 }
 </style>

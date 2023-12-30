@@ -10,6 +10,7 @@ export const useTechnologyStore = defineStore("technology", () => {
     const dialogVisible: Ref<boolean> = ref(false);
     const currentItem: Ref<Item> = ref({} as Item);
     const isBlockedByCurrentUser: Ref<boolean> = ref(false);
+    const calculated: Ref<boolean> = ref(false);
 
     const getTechnologyById = async (id: string | number) => {
         try {
@@ -42,6 +43,7 @@ export const useTechnologyStore = defineStore("technology", () => {
         currentItem.value = item;
         setTechnologyDialogVisible(true);
         isBlockedByCurrentUser.value = compareBlockedAndCurrentUser();
+        calculated.value = currentItem.value.technology.computed;
     };
     const setTechnologyDialogVisible = (visible: boolean) => {
         dialogVisible.value = visible;
@@ -62,6 +64,18 @@ export const useTechnologyStore = defineStore("technology", () => {
         }
     };
 
+    const calculateTechnology = async (id: number, status: boolean) => {
+        try {
+            const response = await api.get<Technology>(
+                `/technology/calculate/${id}?isComputed=${status}`
+            );
+            if (response.status >= 400) throw new Error(response.statusText);
+            calculated.value = response.data.computed;
+        } catch (error) {
+            toast.error("Ошибка при изменении статуса <<Расчитан>>" + error);
+        }
+    };
+
     const compareBlockedAndCurrentUser = () => {
         const { user: currentUser } = useCurrentUserStore();
         const blocked = currentItem.value.technology.blocked;
@@ -72,10 +86,12 @@ export const useTechnologyStore = defineStore("technology", () => {
         dialogVisible,
         currentItem,
         isBlockedByCurrentUser,
+        calculated,
         getTechnologyById,
         setCurrentItem,
         saveTechnology,
         setTechnologyDialogVisible,
         changeBlocked,
+        calculateTechnology,
     };
 });
