@@ -42,7 +42,6 @@ export const useTechnologyStore = defineStore("technology", () => {
         currentItem.value = item;
         setTechnologyDialogVisible(true);
         isBlockedByCurrentUser.value = compareBlockedAndCurrentUser();
-        calculated.value = currentItem.value.technology.computed;
     };
     const setTechnologyDialogVisible = (visible: boolean) => {
         dialogVisible.value = visible;
