@@ -18,10 +18,6 @@
                 <v-list-item v-for="(item, index) in filtered" :key="index" :title="formatMaterialData(item)"
                     @click.stop="active = index">
 
-                    <template v-slot:append>
-                        <v-btn color="orange-lighten-1" icon="mdi-delete" variant="text" @click.stop="remove(item)"></v-btn>
-                    </template>
-
                     <material-create :material="item" :templates="materialTemplates" :visible="active === index"
                         @hide="active = -1" @save="save($event)" />
 
