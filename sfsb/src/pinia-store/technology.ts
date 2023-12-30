@@ -10,7 +10,6 @@ export const useTechnologyStore = defineStore("technology", () => {
     const dialogVisible: Ref<boolean> = ref(false);
     const currentItem: Ref<Item> = ref({} as Item);
     const isBlockedByCurrentUser: Ref<boolean> = ref(false);
-    const calculated: Ref<boolean> = ref(false);
 
     const getTechnologyById = async (id: string | number) => {
         try {
@@ -70,7 +69,10 @@ export const useTechnologyStore = defineStore("technology", () => {
                 `/technology/calculate/${id}?isComputed=${status}`
             );
             if (response.status >= 400) throw new Error(response.statusText);
-            calculated.value = response.data.computed;
+            if (response.data.computed !== status)
+                throw new Error(
+                    "значение ответа не совпало со значением запроса"
+                );
         } catch (error) {
             toast.error("Ошибка при изменении статуса <<Расчитан>>" + error);
         }
@@ -86,7 +88,6 @@ export const useTechnologyStore = defineStore("technology", () => {
         dialogVisible,
         currentItem,
         isBlockedByCurrentUser,
-        calculated,
         getTechnologyById,
         setCurrentItem,
         saveTechnology,

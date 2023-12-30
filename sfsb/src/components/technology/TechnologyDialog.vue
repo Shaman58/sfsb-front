@@ -25,7 +25,7 @@ v-container.technology-dialog
                     td
                         span {{ i.technology.drawingNumber }}
                     td {{ i.technology.drawingName }}
-                    td {{ staffUser(i.technology.blocked) ?staffUser(i.technology.blocked).lastName+" "+staffUser(i.technology.blocked).firstName:"свободен для расчета" }}
+                    td {{ staffUser(i.technology.blocked) ?staffUser(i.technology.blocked).lastName+" "+staffUser(i.technology.blocked).firstName:"" }}
 
     v-card.technology-dialog__self.technology-dialog__card
         v-card-title

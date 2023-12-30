@@ -168,8 +168,9 @@
                     <v-card-actions>
                         <v-col cols="2" class="technology-card__calculate">
 
-                            <span>{{ calculated ? 'Рассчитан' : 'Не рассчитан' }}</span>
-                            <v-switch class="technology-card__switch" v-model="calculate"></v-switch>
+                            <span>{{ currentItem.technology.computed ? 'Рассчитан' : 'Не рассчитан' }}</span>
+                            <v-switch class="technology-card__switch" v-model="calculate"
+                                :disabled="!isBlockedByCurrentUser"></v-switch>
 
                         </v-col>
                         <v-btn color="orange-darken-1" variant="text" type="submit" :disabled="isSaveActive"
@@ -195,7 +196,7 @@
 
 <script setup lang="ts">
 import { useStore } from "vuex";
-import { Ref, computed, ref, watch } from "vue";
+import { ComputedRef, Ref, computed, ref, watch } from "vue";
 import TechWorkpieceCard from "@/components/technology/TechWorkpieceCard.vue";
 import SetupCreateCard from "@/components/technology/SetupCreateCard.vue";
 import 'vue-toast-notification/dist/theme-bootstrap.css'
@@ -210,7 +211,7 @@ import { useCurrentUserStore } from "@/pinia-store/currentUser";
 import TechnologyCardMainOptions from "./TechnologyCardMainOptions.vue";
 import { useMaterialsStore } from "@/pinia-store/materials";
 
-const { dialogVisible, currentItem, isBlockedByCurrentUser, calculated } = storeToRefs(useTechnologyStore());
+const { dialogVisible, currentItem, isBlockedByCurrentUser } = storeToRefs(useTechnologyStore());
 const { saveTechnology, changeBlocked, calculateTechnology } = useTechnologyStore();
 
 const alertDialog = ref<typeof AlertDialog | null>(null)
@@ -228,8 +229,14 @@ const { formatMaterialData, formatWorkpieceData } = materialDataFormatting();
 const activeSetupIndex: Ref<number | null> = ref(null);
 const saveActive = ref(true);
 
-const calculate = ref(calculated)
-watch([calculate], () => calculateTechnology(currentItem.value.technology.id, calculate.value))
+const calculate = ref(currentItem.value.technology && currentItem.value.technology.computed)
+watch([calculate], () => {
+    dialogVisible.value && calculate.value && calculateTechnology(currentItem.value.technology.id, calculate.value)
+})
+watch([dialogVisible], () => {
+    dialogVisible.value && (calculate.value = currentItem.value.technology.computed)
+})
+
 
 const isDialogVisible = computed(() => store.getters.isTechnologyDialogVisible);
 const item = computed(() => {
@@ -248,8 +255,10 @@ const changeOwner = (event: boolean) => {
     console.log("changeOwner", event)
     // changeBlocked(event);
 }
-
-const sortedSetups = computed(() => {
+interface Setup {
+    groupAble?: boolean
+}
+const sortedSetups: ComputedRef<Setup[]> = computed(() => {
     if (currentItem.value.technology.setups.length !== 0) {
         const setups = currentItem.value.technology.setups.slice().sort((a: { setupNumber: number; }, b: { setupNumber: number; }) => a.setupNumber - b.setupNumber);
 
@@ -412,42 +421,37 @@ const showWorkpieceCard = () => {
 
 </script>
 
-<style>
-.dialog-content {
-    max-height: 100vh;
-    overflow-y: auto;
-}
+<style lang="sass">
+.dialog-content
+    max-height: 100vh
+    overflow-y: auto
+.v-toast
+    z-index: 9999 !important
 
-.v-toast {
-    z-index: 9999 !important;
-}
+.computed
+    border: 1px solid #97ffa0
+    border-radius: 10px
+    margin: 2px
 
-.computed {
-    border: 1px solid #97ffa0;
-    border-radius: 10px;
-    margin: 2px;
-}
+.technology-card
 
-.technology-card__owner {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: .5rem
-}
+    &__owner
+        display: flex
+        flex-direction: column
+        align-items: center
+        gap: .5rem
+    &__title
+        display: flex
+        align-items: center
+        justify-content: space-between
+    &__calculate
+        display: flex
+        align-items: center
+        gap: .5rem
 
-.technology-card__title {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
 
-.technology-card__calculate {
-    display: flex;
-    align-items: center;
-    gap: .5rem
-}
+    &__switch
+        .v-input__details
+            display: none
 
-.technology-card__switch .v-input__details {
-    display: none;
-}
 </style>
