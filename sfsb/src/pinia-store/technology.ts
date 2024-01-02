@@ -77,10 +77,10 @@ export const useTechnologyStore = defineStore("technology", () => {
         }
     };
 
-    const compareBlockedAndCurrentUser = ():boolean => {
+    const compareBlockedAndCurrentUser = (): boolean => {
         const { user: currentUser } = useCurrentUserStore();
         const blocked = currentItem.value.technology.blocked;
-        return blocked === currentUser?.id || currentUser?.roles.includes("ADMIN") || false
+        return blocked === currentUser?.id;
     };
 
     return {

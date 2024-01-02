@@ -231,7 +231,7 @@ const saveActive = ref(true);
 
 const calculate = ref(currentItem.value.technology && currentItem.value.technology.computed)
 watch([calculate], () => {
-    dialogVisible.value && calculate.value && calculateTechnology(currentItem.value.technology.id, calculate.value)
+    dialogVisible.value && calculate.value && calculate.value !== currentItem.value.technology.computed && calculateTechnology(currentItem.value.technology.id, calculate.value)
 })
 watch([dialogVisible], () => {
     dialogVisible.value && (calculate.value = currentItem.value.technology.computed)

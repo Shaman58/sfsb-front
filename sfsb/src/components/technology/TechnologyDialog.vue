@@ -34,7 +34,7 @@ v-container.technology-dialog
             v-list-item(v-for="i in items||[]" :key="i.id" @click="setCurrentItem(i)")
                 span {{ i.technology.drawingNumber }} {{ i.technology.drawingName }}
 
-    <TechnologyCreateDialog @close="refresh"/>
+    <technology-create-dialog @close="refresh"/>
 </template>
 
 <script setup lang="ts">
