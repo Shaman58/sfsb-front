@@ -11,8 +11,8 @@ declare module "*.jpeg" {
   export default value;
 }
 
-declare module string {
-  import { defineComponent } from string;
+declare module "*.vue" {
+  import { defineComponent } from "vue";
   const Component: ReturnType<typeof defineComponent>;
   export default Component;
 }
@@ -138,9 +138,10 @@ declare interface Setup {
   text: string | null;
   cooperatePrice: ItemPrice;
   additionalComments: string;
-  group: false;
-  cooperate: false;
-  aggregate: false;
+  group: boolean;
+  cooperate: boolean;
+  aggregate: boolean;
+  groupAble?: boolean
 }
 
 declare interface Technology {
