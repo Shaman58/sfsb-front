@@ -1,8 +1,8 @@
-import { defineStore } from "pinia";
+import {defineStore} from "pinia";
 import api from "@/api/instance";
-import { useToast } from "vue-toast-notification";
-import { Ref, ref } from "vue";
-import { useCurrentUserStore } from "./currentUser";
+import {useToast} from "vue-toast-notification";
+import {Ref, ref} from "vue";
+import {useCurrentUserStore} from "./currentUser";
 
 const toast = useToast();
 
@@ -62,18 +62,25 @@ export const useTechnologyStore = defineStore("technology", () => {
         }
     };
 
+    const hasResponseInError = (error: any) : error is {response:{ data : { info: string}}}  =>{
+        return 'response' in error && 'data' in error.response && 'info' in error.response.data;
+    }
     const calculateTechnology = async (id: number, status: boolean) => {
         try {
             const response = await api.get<Technology>(
                 `/technology/calculate/${id}?isComputed=${status}`
             );
-            if (response.status >= 400) throw new Error(response.statusText);
-            if (response.data.computed !== status)
-                throw new Error(
+            if (response.status >= 400) {
+                const message = 'info' in response.data ? response.data.info+"" : response.statusText
+                throw new Error(message)
+            }
+            if (response.data.computed !== status) throw new Error(
                     "значение ответа не совпало со значением запроса"
                 );
+            currentItem.value.technology.computed = response.data.computed
         } catch (error) {
-            toast.error("Ошибка при изменении статуса <<Расчитан>>" + error);
+            const message = hasResponseInError(error) ? error.response.data.info : error;
+            toast.error("Ошибка при изменении статуса 'Расчитан'" + message);
         }
     };
 

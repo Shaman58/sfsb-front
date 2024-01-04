@@ -3,6 +3,10 @@
           @click.stop="setActive"
           style="height: 48px;">
     <v-card-subtitle class="d-flex justify-space-between align-center">
+       <div class="item-card-indicators">
+           <v-icon v-if="Object.keys(item.technology).length !== 1" :color="item.technology.computed?'#55f':'#7777'">mdi-alarm-panel-outline</v-icon>
+           <v-icon v-if="Object.keys(item.technology).length !== 1" :color="item.technology.workpiece && item.technology.workpiece.material.price.amount?'#55f':'#7777'">mdi-flask-empty</v-icon>
+       </div>
       {{
         Object.keys(item.technology).length === 1
           ? 'Добавить позицию'
@@ -120,3 +124,11 @@ const hide = () => {
 const setActive = () => emit("setActive", props.index);
 
 </script>
+
+<style scoped lang="sass">
+.item-card-indicators
+    width: 60px
+    display: flex
+    gap: .5rem
+
+</style>

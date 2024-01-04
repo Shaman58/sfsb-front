@@ -210,6 +210,7 @@ import AlertDialog from "../common/AlertDialog.vue";
 import { useCurrentUserStore } from "@/pinia-store/currentUser";
 import TechnologyCardMainOptions from "./TechnologyCardMainOptions.vue";
 import { useMaterialsStore } from "@/pinia-store/materials";
+import {ca} from "vuetify/locale";
 
 const { dialogVisible, currentItem, isBlockedByCurrentUser } = storeToRefs(useTechnologyStore());
 const { saveTechnology, changeBlocked, calculateTechnology } = useTechnologyStore();
@@ -231,7 +232,8 @@ const saveActive = ref(true);
 
 const calculate = ref(currentItem.value.technology && currentItem.value.technology.computed)
 watch([calculate], () => {
-    dialogVisible.value && calculate.value && calculate.value !== currentItem.value.technology.computed && calculateTechnology(currentItem.value.technology.id, calculate.value)
+    dialogVisible.value && calculate.value !== currentItem.value.technology.computed && calculateTechnology(currentItem.value.technology.id, calculate.value)
+    setTimeout(()=>calculate.value = currentItem.value.technology.computed, 500)
 })
 watch([dialogVisible], () => {
     dialogVisible.value && (calculate.value = currentItem.value.technology.computed)
