@@ -6,7 +6,7 @@ v-card.supply-card
             v-text-field(v-model="filterText" label="Найти материал")
     v-list.supply-card__list
         v-list-item.supply-card__item(v-for="material in filteredList" @click="$emit('select',material)" :key="material.id")
-            span {{ material.materialName }}
+            span {{ material.materialName }} {{ material.gost1 || "" }} {{ material.gost2 || "" }}
             .supply-card__dates
                 span обновлен: {{ material.updated }}
 </template>
@@ -14,7 +14,8 @@ v-card.supply-card
 <script setup lang="ts">
 import { useSupplyStore } from "@/pinia-store/supply";
 import { storeToRefs } from "pinia";
-import { ref, computed } from "vue"
+import {ref, computed} from "vue"
+import type {ComputedRef} from "vue"
 interface Props {
     title: string
     materials: string
@@ -32,7 +33,7 @@ await getData()
 const materialList = supplyStore[materials as keyof typeof supplyStore]
 console.log("🚀 ~ file: SupplyCard.vue:33 ~ materialList:", materialList)
 
-const filteredList = computed(() => materialList.value.filter(e => e.materialName.includes(filterText.value)))
+const filteredList: ComputedRef<Material[]> = computed(() => materialList.value.filter(e => e.materialName.toLowerCase().includes(filterText.value.toLowerCase())))
 
 </script>
 
@@ -53,4 +54,5 @@ const filteredList = computed(() => materialList.value.filter(e => e.materialNam
     &__list
         max-height: 100%
         overflow-y: auto
+        padding-bottom: 48px
 </style>
