@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import api from "@/api/instance";
 import { useToast } from "vue-toast-notification";
 import { Ref, ref } from "vue";
+import checkStatus from "@/mixins/CheckStatus";
 
 const toast = useToast();
 
@@ -28,8 +29,7 @@ export const useStaffStore = defineStore("staff", () => {
                 {...staff, picture:""},
                 { headers: { "Content-Type": "application/json" } }
             );
-            if (response.status >= 400)
-                throw new Error("Ошибка при сохранении данных пользователя");
+            checkStatus(response)
             toast.success("Данные сохранены");
             await getAllStaff();
             return true
@@ -45,8 +45,7 @@ export const useStaffStore = defineStore("staff", () => {
                 avatar,
                 { headers: { "Content-Type": "multipart/form-data" } }
             );
-            if (response.status >= 400)
-                throw new Error(response.statusText);
+            checkStatus(response)
             toast.success("Данные сохранены");
             await getAllStaff();
         } catch (error) {
@@ -57,8 +56,7 @@ export const useStaffStore = defineStore("staff", () => {
     const deleteStaff = async (staff: Person) => {
         try {
             const response = await api.delete(`/user/${staff.id}`);
-            if (response.status >= 400)
-                throw new Error("Ошибка при сохранении данных пользователя");
+            checkStatus(response)
             toast.success("Данные удалены");
             await getAllStaff();
         } catch (error) {

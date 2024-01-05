@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import api from "@/api/instance";
 import { useToast } from "vue-toast-notification";
 import { Ref, ref } from "vue";
+import checkStatus from "@/mixins/CheckStatus";
 
 const toast = useToast();
 
@@ -11,7 +12,7 @@ export const useToolingStore = defineStore("tooling", () => {
     const fecthToolings = async () => {
         try {
             const response = await api.get("/tooling");
-            if (response.status >= 400) throw new Error(response.statusText);
+            checkStatus(response)
             toolings.value = response.data;
         } catch (error) {
             toast.error("Ошибка в получениее данных оснастки " + error);
@@ -25,8 +26,7 @@ export const useToolingStore = defineStore("tooling", () => {
             const response = await (tooling.id
                 ? api.put(url, tooling)
                 : api.post(url, tooling));
-            if (response.status >= 400) throw new Error(response.statusText);
-
+            checkStatus(response)
             const index = toolings.value.findIndex((e) => e.id === tooling.id);
             if (index !== -1) {
                 toolings.value.splice(index, 1, tooling);
@@ -43,7 +43,7 @@ export const useToolingStore = defineStore("tooling", () => {
     const deleteTooling = async (tooling: Tool) => {
         try {
             const response = await api.delete(`/tooling/${tooling.id}`);
-            if (response.status >= 400) throw new Error(response.statusText);
+            checkStatus(response)
             toolings.value = toolings.value.filter((e) => e.id !== tooling.id);
             toast.info("Успешно удален!", { position: "top-right" });
         } catch (error) {

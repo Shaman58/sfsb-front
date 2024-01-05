@@ -3,15 +3,14 @@ import api from "@/api/instance";
 import {useToast} from "vue-toast-notification";
 import {Ref, ref} from "vue";
 import {AxiosResponse} from "axios";
+import checkStatus from "@/mixins/CheckStatus";
 
 const toast = useToast();
 
 export const useCustomersStore = defineStore("customers", () => {
     const customers: Ref<Customer[]> = ref([])
 
-    const checkStatus = (response: AxiosResponse<any, any>) =>{
-        if(response.status >= 400) throw Error(response.data ? response.data.info : response.statusText)
-    }
+
     const fetchCustomers = async()=>{
         try {
             const response = await api.get("/customer")

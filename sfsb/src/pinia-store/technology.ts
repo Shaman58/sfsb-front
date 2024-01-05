@@ -3,6 +3,7 @@ import api from "@/api/instance";
 import {useToast} from "vue-toast-notification";
 import {Ref, ref} from "vue";
 import {useCurrentUserStore} from "./currentUser";
+import checkStatus from "@/mixins/CheckStatus";
 
 const toast = useToast();
 
@@ -53,8 +54,7 @@ export const useTechnologyStore = defineStore("technology", () => {
             : `/technology/${currentItem.value.technology.id}/unblock`;
         try {
             const resp = await api.get(url);
-            if (resp.status > 400)
-                throw new Error("Ошибка при изменении блокировки");
+            checkStatus(resp)
             await getTechnologyById(currentItem.value.id);
             isBlockedByCurrentUser.value = compareBlockedAndCurrentUser();
         } catch (error) {
@@ -70,10 +70,7 @@ export const useTechnologyStore = defineStore("technology", () => {
             const response = await api.get<Technology>(
                 `/technology/calculate/${id}?isComputed=${status}`
             );
-            if (response.status >= 400) {
-                const message = 'info' in response.data ? response.data.info+"" : response.statusText
-                throw new Error(message)
-            }
+            checkStatus(response)
             if (response.data.computed !== status) throw new Error(
                     "значение ответа не совпало со значением запроса"
                 );

@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import api from "@/api/instance";
 import { useToast } from "vue-toast-notification";
 import { Ref, ref } from "vue";
+import checkStatus from "@/mixins/CheckStatus";
 
 const toast = useToast();
 
@@ -11,7 +12,7 @@ export const useCompanyStore = defineStore("company", () => {
     const fetchCompanyData = async () => {
         try {
             const response = await api.get("/company");
-            if (response.status >= 400) throw new Error(response.statusText);
+            checkStatus(response)
             company.value = response.data;
         } catch (error) {
             toast.error("Ошибка получения данных компании " + error);
@@ -21,7 +22,7 @@ export const useCompanyStore = defineStore("company", () => {
     const saveCompany = async (data: Company) => {
         try {
             const response = await api.put("/company", data);
-            if (response.status >= 400) throw new Error(response.statusText);
+            checkStatus(response)
             company.value = data;
             toast.info("Успешно сохранено!", { position: "top-right" });
         } catch (error) {

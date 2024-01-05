@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import api from "@/api/instance";
 import { useToast } from "vue-toast-notification";
 import { Ref, ref } from "vue";
+import checkStatus from "@/mixins/CheckStatus";
 
 const toast = useToast();
 
@@ -11,7 +12,7 @@ export const useMaterialsStore = defineStore("materials", () => {
     const fetchMaterials = async () => {
         try {
             const response = await api.get("/material");
-            if (response.status > 400) throw new Error(response.statusText);
+            checkStatus(response)
             materials.value = response.data;
         } catch (error) {
             toast.error("Ошибка в получении данных материалов " + error);
@@ -24,7 +25,7 @@ export const useMaterialsStore = defineStore("materials", () => {
             const response = await (material.id
                 ? api.put(url, material)
                 : api.post(url, material));
-            if (response.status > 400) throw new Error(response.statusText);
+            checkStatus(response)
             toast.info("Успешно сохранено!", { position: "top-right" });
             const index = materials.value.findIndex(
                 (e) => e.id === material.id
@@ -40,7 +41,7 @@ export const useMaterialsStore = defineStore("materials", () => {
     const deleteMaterial = async (material: Material) => {
         try {
             const response = await api.delete(`/material/${material.id}`);
-            if (response.status > 400) throw new Error(response.statusText);
+            checkStatus(response)
             toast.info("Успешно удален!", { position: "top-right" });
             materials.value = materials.value.filter(
                 (e) => e.id !== material.id

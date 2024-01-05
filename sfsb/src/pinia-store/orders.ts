@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import api from "@/api/instance";
 import { useToast } from "vue-toast-notification";
 import { Ref, ref } from "vue";
+import checkStatus from "@/mixins/CheckStatus";
 
 const toast = useToast();
 
@@ -12,7 +13,7 @@ export const useOrdersStore = defineStore("orders", () => {
         const url = search ? "/order/find" : "/order";
         try {
             const response = await api.get(url, { params: { search } });
-            if (response.status > 400) throw new Error(response.statusText);
+            checkStatus(response)
             orders.value = response.data;
         } catch (error) {
             toast.error("Ошибка получения списка заказов " + error);
