@@ -15,7 +15,7 @@
             {{
                 Object.keys(item.technology).length === 1
                     ? 'Добавить позицию'
-                    : item.technology.drawingNumber + ' ' + item.technology.drawingName
+                    : item.technology.value.drawingNumber + ' ' + item.technology.value.drawingName
             }}
             <v-icon v-if="item.customerMaterial"
                     color="green">mdi-playlist-minus
@@ -37,18 +37,18 @@
             <v-row>
                 <v-col cols="4">
                     <v-text-field label="Номер чертежа:"
-                                  v-model="item.technology.drawingNumber"
+                                  v-model="item.technology.value.drawingNumber"
                                   :rules="[rules.required, rules.counter]"
                                   maxlength="20"
-                                  :disabled="!!item.technology.id"
+                                  :disabled="!!item.technology.value.id"
                     ></v-text-field>
                 </v-col>
                 <v-col cols="4">
                     <v-text-field label="Название чертежа:"
-                                  v-model="item.technology.drawingName"
+                                  v-model="item.technology.value.drawingName"
                                   :rules="[rules.required, rules.counter]"
                                   maxlength="20"
-                                  :disabled="!!item.technology.id"
+                                  :disabled="!!item.technology.value.id"
                     ></v-text-field>
                 </v-col>
                 <v-col cols="4">
@@ -70,7 +70,7 @@
                     <v-btn :disabled="!valid"
                            @click="save"
                            color="orange-darken-1" variant="text">
-                        {{ item.inserted || item.id ? 'Изменить' : 'Добавить' }}
+                        {{  item.id ? 'Изменить' : 'Добавить' }}
                     </v-btn>
                     <v-btn @click="hide"
                            color="orange-darken-1" variant="text">
@@ -83,38 +83,32 @@
     </v-card>
 </template>
 
-<script setup>
-import {computed, ref, watch} from "vue";
+<script setup lang="ts">
+import {computed, ref, Ref, toRefs} from "vue";
 import {useValidationRules} from "@/mixins/FieldValidationRules";
 
-const props = defineProps({
-    item: {
-        type: Object,
-        required: true
-    },
-    active: {
-        type: [Number, String],
-        required: true
-    },
-    index: {
-        type: [Number, String],
-        required: true
-    }
-})
+interface Props{
+    item: Item
+    active: number|string
+    index: number|string
+}
+const props = defineProps<Props>()
 
-const form = ref(null);
+const form: Ref<HTMLFormElement | null> = ref(null);
 const valid = ref(false);
 const {rules} = useValidationRules();
 const emit = defineEmits();
-const item = ref(JSON.parse(JSON.stringify(props.item)));
-watch(() => props.item, (newValue) => {
-    item.value = JSON.parse(JSON.stringify(newValue));
-});
+// const item = ref(JSON.parse(JSON.stringify(props.item)));
+const item = toRefs(props.item)
+
+// watch(() => props.item, (newValue) => {
+//     item.value = JSON.parse(JSON.stringify(newValue));
+// });
 
 const save = async () => {
-    if (form.value.validate()) {
-        item.value.technology.computed = false;
-        emit("save", item.value);
+    if (form.value?.validate()) {
+        item.technology.value.computed = false;
+        emit("save", item);
         hide();
     }
 }
@@ -122,25 +116,23 @@ const save = async () => {
 const remove = async () => emit("remove");
 
 const hide = () => {
-    item.value = JSON.parse(JSON.stringify(props.item));
+    // item.value = JSON.parse(JSON.stringify(props.item));
     emit("hide");
 };
 
 const setActive = () => emit("setActive", props.index);
 
-const wasDefinedComputedAndWorkpiece = computed(() => !!item.value.technology.computed
-    && !!item.value.technology.workpiece
-    && !!item.value.technology.workpiece.material
-    && !!item.value.technology.workpiece.material.price?.amount)
+const wasDefinedComputedAndWorkpiece = computed(() => item.technology.value.computed && !!item.technology.value.workpiece && !!item.technology.value.workpiece.material
+    && !!item.technology.value.workpiece.material.price?.amount)
 
 const colorOfComputed = computed(() => {
     if(wasDefinedComputedAndWorkpiece.value) return 'green'
-    if(!!item.value.technology.computed) return 'red'
+    if(item.technology.value.computed) return 'red'
     return '#777'
 })
 const colorOfWorkpiece = computed(() => {
     if(wasDefinedComputedAndWorkpiece.value) return 'green'
-    if(!!item.value.technology?.workpiece?.material?.price?.amount) return 'red'
+    if(!!item.technology.value.workpiece?.material?.price?.amount) return 'red'
     return '#777'
 })
 </script>
