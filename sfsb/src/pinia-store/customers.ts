@@ -2,7 +2,6 @@ import {defineStore} from "pinia";
 import api from "@/api/instance";
 import {useToast} from "vue-toast-notification";
 import {Ref, ref} from "vue";
-import {AxiosResponse} from "axios";
 import checkStatus from "@/mixins/CheckStatus";
 
 const toast = useToast();

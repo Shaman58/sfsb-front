@@ -2,14 +2,14 @@ import CONSTS from "@/consts"
 export default function useGeometryFormatting() {
 
 
-  const formatMaterialData = ({geometry, materialName, gost1, gost2}) => {
+  const formatMaterialData = ({geometry, materialName, gost1, gost2}: Material) => {
     const res = CONSTS.GEOMETRIES.find(e=>e.label===geometry)
     return res ? `${res.title} ${materialName} ${gost1 ? gost1 : ''} ${gost2 ? gost2 : ''}` : ""
   };
 
 
 
-  const formatWorkpieceData = ({material,...geoms}) => {
+  const formatWorkpieceData = ({material,id,created,updated, ...geoms}: Workpiece) => {
     const workpieceData: number[] | undefined = CONSTS.GEOMETRIES.find(
       (e) => e.label === material.geometry
     )?.workpieceData;

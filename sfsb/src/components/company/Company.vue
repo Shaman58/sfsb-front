@@ -95,7 +95,7 @@
 <script setup lang="ts">
 import { useValidationRules } from "@/mixins/FieldValidationRules";
 import { useStore } from "vuex";
-import { computed, ref, watch } from "vue";
+import {computed, Ref, ref, watch} from "vue";
 import { useCompanyStore } from "@/pinia-store/company"
 import { storeToRefs } from "pinia"
 import { useRouter } from "vue-router"
@@ -108,7 +108,7 @@ const emit = defineEmits();
 const { rules } = useValidationRules();
 const store = useStore();
 
-const form = ref(null);
+const form: Ref<HTMLFormElement | null> = ref(null);
 const valid = ref(false);
 
 const router = useRouter();
@@ -118,7 +118,7 @@ const hide = () => {
 };
 
 const save = (data: Company) => {
-    if (form.value.validate()) {
+    if (form.value && form.value.validate()) {
         saveCompany(data)
     }
 };
