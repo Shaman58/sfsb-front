@@ -2,7 +2,7 @@
     <Suspense>
         <template #fallback>
             <div class="technology-view">
-                <v-progress-circular indeterminate :size="62" :width="6" color="#2196F3"></v-progress-circular>
+                <v-progress-circular indeterminate :size="62" :width="6" color="#2F477E"></v-progress-circular>
             </div>
         </template>
         <technology-dialog />

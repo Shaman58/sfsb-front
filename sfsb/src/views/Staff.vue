@@ -2,7 +2,7 @@
 v-container.staff__container
     Suspense
         template(v-slot:fallback)
-            v-progress-circular(indeterminate :size="62" :width="6" color="#2196F3")
+            v-progress-circular(indeterminate :size="62" :width="6" color="#2F477E")
         template(v-slot:default)
             staff-list
                 template(v-slot:title)

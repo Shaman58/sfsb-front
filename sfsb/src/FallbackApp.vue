@@ -60,7 +60,7 @@ body {
 }
 
 li {
-    background-color: #2196F3;
+    background-color: #2F477E;
     width: 10px;
     height: 10px;
     float: right;

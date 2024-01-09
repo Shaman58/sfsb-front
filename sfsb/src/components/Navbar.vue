@@ -1,6 +1,6 @@
 <template>
     <v-container>
-        <v-app-bar color="blue" class="navbar">
+        <v-app-bar color="#2F477E" class="navbar">
             <template v-slot:prepend>
 
                 <v-btn :to="'/'">
@@ -8,16 +8,16 @@
                 </v-btn>
             </template>
 
-            {{ version }}
+            <span :style="{color:'white'}">{{ version }}</span>
             <v-toolbar-items class="ml-5" style="overflow-x: auto;">
 
-                <v-btn v-for="navitem in CONSTS.MAINMENU" :key="navitem.path" :to="navitem.path" rounded="xs" tonal
+                <v-btn :color="'white'" v-for="navitem in CONSTS.MAINMENU" :key="navitem.path" :to="navitem.path" rounded="xs" tonal
                     :hidden="navitem.role && navitem.role.length && !user?.roles.some(e => navitem.role?.includes(e))">
                     {{ navitem.label }}
                 </v-btn>
                 <v-menu open-on-hover>
                     <template v-slot:activator="{ props }">
-                        <v-btn color="primary" v-bind="props">
+                        <v-btn color="white" v-bind="props">
                             <div class="navbar__user-data">
                                 <img class="navbar__img" :src="picture || 'images/user-profile.png'" alt="" />
                                 <span class="navbar__name">{{ name }}</span>
