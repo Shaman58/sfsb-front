@@ -5,21 +5,21 @@
         <v-card-subtitle class="d-flex justify-space-between align-center">
             <div class="item-card-indicators">
                 <v-icon v-if="Object.keys(item.technology).length !== 1"
-                        :color="item.technology.value.computed ? 'green':'grey'">mdi-alarm-panel-outline
+                        :color="item.technology.computed ? 'green':'grey'">mdi-alarm-panel-outline
                 </v-icon>
                 <v-icon v-if="Object.keys(item.technology).length !== 1"
-                        :color="!!item.technology.value.workpiece?.material?.price?.amount ? 'green':'grey' ">
+                        :color="!!item.technology.workpiece?.material?.price?.amount ? 'green':'grey' ">
                     mdi-flask-empty
                 </v-icon>
             </div>
             {{
-                Object.keys(item.technology.value).length === 1
+                Object.keys(item.technology).length === 1
                     ? 'Добавить позицию'
-                    : item.technology.value.drawingNumber + ' ' + item.technology.value.drawingName
+                    : item.technology.drawingNumber + ' ' + item.technology.drawingName
             }}
 
-            <a v-if="Object.keys(item.technology.value).length !== 1"
-               class="ml-auto">{{ item.quantity.value + ' шт.' }}</a>
+            <a v-if="Object.keys(item.technology).length !== 1"
+               class="ml-auto">{{ item.quantity + ' шт.' }}</a>
             <v-btn v-if="Object.keys(item.technology).length !== 1"
                    icon @click.stop="remove"
                    color="orange-darken-1" variant="text">
@@ -35,18 +35,18 @@
             <v-row>
                 <v-col cols="4">
                     <v-text-field label="Номер чертежа:"
-                                  v-model="item.technology.value.drawingNumber"
+                                  v-model="item.technology.drawingNumber"
                                   :rules="[rules.required, rules.counter]"
                                   maxlength="20"
-                                  :disabled="!!item.technology.value.id"
+                                  :disabled="!!item.technology.id"
                     ></v-text-field>
                 </v-col>
                 <v-col cols="4">
                     <v-text-field label="Название чертежа:"
-                                  v-model="item.technology.value.drawingName"
+                                  v-model="item.technology.drawingName"
                                   :rules="[rules.required, rules.counter]"
                                   maxlength="20"
-                                  :disabled="!!item.technology.value.id"
+                                  :disabled="!!item.technology.id"
                     ></v-text-field>
                 </v-col>
                 <v-col cols="4">
@@ -82,7 +82,7 @@
 </template>
 
 <script setup lang="ts">
-import {computed, ref, Ref, toRefs} from "vue";
+import {computed, reactive, ref, Ref, toRefs, watch} from "vue";
 import {useValidationRules} from "@/mixins/FieldValidationRules";
 
 interface Props{
@@ -97,15 +97,16 @@ const valid = ref(false);
 const {rules} = useValidationRules();
 const emit = defineEmits();
 // const item = ref(JSON.parse(JSON.stringify(props.item)));
-const item = toRefs(props.item)
+const item = reactive(props.item)
 
+watch([item.customerMaterial], console.log)
 // watch(() => props.item, (newValue) => {
 //     item.value = JSON.parse(JSON.stringify(newValue));
 // });
 
 const save = async () => {
     if (form.value?.validate()) {
-        item.technology.value.computed = false;
+        item.technology.computed = false;
         emit("save", item);
         hide();
     }
@@ -120,8 +121,8 @@ const hide = () => {
 
 const setActive = () => emit("setActive", props.index);
 
-const wasDefinedComputedAndWorkpiece = computed(() => item.technology.value.computed && !!item.technology.value.workpiece && !!item.technology.value.workpiece.material
-    && !!item.technology.value.workpiece.material.price?.amount)
+const wasDefinedComputedAndWorkpiece = computed(() => item.technology.computed && !!item.technology.workpiece && !!item.technology.workpiece.material
+    && !!item.technology.workpiece.material.price?.amount)
 
 
 </script>

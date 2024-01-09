@@ -34,7 +34,7 @@
                                         :class="getBackgroundColorClass(item)" />
                                 </v-col>
                                 <v-col cols="12">
-                                    <item-card :item="{ technology: { outsourcedCosts: { amount: 0, currency: 'RUB' } } }"
+                                    <item-card :item="{ technology: { outsourcedCosts: { amount: 0, currency: 'RUB' } }, customerMaterial:false }"
                                         :active="active" :index="'new'" @save="addItem($event)" @hide="active = -1"
                                         @setActive="setActive($event)" />
                                 </v-col>
