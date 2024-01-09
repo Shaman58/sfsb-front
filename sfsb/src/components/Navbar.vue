@@ -1,6 +1,6 @@
 <template>
     <v-container>
-        <v-app-bar color="orange" class="navbar">
+        <v-app-bar color="blue" class="navbar">
             <template v-slot:prepend>
 
                 <v-btn :to="'/'">
@@ -19,7 +19,7 @@
                     <template v-slot:activator="{ props }">
                         <v-btn color="primary" v-bind="props">
                             <div class="navbar__user-data">
-                                <img class="navbar__img" :src="picture || 'images/default-avatar.jpg'" alt="" />
+                                <img class="navbar__img" :src="picture || 'images/user-profile.png'" alt="" />
                                 <span class="navbar__name">{{ name }}</span>
                             </div>
                         </v-btn>

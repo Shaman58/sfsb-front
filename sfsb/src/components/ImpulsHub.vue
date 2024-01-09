@@ -32,7 +32,7 @@
 }
 
 .hub {
-    background-color: orange;
+    background-color: #2196F3;
     border-radius: 10px;
     font-weight: bold;
 }

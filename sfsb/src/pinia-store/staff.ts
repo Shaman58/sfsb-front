@@ -40,8 +40,8 @@ export const useStaffStore = defineStore("staff", () => {
 
     const saveAvatar = async (id: string, avatar: FormData) => {
         try {
-            const response = await api.put(
-                `/user/file/${id}`,
+            const response = await api.post(
+                `/user/${id}`,
                 avatar,
                 { headers: { "Content-Type": "multipart/form-data" } }
             );

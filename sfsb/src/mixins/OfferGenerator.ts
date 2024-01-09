@@ -2,6 +2,8 @@ import api from "@/api/instance";
 import mammoth from "mammoth";
 import { useToast } from "vue-toast-notification";
 import { saveAs } from "file-saver";
+import checkStatus from "@/mixins/CheckStatus";
+import {AxiosError} from "axios";
 
 const toast = useToast();
 
@@ -11,12 +13,13 @@ export const useOfferGenerator = () => {
         params: { orderId: number },
         filename: string
     ) => {
+        // @ts-ignore
         try {
             const response = await api.get(url, {
                 params,
                 responseType: "arraybuffer",
             });
-
+            checkStatus(response)
             const arrayBuffer = response.data;
             const result = await mammoth.convertToHtml({ arrayBuffer });
             const blob = new Blob([arrayBuffer], {
@@ -34,8 +37,12 @@ export const useOfferGenerator = () => {
             newWindow && newWindow.document.write(downloadButtonHtml);
             newWindow && newWindow.document.write(result.value);
             newWindow && newWindow.document.close();
-        } catch (error) {
-            toast.error("Ошибка", { position: "top-right" });
+        } catch (error: unknown) {
+            const axiosError = error as AxiosError<{info:string}, any>
+            const {response} = axiosError
+            const {data} = response
+            const textError = data && JSON.parse(new TextDecoder().decode(data || ""))
+            toast.error("Ошибка: "+  textError?.info, { position: "top-right" });
             console.error(
                 "There was an error previewing the DOCX file:",
                 error

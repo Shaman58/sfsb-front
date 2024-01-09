@@ -8,7 +8,7 @@ v-container
         v-list
             v-list-item.person(v-for="person in items" :key="person.id" @click="edit(person.id)")
                 template(#prepend)
-                    img.person__img(:src="person.picture ? person.picture : '/images/default-avatar.jpg'" alt="person")
+                    img.person__img(:src="person.picture ? person.picture : '/images/user-profile.png'" alt="person")
                 .person__right
                     h3.person__title {{ person.firstName }} {{ person.lastName }}
                     .person__hidden
@@ -34,7 +34,7 @@ import type {Ref} from "vue"
 import StaffCard from "./StaffCard.vue"
 import {useStaffStore} from "@/pinia-store/staff"
 import {storeToRefs} from "pinia"
-import DefaultAvatar from "@/assets/default-avatar.png"
+// import DefaultAvatar from "@/assets/default-avatar.png"
 import { useRolesStore } from '@/pinia-store/roles'
 
 const rolesStore = useRolesStore();
