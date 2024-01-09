@@ -5,23 +5,21 @@
         <v-card-subtitle class="d-flex justify-space-between align-center">
             <div class="item-card-indicators">
                 <v-icon v-if="Object.keys(item.technology).length !== 1"
-                        :color="colorOfComputed">mdi-alarm-panel-outline
+                        :color="item.technology.value.computed ? 'green':'grey'">mdi-alarm-panel-outline
                 </v-icon>
                 <v-icon v-if="Object.keys(item.technology).length !== 1"
-                        :color="colorOfWorkpiece">
+                        :color="!!item.technology.value.workpiece?.material?.price?.amount ? 'green':'grey' ">
                     mdi-flask-empty
                 </v-icon>
             </div>
             {{
-                Object.keys(item.technology).length === 1
+                Object.keys(item.technology.value).length === 1
                     ? 'Добавить позицию'
                     : item.technology.value.drawingNumber + ' ' + item.technology.value.drawingName
             }}
-            <v-icon v-if="item.customerMaterial"
-                    color="green">mdi-playlist-minus
-            </v-icon>
-            <a v-if="Object.keys(item.technology).length !== 1"
-               class="ml-auto">{{ item.quantity + ' шт.' }}</a>
+
+            <a v-if="Object.keys(item.technology.value).length !== 1"
+               class="ml-auto">{{ item.quantity.value + ' шт.' }}</a>
             <v-btn v-if="Object.keys(item.technology).length !== 1"
                    icon @click.stop="remove"
                    color="orange-darken-1" variant="text">
@@ -125,16 +123,7 @@ const setActive = () => emit("setActive", props.index);
 const wasDefinedComputedAndWorkpiece = computed(() => item.technology.value.computed && !!item.technology.value.workpiece && !!item.technology.value.workpiece.material
     && !!item.technology.value.workpiece.material.price?.amount)
 
-const colorOfComputed = computed(() => {
-    if(wasDefinedComputedAndWorkpiece.value) return 'green'
-    if(item.technology.value.computed) return 'red'
-    return '#777'
-})
-const colorOfWorkpiece = computed(() => {
-    if(wasDefinedComputedAndWorkpiece.value) return 'green'
-    if(!!item.technology.value.workpiece?.material?.price?.amount) return 'red'
-    return '#777'
-})
+
 </script>
 
 
