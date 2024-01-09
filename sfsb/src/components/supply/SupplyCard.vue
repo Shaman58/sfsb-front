@@ -3,6 +3,7 @@ v-card.supply-card
     template(#title)
         .supply-card__title
             span {{ title }}
+            v-autocomplete(label="Вид" :items="geometries" v-model="selectedType" )
             v-text-field(v-model="filterText" label="Найти материал")
     v-list.supply-card__list
         v-list-item.supply-card__item(v-for="material in filteredList" @click="$emit('select',material)" :key="material.id")
@@ -14,16 +15,23 @@ v-card.supply-card
 <script setup lang="ts">
 import { useSupplyStore } from "@/pinia-store/supply";
 import { storeToRefs } from "pinia";
-import {ref, computed} from "vue"
-import type {ComputedRef} from "vue"
+import {ref, computed, watch} from "vue"
+import type {Ref} from "vue"
+import CONST from "@/consts"
+
 interface Props {
     title: string
     materials: string
     getData: () => Promise<void>
 }
+
 const { materials, getData, title = "" } = defineProps<Props>()
 const emit = defineEmits(["select"])
 const filterText = ref("")
+const geometries = CONST.GEOMETRIES
+const selectedType: Ref<string|null> = ref(null)
+
+
 
 console.log("SupplyCard title", title, materials)
 const supplyStore = storeToRefs(useSupplyStore())
@@ -33,7 +41,13 @@ await getData()
 const materialList = supplyStore[materials as keyof typeof supplyStore]
 console.log("🚀 ~ file: SupplyCard.vue:33 ~ materialList:", materialList)
 
-const filteredList: ComputedRef<Material[]> = computed(() => materialList.value.filter(e => e.materialName.toLowerCase().includes(filterText.value.toLowerCase())))
+const filteredList: ComputedRef<Material[]> = computed(() => materialList.value.filter(e => e.materialName
+    .toLowerCase()
+    .includes(filterText.value.toLowerCase()))
+    .filter(e=> {
+        const label = geometries.find(v=>v.title===selectedType.value)?.label || null
+        return selectedType.value ? e.geometry === label : true
+    }))
 
 </script>
 
