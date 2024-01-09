@@ -375,7 +375,8 @@ const hideDialog = () => {
 };
 
 const save = async () => {
-    if (alertDialog.value && currentItem.value.technology.user.id !== user.value?.id) {
+    console.log(currentItem, user)
+    if (alertDialog.value && currentItem.value.technology.blocked !== user.value.id) {
         alertDialog.value.show();
         try {
             const res = await alertDialog.value.getAnswer()
@@ -394,8 +395,8 @@ const save = async () => {
     await store.dispatch("fetchItem", currentItem.value.id);
     await store.dispatch("fetchItems");
     saveActive.value = true;
-    saveTechnology(currentItem.value.technology);
-
+    await saveTechnology(currentItem.value.technology);
+    calculate.value = currentItem.value.technology && currentItem.value.technology.computed
 };
 
 // const calculateItem = async () => {

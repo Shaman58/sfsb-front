@@ -52,7 +52,7 @@ const filteredList: ComputedRef<Material[]> = computed(() => materialList.value.
         color: #777
 
     &__list
-        max-height: 100%
+        max-height: 200px
         overflow-y: auto
         padding-bottom: 48px
 </style>
