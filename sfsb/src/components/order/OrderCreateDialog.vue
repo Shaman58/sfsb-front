@@ -60,10 +60,10 @@
 
             </v-card>
             <v-card-actions class="card-actions">
-                <v-btn @click="previewCommerce(order)" :disabled="kpAvailable">компред</v-btn>
-                <v-btn @click="previewToolOrder(order, 1, 2)" :disabled="kpAvailable">заявка на инструмент</v-btn>
-                <v-btn @click="previewPlan1(order)" :disabled="kpAvailable">План 1</v-btn>
-                <v-btn @click="previewPlan2(order)" :disabled="kpAvailable">План 2</v-btn>
+                <v-btn @click="previewCommerce(order)" :disabled="!isOrderComputed">компред</v-btn>
+                <v-btn @click="previewToolOrder(order, 1, 2)" :disabled="!isAllComputed">заявка на инструмент</v-btn>
+                <v-btn @click="previewPlan1(order)" :disabled="!isAllComputed">План 1</v-btn>
+                <v-btn @click="previewPlan2(order)" :disabled="!isAllComputed">План 2</v-btn>
                 <v-spacer></v-spacer>
                 <v-btn color="orange-darken-1" variant="text" @click="hide">
                     Закрыть
@@ -124,6 +124,10 @@ const isSameUser = () => {
     return props.order.user && props.order.user.id === user.value?.id;
 }
 
+const isAllComputed = computed(()=>order.value.items.every((e: Item) => e.technology.computed))
+const isAllWorkpieced = computed(()=>order.value.items.every((e: Item) => e.technology.workpiece.material.price.amount))
+const isOrderComputed = computed(()=>isAllComputed.value && isAllWorkpieced.value)
+
 const save = async (data: Order) => {
     if (props.order.user && !isSameUser() && alertDialog.value) {
         try {
@@ -169,7 +173,7 @@ const kpAvailable = computed(() => {
 });
 
 const getBackgroundColorClass = (item: Item) => {
-    if (!!item?.technology?.computed && item?.technology?.computed) {
+    if (item.technology?.computed && item.technology.workpiece?.material?.price?.amount) {
         return 'computed';
     } else {
         return 'not-computed';
