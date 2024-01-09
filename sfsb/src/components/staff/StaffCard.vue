@@ -17,7 +17,7 @@ v-container.person-card__container
                         v-text-field(label="Имя" v-model="personLocal.firstName" :rules="[required]")
                         v-text-field(label="Фамилия" v-model="personLocal.lastName" :rules="[required]")
                     .person-card__form-contacts
-                        v-text-field(label="Email" v-model="personLocal.email" :rules="[required, emailValidation]")
+                        v-text-field(label="Email" v-model="personLocal.email" :rules="[emailValidation]")
                     .person-card__form-roles
                         v-checkbox(v-for="role in roles" :label="role" v-model="personLocal.roles" :value="role")
                 v-card.person-card__pass
@@ -49,7 +49,6 @@ import { useToast } from 'vue-toast-notification';
 import { useStaffStore } from '@/pinia-store/staff'
 import { useRolesStore } from '@/pinia-store/roles'
 import { storeToRefs } from 'pinia'
-import { useValidationRules } from "@/mixins/FieldValidationRules";
 
 const personForm = ref(null)
 const newAvatarFD: Ref<string | Blob | null> = ref(null)
@@ -74,8 +73,11 @@ const newPass = ref("")
 const newPassRepeat = ref("")
 
 const required = (v: string) => !!v.length || "Поле обязательно для заполнения"
-const { rules:{emailValidation} } = useValidationRules()
-
+// const { rules:{emailValidation} } = useValidationRules()
+const emailValidation = (value: string) => {
+    const pattern = /^\w+([.-]?\w+){2,}@\w+([.-]?\w+)*(\.\w{2,5})+$/
+    return value==="" || pattern.test(value) || 'Неверный формат'
+}
 const isValidForm = computed(() => !!personLocal.firstName.length
                             && !!personLocal.lastName.length
                             && emailValidation(personLocal.email)===true)
@@ -111,7 +113,7 @@ const save = async () => {
     console.log("personLocal from component", personLocal);
     if (!isValidForm) return toast.error("Поля не заполнены")
     if(!person.username && !personLocal.password) return toast.error("Вы забыли задать пароль")
-    const isSuccess = await staffStore.saveStaff(personLocal)
+    await staffStore.saveStaff(personLocal)
     emit("exit")
 }
 
