@@ -2,7 +2,7 @@
 v-container.company__container
     Suspense
         template(v-slot:fallback)
-            v-progress-circular(indeterminate :size="62" :width="6" color="orange")
+            v-progress-circular(indeterminate :size="62" :width="6" color="#2196F3")
         Company
 
 </template>
