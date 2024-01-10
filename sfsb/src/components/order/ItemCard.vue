@@ -18,6 +18,7 @@
                     ? 'Добавить позицию'
                     : item.technology.drawingNumber + ' ' + item.technology.drawingName
             }}
+            <span>{{ props.index }}</span>
             <span v-if="Object.keys(item.technology).length !== 1"
                class="ml-auto">{{ item.quantity + ' шт.' }}</span>
             <v-btn v-if="Object.keys(item.technology).length !== 1"
@@ -82,7 +83,7 @@
 </template>
 
 <script setup lang="ts">
-import {computed, onMounted, reactive, ref, Ref, toRefs, watch} from "vue";
+import {computed, onMounted, reactive, ref, Ref, toRefs, watch, toRaw} from "vue";
 import {useValidationRules} from "@/mixins/FieldValidationRules";
 
 interface Props{
@@ -95,18 +96,16 @@ const props = defineProps<Props>()
 const form: Ref<HTMLFormElement | null> = ref(null);
 const valid = ref(false);
 const {rules} = useValidationRules();
-const emit = defineEmits();
+const emit = defineEmits(["save","remove","hide","setActive"]);
 // const item = ref(JSON.parse(JSON.stringify(props.item)));
-let item = reactive(props.item)
+const emptyItem =()=> ({ technology: { outsourcedCosts: { amount: 0, currency: 'RUB' } }, customerMaterial:false } as Item)
 
-// watch(() => props.item, (newValue) => {
-//     item.value = JSON.parse(JSON.stringify(newValue));
-// });
+let item = props.item ? reactive(props.item) : reactive(emptyItem())
 
 const save = async () => {
     if (form.value?.validate()) {
         // item.technology.computed = false;
-        emit("save", item);
+        emit("save", {...toRaw(item)});
         hide();
         // item = reactive({ } as Item)
     }
@@ -116,8 +115,8 @@ const remove = async () => emit("remove");
 
 const hide = () => {
     // item.value = JSON.parse(JSON.stringify(props.item));
-    item = reactive(props.item)
     emit("hide");
+    item = props.item ? reactive(props.item) : reactive(emptyItem())
 };
 
 const setActive = () => emit("setActive", props.index);

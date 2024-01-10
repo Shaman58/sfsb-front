@@ -16,10 +16,11 @@ v-dialog(v-model="props.visible" width="800")
                             v-select(v-if="customers" :items="customers" :item-title="'companyName'" return-object v-model="order.customer" :rules="[rules.required]" @update:modelValue="order.contact = null" label="Заказчик")
 
                         v-row(v-if="order.id")
-                            v-col(cols="12" v-for="item in order.items" :key="complexId(item)")
+                            //v-col(cols="12" v-for="item in order.items" :key="complexId(item)")
                                 item-card(:item="item" :active="active" :index="complexId(item)" @save="replaceItem($event)" @hide="active = -1" @setActive="setActive($event)" @remove="deleteItem(complexId(item))" :class="getBackgroundColorClass(item)")
-                            v-col(cols="12")
-                                item-card(:item="emptyItem" :active="active" :index="'new'" @save="addItem($event)" @hide="active = -1" @setActive="setActive($event)")
+                            //v-col(cols="12")
+                                item-card(:item="null" :active="active" :index="'new'" @save="addItem($event)" @hide="active = -1" @setActive="setActive($event)")
+                            order-items(:order="order")
 
                         v-col(cols="12")
                             v-textarea(label="Название" v-model="order.description" :rules="[rules.required]")
@@ -52,6 +53,7 @@ import OrderFiles from "./OrderFiles.vue";
 import AlertDialog from "@/components/common/AlertDialog.vue";
 import { storeToRefs } from "pinia";
 import { useCurrentUserStore } from "@/pinia-store/currentUser";
+import OrderItems from "@/components/order/OrderItems.vue";
 
 
 interface Props {
@@ -120,7 +122,7 @@ const save = async (data: Order) => {
 const addItem = (data: Partial<Item>) => {
     lastIndex++
     data.uid = lastIndex
-    order.items.push(data);
+    order.items.push({...data} as Item);
 };
 
 const replaceItem = async (item: Item) => {
