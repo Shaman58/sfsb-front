@@ -168,6 +168,7 @@ declare interface Item {
   created: string;
   customerMaterial: boolean;
   id: number;
+  uid?: number|string
   price: ItemPrice;
   quantity: number;
   technology: Technology;

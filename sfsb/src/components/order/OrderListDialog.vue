@@ -1,11 +1,11 @@
 <template>
-    <v-dialog v-model="props.visible" width="800" persistent>
+    <v-dialog v-model="props.visible" width="800">
         <v-card>
             <v-card-title>
                 <span class="text-h5">Заявки</span>
             </v-card-title>
             <v-list density="compact">
-                <v-list-item v-for="(item, index) in props.orders" :key="index" :value="item"
+                <v-list-item v-for="(item, index) in props.orders" :key="item.id" :value="item"
                     :title="`№${item.applicationNumber} ${item.customer.companyName}`" @click.stop="active = item.id">
 
                     <order-create-dialog v-if="active === item.id" :visible="active === item.id" :order="item"

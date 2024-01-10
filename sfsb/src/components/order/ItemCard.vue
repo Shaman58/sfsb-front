@@ -8,18 +8,18 @@
                         :color="item.technology.computed ? 'green':'grey'">mdi-alarm-panel-outline
                 </v-icon>
                 <v-icon v-if="Object.keys(item.technology).length !== 1"
-                        :color="!!item.technology.workpiece?.material?.price?.amount ? 'green':'grey' ">
+                        :color="!!item.customerMaterial || !!item.technology.assembly || !!item.technology.workpiece?.material?.price?.amount ? 'green':'grey' ">
                     mdi-flask-empty
                 </v-icon>
+
             </div>
             {{
                 Object.keys(item.technology).length === 1
                     ? 'Добавить позицию'
                     : item.technology.drawingNumber + ' ' + item.technology.drawingName
             }}
-
-            <a v-if="Object.keys(item.technology).length !== 1"
-               class="ml-auto">{{ item.quantity + ' шт.' }}</a>
+            <span v-if="Object.keys(item.technology).length !== 1"
+               class="ml-auto">{{ item.quantity + ' шт.' }}</span>
             <v-btn v-if="Object.keys(item.technology).length !== 1"
                    icon @click.stop="remove"
                    color="orange-darken-1" variant="text">
@@ -68,7 +68,7 @@
                     <v-btn :disabled="!valid"
                            @click="save"
                            color="orange-darken-1" variant="text">
-                        {{  item.id ? 'Изменить' : 'Добавить' }}
+                        {{  item.id || item.uid ? 'Изменить' : 'Добавить' }}
                     </v-btn>
                     <v-btn @click="hide"
                            color="orange-darken-1" variant="text">
@@ -82,7 +82,7 @@
 </template>
 
 <script setup lang="ts">
-import {computed, reactive, ref, Ref, toRefs, watch} from "vue";
+import {computed, onMounted, reactive, ref, Ref, toRefs, watch} from "vue";
 import {useValidationRules} from "@/mixins/FieldValidationRules";
 
 interface Props{
@@ -97,18 +97,18 @@ const valid = ref(false);
 const {rules} = useValidationRules();
 const emit = defineEmits();
 // const item = ref(JSON.parse(JSON.stringify(props.item)));
-const item = reactive(props.item)
+let item = reactive(props.item)
 
-watch([item.customerMaterial], console.log)
 // watch(() => props.item, (newValue) => {
 //     item.value = JSON.parse(JSON.stringify(newValue));
 // });
 
 const save = async () => {
     if (form.value?.validate()) {
-        item.technology.computed = false;
+        // item.technology.computed = false;
         emit("save", item);
         hide();
+        // item = reactive({ } as Item)
     }
 }
 
@@ -116,6 +116,7 @@ const remove = async () => emit("remove");
 
 const hide = () => {
     // item.value = JSON.parse(JSON.stringify(props.item));
+    item = reactive(props.item)
     emit("hide");
 };
 
