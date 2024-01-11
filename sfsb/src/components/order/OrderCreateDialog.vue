@@ -94,7 +94,7 @@ const isSameUser = () => {
 }
 
 const isAllComputed = computed(()=>order.items.every((e: Item) => e.technology.computed))
-const isAllWorkpieced = computed(()=>order.items.every((e: Item) => e.technology.workpiece.material.price.amount))
+const isAllWorkpieced = computed(()=>order.items.every((e: Item) => e.customerMaterial || e.technology.assembly || e.technology.workpiece.material.price.amount))
 const isOrderComputed = computed(()=>isAllComputed.value && isAllWorkpieced.value)
 
 const save = async (data: Order) => {
