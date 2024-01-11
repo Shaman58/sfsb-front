@@ -16,11 +16,7 @@ v-dialog(v-model="props.visible" width="800")
                             v-select(v-if="customers" :items="customers" :item-title="'companyName'" return-object v-model="order.customer" :rules="[rules.required]" @update:modelValue="order.contact = null" label="Заказчик")
 
                         v-row(v-if="order.id")
-                            //v-col(cols="12" v-for="item in order.items" :key="complexId(item)")
-                                item-card(:item="item" :active="active" :index="complexId(item)" @save="replaceItem($event)" @hide="active = -1" @setActive="setActive($event)" @remove="deleteItem(complexId(item))" :class="getBackgroundColorClass(item)")
-                            //v-col(cols="12")
-                                item-card(:item="null" :active="active" :index="'new'" @save="addItem($event)" @hide="active = -1" @setActive="setActive($event)")
-                            order-items(:order="order")
+                           order-items(v-model:items="order.items")
 
                         v-col(cols="12")
                             v-textarea(label="Название" v-model="order.description" :rules="[rules.required]")
@@ -83,6 +79,8 @@ const emptyItem = { technology: { outsourcedCosts: { amount: 0, currency: 'RUB' 
 
 // const order = ref(JSON.parse(JSON.stringify(props.order)));
 let order = reactive(props.order);
+
+watch([order],console.log)
 const complexId = (item: Item) => item.id+""+item.uid
 
 const hide = () => {
@@ -160,6 +158,9 @@ onMounted(()=>{
     lastIndex = order.items.reduce((acc,e)=>e.id > acc ? e.id : acc,0)
 })
 
+const change=(changedOrder: Order)=>{
+    // order = reactive(changedOrder)
+}
 </script>
 
 <style lang="sass">

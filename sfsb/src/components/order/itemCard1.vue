@@ -2,13 +2,13 @@
 .item-card(:data-type="type")
     .item-card__info(v-if="!editing")
         .item-card__indicators
-            v-icon(v-if="type!=='new'") mdi-alarm-panel-outline
+            v-icon(v-if="type!=='new'" :color="colorComputed") mdi-alarm-panel-outline
             v-icon(v-if="type!=='new'") mdi-flask-empty
         .item-card__name(@click="editing=true") {{type==="new" ? "добавить новый" : itemLocal.technology.drawingNumber}} {{type==="new" ? "" :itemLocal.technology.drawingName}}
         .item-card__amount(v-if="type!=='new'" @click="editing=true") {{itemLocal.quantity}} шт.
         .item-card__controls
-            v-icon(@click="editing=true"  v-if="type!=='new'" icon="mdi-pencil")
-            v-icon(@click="emit('remove')" v-if="type!=='new'" icon="mdi-close")
+            v-icon(@click="editing=true"  v-if="type!=='new'" icon="mdi-pencil" color="blue")
+            v-icon(@click="emit('remove')" v-if="type!=='new'" icon="mdi-close" color="red")
     .item-card__details(v-if="editing")
         .item-card__details-date
             v-text-field.item-card__schema-number(label="Номер чертежа:" v-model="itemLocal.technology.drawingNumber")
@@ -21,28 +21,29 @@
 </template>
 
 <script setup lang="ts">
-import {reactive, ref, toRaw, watch} from "vue";
+import {ref, toRaw, watch, watchEffect} from "vue";
 
 const {item, type} = defineProps<{item: Item, type?: "new"}>()
 const emit = defineEmits(["save", "remove"])
 
 const editing = ref(false)
-let itemLocal = reactive(item)
+const itemLocal = ref(item)
 
 const save=()=>{
-    emit('save', {...toRaw(itemLocal)})
+    emit('save', {...itemLocal.value})
     editing.value=false
 }
 
 const newItem = ()=> {
-    // lastId.value++
-    return ({ technology: { outsourcedCosts: { amount: 0, currency: 'RUB' }}, customerMaterial:false } as Item)
+    return ({ technology: { outsourcedCosts: { amount: 0, currency: 'RUB' }}, customerMaterial:false, uid: Date.now() } as Item)
 }
 
 watch([editing],()=>{
     if(type!=="new") return
-    editing.value && (itemLocal = reactive(newItem()))
+    editing.value && (itemLocal.value = newItem())
 })
+
+watchEffect(()=>console.log(itemLocal.value))
 </script>
 
 <style scoped lang="sass">
@@ -60,7 +61,18 @@ watch([editing],()=>{
 
     &__info
         display: grid
-        grid-template-columns: 1fr 3fr 1fr 1fr
+        grid-template-columns: 1fr 3fr 2fr 1fr
+
+    &__name, &__amount
+        cursor: pointer
+
+    &__amount
+        display: flex
+        justify-content: center
+
+    &__controls
+        display: flex
+        justify-content: flex-end
 
     &__details-date
         display: flex

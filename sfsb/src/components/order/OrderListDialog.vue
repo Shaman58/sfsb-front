@@ -9,7 +9,7 @@
                     :title="`№${item.applicationNumber} ${item.customer.companyName}`" @click.stop="active = item.id">
 
                     <order-create-dialog v-if="active === item.id" :visible="active === item.id" :order="item"
-                        :customers="props.customers" @hide="active = -1" @save="save($event)" />
+                        :customers="props.customers" @hide="active = -1" @save="save" />
 
                 </v-list-item>
                 <v-list-item title="...">
@@ -86,6 +86,8 @@ const remove = (data) => emit("remove", data);
 
 const hide = () => emit("hide");
 
-const save = (data) => emit("save", data);
+const save = (data) => {
+    emit("save", data)
+};
 
 </script>
