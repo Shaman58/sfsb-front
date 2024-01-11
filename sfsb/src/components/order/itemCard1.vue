@@ -1,9 +1,9 @@
 <template lang="pug">
-.item-card(:data-type="type")
+.item-card(:data-type="type" :data-calculated="isComputed && isMaterial")
     .item-card__info(v-if="!editing")
         .item-card__indicators
-            v-icon(v-if="type!=='new'" :color="colorComputed") mdi-alarm-panel-outline
-            v-icon(v-if="type!=='new'") mdi-flask-empty
+            v-icon(v-if="type!=='new'" :color="isComputed?'green':'grey'") mdi-alarm-panel-outline
+            v-icon(v-if="type!=='new'" :color="isMaterial?'green':'grey'") mdi-flask-empty
         .item-card__name(@click="editing=true") {{type==="new" ? "добавить новый" : itemLocal.technology.drawingNumber}} {{type==="new" ? "" :itemLocal.technology.drawingName}}
         .item-card__amount(v-if="type!=='new'" @click="editing=true") {{itemLocal.quantity}} шт.
         .item-card__controls
@@ -11,9 +11,9 @@
             v-icon(@click="emit('remove')" v-if="type!=='new'" icon="mdi-close" color="red")
     .item-card__details(v-if="editing")
         .item-card__details-date
-            v-text-field.item-card__schema-number(label="Номер чертежа:" v-model="itemLocal.technology.drawingNumber")
-            v-text-field.item-card__schema-name(label="Название чертежа:" v-model="itemLocal.technology.drawingName")
-            v-text-field.item-card__schema-amount(label="Количество:" v-model="itemLocal.quantity", type="number" )
+            v-text-field.item-card__schema-number(label="Номер чертежа:" v-model="itemLocal.technology.drawingNumber" :disabled="!!itemLocal.technology?.id")
+            v-text-field.item-card__schema-name(label="Название чертежа:" v-model="itemLocal.technology.drawingName" :disabled="!!itemLocal.technology?.id")
+            v-text-field.item-card__schema-amount(label="Количество:" v-model="itemLocal.quantity" type="number")
         .item-card__details-controls
             v-switch.item-card__outsource-material(v-model="itemLocal.customerMaterial", :label="itemLocal.customerMaterial ? 'Материал заказчика' : 'Наш материал'")
             .item-card__change(@click="save") {{type==="new" ? 'Добавить' : 'Изменить' }}
@@ -21,13 +21,16 @@
 </template>
 
 <script setup lang="ts">
-import {ref, toRaw, watch, watchEffect} from "vue";
+import {computed, ref, watch, watchEffect} from "vue";
 
 const {item, type} = defineProps<{item: Item, type?: "new"}>()
 const emit = defineEmits(["save", "remove"])
 
 const editing = ref(false)
 const itemLocal = ref(item)
+
+const isComputed = computed(()=>!!itemLocal.value?.technology?.computed)
+const isMaterial = computed(()=>!!itemLocal.value?.customerMaterial || !!itemLocal.value?.technology?.assembly || !!itemLocal.value.technology?.workpiece?.material?.price?.amount)
 
 const save=()=>{
     emit('save', {...itemLocal.value})
@@ -53,7 +56,17 @@ watchEffect(()=>console.log(itemLocal.value))
     border-radius: 4px
     background: #eeea
 
+    &[data-calculated="true"]
+        background-color: #00e67630
+        border: 1px solid #00e676
+    &:not([data-calculated="true"])
+        border: 1px solid #c62828
+
     &[data-type="new"]
+        background-color: #eee
+        border: 1px solid transparent
+        text-transform: uppercase
+
         .item-card__info
             grid-template-columns: 1fr
             place-items: center
