@@ -9,15 +9,17 @@
         .item-card__controls
             v-icon(@click="editing=true"  v-if="type!=='new'" icon="mdi-pencil" color="blue")
             v-icon(@click="emit('remove')" v-if="type!=='new'" icon="mdi-close" color="red")
-    .item-card__details(v-if="editing")
-        .item-card__details-date
-            v-text-field.item-card__schema-number(label="Номер чертежа:" v-model="itemLocal.technology.drawingNumber" :disabled="!!itemLocal.technology?.id")
-            v-text-field.item-card__schema-name(label="Название чертежа:" v-model="itemLocal.technology.drawingName" :disabled="!!itemLocal.technology?.id")
-            v-text-field.item-card__schema-amount(label="Количество:" v-model="itemLocal.quantity" type="number")
-        .item-card__details-controls
-            v-switch.item-card__outsource-material(v-model="itemLocal.customerMaterial", :label="itemLocal.customerMaterial ? 'Материал заказчика' : 'Наш материал'")
-            .item-card__change(@click="save") {{type==="new" ? 'Добавить' : 'Изменить' }}
-            .item-card__close(@click="editing=false") Закрыть
+
+    transition.item-card__transition(name="fade")
+        .item-card__details(v-if="editing")
+            .item-card__details-date
+                v-text-field.item-card__schema-number(label="Номер чертежа:" v-model="itemLocal.technology.drawingNumber" :disabled="!!itemLocal.technology?.id")
+                v-text-field.item-card__schema-name(label="Название чертежа:" v-model="itemLocal.technology.drawingName" :disabled="!!itemLocal.technology?.id")
+                v-text-field.item-card__schema-amount(label="Количество:" v-model="itemLocal.quantity" type="number")
+            .item-card__details-controls
+                v-switch.item-card__outsource-material(v-model="itemLocal.customerMaterial", :label="itemLocal.customerMaterial ? 'Материал заказчика' : 'Наш материал'")
+                .item-card__change(@click="save") {{type==="new" ? 'Добавить' : 'Изменить' }}
+                .item-card__close(@click="editing=false") Закрыть
 </template>
 
 <script setup lang="ts">
@@ -103,4 +105,12 @@ watchEffect(()=>console.log(itemLocal.value))
 
         & > *
             cursor: pointer
+
+.fade-enter-active, .fade-leave-active
+    transition: opacity 0.5s ease, height 0.5s ease
+
+.fade-enter-from, .fade-leave-to
+    opacity: 0
+    height: 0
+
 </style>
