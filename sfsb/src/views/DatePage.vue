@@ -7,7 +7,7 @@
             <cutter-component />
             <special-component />
             <tooling-component />
-            <operation-component />
+
         </v-card>
     </v-container>
 </template>
