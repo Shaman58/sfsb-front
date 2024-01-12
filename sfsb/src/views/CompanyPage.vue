@@ -3,12 +3,13 @@ v-container.company__container
     Suspense
         template(v-slot:fallback)
             v-progress-circular(indeterminate :size="62" :width="6" color="#2F477E")
-        Company
+        template(#default)
+            companies-component
 
 </template>
 
 <script setup lang="ts">
-import Company from "@/components/company/Company"
+import CompaniesComponent from "@/components/company/Companies.vue"
 </script>
 
 <style lang="sass" scoped>

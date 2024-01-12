@@ -200,6 +200,14 @@ declare interface Person {
     roles: Roles;
 }
 
+declare interface Logo{
+    id: number,
+    created: string,
+    updated: string,
+    filename: string,
+    link: string,
+    user: null | Person
+}
 declare interface Company {
     id:number,
     created:string|null,
@@ -215,6 +223,7 @@ declare interface Company {
     correspondentAccount:number,
     phoneNumber:string,
     email:string
+    logo: null | Logo
 }
 
 
