@@ -1,113 +1,33 @@
 <template lang="pug">
 .company
     .company__header
-        .d-flex.justify-center.align-center.ga-2
-            h1 {{currentCompany.companyName||"НОВАЯ КОМПАНИЯ"}}
-            img.company__logo(v-if="currentCompany.logo" alt="logo" :src="currentCompany.logo.link")
+        h1 {{currentCompany.companyName||"НОВАЯ КОМПАНИЯ"}}
+        .company__logo-component
+            img.company__logo(v-if="currentCompany.logo.link" alt="logo" :src="picture")
+            input.company__file-logo(type="file" hidden @change="changeLogo")
     v-form.company__form(ref="form" v-model="valid" @submit="save")
         v-card.company__cards
             v-card.company__card(title="Общие данные" prepend-icon="mdi-home"  )
                 v-text-field(label="Название организации" variant="underlined" v-model="currentCompany.companyName")
                 v-text-field(label="Адрес" variant="underlined" v-model="currentCompany.address")
                 .d-flex
-                    v-text-field(label="ИНН" variant="underlined" v-model="currentCompany.inn")
-                    v-text-field(label="КПП" variant="underlined" v-model="currentCompany.kpp")
-                    v-text-field(label="ОГРН" variant="underlined" v-model="currentCompany.ogrn")
+                    v-text-field(label="ИНН" variant="underlined" v-model="currentCompany.inn" :rules="[rules.innValidation]")
+                    v-text-field(label="КПП" variant="underlined" v-model="currentCompany.kpp" :rules="[rules.bikkppValidation]")
+                    v-text-field(label="ОГРН" variant="underlined" v-model="currentCompany.ogrn" :rules="[rules.ogrnValidation]")
             v-card.company__card(title="Банковские реквизиты" prepend-icon="mdi-bank" )
-                v-text-field(label="Банк" variant="underlined" v-model="currentCompany.bank")
+                v-text-field(label="Банк" variant="underlined" v-model="currentCompany.bank" :rules="[rules.required, rules.counter]")
                 .d-flex
-                    v-text-field(label="Расчетный счет" variant="underlined" v-model="currentCompany.paymentAccount")
-                    v-text-field(label="БИК" variant="underlined" v-model="currentCompany.bik")
-                    v-text-field(label="Корреспонденский счет" variant="underlined" v-model="currentCompany.correspondentAccount")
+                    v-text-field(label="Расчетный счет" variant="underlined" v-model="currentCompany.paymentAccount" :rules="[rules.accountValidation]")
+                    v-text-field(label="БИК" variant="underlined" v-model="currentCompany.bik" :rules="[rules.bikkppValidation]")
+                    v-text-field(label="Корреспонденский счет" variant="underlined" v-model="currentCompany.correspondentAccount" :rules="[rules.accountValidation]")
             v-card.company__card(title="Контактные данные" prepend-icon="mdi-mail" )
                 .d-flex
-                    v-text-field(label="email" variant="underlined" v-model="currentCompany.email")
-                    v-text-field(label="телефон" variant="underlined" v-model="currentCompany.phoneNumber")
+                    v-text-field(label="email" variant="underlined" v-model="currentCompany.email" :rules="[rules.required, rules.emailValidation]")
+                    v-text-field(label="телефон" variant="underlined" v-model="currentCompany.phoneNumber" :rules="[rules.required, rules.phoneValidation]")
     .company__footer
         v-btn(@click="()=>route.params.id==='new'?add():save()" variant="plain" ) Сохранить
         v-btn(@click="hide" variant="plain" ) На главную
-    //v-form.company__form(ref="form" v-model="valid" v-on:submit.prevent="save(currentCompany)" style="overflow-y: auto;")
-        v-card(class="mx-auto my-12")
-            v-card-title
-                span.text-h5 Карточка организации
-            v-card-text
-                v-container
-                    v-row
-                        v-col(cols="12")
-                            v-text-field(label="Название организации*" v-model="currentCompany.companyName" :rules="[rules.required, rules.counter]" counter maxlength="200")
-                    v-row
-                        v-col(cols="12")
-                            v-text-field(label="Адрес*" v-model="company.address" :rules="[rules.required, rules.counter]" counter maxlength="200")
 
-    <!--                    <v-row>-->
-
-    <!--                        <v-col cols="12" sm="6" md="6">-->
-    <!--                            <v-text-field label="Email*" v-model="company.email"-->
-    <!--                                :rules="[rules.required, rules.emailValidation]" placeholder="example@exe.com">-->
-    <!--                            </v-text-field>-->
-    <!--                        </v-col>-->
-    <!--                        <v-col cols="12" sm="6" md="6">-->
-    <!--                            <v-text-field label="Телефон*" v-model="company.phoneNumber"-->
-    <!--                                :rules="[rules.required, rules.phoneValidation]" placeholder="+7 (4321) 23-34-45">-->
-    <!--                            </v-text-field>-->
-    <!--                        </v-col>-->
-
-    <!--                    </v-row>-->
-    <!--                    <v-row>-->
-
-    <!--                        <v-col cols="12" sm="6" md="4">-->
-    <!--                            <v-text-field label="ИНН*" v-model="company.inn" :rules="[rules.innValidation]" counter>-->
-    <!--                            </v-text-field>-->
-    <!--                        </v-col>-->
-    <!--                        <v-col cols="12" sm="6" md="4">-->
-    <!--                            <v-text-field label="КПП*" v-model="company.kpp" :rules="[rules.bikkppValidation]" counter>-->
-    <!--                            </v-text-field>-->
-    <!--                        </v-col>-->
-    <!--                        <v-col cols="12" sm="6" md="4">-->
-    <!--                            <v-text-field label="ОКПО*" v-model="company.ogrn" :rules="[rules.ogrnValidation]" counter>-->
-    <!--                            </v-text-field>-->
-    <!--                        </v-col>-->
-
-    <!--                    </v-row>-->
-    <!--                    <v-row>-->
-
-    <!--                        <v-col cols="12" sm="6" md="4">-->
-    <!--                            <v-text-field label="Банк*" v-model="company.bank" :rules="[rules.required, rules.counter]"-->
-    <!--                                placeholder="ОАО ВТБ" counter maxlength="200">-->
-    <!--                            </v-text-field>-->
-    <!--                        </v-col>-->
-    <!--                        <v-col cols="12" sm="6" md="4">-->
-    <!--                            <v-text-field label="Расчетный счет*" v-model="company.paymentAccount"-->
-    <!--                                :rules="[rules.accountValidation]" counter>-->
-    <!--                            </v-text-field>-->
-    <!--                        </v-col>-->
-    <!--                        <v-col cols="12" sm="6" md="4">-->
-    <!--                            <v-text-field label="БИК*" v-model="company.bik" :rules="[rules.bikkppValidation]" counter>-->
-    <!--                            </v-text-field>-->
-    <!--                        </v-col>-->
-
-    <!--                    </v-row>-->
-    <!--                    <v-row>-->
-
-    <!--                        <v-col cols="12" sm="6" md="4">-->
-    <!--                            <v-text-field label="Корсчет*" v-model="company.correspondentAccount"-->
-    <!--                                :rules="[rules.accountValidation]" counter>-->
-    <!--                            </v-text-field>-->
-    <!--                        </v-col>-->
-    <!--                    </v-row>-->
-    <!--                </v-container>-->
-    <!--            </v-card-text>-->
-    <!--            <v-card-actions>-->
-    <!--                <v-spacer />-->
-    <!--                <v-btn color="orange-darken-1" variant="text" @click="hide">-->
-    <!--                    Закрыть-->
-    <!--                </v-btn>-->
-    <!--                <v-btn color="orange-darken-1" variant="text" type="submit" :disabled="!valid">-->
-    <!--                    Сохранить-->
-    <!--                </v-btn>-->
-    <!--            </v-card-actions>-->
-    <!--        </v-card>-->
-    <!--    </v-form>-->
 </template>
 
 <script setup lang="ts">
@@ -116,7 +36,9 @@ import {ref} from "vue";
 import {useRouter, useRoute} from "vue-router"
 import {useCompaniesStore} from "@/pinia-store/companies";
 
-const {getCompanyById, saveCompany, addCompany} = useCompaniesStore()
+const {getCompanyById, saveCompany, addCompany, changeCompanyLogo } = useCompaniesStore()
+
+const {rules} = useValidationRules()
 
 const form: Ref<HTMLFormElement | null> = ref(null);
 const valid = ref(false);
@@ -143,8 +65,22 @@ const initialCompany: Company = {
 }
 const currentCompany = ref(initialCompany)
 const result = await getCompanyById(+route.params.id)
-currentCompany.value = {...result} as Company|| {} as Company
 
+currentCompany.value = {...result} as Company|| {} as Company
+const picture = ref(currentCompany.value.logo?.link)
+const changeLogo = (event: Event) => {
+    const target = event.target as HTMLInputElement
+    if(target.files && target.files[0] && target.files[0].size>1024 * 1024) return toast.error("Максимальный размер файла 1MB")
+
+    const file = new FileReader()
+    file.addEventListener("load", async (e: ProgressEvent<FileReader>) =>{
+        const fd = new FormData()
+        fd.append("file", target.files[0])
+        await changeCompanyLogo(fd, currentCompany.value.id)
+        picture.value = e.target.result
+    })
+    target && target.files && file.readAsDataURL(target.files[0])
+}
 const hide = () => {
     router.push("/")
 };
@@ -159,8 +95,6 @@ const add = () => {
     }
 };
 
-
-//TODO: проверить валидацию
 </script>
 
 <style scoped lang="sass">
@@ -172,9 +106,30 @@ const add = () => {
     &__header
         width: 100%
         height: 100px
+        display: flex
+        align-items: center
+        justify-content: center
+        gap: 1rem
+    &__logo-component
+        min-height: 100px
+        height: 100%
+        min-width: 100px
+        border: 1px solid #7777
+        cursor: pointer
+        position: relative
     &__logo
+        inset: 0
+        width: 100%
         height: 100%
         object-fit: contain
+    &__file-logo
+        display: block
+        position: absolute
+        inset: 0
+        width: 100%
+        height: 100%
+        z-index: 2
+        opacity: 0
     &__form
         width: 100%
     &__cards

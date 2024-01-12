@@ -41,5 +41,12 @@
       "return { }",
       "});"
     ]
-  }
+  },
+  "console.log": {
+    "scope": "vue,javascript,typescript",
+    "prefix": "clg",
+    "body": [
+      "console.log($1)"
+    ]
+  },
 }

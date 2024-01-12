@@ -41,7 +41,8 @@ export const useCompaniesStore = defineStore("companies", () => {
             checkStatus(response)
             toast.info("Успешно сохранено!", {position: "top-right"});
         } catch (error) {
-            toast.error("Ошибка передачи данных компании " + error);
+            toast.error("Ошибка сохранения данных компании ");
+            toErrorMessage(error)
         }
     };
 
@@ -57,12 +58,30 @@ export const useCompaniesStore = defineStore("companies", () => {
         }
     };
 
+    const changeCompanyLogo = async (data: FormData, id: string | number) => {
+        try {
+            const url = `/file/company/${id}`
+            const response = await api.post(url, data, {
+                headers:{
+                    "Content-Type": "multipart/form-data"
+                }
+            });
+            checkStatus(response)
+            toast.info("Успешно сохранено!", {position: "top-right"});
+            await fetchCompaniesData()
+        } catch (error) {
+            toast.error("Ошибка сохранения картинки ");
+            toErrorMessage(error)
+        }
+    }
+
     return {
         companies,
         fetchCompaniesData,
         saveCompany,
         addCompany,
         getCompanyById,
-        getShortList
+        getShortList,
+        changeCompanyLogo
     };
 });
