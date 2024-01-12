@@ -1,9 +1,8 @@
 import {defineStore} from "pinia";
-import api from "@/api/instance";
+import api, {query} from "@/api/instance";
 import {useToast} from "vue-toast-notification";
 import {Ref, ref} from "vue";
 import checkStatus from "@/mixins/CheckStatus";
-import {AxiosError} from "axios";
 import toErrorMessage from "@/mixins/ToErrorMessage";
 
 const toast = useToast();
@@ -36,14 +35,7 @@ export const useCompaniesStore = defineStore("companies", () => {
     }
 
     const saveCompany = async (data: Company) => {
-        try {
-            const response = await api.put(`/company/manager/${data.id}`, data);
-            checkStatus(response)
-            toast.info("Успешно сохранено!", {position: "top-right"});
-        } catch (error) {
-            toast.error("Ошибка сохранения данных компании ");
-            toErrorMessage(error)
-        }
+        await query(async () => await api.put(`/company/manager/${data.id}`, data))
     };
 
 
@@ -62,7 +54,7 @@ export const useCompaniesStore = defineStore("companies", () => {
         try {
             const url = `/file/company/${id}`
             const response = await api.post(url, data, {
-                headers:{
+                headers: {
                     "Content-Type": "multipart/form-data"
                 }
             });

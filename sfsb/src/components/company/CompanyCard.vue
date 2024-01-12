@@ -3,7 +3,7 @@
     .company__header
         h1 {{currentCompany.companyName||"НОВАЯ КОМПАНИЯ"}}
         .company__logo-component
-            img.company__logo(v-if="currentCompany.logo.link" alt="logo" :src="picture")
+            img.company__logo(v-if="currentCompany?.logo?.link" alt="logo" :src="picture")
             input.company__file-logo(type="file" hidden @change="changeLogo")
     v-form.company__form(ref="form" v-model="valid" @submit="save")
         v-card.company__cards
