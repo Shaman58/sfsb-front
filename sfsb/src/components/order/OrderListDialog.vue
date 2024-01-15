@@ -6,24 +6,40 @@
             </v-card-title>
             <v-list density="compact">
                 <v-list-item v-for="(item, index) in props.orders" :key="item.id" :value="item"
-                    :title="`№${item.applicationNumber} ${item.customer.companyName}`" @click.stop="active = item.id">
+                             :title="`№${item.applicationNumber} ${item.customer.companyName}`"
+                             @click.stop="active = item.id">
 
-                    <order-create-dialog v-if="active === item.id" :visible="active === item.id" :order="item"
-                        :customers="props.customers" @hide="active = -1" @save="save" />
+                    <Suspense>
+                        <template #fallback>
+                            <v-progress-circular indeterminate :size="62" :width="6" color="#2F477E"/>
+                        </template>
+                        <template #default>
+                            <order-create-dialog v-if="active === item.id" :visible="active === item.id" :order="item"
+                                                 :customers="props.customers" @hide="active = -1" @save="save"/>
+                        </template>
+                    </Suspense>
 
                 </v-list-item>
                 <v-list-item title="...">
                     <template v-slot:append>
                         <v-btn color="orange-lighten-1" icon="mdi-plus" variant="text" @click.stop="showOrder"></v-btn>
                     </template>
+                    <Suspense>
+                        <template #fallback>
+                            <v-progress-circular indeterminate :size="62" :width="6" color="#2F477E"/>
+                        </template>
+                        <template #default>
 
-                    <order-create-dialog v-if="order" :visible="active === 'new'" :order="order" :customers="props.customers"
-                        @hide="hideOrder" @save="save($event)" />
+                            <order-create-dialog v-if="order" :visible="active === 'new'" :order="order"
+                                                 :customers="props.customers"
+                                                 @hide="hideOrder" @save="save($event)"/>
+                        </template>
+                    </Suspense>
 
                 </v-list-item>
             </v-list>
             <v-card-actions>
-                <v-spacer />
+                <v-spacer/>
                 <v-btn color="orange-darken-1" variant="text" @click="hide">Закрыть
                 </v-btn>
             </v-card-actions>
@@ -33,7 +49,7 @@
 
 <script setup>
 
-import { ref, watch } from "vue";
+import {ref, watch} from "vue";
 import OrderCreateDialog from "@/components/order/OrderCreateDialog.vue";
 
 const emit = defineEmits();
@@ -69,7 +85,7 @@ const calculateAppNumber = () => {
     const appNumber = props.orders.reduce((max, item) => {
         return item.applicationNumber > max ? item.applicationNumber : max
     }, 0);
-    order.value = { applicationNumber: appNumber + 1, items: [], contact: null };
+    order.value = {applicationNumber: appNumber + 1, items: [], contact: null};
 };
 
 const showOrder = () => {
