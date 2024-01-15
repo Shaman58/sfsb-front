@@ -1,7 +1,7 @@
 <template lang="pug">
     .mobile-menu(v-if="show" @keyup.esc="close")
 
-        .mobile-menu__nav(@keyup.esc="close" :data-active="showNav")
+        .mobile-menu__nav(@keyup.esc="close" :data-active="showNav" )
             .mobile-menu__header
                 v-icon.mobile-menu__close(@click="close" icon="mdi-close" color="red")
                 .mobile-menu__user(@click="userShow=!userShow")
@@ -27,21 +27,29 @@ interface Props {
 const {userName, picture} = defineProps<Props>()
 const emit = defineEmits(["exit"])
 const show = defineModel({type: Boolean})
-const showNav = ref(true)
+const showNav = ref(false)
 const userShow = ref(false)
 const version = import.meta.env.VITE_APP_VERSION;
 
-watch([show], () => {
-    setTimeout(() => {
-        showNav.value = show.value || false
-    })
+const lag = 500
+const lagcss = lag + 'ms'
+watch([show], ([newVal]) => {
+    newVal && setTimeout(() => showNav.value = true, lag)
 })
+watch([showNav], console.info)
 const close = () => {
-    show.value = false
+    // debugger
     userShow.value = false
+    showNav.value = false
+    setTimeout(() => {
+        show.value = false
+    }, 2 * lag)
 }
 const exit = () => {
     emit("exit")
+}
+const trans = (e: Event) => {
+    console.log("transition", e)
 }
 
 </script>
@@ -69,7 +77,7 @@ const exit = () => {
         background: #fff
         gap: 0.5rem
         translate: 100% 0
-        transition: translate 0.5s 0.3s
+        transition: translate 0.5s v-bind('lagcss')
 
     &__nav[data-active="true"]
         translate: 0 0
