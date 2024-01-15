@@ -8,7 +8,9 @@
                     img.mobile-menu__avatar(:src="picture" alt="picture")
                     span {{userName}}
                 v-card-item.mobile-menu__user-close(v-if="userShow" )
-                    span(@click="exit") ВЫХОД
+                    .mobile-menu__user-close-inner
+                        span(@click="exit") ВЫХОД
+                        v-icon(icon="mdi-exit-to-app" class="ml-2" color="red")
             .mobile-menu__body
                 .mobile-menu__body-wrapper
                     a.mobile-menu__link(v-for="i in CONSTS.MAINMENU" :href="i.path") {{i.label}}
@@ -26,7 +28,7 @@ interface Props {
 
 const {userName, picture} = defineProps<Props>()
 const emit = defineEmits(["exit"])
-const show = defineModel({type: Boolean})
+const show = defineModel<boolean>()
 const showNav = ref(false)
 const userShow = ref(false)
 const version = import.meta.env.VITE_APP_VERSION;
@@ -38,7 +40,6 @@ watch([show], ([newVal]) => {
 })
 watch([showNav], console.info)
 const close = () => {
-    // debugger
     userShow.value = false
     showNav.value = false
     setTimeout(() => {
@@ -47,9 +48,6 @@ const close = () => {
 }
 const exit = () => {
     emit("exit")
-}
-const trans = (e: Event) => {
-    console.log("transition", e)
 }
 
 </script>
@@ -117,9 +115,11 @@ const trans = (e: Event) => {
 
     &__user-close
         position: absolute
+        width: max-content
         display: grid
         place-items: center
-        padding: 0.5rem
+        padding: 0 0.5rem 0.5rem
+        margin-top: -0.5rem
         z-index: 2
         top: 100%
         left: 50%
@@ -127,6 +127,10 @@ const trans = (e: Event) => {
 
         & span
             color: red
+
+    &__user-close-inner
+        display: flex
+        gap: .5rem
 
     &__avatar
         width: 30px

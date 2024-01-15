@@ -9,7 +9,7 @@
             v-toolbar-items.ml-5(style="overflow-x: auto;" v-if="width>=1024")
                 v-btn(:color="'white'" v-for="navitem in CONSTS.MAINMENU" :key="navitem.path" :to="navitem.path" rounded="xs" tonal :hidden="navitem.role && navitem.role.length && !user?.roles.some(e => navitem.role?.includes(e))") {{ navitem.label }}
 
-                v-menu(open-on-hover)
+                v-menu(open-on-hover="")
                     template(#activator="{ props }")
                         v-btn(color="white" v-bind="props")
                             .navbar__user-data
@@ -22,6 +22,7 @@
                             v-icon(icon="mdi-exit-to-app" class="ml-2" color="red")
             v-btn(:color="'white'" v-if="width < 1024" @click="showMobileMenu=true")
                 v-icon(icon="mdi-menu")
+
     mobile-menu(v-model="showMobileMenu" :user-name="name" :picture="picture || '/images/user-profile.png'" @exit="logout")
 </template>
 
