@@ -20,7 +20,8 @@
                         v-list-item(@click="logout" class="d-flex justify-center align-center navbar-exit")
                             span(color="red") ВЫХОД
                             v-icon(icon="mdi-exit-to-app" class="ml-2" color="red")
-            v-btn(:color="'white'" v-if="width < 1024" @click="showMobileMenu=true") Бургер
+            v-btn(:color="'white'" v-if="width < 1024" @click="showMobileMenu=true")
+                v-icon(icon="mdi-menu")
     mobile-menu(v-model="showMobileMenu" :user-name="name" :picture="picture || '/images/user-profile.png'" @exit="logout")
 </template>
 
