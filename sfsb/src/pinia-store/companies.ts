@@ -51,20 +51,27 @@ export const useCompaniesStore = defineStore("companies", () => {
     };
 
     const changeCompanyLogo = async (data: FormData, id: string | number) => {
-        try {
-            const url = `/file/company/${id}`
-            const response = await api.post(url, data, {
-                headers: {
-                    "Content-Type": "multipart/form-data"
-                }
-            });
-            checkStatus(response)
-            toast.info("Успешно сохранено!", {position: "top-right"});
-            await fetchCompaniesData()
-        } catch (error) {
-            toast.error("Ошибка сохранения картинки ");
-            toErrorMessage(error)
-        }
+        // try {
+        //     const url = `/file/company/${id}`
+        //     const response = await api.post(url, data, {
+        //         headers: {
+        //             "Content-Type": "multipart/form-data"
+        //         }
+        //     });
+        //     checkStatus(response)
+        //     toast.info("Успешно сохранено!", {position: "top-right"});
+        //     await fetchCompaniesData()
+        // } catch (error) {
+        //     toast.error("Ошибка сохранения картинки ");
+        //     toErrorMessage(error)
+        // }
+        const url = `/file/company/${id}`
+        await query(async () => await api.post(url, data, {
+            headers: {
+                "Content-Type": "multipart/form-data"
+            }
+        }))
+        await fetchCompaniesData()
     }
 
     return {
