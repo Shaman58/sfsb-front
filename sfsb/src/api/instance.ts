@@ -42,11 +42,12 @@ interface ErrorMessages {
     failure: string
 }
 
-export const query = async (cb: () => Promise<AxiosResponse<any, any>>, options?: Partial<ErrorMessages>) => {
+export const query: T = async (cb: () => Promise<AxiosResponse<T, any>>, options?: Partial<ErrorMessages>) => {
     try {
         const response = await cb()
         checkStatus(response)
         toast.info(options && options.success || "Успешно выполнено!", {position: "top-right"});
+        return response.data
     } catch (error) {
         toast.error(options && options.failure || "Ошибка выполнения запроса ");
         toErrorMessage(error)

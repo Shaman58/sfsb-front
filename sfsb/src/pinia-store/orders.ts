@@ -1,8 +1,9 @@
-import { defineStore } from "pinia";
-import api from "@/api/instance";
-import { useToast } from "vue-toast-notification";
-import { Ref, ref } from "vue";
+import {defineStore} from "pinia";
+import api, {query} from "@/api/instance";
+import {useToast} from "vue-toast-notification";
+import {Ref, ref} from "vue";
 import checkStatus from "@/mixins/CheckStatus";
+import {Axios} from "axios";
 
 const toast = useToast();
 
@@ -12,7 +13,7 @@ export const useOrdersStore = defineStore("orders", () => {
     const getOrders = async (search?: string) => {
         const url = search ? "/order/find" : "/order";
         try {
-            const response = await api.get(url, { params: { search } });
+            const response = await api.get(url, {params: {search}});
             checkStatus(response)
             orders.value = response.data;
         } catch (error) {
@@ -20,8 +21,16 @@ export const useOrdersStore = defineStore("orders", () => {
         }
     };
 
+    const saveOrder = async (order: Order): Promise<Order> => {
+        const url = order.id
+            ? `/order/${order.id}`
+            : '/order'
+        const method: keyof Axios = order.id ? 'put' : 'post';
+        return await query<Order>(async () => await api[method](url, order))
+    }
     return {
         orders,
         getOrders,
+        saveOrder
     };
 });

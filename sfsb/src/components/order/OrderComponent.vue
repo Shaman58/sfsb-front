@@ -4,22 +4,28 @@
         order-list-dialog(v-if="orders" :visible="visible" :orders="orders" :customers="customers" :active="active" @hide="visible=false" @save="save($event)" @remove="remove($event)")
 </template>
 
-<script setup>
+<script setup lang="ts">
 
 import OrderPreviewCard from "@/components/order/OrderPreviewCard.vue";
 import OrderListDialog from "@/components/order/OrderListDialog.vue";
 import {useStore} from "vuex";
 import {computed, ref} from "vue";
+import {storeToRefs} from "pinia";
+import {useOrdersStore} from "@/pinia-store/orders";
 
+
+const {orders} = storeToRefs(useOrdersStore())
+const {getOrders, saveOrder} = useOrdersStore()
+await getOrders()
+// const orders = computed(() => store.getters.getOrders);
 const store = useStore();
-
-const orders = computed(() => store.getters.getOrders);
 const customers = computed(() => store.getters.getCustomers);
 const visible = ref(false);
 const active = ref(-1);
 
-const save = async (data) => {
-    const response = await store.dispatch("saveOrder", data);
+const save = async (data: Order) => {
+    // const response = await store.dispatch("saveOrder", data);
+    const response = await saveOrder(data)
     active.value = response.id;
 };
 

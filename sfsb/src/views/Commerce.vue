@@ -9,7 +9,9 @@
                 <customer-component/>
             </v-col>
             <v-col cols="6">
-                <order-component/>
+                <suspended-component>
+                    <order-component/>
+                </suspended-component>
             </v-col>
         </v-row>
     </v-container>
@@ -22,6 +24,7 @@ import OrderComponent from "@/components/order/OrderComponent.vue";
 import {onMounted} from "vue";
 import {useStore} from "vuex";
 import OperationComponent from "@/components/operation/OperationComponent.vue";
+import SuspendedComponent from "@/components/common/SuspendedComponent.vue";
 
 const store = useStore();
 
