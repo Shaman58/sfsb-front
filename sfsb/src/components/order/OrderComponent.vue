@@ -15,7 +15,7 @@ import {useOrdersStore} from "@/pinia-store/orders";
 
 
 const {orders} = storeToRefs(useOrdersStore())
-const {getOrders, saveOrder} = useOrdersStore()
+const {getOrders, saveOrder, deleteOrder} = useOrdersStore()
 await getOrders()
 // const orders = computed(() => store.getters.getOrders);
 const store = useStore();
@@ -29,6 +29,6 @@ const save = async (data: Order) => {
     active.value = response.id;
 };
 
-const remove = (data) => store.dispatch("deleteOrder", data);
+const remove = async (data: Order) => await deleteOrder(data);
 
 </script>

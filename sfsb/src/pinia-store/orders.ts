@@ -28,9 +28,16 @@ export const useOrdersStore = defineStore("orders", () => {
         const method: keyof Axios = order.id ? 'put' : 'post';
         return await query<Order>(async () => await api[method](url, order))
     }
+
+    const deleteOrder = async (order: Order) => {
+        return await query<Order>(async () => await api.delete(`/order/${order.id}`))
+    }
     return {
         orders,
         getOrders,
-        saveOrder
+        saveOrder,
+        deleteOrder
     };
+
+
 });
