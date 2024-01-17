@@ -36,6 +36,16 @@ export const useOfferGenerator = () => {
             const newWindow = window.open("", "_blank");
             console.log(result.value)
             newWindow && newWindow.document.write(downloadButtonHtml);
+            newWindow && newWindow.document.write(`
+                <style>
+                    img{
+                        display: block;
+                        max-width: 150px;
+                        max-height: 32px;
+                        object-fit: contain;
+                    }
+                </style>
+            `)
             newWindow && newWindow.document.write(result.value);
             newWindow && newWindow.document.close();
         } catch (error: unknown) {
