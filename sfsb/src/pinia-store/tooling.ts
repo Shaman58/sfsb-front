@@ -12,7 +12,7 @@ export const useToolingStore = defineStore("tooling", () => {
 
     const fecthToolings = async () => {
         loading.value = true
-        toolings.value = await query(async () => await api.get("/tooling"))
+        toolings.value = await query(async () => await api.get("/tooling"), {success: ""})
         loading.value = false
     };
 

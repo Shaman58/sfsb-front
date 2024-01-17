@@ -37,19 +37,20 @@ api.interceptors.request.use((config) => {
 
 export default api;
 
-interface ErrorMessages {
-    success: string,
-    failure: string
+export interface ErrorMessages {
+    success?: string,
+    failure?: string
 }
 
-export const query: T = async (cb: () => Promise<AxiosResponse<T, any>>, options?: Partial<ErrorMessages>) => {
+export const query: T = async (cb: () => Promise<AxiosResponse<T, any>>, options: ErrorMessages) => {
+    const {success = "Успешно выполнено!", failure = "Ошибка выполнения запроса "} = options || {} as ErrorMessages
     try {
         const response = await cb()
         checkStatus(response)
-        toast.info(options && options.success || "Успешно выполнено!", {position: "top-right"});
+        success && toast.info(success, {position: "top-right"});
         return response.data
     } catch (error) {
-        toast.error(options && options.failure || "Ошибка выполнения запроса ");
+        failure && toast.error(failure);
         toErrorMessage(error)
     }
 }

@@ -4,7 +4,8 @@
 
         v-card.center-card
             material-component
-            cutter-component
+            suspended-component
+                cutter-component
             suspended-component
                 special-component
             suspended-component

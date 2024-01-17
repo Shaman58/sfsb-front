@@ -12,7 +12,7 @@ export const useSpecialStore = defineStore("specials", () => {
 
     const fetchSpecials = async () => {
         loading.value = true
-        specials.value = await query(async () => await api.get("/special"))
+        specials.value = await query(async () => await api.get("/special"), {success: ""})
         loading.value = false
     };
 
