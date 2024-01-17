@@ -5,7 +5,8 @@
         v-card.center-card
             material-component
             cutter-component
-            special-component
+            suspended-component
+                special-component
             suspended-component
                 tooling-component
 </template>

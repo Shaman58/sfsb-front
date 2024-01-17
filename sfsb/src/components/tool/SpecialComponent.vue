@@ -1,40 +1,23 @@
-<template>
-  <v-btn @click.stop="visible=true"
-         color="orange-darken-1" variant="text">
-    Редактировать базу специнструмента
-  </v-btn>
-  <tool-list v-if="specials && specials.length"
-             :visible="visible"
-             :tools="specials"
-             @hide="visible=false"
-             @save="save($event)"
-             @remove="remove($event)"
-  />
+<template lang="pug">
+    v-btn(@click.stop="visible=true" color="orange-darken-1" variant="text") Редактировать базу специнструмента
+    tool-list(v-if="specials && specials.length" :visible="visible" :tools="specials" :loading="loading" @hide="visible=false" @save="save" @remove="remove")
 
 </template>
 
-<script setup>
-import {useStore} from "vuex";
-import {computed, onMounted, ref} from "vue";
+<script setup lang="ts">
+import {ref} from "vue";
 import ToolList from "@/components/tool/ToolList.vue";
+import {storeToRefs} from "pinia";
+import {useSpecialStore} from "@/pinia-store/specials";
 
-onMounted(() => {
-  store.dispatch("fetchSpecials");
-});
+const {specials, loading} = storeToRefs(useSpecialStore())
+const {fetchSpecials, deleteSpecial, saveSpecial} = useSpecialStore()
 
-const visible = ref(false);
+await fetchSpecials()
 
-const store = useStore();
+const visible = ref(false)
+const save = async (data: Tool) => await saveSpecial(data)
+const remove = async (data: Tool) => await deleteSpecial(data)
 
-const specials = computed(() => store.getters.getSpecials);
-
-
-const save = (data) => {
-  store.dispatch("saveSpecial", data);
-};
-
-const remove = ((data) => {
-  store.dispatch("deleteSpecial", data);
-});
 
 </script>

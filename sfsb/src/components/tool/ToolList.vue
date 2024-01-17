@@ -13,7 +13,7 @@
                 v-list-item(:title="'...'")
                     template(#append)
                         v-btn(color="orange-lighten-1" icon="mdi-plus" variant="text" @click.stop="active = 'new'")
-                    tool-template-create(:tool="{} as Tool" :visible="active === 'new'" @hide="active = -1" @save="save($event)")
+                    tool-template-create(:tool="{}" :visible="active === 'new'" @hide="active = -1" @save="save($event)")
 
             v-card-actions
                 v-spacer
