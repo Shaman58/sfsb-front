@@ -9,7 +9,7 @@ export const useCompaniesStore = defineStore("companies", () => {
     const companies: Ref<Company[]> = ref([] as Company[]);
 
     const fetchCompaniesData = async () => {
-        await query(async () => await api.get("/company/manager"))
+        companies.value = await query(async () => await api.get("/company/manager"))
     };
 
     const getCompanyById = async (id: number) => {
@@ -17,7 +17,7 @@ export const useCompaniesStore = defineStore("companies", () => {
             if (!companies.value || !companies.value.length) await fetchCompaniesData()
             return companies.value.find(e => e.id === id);
         } catch (error) {
-            toast.error("Ошибка получения данных компаниb " + error);
+            toast.error("Ошибка получения данных компании " + error);
         }
     }
 
@@ -28,10 +28,12 @@ export const useCompaniesStore = defineStore("companies", () => {
 
     const saveCompany = async (data: Company) => {
         await query(async () => await api.put(`/company/manager/${data.id}`, data))
+        await fetchCompaniesData()
     };
 
     const addCompany = async (data: Company) => {
         await query(async () => await api.post("/company/manager", data))
+        await fetchCompaniesData()
     };
 
     const changeCompanyLogo = async (data: FormData, id: string | number) => {
