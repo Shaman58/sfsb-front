@@ -20,7 +20,7 @@ export const useCuttersStore = defineStore("cutters", () => {
         const url = cutter.id ? `/cutter/${cutter.id}` : "/cutter";
         const method: keyof Axios = cutter.id ? "put" : "post"
         loading.value = true
-        await query<Tool>(async () => await api[method](url, special))
+        await query<Tool>(async () => await api[method](url, cutter))
         await fetchCutters()
         loading.value = false
     };
