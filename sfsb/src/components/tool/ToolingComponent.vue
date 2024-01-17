@@ -6,6 +6,7 @@
     <tool-list v-if="toolings && toolings.length"
                :visible="visible"
                :tools="toolings"
+               :loading="loading"
                @hide="visible=false"
                @save="save($event)"
                @remove="remove($event)"
@@ -30,7 +31,7 @@ const store = useStore();
 
 // const toolings = computed(() => store.getters.getToolings);
 
-const {toolings} = storeToRefs(useToolingStore())
+const {toolings, loading} = storeToRefs(useToolingStore())
 const {saveToolings, fecthToolings, deleteTooling} = useToolingStore()
 
 await fecthToolings()
