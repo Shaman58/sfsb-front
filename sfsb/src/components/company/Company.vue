@@ -1,5 +1,6 @@
 <template>
-    <v-form class="company__form" ref="form" v-model="valid" v-on:submit.prevent="save(company)" style="overflow-y: auto;">
+    <v-form class="company__form" ref="form" v-model="valid" v-on:submit.prevent="save(company)"
+            style="overflow-y: auto;">
         <v-card class="mx-auto my-12">
             <v-card-title>
                 <span class="text-h5">Карточка организации</span>
@@ -9,14 +10,15 @@
                     <v-row>
                         <v-col cols="12">
                             <v-text-field label="Название организации*" v-model="company.companyName"
-                                :rules="[rules.required, rules.counter]" counter maxlength="200">
+                                          :rules="[rules.required, rules.counter]" counter maxlength="200">
                             </v-text-field>
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col cols="12">
-                            <v-text-field label="Адрес*" v-model="company.address" :rules="[rules.required, rules.counter]"
-                                placeholder="г. Заречный ул. Мира 12" counter maxlength="200">
+                            <v-text-field label="Адрес*" v-model="company.address"
+                                          :rules="[rules.required, rules.counter]"
+                                          placeholder="г. Заречный ул. Мира 12" counter maxlength="200">
                             </v-text-field>
                         </v-col>
 
@@ -25,12 +27,14 @@
 
                         <v-col cols="12" sm="6" md="6">
                             <v-text-field label="Email*" v-model="company.email"
-                                :rules="[rules.required, rules.emailValidation]" placeholder="example@exe.com">
+                                          :rules="[rules.required, rules.emailValidation]"
+                                          placeholder="example@exe.com">
                             </v-text-field>
                         </v-col>
                         <v-col cols="12" sm="6" md="6">
                             <v-text-field label="Телефон*" v-model="company.phoneNumber"
-                                :rules="[rules.required, rules.phoneValidation]" placeholder="+7 (4321) 23-34-45">
+                                          :rules="[rules.required, rules.phoneValidation]"
+                                          placeholder="+7 (4321) 23-34-45">
                             </v-text-field>
                         </v-col>
 
@@ -55,12 +59,12 @@
 
                         <v-col cols="12" sm="6" md="4">
                             <v-text-field label="Банк*" v-model="company.bank" :rules="[rules.required, rules.counter]"
-                                placeholder="ОАО ВТБ" counter maxlength="200">
+                                          placeholder="ОАО ВТБ" counter maxlength="200">
                             </v-text-field>
                         </v-col>
                         <v-col cols="12" sm="6" md="4">
                             <v-text-field label="Расчетный счет*" v-model="company.paymentAccount"
-                                :rules="[rules.accountValidation]" counter>
+                                          :rules="[rules.accountValidation]" counter>
                             </v-text-field>
                         </v-col>
                         <v-col cols="12" sm="6" md="4">
@@ -73,14 +77,14 @@
 
                         <v-col cols="12" sm="6" md="4">
                             <v-text-field label="Корсчет*" v-model="company.correspondentAccount"
-                                :rules="[rules.accountValidation]" counter>
+                                          :rules="[rules.accountValidation]" counter>
                             </v-text-field>
                         </v-col>
                     </v-row>
                 </v-container>
             </v-card-text>
             <v-card-actions>
-                <v-spacer />
+                <v-spacer/>
                 <v-btn color="orange-darken-1" variant="text" @click="hide">
                     Закрыть
                 </v-btn>
@@ -93,20 +97,18 @@
 </template>
 
 <script setup lang="ts">
-import { useValidationRules } from "@/mixins/FieldValidationRules";
-import { useStore } from "vuex";
-import {computed, Ref, ref, watch} from "vue";
-import { useCompanyStore } from "@/pinia-store/company"
-import { storeToRefs } from "pinia"
-import { useRouter } from "vue-router"
+import {useValidationRules} from "@/mixins/FieldValidationRules";
+import {Ref, ref} from "vue";
+import {useCompanyStore} from "@/pinia-store/company"
+import {storeToRefs} from "pinia"
+import {useRouter} from "vue-router"
 
-const { company } = storeToRefs(useCompanyStore())
-const { fetchCompanyData, saveCompany } = useCompanyStore()
+const {company} = storeToRefs(useCompanyStore())
+const {fetchCompanyData, saveCompany} = useCompanyStore()
 await fetchCompanyData()
 
 const emit = defineEmits();
-const { rules } = useValidationRules();
-const store = useStore();
+const {rules} = useValidationRules();
 
 const form: Ref<HTMLFormElement | null> = ref(null);
 const valid = ref(false);

@@ -1,57 +1,32 @@
-<template>
-    <v-dialog v-model="props.visible" width="800" persistent>
-        <v-card title="Контрагенты:">
-            <v-list>
-                <v-list-item v-for="(item, index) in props.customers" :key="index" :title="item.companyName"
-                    @click.stop="active = index">
+<template lang="pug">
+    v-dialog(v-model="visibleLocal" width="800")
+        v-card(title="Контрагенты:")
+            v-list
+                v-list-item(v-for="(item, index) in customers" :key="index" :title="item.companyName" @click.stop="active=index")
+                    CompanyCreateDialog(:visible="active === index" :company="item" @hide="active = -1" @save="save($event)" @remove="remove($event)")
 
-                    <company-create-dialog :visible="active === index" :company="item" @hide="active = -1" @save="save($event)"
-                        @remove="remove($event)" @saveContact="saveContact($event)"
-                        @removeContact="removeContact($event)" />
+                v-list-item(title="...")
+                    template(#append)
+                        v-btn(color="orange-lighten-1" icon="mdi-plus" variant="text" @click.stop="active = 'new'")
+                    CompanyCreateDialog(:visible="active === 'new'" :company="{}" @hide="active = -1" @save="save($event)" @remove="remove($event)")
 
-                </v-list-item>
-                <v-list-item title="...">
-                    <template v-slot:append>
-                        <v-btn color="orange-lighten-1" icon="mdi-plus" variant="text" @click.stop="active = 'new'"></v-btn>
-                    </template>
+            v-card-actions
+                v-spacer
+                v-btn(color="orange-darken-1" variant="text" @click="hide") Закрыть
 
-                    <company-create-dialog :visible="active === 'new'" :company="{}" @hide="active = -1" @save="save($event)"
-                        @remove="remove($event)" @saveContact="saveContact($event)"
-                        @removeContact="removeContact($event)" />
-
-                </v-list-item>
-            </v-list>
-            <v-card-actions>
-                <v-spacer />
-                <v-btn color="orange-darken-1" variant="text" @click="hide">
-                    Закрыть
-                </v-btn>
-            </v-card-actions>
-        </v-card>
-    </v-dialog>
 </template>
 
-<script setup>
-import { ref } from "vue";
-import { useStore } from "vuex";
+<script setup lang="ts">
+import {type Ref, ref, toRef} from "vue";
 import CompanyCreateDialog from "@/components/company/CompanyCreateDialog.vue";
 
-const props = defineProps({
-    customers: {
-        type: Array,
-        required: true
-    },
-    visible: {
-        type: Boolean,
-        required: true
-    }
-});
+const {customers, visible} = defineProps<{ customers: Customer[], visible: boolean }>();
 
-const emit = defineEmits();
-const store = useStore();
-const active = ref(null);
+const emit = defineEmits(["remove", "hide", "save"]);
+const active: Ref<null | number | string> = ref(null);
+const visibleLocal = toRef(visible)
 
-const remove = (data) => {
+const remove = (data: Customer) => {
     emit("remove", data);
 };
 
@@ -59,16 +34,8 @@ const hide = () => {
     emit("hide");
 };
 
-const save = (data) => {
+const save = (data: Customer) => {
     emit("save", data);
-};
-
-const saveContact = (data) => {
-    emit("saveContact", data);
-};
-
-const removeContact = (data) => {
-    emit("removeContact", data);
 };
 
 </script>

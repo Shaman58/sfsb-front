@@ -37,9 +37,12 @@
 
 <script setup lang="ts">
 import {useValidationRules} from "@/mixins/FieldValidationRules";
-import {ref} from "vue";
+import {type Ref, ref} from "vue";
 import {useRoute, useRouter} from "vue-router"
 import {useCompaniesStore} from "@/pinia-store/companies";
+import {useToast} from "vue-toast-notification";
+
+const toast = useToast()
 
 const {getCompanyById, saveCompany, addCompany, changeCompanyLogo} = useCompaniesStore()
 
@@ -81,9 +84,9 @@ const changeLogo = (event: Event) => {
     const file = new FileReader()
     file.addEventListener("load", async (e: ProgressEvent<FileReader>) => {
         const fd = new FormData()
-        fd.append("file", target.files[0])
+        target.files && fd.append("file", target.files[0])
         await changeCompanyLogo(fd, currentCompany.value.id)
-        picture.value = e.target.result
+        picture.value = e.target && e.target.result || ""
     })
     target && target.files && file.readAsDataURL(target.files[0])
 }
