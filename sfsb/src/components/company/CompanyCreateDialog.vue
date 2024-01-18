@@ -1,5 +1,5 @@
 <template lang="pug">
-    v-dialog(:model-value="visible" width="1024")
+    v-dialog(v-model="show" width="1024")
         v-form(ref="form" v-model="valid" v-on:submit.prevent="save" style="overflow-y: auto;")
             v-card.mx-auto.my-12
                 v-card-title
@@ -36,15 +36,19 @@
                                 v-text-field(label="Корсчет*" v-model="companyLocal.correspondentAccount" :rules="[rules.accountValidation]" counter)
                 v-card-actions
                     v-spacer
-                    v-btn(color="orange-darken-1" variant="text" @click="hide") Закрыть
+                    v-btn(color="orange-darken-1" variant="text" @click="show=false") Закрыть
                     v-btn(color="orange-darken-1" variant="text" type="submit" :disabled="!valid") Сохранить
 </template>
 
 <script setup lang="ts">
 import {useValidationRules} from "@/mixins/FieldValidationRules";
-import {ref} from "vue";
+import {onUpdated, ref, toRefs} from "vue";
 
-const {visible, company} = defineProps<{ company: Company | Customer | object, visible: boolean }>();
+const props = defineProps<{ company: Company | Customer, visible: boolean }>();
+const show = defineModel("show")
+
+const {company} = toRefs(props)
+const companyLocal = ref(company)
 
 const emit = defineEmits();
 const {rules} = useValidationRules();
@@ -52,8 +56,9 @@ const {rules} = useValidationRules();
 const form = ref(null);
 const valid = ref(false);
 
-const companyLocal = ref({...company});
-
+onUpdated(() => {
+    companyLocal.value = company.value
+})
 
 // watch(
 //     () => props.company,
@@ -64,12 +69,12 @@ const companyLocal = ref({...company});
 
 const hide = () => {
     emit("hide");
-    companyLocal.value = {...company};
+    // companyLocal.value = {...company};
 };
 
 const save = () => {
     if (form.value && form.value.validate()) {
-        emit("save", companyLocal);
+        emit("save", companyLocal.value);
         emit("hide");
     }
 };
