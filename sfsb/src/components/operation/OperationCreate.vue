@@ -1,115 +1,57 @@
-<template>
-  <v-dialog v-model="props.visible" persistent>
-    <v-card>
-      <v-form ref="form" v-model="valid" @submit.prevent="save(operation)">
-        <v-card-text>
-          <v-row>
-            <v-col cols="4">
-              <v-text-field label="Название операции:"
-                            v-model="operation.operationName"
-                            :rules="[rules.required, rules.nameValidation]"
-                            counter
-                            :disabled="operation.id<3">
-              </v-text-field>
-            </v-col>
-            <v-col cols="4">
-              <v-select label="Описание:"
-                        :items="operations"
-                        item-title="title"
-                        item-value="label"
-                        v-model="operation.operationTimeManagement"
-                        :disabled="operation.id<3">
-              </v-select>
-            </v-col>
-            <v-col cols="4">
-              <v-text-field label="Стоимость за час:"
-                            v-model="operation.paymentPerHour.amount"
-                            :rules="[rules.required,rules.numeric]"
-                            type="number"
-              ></v-text-field>
-            </v-col>
-          </v-row>
-          <v-card-actions>
-            <v-spacer/>
-            <v-btn color="orange-darken-1"
-                   variant="text"
-                   @click="hide">
-              Закрыть
-            </v-btn>
-            <v-btn color="orange-darken-1"
-                   variant="text" type="submit"
-                   :disabled="!valid">
-              Сохранить
-            </v-btn>
-          </v-card-actions>
-        </v-card-text>
-        <v-container v-if="!operation.id||operation.id>=3">
-          <v-row>
-            <v-col cols="4">
-              <v-card>
-                Станочная - применяется для назначения машинных операций с временем <a class="text-cyan">операции</a>,
-                <a class="text-cyan">наладки</a> и
-                <a class="text-cyan">межоперационки</a>
-              </v-card>
-            </v-col>
-            <v-col cols="4">
-              <v-card>
-                Ручная - применяется для назначения ручных операций с временем <a class="text-cyan">операции</a> БЕЗ <a
-                class="text-red">наладки</a> и
-                <a class="text-red">межоперационки</a>
-              </v-card>
-            </v-col>
-            <v-col cols="4">
-              <v-card>Вычисляемая - применяется для назначения операции с временем <a class="text-cyan">операции</a> и
-                возможностью обработки по
-                <a class="text-cyan">несколько ЗАГОТОВОК</a>
-              </v-card>
-            </v-col>
-          </v-row>
-        </v-container>
-      </v-form>
-    </v-card>
-  </v-dialog>
+<template lang="pug">
+    v-dialog(:model-value="visible" @update:model-value="emit('hide')")
+        v-card
+            v-form(ref="form" v-model="valid" @submit.prevent="save")
+                v-card-text
+                    v-row
+                        v-col(cols="4")
+                            v-text-field(label="Название операции:" v-model="operationLocal.operationName" :rules="[rules.required, rules.nameValidation]" counter :disabled="operationLocal.id<3")
+                        v-col(cols="4")
+                            v-select(label="Описание:" :items="operations" item-title="title" item-value="label" v-model="operation.operationTimeManagement" :disabled="operationLocal.id<3")
+                        v-col(cols="4")
+                            v-text-field(label="Стоимость за час:" v-model="operationLocal.paymentPerHour.amount" :rules="[rules.required,rules.numeric]" type="number")
+                    v-card-actions
+                        v-spacer
+                        v-btn(color="orange-darken-1" variant="text" @click="hide") Закрыть
+                        v-btn(color="orange-darken-1" variant="text" type="submit" :disabled="!valid") Сохранить
+                v-container(v-if="!operationLocal.id||operationLocal.id>=3")
+                    operation-descriptions
 </template>
 
-<script setup>
-import {useStore} from "vuex";
+<script setup lang="ts">
 import {useValidationRules} from "@/mixins/FieldValidationRules";
 // import useOperationFormatting from "@/mixins/OperationDataFormatting"
 import CONST from "@/consts"
-import {ref} from "vue";
+import {ref, toRefs} from "vue";
+import OperationDescriptions from "@/components/operation/OperationDescriptions.vue";
 
-const props = defineProps({
-  operation: {
-    type: Object,
-    required: true
-  },
-  visible: {
-    type: Boolean,
-    required: true
-  }
-});
+interface Props {
+    operation: Partial<Operation>
+    visible: boolean
+}
 
-const emit = defineEmits();
-const store = useStore();
+const props = defineProps<Props>();
+const {operation, visible} = toRefs(props)
+
+const emit = defineEmits(["hide", "save"]);
 const {rules} = useValidationRules();
 // const {operations} = useOperationFormatting();
 const operations = CONST.OPERATIONS
 
 const form = ref(null);
 const valid = ref(false);
-const operation = ref({...props.operation, paymentPerHour: {...props.operation.paymentPerHour}});
+const operationLocal = ref(operation);
 
-const save = (operation) => {
-  if (form.value.validate()) {
-    emit("save", operation);
-    emit("hide");
-  }
+const save = () => {
+    if (form.value.validate()) {
+        emit("save", operationLocal);
+        emit("hide");
+    }
 };
 
 const hide = () => {
-  emit("hide");
-  operation.value = {...props.operation}
+    emit("hide");
+    // operationLocal.value = {} as Operation
 }
 
 </script>

@@ -44,7 +44,7 @@
 import {useValidationRules} from "@/mixins/FieldValidationRules";
 import {onUpdated, ref, toRefs} from "vue";
 
-const props = defineProps<{ company: Company | Customer, visible: boolean }>();
+const props = defineProps<{ company: PartialCompany | PartialCustomer, visible: boolean }>();
 const show = defineModel("show")
 
 const {company} = toRefs(props)

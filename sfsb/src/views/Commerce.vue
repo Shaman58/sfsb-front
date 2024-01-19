@@ -2,7 +2,8 @@
     br
     v-container
         .d-flex.justify-center
-            operation-component
+            suspended-component
+                operation-component
         v-row
             v-col(cols="6")
                 suspended-component

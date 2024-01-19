@@ -1,4 +1,4 @@
-import axios, {AxiosResponse} from "axios";
+import axios, {Axios, AxiosResponse} from "axios";
 import Service from "@/plugins/keycloak/service"
 import checkStatus from "@/mixins/CheckStatus";
 import toErrorMessage from "@/mixins/ToErrorMessage";
@@ -42,7 +42,7 @@ export interface ErrorMessages {
     failure?: string
 }
 
-export const query: T = async (cb: () => Promise<AxiosResponse<T, any>>, options: ErrorMessages) => {
+export const query = async <T>(cb: () => Promise<AxiosResponse<T, any>>, options?: ErrorMessages): Promise<T | undefined> => {
     const {success = "Успешно выполнено!", failure = "Ошибка выполнения запроса "} = options || {} as ErrorMessages
     try {
         const response = await cb()
@@ -53,4 +53,45 @@ export const query: T = async (cb: () => Promise<AxiosResponse<T, any>>, options
         failure && toast.error(failure);
         toErrorMessage(error)
     }
+}
+
+export class CRUD {
+    url: string = ""
+
+    constructor(url: string) {
+        this.url = url
+        this.fetch = this.fetch.bind(this)
+        this.save = this.save.bind(this)
+        this.delete = this.delete.bind(this)
+        this.deleteAndFetch = this.deleteAndFetch.bind(this)
+        this.saveAndFetch = this.saveAndFetch.bind(this)
+    }
+
+    async fetch<T>(): Promise<T | undefined> {
+        return await query<T>(async () => await api.get(this.url), {success: ""})
+    }
+
+    async save(arg: { id: number | string }) {
+        const url = arg.id
+            ? `${this.url}/${arg.id}`
+            : this.url;
+        const method: keyof Axios = arg.id ? 'put' : 'post';
+        await query(async () => await api[method](url, arg))
+    }
+
+    async saveAndFetch<T>(arg: { id: number | string }) {
+        await this.save(arg)
+        return this.fetch<T>()
+    }
+
+    async delete(arg: { id: number | string }) {
+        await query(async () => await api.delete(`${this.url}/${arg.id}`))
+    }
+
+    async deleteAndFetch<T>(arg: { id: number | string }) {
+        await this.delete(arg)
+        return this.fetch<T>()
+    }
+
+
 }
