@@ -1,5 +1,5 @@
 <template lang="pug">
-    suspended-component
+    suspended-component.technology-view
         technology-dialog
 </template>
 
@@ -9,7 +9,7 @@ import SuspendedComponent from "@/components/common/SuspendedComponent.vue";
 </script>
 <style lang="sass" scoped>
 .technology-view
-    height: 85vh
+    height: calc(100dvh - 40px)
     display: grid
     place-items: center
 </style>

@@ -93,11 +93,31 @@ import TechnologyCreateDialogCardPart2
 import TechnologyCreateDialogCardPart4
     from "@/components/technology/TechnologyCreateDialogCardParts/TechnologyCreateDialogCardPart4.vue";
 import SuspendedComponent from "@/components/common/SuspendedComponent.vue";
+import {useSpecialStore} from "@/pinia-store/specials";
+import {useCuttersStore} from "@/pinia-store/cutters";
+import {useToolingStore} from "@/pinia-store/tooling";
+import {useOperationsStore} from "@/pinia-store/operations";
 
 const {dialogVisible, currentItem, isBlockedByCurrentUser} = storeToRefs(useTechnologyStore());
 const {saveTechnology, changeBlocked, calculateTechnology, setTechnologyDialogVisible} = useTechnologyStore();
 
 const alertDialog = ref<typeof AlertDialog | null>(null)
+
+const {specials} = storeToRefs(useSpecialStore())
+const {fetchSpecials} = useSpecialStore()
+!specials.value.length && await fetchSpecials()
+
+const {cutters} = storeToRefs(useCuttersStore())
+const {fetchCutters} = useCuttersStore()
+!specials.value.length && await fetchCutters()
+
+const {toolings} = storeToRefs(useToolingStore())
+const {fetchToolings} = useToolingStore()
+!toolings.value.length && await fetchToolings()
+
+const {operations} = storeToRefs(useOperationsStore())
+const {fetchOperation} = useOperationsStore()
+!operations.value.length && await fetchOperation()
 
 const {user} = storeToRefs(useCurrentUserStore())
 

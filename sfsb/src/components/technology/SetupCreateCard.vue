@@ -75,7 +75,7 @@ import {useCuttersStore} from "@/pinia-store/cutters";
 import {useToolingStore} from "@/pinia-store/tooling";
 
 interface Props {
-    setup: Setup
+    setup: Partial<Setup>
     quantityOfPartsFromWorkpiece?: number
     additionalTexts: string[]
 }
@@ -140,7 +140,7 @@ const {fetchOperation} = useOperationsStore()
 const setupNumbers = computed(() => currentItem.value.technology.setups.filter(item => item.setupNumber !== setup.setupNumber).map(obj => obj.setupNumber));
 const unitNumberValidationRule = rules.unitNumberValidation(setupNumbers);
 
-const save = (setup: Setup) => emit("save", setup);
+const save = (setup: Partial<Setup>) => emit("save", setup);
 
 const deleteSetup = () => {
     hideSetup();

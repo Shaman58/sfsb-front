@@ -34,7 +34,8 @@
                 v-list-item(v-for="i in items||[]" :key="i.id" @click="setCurrentItem(i)")
                     span {{ i.technology.drawingNumber }} {{ i.technology.drawingName }}
 
-        technology-create-dialog(@close="refresh")
+        suspended-component
+            technology-create-dialog(@close="refresh")
 </template>
 
 <script setup lang="ts">
@@ -47,6 +48,7 @@ import {useCurrentUserStore} from '@/pinia-store/currentUser';
 import {useTechnologyStore} from '@/pinia-store/technology';
 import {useStaffStore} from '@/pinia-store/staff';
 import {useItemStore} from '@/pinia-store/item';
+import SuspendedComponent from "@/components/common/SuspendedComponent.vue";
 
 const {orders} = storeToRefs(useOrdersStore())
 const {getOrders} = useOrdersStore()
