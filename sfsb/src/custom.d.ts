@@ -127,6 +127,12 @@ declare interface Operation {
     operationTimeManagement: string;
 }
 
+declare interface AdditionalTool extends Tool {
+    workpiece: Workpiece,
+    amount: number,
+    processTime: string
+}
+
 declare interface Setup {
     id: number;
     created: string;
@@ -137,10 +143,10 @@ declare interface Setup {
     processTime: string;
     interoperativeTime: string;
     measureToolItems: ToolItem[];
-    additionalTools: any[];
+    additionalTools: AdditionalTool[];
     specialToolItems: ToolItem[];
     cutterToolItems: ToolItem[];
-    toolings: [];
+    toolings: Tool[];
     perTime: string | null;
     text: string | null;
     cooperatePrice: ItemPrice;

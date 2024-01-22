@@ -10,7 +10,7 @@ export const useToolingStore = defineStore("tooling", () => {
     const toolings: Ref<Tool[]> = ref([]);
     const loading: Ref<boolean> = ref(false)
 
-    const fecthToolings = async () => {
+    const fetchToolings = async () => {
         loading.value = true
         toolings.value = await query(async () => await api.get("/tooling"), {success: ""})
         loading.value = false
@@ -21,7 +21,7 @@ export const useToolingStore = defineStore("tooling", () => {
         const method: keyof Axios = tooling.id ? "put" : "post"
         loading.value = true
         await query<Tool>(async () => await api[method](url, tooling))
-        await fecthToolings()
+        await fetchToolings()
         loading.value = false
     };
 
@@ -34,7 +34,7 @@ export const useToolingStore = defineStore("tooling", () => {
     return {
         toolings,
         loading,
-        fecthToolings,
+        fetchToolings,
         saveToolings,
         deleteTooling,
     };

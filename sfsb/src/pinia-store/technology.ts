@@ -1,7 +1,7 @@
 import {defineStore} from "pinia";
 import api from "@/api/instance";
 import {useToast} from "vue-toast-notification";
-import {Ref, ref} from "vue";
+import {type Ref, ref} from "vue";
 import {useCurrentUserStore} from "./currentUser";
 import checkStatus from "@/mixins/CheckStatus";
 
@@ -18,11 +18,11 @@ export const useTechnologyStore = defineStore("technology", () => {
             const res = await api.get<Item>(url);
             res.status === 200
                 ? ((currentItem.value = res.data),
-                  (isBlockedByCurrentUser.value =
-                      compareBlockedAndCurrentUser()))
+                    (isBlockedByCurrentUser.value =
+                        compareBlockedAndCurrentUser()))
                 : toast.error(
-                      "Ошибка при получении технологии " + res.statusText
-                  );
+                    "Ошибка при получении технологии " + res.statusText
+                );
         } catch (error) {
             toast.error("Ошибка при получении технологии " + error);
         }
@@ -32,7 +32,7 @@ export const useTechnologyStore = defineStore("technology", () => {
         try {
             const url = `/technology/${technology.id}`;
             await api.put(url, technology);
-            toast.info("Успешно сохранено!", { position: "top-right" });
+            toast.info("Успешно сохранено!", {position: "top-right"});
             await getTechnologyById(technology.id);
         } catch (error) {
             toast.error("Ошибка при сохранении данных " + error);
@@ -62,7 +62,7 @@ export const useTechnologyStore = defineStore("technology", () => {
         }
     };
 
-    const hasResponseInError = (error: any) : error is {response:{ data : { info: string}}}  =>{
+    const hasResponseInError = (error: any): error is { response: { data: { info: string } } } => {
         return 'response' in error && 'data' in error.response && 'info' in error.response.data;
     }
     const calculateTechnology = async (id: number, status: boolean) => {
@@ -72,8 +72,8 @@ export const useTechnologyStore = defineStore("technology", () => {
             );
             checkStatus(response)
             if (response.data.computed !== status) throw new Error(
-                    "значение ответа не совпало со значением запроса"
-                );
+                "значение ответа не совпало со значением запроса"
+            );
             currentItem.value.technology.computed = response.data.computed
         } catch (error) {
             const message = hasResponseInError(error) ? error.response.data.info : error;
@@ -82,7 +82,7 @@ export const useTechnologyStore = defineStore("technology", () => {
     };
 
     const compareBlockedAndCurrentUser = (): boolean => {
-        const { user: currentUser } = useCurrentUserStore();
+        const {user: currentUser} = useCurrentUserStore();
         const blocked = currentItem.value.technology.blocked;
         return blocked === currentUser?.id;
     };

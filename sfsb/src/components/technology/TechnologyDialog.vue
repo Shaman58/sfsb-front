@@ -34,13 +34,11 @@ v-container.technology-dialog
             v-list-item(v-for="i in items||[]" :key="i.id" @click="setCurrentItem(i)")
                 span {{ i.technology.drawingNumber }} {{ i.technology.drawingName }}
 
-    <technology-create-dialog @close="refresh"/>
+    technology-create-dialog(@close="refresh")
 </template>
 
 <script setup lang="ts">
 import TechnologyCreateDialog from "@/components/technology/TechnologyCreateDialog.vue";
-
-import { useStore } from 'vuex';
 import { useOrdersStore } from '@/pinia-store/orders';
 import { storeToRefs } from 'pinia';
 import { computed, onMounted, ref, watch, watchEffect } from 'vue';
@@ -88,16 +86,7 @@ const refresh = async () => {
     await getOrders()
     currentOrder.value = orders.value.find(order => order.id == currentOrder.value?.id) || null
 }
-//--- LEGASY ---
-const store = useStore();
-onMounted(() => {
-    // store.dispatch("fetchMaterials");
-    store.dispatch("fetchToolings");
-    store.dispatch("fetchSpecials");
-    store.dispatch("fetchCutters");
-    // store.dispatch("fetchItems");
-    store.dispatch("fetchOperations");
-});
+
 
 </script>
 
