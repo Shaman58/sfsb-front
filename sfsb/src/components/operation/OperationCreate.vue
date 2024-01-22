@@ -30,7 +30,7 @@ interface Props {
     visible: boolean
 }
 
-const props = defineProps<Props>();
+const props = defineProps<Partial<Props>>();
 const {operation, visible} = toRefs(props)
 
 const emit = defineEmits(["hide", "save"]);

@@ -28,13 +28,13 @@
 </template>
 
 <script setup lang="ts">
-import {computed, type Ref, ref, watchEffect} from "vue";
+import {computed, type ComputedRef, type Ref, ref} from "vue";
 import useOperationFormatting from "@/mixins/OperationDataFormatting"
 import OperationCreate from "@/components/operation/OperationCreate.vue";
 
 interface Props {
     visible: boolean
-    operations: Operation[]
+    operations: Operation[] | null
     techPrice: Operation
     setupPrice: Operation
 }
@@ -57,14 +57,13 @@ const setOperation = (operation: Partial<Operation>) => {
 }
 
 
-watchEffect(() => console.log("toOperation", toOperation.value))
 const clearOperation = () => {
     toOperation.value = emptyOperation
     showOperationCreate.value = false
 }
 
 
-const filtered = computed(() => {
+const filtered: ComputedRef<Operation[]> = computed(() => {
     return props.operations.filter((item) => {
         return (
             (!filter.value || item.operationName.toLowerCase().includes(filter.value.toLowerCase()))

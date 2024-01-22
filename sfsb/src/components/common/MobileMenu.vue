@@ -19,14 +19,15 @@
 </template>
 <script setup lang="ts">
 import CONSTS from "@consts/index"
-import {defineModel, ref, watch} from "vue"
+import {defineModel, ref, toRefs, watch} from "vue"
 
 interface Props {
     userName: string
     picture: any
 }
 
-const {userName, picture} = defineProps<Props>()
+const props = defineProps<Partial<Props>>()
+const {userName, picture} = toRefs(props)
 const emit = defineEmits(["exit"])
 const show = defineModel<boolean>()
 const showNav = ref(false)

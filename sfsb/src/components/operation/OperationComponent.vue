@@ -17,10 +17,8 @@ const {
     deleteOperation,
     fetchTechPrice,
     saveTechPrice,
-    deleteTechPrice,
     fetchSetupPrice,
     saveSetupPrice,
-    deleteSetupPrice
 } = useOperationsStore()
 
 await fetchOperation()
@@ -28,15 +26,16 @@ await fetchTechPrice()
 await fetchSetupPrice()
 
 const visible = ref(false);
-const save = (data: Operation) => {
+const save = async (data: Operation) => {
     if (data.id === 1) {
-        store.dispatch("saveSetupPrice", data);
+        await saveSetupPrice(data);
     } else if (data.id === 2) {
-        store.dispatch("saveTechPrice", data);
+        await saveTechPrice(data)
     } else {
-        store.dispatch("saveOperation", data);
+        await saveOperation(data);
     }
 };
+
 
 const remove = async (data: Operation) => await deleteOperation(data);
 
