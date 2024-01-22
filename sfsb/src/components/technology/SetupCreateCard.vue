@@ -33,7 +33,7 @@
                             v-btn(size="small" variant="text" v-if="setup.measureToolItems?.length === 0" @click="measureVisible = true") Меритель
                             v-list(v-else @click="measureVisible = true")
                                 v-list-item(v-for="tool in setup.measureToolItems" :title="tool.tool.toolName + ' ' + tool.tool.description" :subtitle="tool.amount + 'шт.'")
-                            measure-create-list(title="Меритель" :visible="measureVisible" :tools="setup.measureToolItems" @hide="measureVisible = false")
+                            MeasureCreateList(title="Меритель" :visible="measureVisible" :tools="setup.measureToolItems" @hide="measureVisible = false")
                         v-col(cols="4" v-if="setup?.operation?.operationTimeManagement === 'FULL' && !setup.cooperate || setup?.operation?.operationTimeManagement === 'PROCESS_TIME_ONLY' && !setup.cooperate")
                             v-btn(size="small" variant="text" v-if="setup.cutterToolItems?.length === 0" @click="cutterVisible = true") Инструмент
                             v-list(v-else @click="cutterVisible = true")
@@ -104,6 +104,10 @@ const props = defineProps<Props>();
 const emit = defineEmits(["hideSetup", "save", "deleteSetup"]);
 
 const {setup, additionalTexts, quantityOfPartsFromWorkpiece} = toRefs(props);
+
+// const setup = reactive(setupProps.value)
+
+
 const {rules} = useValidationRules();
 const valid = ref(true);
 const form = ref(null);
@@ -113,7 +117,7 @@ const specialVisible = ref(false);
 const additionalVisible = ref(false);
 const {formatWorkpieceData} = materialDataFormatting();
 
-const isExist = (!!(setup.value.operation?.operationName));
+const isExist = (!!(setup.operation?.operationName));
 
 const {specials} = storeToRefs(useSpecialStore())
 const {fetchSpecials} = useSpecialStore()
@@ -133,7 +137,7 @@ const {operations} = storeToRefs(useOperationsStore())
 const {fetchOperation} = useOperationsStore()
 !operations.value.length && await fetchOperation()
 
-const setupNumbers = computed(() => currentItem.value.technology.setups.filter(item => item.setupNumber !== setup.value.setupNumber).map(obj => obj.setupNumber));
+const setupNumbers = computed(() => currentItem.value.technology.setups.filter(item => item.setupNumber !== setup.setupNumber).map(obj => obj.setupNumber));
 const unitNumberValidationRule = rules.unitNumberValidation(setupNumbers);
 
 const save = (setup: Setup) => emit("save", setup);
@@ -144,6 +148,5 @@ const deleteSetup = () => {
 };
 
 const hideSetup = () => emit("hideSetup");
-
 
 </script>

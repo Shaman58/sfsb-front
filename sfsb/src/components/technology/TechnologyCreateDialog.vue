@@ -51,11 +51,13 @@
                                         v-col(cols="9" fill-height v-else-if="setup.operation.operationTimeManagement === 'COMPUTED'")
                                             v-card(height="100%" :title="setup.aggregate ? 'Групповая по ' + setup.perTime + 'шт.' : ''") {{ setup.text }}
 
-                                setup-create-card(v-else :setup="{ ...setup }" :quantity-of-parts-from-workpiece="Number(currentItem.technology.quantityOfPartsFromWorkpiece)" :additionalTexts="additionalTexts" @hideSetup="hideSetup()" @deleteSetup="deleteSetup(index)" @save="replaceSetup($event, index)")
+                                suspended-component(v-else)
+                                    setup-create-card( :setup="setup" :quantity-of-parts-from-workpiece="Number(currentItem.technology.quantityOfPartsFromWorkpiece)" :additionalTexts="additionalTexts" @hideSetup="hideSetup()" @deleteSetup="deleteSetup(index)" @save="replaceSetup($event, index)")
 
                             v-col(cols="12")
                                 v-card(v-if="activeSetupIndex !== 'new'" title="Новый установ" @click="activeSetupIndex = 'new'")
-                                setup-create-card(v-else :setup="{ ...newSetup }" :quantity-of-parts-from-workpiece="Number(currentItem.technology.quantityOfPartsFromWorkpiece)" :additionalTexts="additionalTexts" @hideSetup="hideSetup()" @save="pushSetup" )
+                                suspended-component(v-else)
+                                    setup-create-card( :setup="newSetup" :quantity-of-parts-from-workpiece="Number(currentItem.technology.quantityOfPartsFromWorkpiece)" :additionalTexts="additionalTexts" @hideSetup="hideSetup()" @save="pushSetup" )
 
                     v-card-actions
                         v-col(cols="2" class="technology-card__calculate")
@@ -90,6 +92,7 @@ import TechnologyCreateDialogCardPart2
     from "@/components/technology/TechnologyCreateDialogCardParts/TechnologyCreateDialogCardPart2.vue";
 import TechnologyCreateDialogCardPart4
     from "@/components/technology/TechnologyCreateDialogCardParts/TechnologyCreateDialogCardPart4.vue";
+import SuspendedComponent from "@/components/common/SuspendedComponent.vue";
 
 const {dialogVisible, currentItem, isBlockedByCurrentUser} = storeToRefs(useTechnologyStore());
 const {saveTechnology, changeBlocked, calculateTechnology, setTechnologyDialogVisible} = useTechnologyStore();
