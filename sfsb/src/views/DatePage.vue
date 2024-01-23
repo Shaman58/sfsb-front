@@ -3,7 +3,8 @@
     v-container
 
         v-card.center-card
-            material-component
+            suspended-component
+                material-component
             suspended-component
                 cutter-component
             suspended-component

@@ -1,39 +1,39 @@
-<template>
-    <v-btn @click="visible = true" color="orange-darken-1" variant="text">
-        Редактировать базу материалов
-    </v-btn>
-
-    <Suspense>
-        <template #fallback>Загрузка ...</template>
-        <material-list-dialog1 v-model:visible="visible" />
-    </Suspense>
+<template lang="pug">
+    v-btn(@click="visible = true" color="orange-darken-1" variant="text") Редактировать базу материалов
+    suspended-component
+        material-list-dialog1(v-model:visible="visible")
 </template>
 
-<script setup>
-import { useStore } from "vuex";
-import { computed, onMounted, ref } from "vue";
+<script setup lang="ts">
+import {useStore} from "vuex";
+import {ref} from "vue";
 // import MaterialListDialog from "@/components/material/MaterialList.vue";
 import MaterialListDialog1 from "@/components/material/MaterialList1.vue";
-import ToolList from "@/components/tool/ToolList.vue";
+import {useMaterialsStore} from "@/pinia-store/materials.js";
+import {useMaterialTemplatesStore} from "@/pinia-store/materialTemplates";
+import {storeToRefs} from "pinia";
+import SuspendedComponent from "@/components/common/SuspendedComponent.vue";
 
-onMounted(() => {
-    store.dispatch("fetchMaterials");
-    store.dispatch("fetchMaterialTemplates");
-});
+const {materials} = storeToRefs(useMaterialsStore())
+const {fetchMaterials, saveMaterial, deleteMaterial} = useMaterialsStore()
+!materials.value.length && await fetchMaterials()
+
+const {materialTemplates: templates} = storeToRefs(useMaterialTemplatesStore())
+const {fetchMaterialTemplates} = useMaterialTemplatesStore()
+!templates.value.length && await fetchMaterialTemplates()
+
 
 const visible = ref(false);
 
 const store = useStore();
 
-const materials = computed(() => store.getters.getMaterials);
-const templates = computed(() => store.getters.getMaterialTemplates);
 
-const save = (data) => {
-    store.dispatch("saveMaterial", data);
+const save = async (data: Material) => {
+    await saveMaterial(data);
 };
 
-const remove = ((data) => {
-    store.dispatch("deleteMaterial", data);
-});
+const remove = async (data) => {
+    await deleteMaterial(data);
+};
 
 </script>
