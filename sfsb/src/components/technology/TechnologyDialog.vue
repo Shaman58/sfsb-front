@@ -43,7 +43,7 @@ import TechnologyCreateDialog from "@/components/technology/TechnologyCreateDial
 import {useOrdersStore} from '@/pinia-store/orders';
 import {storeToRefs} from 'pinia';
 import type {Ref} from 'vue'
-import {computed, ref, watchEffect} from 'vue';
+import {ref, watchEffect} from 'vue';
 import {useCurrentUserStore} from '@/pinia-store/currentUser';
 import {useTechnologyStore} from '@/pinia-store/technology';
 import {useStaffStore} from '@/pinia-store/staff';
@@ -70,7 +70,7 @@ await getAllStaff()
 
 const currentOrder: Ref<Order | null> = ref(orders.value[0] || null)
 
-const technologiesByUser = computed(() => currentOrder && currentOrder.value?.items.filter(item => item.technology.blocked === user.value?.id))
+// const technologiesByUser = computed(() => currentOrder && currentOrder.value?.items.filter(item => item.technology.blocked === user.value?.id))
 
 const staffUser = (uuid: string) => staff.value.find(user => user.id === uuid)
 

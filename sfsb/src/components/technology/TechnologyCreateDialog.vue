@@ -97,6 +97,7 @@ import {useSpecialStore} from "@/pinia-store/specials";
 import {useCuttersStore} from "@/pinia-store/cutters";
 import {useToolingStore} from "@/pinia-store/tooling";
 import {useOperationsStore} from "@/pinia-store/operations";
+import {useItemStore} from "@/pinia-store/item";
 
 const {dialogVisible, currentItem, isBlockedByCurrentUser} = storeToRefs(useTechnologyStore());
 const {saveTechnology, changeBlocked, calculateTechnology, setTechnologyDialogVisible} = useTechnologyStore();
@@ -118,6 +119,10 @@ const {fetchToolings} = useToolingStore()
 const {operations} = storeToRefs(useOperationsStore())
 const {fetchOperation} = useOperationsStore()
 !operations.value.length && await fetchOperation()
+
+const {items} = storeToRefs(useItemStore())
+const {fetchItems, fetchItem} = useItemStore()
+!items.value.length && await fetchItems()
 
 const {user} = storeToRefs(useCurrentUserStore())
 
@@ -223,7 +228,7 @@ const createNewSetup = () => ({
     cutterToolItems: [],
     toolings: [],
     additionalTools: [],
-    setupNumber: calculateSetupNumber,
+    setupNumber: calculateSetupNumber.value,
     operation: {
         operationName: ''
     },
@@ -232,13 +237,13 @@ const createNewSetup = () => ({
 
 const newSetup = ref(createNewSetup());
 
-const pushSetup = ({...setup}) => {
+const pushSetup = (setup: Setup) => {
     hideSetup();
     currentItem.value.technology.setups.push(setup);
     newSetup.value = createNewSetup();
 };
 
-const replaceSetup = async (setup: { [x: string]: any; }, index: any) => {
+const replaceSetup = async (setup: Setup, index: any) => {
     await deleteSetup(index);
     pushSetup(setup);
 };
@@ -248,7 +253,7 @@ const hideSetup = () => {
 };
 
 const deleteSetup = async (index: string | number) => {
-    const setupNumberToDelete = sortedSetups.value[index].setupNumber;
+    const setupNumberToDelete = sortedSetups.value[+index].setupNumber;
     const indexInOriginalList = currentItem.value.technology.setups.findIndex((setup: {
         setupNumber: any;
     }) => setup.setupNumber === setupNumberToDelete);
@@ -271,7 +276,7 @@ const hideDialog = () => {
 
 const save = async () => {
     console.log(currentItem, user)
-    if (alertDialog.value && currentItem.value.technology.blocked !== user.value.id) {
+    if (alertDialog.value && currentItem.value.technology.blocked !== user.value?.id) {
         alertDialog.value.show();
         try {
             const res = await alertDialog.value.getAnswer()
@@ -351,8 +356,7 @@ const showWorkpieceCard = () => {
         gap: .5rem
 
 
-    &__switch
-        .v-input__details
+    &__switch .v-input__details
         display: none
 
 </style>
