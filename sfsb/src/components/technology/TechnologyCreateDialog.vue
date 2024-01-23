@@ -204,7 +204,7 @@ const additionalTextGenerator = (setup: Setup) => {
 
 
 const calculateSetupNumber = computed(() => {
-    if (!currentItem.value.technology.setups) {
+    if (!currentItem.value.technology?.setups) {
         return -1
     }
     const setupNumbers = currentItem.value.technology.setups.map((setup: { setupNumber: any; }) => setup.setupNumber);
