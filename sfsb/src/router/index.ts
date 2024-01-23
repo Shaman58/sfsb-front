@@ -1,16 +1,16 @@
-import { createRouter, createWebHistory } from "vue-router";
+import {createRouter, createWebHistory} from "vue-router";
 import Commerce from "@/views/Commerce.vue";
 import Technology from "@/views/Technology.vue";
-import DatePage from "@/views/DatePage.vue";
 import Staff from "@/views/Staff.vue";
 import Supplier from "@/views/Supplier.vue";
 import NotFound from "@/views/NotFound.vue";
 import StartPage from "@/views/StartPage.vue";
-import { useCurrentUserStore } from "@/pinia-store/currentUser";
-import { useToast } from "vue-toast-notification";
-import { storeToRefs } from "pinia";
+import {useCurrentUserStore} from "@/pinia-store/currentUser";
+import {useToast} from "vue-toast-notification";
+import {storeToRefs} from "pinia";
 import CompanyPage from "@/views/CompanyPage.vue";
 import Company1 from "@/components/company/Company1.vue";
+import DataPageTabs from "@/views/DataPageTabs.vue";
 
 const toast = useToast();
 
@@ -35,7 +35,7 @@ const routes = [
     },
     {
         path: "/date",
-        component: DatePage,
+        component: DataPageTabs,
         meta: {
             onlyFor: ["TECHNOLOGIST", "ADMIN"],
         },
@@ -79,9 +79,9 @@ const router = createRouter({
     routes,
 });
 
-router.beforeEach(async (to, from, next) => {
-    const { fetchUser } = useCurrentUserStore();
-    const { user } = storeToRefs(useCurrentUserStore());
+router.beforeEach(async (to, _, next) => {
+    const {fetchUser} = useCurrentUserStore();
+    const {user} = storeToRefs(useCurrentUserStore());
 
     await fetchUser();
 
@@ -102,7 +102,6 @@ router.beforeEach(async (to, from, next) => {
         return next("/");
     }
 
-    next();
 });
 
 export default router;
