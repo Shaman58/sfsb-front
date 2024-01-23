@@ -17,25 +17,22 @@
                                     .datapage-tabs__list-option(v-if="item.description") {{ item.description}}
                 .datapage-tabs__card
                     .datapage-tabs__card-content(v-if="currentTab?.type==='Material'")
-                        | MATERIAL
-                        | {{ isReactive(currentTool) ? "REACTIVE" : "NOT REACTIVE" }}
                         MaterialComponent(:material="currentTool" )
                     .datapage-tabs__card-content(v-if="currentTab?.type==='Tool'")
-                        //ToolComponent(:tool="currentTool" )
-                        | TOOL
+                        ToolComponent(:tool="currentTool" )
 </template>
 
 <script setup lang="ts">
 
-import {computed, isReactive, onMounted, type Ref, ref, toRef, toValue} from "vue";
+import {computed, onMounted, type Ref, ref, toRef, toValue, watch} from "vue";
 import {storeToRefs} from "pinia";
 import {useMaterialsStore} from "@/pinia-store/materials";
 import {useToolingStore} from "@/pinia-store/tooling";
 import {useCuttersStore} from "@/pinia-store/cutters";
 import {useSpecialStore} from "@/pinia-store/specials";
 import MaterialComponent from "@/components/data-page/Material.vue";
+import ToolComponent from "@/components/data-page/Tool.vue";
 
-type MaterialOrTool = Material | Tool
 
 interface SwitchTab {
     id: number
@@ -84,7 +81,8 @@ const switchTab = (item: SwitchTab) => {
 
 const setCurrentTool = (item: typeof normalizedList.value[0]) => {
     if (!item) return
-    currentTool.value = currentTab.value.list.find(e => e.id === item.id)
+    const found = currentTab.value.list.find(e => e.id === item.id)
+    found && (currentTool.value = found)
 }
 
 onMounted(async () => {
@@ -94,6 +92,10 @@ onMounted(async () => {
     !specials.value.length && await fetchSpecials()
 
     currentTool.value = toValue(currentTab.value.list).at(0) as Material
+})
+
+watch([currentTab], () => {
+    currentTool.value = currentTab.value.list[0]
 })
 </script>
 

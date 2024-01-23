@@ -35,7 +35,6 @@
 import {computed, ref, toRefs} from "vue";
 import {useValidationRules} from "@/mixins/FieldValidationRules";
 import TechWorkpieceCard from "@/components/technology/TechWorkpieceCard.vue";
-import store from "@/store";
 import materialDataFormatting from "@/mixins/MaterialDataFormatting";
 
 interface Props {
