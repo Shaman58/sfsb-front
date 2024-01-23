@@ -10,7 +10,9 @@
                     v-card-text
                         v-list.datapage-tabs__list
                             v-list-item(v-for="item in normalizedList" :key="item.id" @click="currentTool=item") {{ item.name }}
-                v-card.datapage-tabs__card {{ currentTool }}
+                v-card.datapage-tabs__card
+                    .datapage-tabs__card-material(v-if="currentTab.type==='Material'")
+                    .datapage-tabs__card-tool(v-else)
 </template>
 
 <script setup lang="ts">
@@ -26,6 +28,7 @@ interface SwitchTab {
     id: number
     name: string,
     list: MaybeRef<Material[] | Tool[]>
+    type: "Tool" | "Material"
 }
 
 const {materials} = storeToRefs(useMaterialsStore())
@@ -47,10 +50,10 @@ onMounted(async () => {
 
 
 const switches: Readonly<SwitchTab[]> = [
-    {id: 1, name: "Материалы", list: materials},
-    {id: 2, name: "Инструменты", list: cutters},
-    {id: 3, name: "Специнструменты", list: specials},
-    {id: 4, name: "Остастка", list: toolings},
+    {id: 1, name: "Материалы", list: materials, type: "Tool"},
+    {id: 2, name: "Инструменты", list: cutters, type: "Tool"},
+    {id: 3, name: "Специнструменты", list: specials, type: "Tool"},
+    {id: 4, name: "Остастка", list: toolings, type: "Tool"},
 ] as const
 
 const currentTab: Ref<SwitchTab> = ref(switches[0])
