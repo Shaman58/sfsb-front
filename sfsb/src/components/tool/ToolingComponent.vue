@@ -32,9 +32,9 @@ const store = useStore();
 // const toolings = computed(() => store.getters.getToolings);
 
 const {toolings, loading} = storeToRefs(useToolingStore())
-const {saveToolings, fecthToolings, deleteTooling} = useToolingStore()
+const {saveToolings, fetchToolings, deleteTooling} = useToolingStore()
 
-await fecthToolings()
+await fetchToolings()
 const save = async (data: Tool) => {
     // store.dispatch("saveTooling", data);
     await saveToolings(data)
