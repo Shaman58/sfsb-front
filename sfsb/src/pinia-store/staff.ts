@@ -1,7 +1,7 @@
-import { defineStore } from "pinia";
+import {defineStore} from "pinia";
 import api from "@/api/instance";
-import { useToast } from "vue-toast-notification";
-import { Ref, ref } from "vue";
+import {useToast} from "vue-toast-notification";
+import {type Ref, ref} from "vue";
 import checkStatus from "@/mixins/CheckStatus";
 
 const toast = useToast();
@@ -23,11 +23,15 @@ export const useStaffStore = defineStore("staff", () => {
         const url = staff.id ? `/user/${staff.id}` : "/user";
         const method = staff.id ? "put" : "post";
 
+        const {email, ...staffOmitEmail} = staff
+
+        const sendingStaff = staff.email ? staff : staffOmitEmail
+
         try {
             const response = await api[method](
                 url,
-                {...staff, picture:""},
-                { headers: { "Content-Type": "application/json" } }
+                {...sendingStaff, picture: ""},
+                {headers: {"Content-Type": "application/json"}}
             );
             checkStatus(response)
             toast.success("Данные сохранены");
@@ -43,7 +47,7 @@ export const useStaffStore = defineStore("staff", () => {
             const response = await api.post(
                 `/user/${id}`,
                 avatar,
-                { headers: { "Content-Type": "multipart/form-data" } }
+                {headers: {"Content-Type": "multipart/form-data"}}
             );
             checkStatus(response)
             toast.success("Данные сохранены");
