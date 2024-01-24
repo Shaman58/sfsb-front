@@ -22,20 +22,35 @@
 
 <script setup lang="ts">
 
-import {computed, onMounted, type Ref, ref, toRef, toValue, watch} from "vue";
+import {computed, type MaybeRef, onMounted, type Ref, ref, toRef, toValue, watch} from "vue";
 import {storeToRefs} from "pinia";
 import {useMaterialsStore} from "@/pinia-store/materials";
 import {useToolingStore} from "@/pinia-store/tooling";
 import {useCuttersStore} from "@/pinia-store/cutters";
 import {useSpecialStore} from "@/pinia-store/specials";
 import MaterialComponent from "@/components/data-page/Material.vue";
+import Material from "@/components/data-page/Material.vue";
 import ToolComponent from "@/components/data-page/Tool.vue";
 
+// type CommonType = Partial<Material> & Partial<Tool>
+type CommonType = {
+    id: number;
+    created?: string | null;
+    updated?: string | null;
+    toolName?: string;
+    description?: string;
+    materialName?: string;
+    gost1?: string;
+    gost2?: string | null;
+    geometry?: string;
+    price?: ItemPrice;
+    density?: number;
+}
 
 interface SwitchTab {
     id: number
     name: string,
-    list: Ref<Material[]> | Ref<Tool[]>
+    list: MaybeRef<CommonType[]>
     type: "Tool" | "Material"
 }
 
@@ -49,6 +64,11 @@ const {fetchToolings} = useToolingStore()
 const {fetchCutters} = useCuttersStore()
 const {fetchSpecials} = useSpecialStore()
 
+!materials.value.length && await fetchMaterials()
+!toolings.value.length && await fetchToolings()
+!cutters.value.length && await fetchCutters()
+!specials.value.length && await fetchSpecials()
+
 
 const switches: Readonly<SwitchTab[]> = [
     {id: 1, name: "Материалы", list: materials, type: "Material"},
@@ -58,10 +78,10 @@ const switches: Readonly<SwitchTab[]> = [
 ] as const
 
 const currentTab = toRef(switches[0])
-const currentTool: Ref<Material> | Ref<Tool> = ref(toValue(currentTab.value.list).at(0) as Material)
+const currentTool: Ref<CommonType> = ref(toValue(currentTab.value.list).at(0) as Material)
 const list = ref([])
 
-const normalizedList = computed(() => toValue(currentTab.value.list).map((e: Partial<Material> & Partial<Tool>) => {
+const normalizedList = computed(() => toValue(currentTab.value.list).map((e: CommonType) => {
     if ("materialName" in e) {
         const {materialName, ...other} = e
         return {...other, name: e.materialName}
@@ -94,11 +114,6 @@ const filtredList = computed(() => {
 
 
 onMounted(async () => {
-    !materials.value.length && await fetchMaterials()
-    !toolings.value.length && await fetchToolings()
-    !cutters.value.length && await fetchCutters()
-    !specials.value.length && await fetchSpecials()
-
     currentTool.value = toValue(currentTab.value.list).at(0) as Material
 })
 

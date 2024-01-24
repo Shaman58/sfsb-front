@@ -19,7 +19,7 @@
 <script setup lang="ts">
 import {onMounted, type Ref, ref, toRefs, watchEffect} from "vue";
 
-const props = defineProps<{ tool: Tool }>()
+const props = defineProps<{ tool: Partial<Tool> }>()
 const {tool} = toRefs(props)
 const form = ref<HTMLFormElement>()
 

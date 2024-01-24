@@ -10,7 +10,7 @@ import {useToast} from "vue-toast-notification";
 import {storeToRefs} from "pinia";
 import CompanyPage from "@/views/CompanyPage.vue";
 import Company1 from "@/components/company/Company1.vue";
-import DataPageTabs from "@/views/DataPageTabs.vue";
+import DataPage1 from "@/views/DataPage1.vue";
 
 const toast = useToast();
 
@@ -35,7 +35,7 @@ const routes = [
     },
     {
         path: "/date",
-        component: DataPageTabs,
+        component: DataPage1,
         meta: {
             onlyFor: ["TECHNOLOGIST", "ADMIN"],
         },
