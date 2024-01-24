@@ -1,38 +1,51 @@
 <template lang="pug">
-    v-form.material-form(ref="form" v-if="currentTool")
+    v-form.material-form(ref="form" v-if="currentTool" @submit="save")
         v-card.material-form__card
             v-card-title.material-form__title
                 span.material-form__title-name {{ currentTool.toolName}}
                 span.material-form__title-description {{ currentTool.description}}
             v-card-text.material-form__controls
                 .material-form__controls-content
-                    v-text-field.material-form__input(label="Наименование" v-model="currentTool.toolName" )
+                    v-text-field.material-form__input(label="Наименование" v-model="currentTool.toolName" :rules="[rules.required, rules.nameValidation]")
                     v-text-field.material-form__input(label="Описание" v-model="currentTool.description")
             v-card-actions.material-form__actions
-                v-btn.material-form__btn {{ newFlag ? "Сохранить" : "Изменить" }}
+                v-btn.material-form__btn(type="submit") {{ newFlag ? "Сохранить" : "Изменить" }}
                 v-spacer
-                v-btn.material-form__btn(@click="insert" color="orangered") Добавить новый
+                v-btn.material-form__btn(@click="insert" color="orange") Добавить новый
 
 
 </template>
 
 <script setup lang="ts">
 import {onMounted, type Ref, ref, toRefs, watchEffect} from "vue";
+import {useValidationRules} from "@/mixins/FieldValidationRules";
 
-const props = defineProps<{ tool: Partial<Tool> }>()
-const {tool} = toRefs(props)
+const props = defineProps<{ item: Partial<Tool> }>()
+const {item} = toRefs(props)
 const form = ref<HTMLFormElement>()
 
-const currentTool: Ref<Partial<Tool>> = ref(props.tool)
+const emit = defineEmits(["save"])
+
+const {rules} = useValidationRules();
+
+const currentTool: Ref<Partial<Tool>> = ref(item.value)
 const newFlag: Ref<boolean> = ref(false)
 
+const save = async () => {
+    if (!form.value) return
+    const valid: { valid: boolean, errors: Ref<string[]> } = await form.value?.validate()
+    if (valid.valid) {
+        emit('save', currentTool)
+    }
+}
+
 onMounted(() => {
-    currentTool.value = tool.value
+    currentTool.value = item.value
 })
 
 watchEffect(() => {
-    console.log("tool props", tool)
-    currentTool.value = tool.value
+    console.log("item props", item)
+    currentTool.value = item.value
     newFlag.value = false
 })
 

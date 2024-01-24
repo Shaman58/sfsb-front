@@ -15,7 +15,7 @@ export const useMaterialsStore = defineStore("materials", () => {
         loading.value = false
     };
 
-    const saveMaterial = async (material: Material) => {
+    const saveMaterial = async (material: Partial<Material>) => {
         const url = material.id ? `/material/${material.id}` : "/material";
         const method: keyof Axios = material.id ? "put" : "post"
         loading.value = true
@@ -32,6 +32,7 @@ export const useMaterialsStore = defineStore("materials", () => {
 
     return {
         materials,
+        loading,
         fetchMaterials,
         saveMaterial,
         deleteMaterial,

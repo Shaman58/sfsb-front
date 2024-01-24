@@ -85,7 +85,7 @@ declare interface Material {
     updated: null;
     materialName: string;
     gost1: string;
-    gost2: null;
+    gost2: string | null;
     geometry: string;
     price: ItemPrice;
     density: number;
