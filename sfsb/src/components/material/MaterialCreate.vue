@@ -32,7 +32,7 @@
 
 <script setup lang="ts">
 import {useRoute} from "vue-router"
-import {ref, toRef} from "vue";
+import {ref} from "vue";
 import materialDataFormatting from '@/mixins/MaterialDataFormatting'
 import {useValidationRules} from "@/mixins/FieldValidationRules";
 import CONST from "@/consts"
@@ -61,8 +61,8 @@ const {materialTemplates: templates} = storeToRefs(useMaterialTemplatesStore())
 
 const form = ref<HTMLFormElement | null>(null);
 const valid = ref(false);
-const materialLocal = toRef(props, "material")
-const material = ref({...props.material, price: {...props.material?.price}})
+const materialLocal = ref(props.material)
+// const material = ref({...props.material, price: {...props.material?.price}})
 
 const save = (material: Material) => {
     if (form.value && form.value.validate()) {
@@ -73,7 +73,7 @@ const save = (material: Material) => {
 
 const hide = () => {
     emit("hide");
-    material.value = {...props.material, price: {...props.material.price}};
+    // material.value = {...props.material, price: {...props.material.price}};
 };
 
 </script>
