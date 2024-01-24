@@ -3,28 +3,29 @@
         v-card.material-form__card
             v-card-title.material-form__title {{ materialLocal.materialName}}
             v-card-text.material-form__controls
-                v-row
-                    v-col(cols="4")
-                        v-text-field(label="Название:" v-model="materialLocal.materialName" :rules="[rules.required, rules.nameValidation]" counter :disabled="route.path !== '/date'")
-                    v-col(cols="4")
-                        v-select(label="Выберите вид:" :items="geometries" item-title="title" item-value="label"
-                            v-model="materialLocal.geometry" :rules="[rules.required]" :disabled="route.path !== '/date'")
-                    v-col(cols="4")
-                        v-text-field(label="Гост на метериал:" v-model="materialLocal.gost1" :disabled="route.path !== '/date'")
-                v-row
-                    v-col(cols="4")
-                        v-select(label="Выберите плотность:" :items="templates" item-title="materialTypeName"
-                            item-value="density" v-model="materialLocal.density" :disabled="route.path !== '/date'")
-                    v-col(cols="2")
-                        v-text-field(label="Плотность:" v-model="materialLocal.density"
-                            :rules="[rules.required, rules.numeric]" :disabled="route.path !== '/date'")
-                    v-col(cols="2")
-                        v-text-field(label="Стоимость килограмма:" v-model="materialLocal.price.amount"
-                            :rules="[rules.required, rules.numeric]" type="number"
-                            :disabled="route.path !== '/date' && route.path !== '/supplier'")
-                    v-col(cols="4")
-                        v-text-field(label="Гост на сортамент:" v-model="materialLocal.gost2"
-                            :disabled="route.path !== '/date'")
+                .material-form__controls-content
+                    v-row
+                        v-col(cols="4")
+                            v-text-field(label="Название:" v-model="materialLocal.materialName" :rules="[rules.required, rules.nameValidation]" counter :disabled="route.path !== '/date'")
+                        v-col(cols="4")
+                            v-select(label="Выберите вид:" :items="geometries" item-title="title" item-value="label"
+                                v-model="materialLocal.geometry" :rules="[rules.required]" :disabled="route.path !== '/date'")
+                        v-col(cols="4")
+                            v-text-field(label="Гост на метериал:" v-model="materialLocal.gost1" :disabled="route.path !== '/date'")
+                    v-row
+                        v-col(cols="4")
+                            v-select(label="Выберите плотность:" :items="templates" item-title="materialTypeName"
+                                item-value="density" v-model="materialLocal.density" :disabled="route.path !== '/date'")
+                        v-col(cols="2")
+                            v-text-field(label="Плотность:" v-model="materialLocal.density"
+                                :rules="[rules.required, rules.numeric]" :disabled="route.path !== '/date'")
+                        v-col(cols="2")
+                            v-text-field(label="Стоимость килограмма:" v-model="materialLocal.price.amount"
+                                :rules="[rules.required, rules.numeric]" type="number"
+                                :disabled="route.path !== '/date' && route.path !== '/supplier'")
+                        v-col(cols="4")
+                            v-text-field(label="Гост на сортамент:" v-model="materialLocal.gost2"
+                                :disabled="route.path !== '/date'")
 
             v-card-actions.material-form__actions
                 v-btn.material-form__btn(@click="save") Изменить
@@ -105,4 +106,8 @@ onUpdated(() => {
         height: 100%
         display: grid
         grid-template-rows: 50px 1fr 50px
+
+    &__controls
+        display: grid
+        place-items: center stretch
 </style>

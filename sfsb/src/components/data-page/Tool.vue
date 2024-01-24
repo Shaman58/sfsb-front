@@ -5,8 +5,9 @@
                 span.material-form__title-name {{ currentTool.toolName}}
                 span.material-form__title-description {{ currentTool.description}}
             v-card-text.material-form__controls
-                v-text-field.material-form__input(label="Наименование" v-model="currentTool.toolName" )
-                v-text-field.material-form__input(label="Описание" v-model="currentTool.description")
+                .material-form__controls-content
+                    v-text-field.material-form__input(label="Наименование" v-model="currentTool.toolName" )
+                    v-text-field.material-form__input(label="Описание" v-model="currentTool.description")
             v-card-actions.material-form__actions
                 v-btn.material-form__btn {{ newFlag ? "Сохранить" : "Изменить" }}
                 v-spacer
@@ -66,4 +67,8 @@ const insert = () => {
         font-size: 0.95rem
         font-weight: 200
         color: #0009
+
+    &__controls
+        display: grid
+        place-items: center stretch
 </style>

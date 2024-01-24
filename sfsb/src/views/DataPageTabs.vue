@@ -2,12 +2,12 @@
     .datapage-tabs
         .datapage-tabs__container
             .datapage-tabs__switches
-                v-btn(variant="tonal" v-for="key in switches" :key="key.id" @click="switchTab(key)") {{ key.name }}
+                v-btn( v-for="key in switches" :key="key.id" @click="switchTab(key)" :variant="key.id === currentTab.id ? 'flat' : 'tonal'") {{ key.name }}
             .datapage-tabs__main
                 .datapage-tabs__list-container
                     v-text-field(label="фильтр")
                     v-list.datapage-tabs__list
-                        v-list-item.datapage-tabs__list-item(v-for="item in normalizedList" :key="item.id" @click="setCurrentTool(item)")
+                        v-list-item.datapage-tabs__list-item(v-for="item in normalizedList" :key="item.id" @click="setCurrentTool(item)" :variant="item.id === currentTool.id ? 'tonal' : 'flat'" )
                             .datapage-tabs__list-name {{ item.name }}
                             .datapage-tabs__list-options
                                 .datapage-tabs__list-option(v-if="item.gost1") {{ item.gost1}}
