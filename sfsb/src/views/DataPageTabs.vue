@@ -5,9 +5,9 @@
                 v-btn( v-for="key in switches" :key="key.id" @click="switchTab(key)" :variant="key.id === currentTab.id ? 'flat' : 'tonal'") {{ key.name }}
             .datapage-tabs__main
                 .datapage-tabs__list-container
-                    v-text-field(label="фильтр")
+                    v-text-field(label="фильтр" v-model="filterText" )
                     v-list.datapage-tabs__list
-                        v-list-item.datapage-tabs__list-item(v-for="item in normalizedList" :key="item.id" @click="setCurrentTool(item)" :variant="item.id === currentTool.id ? 'tonal' : 'flat'" )
+                        v-list-item.datapage-tabs__list-item(v-for="item in filtredList" :key="item.id" @click="setCurrentTool(item)" :variant="item.id === currentTool?.id ? 'tonal' : 'flat'" )
                             .datapage-tabs__list-name {{ item.name }}
                             .datapage-tabs__list-options
                                 .datapage-tabs__list-option(v-if="item.gost1") {{ item.gost1}}
@@ -61,7 +61,7 @@ const currentTab = toRef(switches[0])
 const currentTool: Ref<Material> | Ref<Tool> = ref(toValue(currentTab.value.list).at(0) as Material)
 const list = ref([])
 
-const normalizedList = computed(() => toValue(currentTab.value.list).map((e: Material | Tool) => {
+const normalizedList = computed(() => toValue(currentTab.value.list).map((e: Partial<Material> & Partial<Tool>) => {
     if ("materialName" in e) {
         const {materialName, ...other} = e
         return {...other, name: e.materialName}
@@ -82,6 +82,16 @@ const setCurrentTool = (item: typeof normalizedList.value[0]) => {
     const found = currentTab.value.list.find(e => e.id === item.id)
     found && (currentTool.value = found)
 }
+
+const filterText = ref("")
+const filtredList = computed(() => {
+    if (!filterText.value) return normalizedList.value
+    return normalizedList.value.filter(e => {
+        const concat = `${e.name} ${e?.description || ""} ${e?.gost1 || ""} ${e?.gost2 || ""}`
+        return concat.includes(filterText.value)
+    })
+})
+
 
 onMounted(async () => {
     !materials.value.length && await fetchMaterials()
@@ -104,7 +114,7 @@ watch([currentTab], () => {
     margin-top: var(--top)
     padding-top: 2rem
     height: calc(100dvh - 42px)
-    background-color: #ddd
+    background-color: rgba(174, 174, 231, 0.3)
 
     &__container
         margin-inline: 1rem
