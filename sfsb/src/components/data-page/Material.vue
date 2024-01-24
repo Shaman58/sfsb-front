@@ -1,6 +1,5 @@
 <template lang="pug">
     v-form.material-form(ref="form" v-if="materialLocal" )
-        | {{materialLocal}}
         v-card.material-form__card
             v-card-title.material-form__title {{ materialLocal.materialName}}
             v-card-text.material-form__controls
@@ -35,7 +34,7 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, type Ref, ref, toRefs, toValue, watch} from "vue";
+import {onMounted, onUpdated, type Ref, ref, toRefs, toValue, watchEffect} from "vue";
 import {useValidationRules} from "@/mixins/FieldValidationRules";
 import {useRoute} from "vue-router";
 import CONST from "@/consts";
@@ -75,6 +74,9 @@ const insert = () => {
         gost1: "",
         gost2: "",
         density: 0,
+        price: {
+            amount: 0
+        }
     }
 }
 onMounted(async () => {
@@ -83,8 +85,12 @@ onMounted(async () => {
 
 })
 
-watch([material], () => {
+watchEffect(() => {
     materialLocal.value = material.value
+})
+
+onUpdated(() => {
+    console.log("Material was updated")
 })
 
 
@@ -92,5 +98,11 @@ watch([material], () => {
 
 
 <style scoped lang="sass">
+.material-form
+    height: 100%
 
+    &__card
+        height: 100%
+        display: grid
+        grid-template-rows: 50px 1fr 50px
 </style>

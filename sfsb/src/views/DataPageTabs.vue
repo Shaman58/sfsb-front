@@ -3,18 +3,16 @@
         .datapage-tabs__container
             .datapage-tabs__switches
                 v-btn(variant="tonal" v-for="key in switches" :key="key.id" @click="switchTab(key)") {{ key.name }}
-            v-card.datapage-tabs__main
-                v-card.datapage-tabs__list-container
-                    v-card-title
-                        v-text-field(label="фильтр")
-                    v-card-text
-                        v-list.datapage-tabs__list
-                            v-list-item.datapage-tabs__list-item(v-for="item in normalizedList" :key="item.id" @click="setCurrentTool(item)")
-                                .datapage-tabs__list-name {{ item.name }}
-                                .datapage-tabs__list-options
-                                    .datapage-tabs__list-option(v-if="item.gost1") {{ item.gost1}}
-                                    .datapage-tabs__list-option(v-if="item.gost2") {{ item.gost2}}
-                                    .datapage-tabs__list-option(v-if="item.description") {{ item.description}}
+            .datapage-tabs__main
+                .datapage-tabs__list-container
+                    v-text-field(label="фильтр")
+                    v-list.datapage-tabs__list
+                        v-list-item.datapage-tabs__list-item(v-for="item in normalizedList" :key="item.id" @click="setCurrentTool(item)")
+                            .datapage-tabs__list-name {{ item.name }}
+                            .datapage-tabs__list-options
+                                .datapage-tabs__list-option(v-if="item.gost1") {{ item.gost1}}
+                                .datapage-tabs__list-option(v-if="item.gost2") {{ item.gost2}}
+                                .datapage-tabs__list-option(v-if="item.description") {{ item.description}}
                 .datapage-tabs__card
                     .datapage-tabs__card-content(v-if="currentTab?.type==='Material'")
                         MaterialComponent(:material="currentTool" )
@@ -102,13 +100,16 @@ watch([currentTab], () => {
 
 <style scoped lang="sass">
 .datapage-tabs
-    --top: 40px
+    --top: 10px
     margin-top: var(--top)
-    height: calc(min(100%, 100dvh) - var(--top))
+    padding-top: 2rem
+    height: calc(100dvh - 42px)
+    background-color: #ddd
 
     &__container
         margin-inline: 1rem
         height: 100%
+
         display: grid
         grid-template-rows: 50px 1fr
 
@@ -118,11 +119,30 @@ watch([currentTab], () => {
         gap: 0.5rem
 
     &__main
-        height: 100%
+        height: min(520px, 100%)
+        //overflow-y: auto
         margin-top: 1rem
         display: grid
         grid-template-columns: 1fr 4fr
         gap: .5rem
+
+    &__list-container
+        display: grid
+        grid-template-rows: 50px 1fr
+        overflow-y: auto
+        gap: 1rem
+
+    &__list
+        border-radius: 4px
+
+        &::-webkit-scrollbar
+            width: 4px
+            background-color: transparent
+
+        &::-webkit-scrollbar-thumb
+            width: 4px
+            background-color: #777
+            border-radius: 8px
 
     &__list-name
         font-size: 1.1rem
@@ -138,5 +158,10 @@ watch([currentTab], () => {
         font-weight: 200
         font-size: 0.9rem
 
+    &__card
+        height: 100%
+
+    &__card-content
+        height: 100%
 
 </style>
