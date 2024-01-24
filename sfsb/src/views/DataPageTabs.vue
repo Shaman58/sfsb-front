@@ -14,8 +14,7 @@
                                 .datapage-tabs__list-option(v-if="item.gost2") {{ item.gost2}}
                                 .datapage-tabs__list-option(v-if="item.description") {{ item.description}}
                 .datapage-tabs__card
-                    component(:is="currentTab?.type==='Material' ? MaterialComponent : ToolComponent"
-                        :item="currentTool" @save="saveTool")
+                    component(:is="selectedComponent" :item="currentTool")
 </template>
 
 <script setup lang="ts">
@@ -50,7 +49,6 @@ interface SwitchTab {
     name: string,
     list: MaybeRef<CommonType[]>
     type: "Tool" | "Material"
-    save: (tool: Tool) => Promise<void>
 }
 
 const {materials} = storeToRefs(useMaterialsStore())
@@ -59,9 +57,9 @@ const {cutters} = storeToRefs(useCuttersStore())
 const {specials} = storeToRefs(useSpecialStore())
 
 const {fetchMaterials} = useMaterialsStore()
-const {fetchToolings, saveToolings} = useToolingStore()
-const {fetchCutters, saveCutter} = useCuttersStore()
-const {fetchSpecials, saveSpecial} = useSpecialStore()
+const {fetchToolings} = useToolingStore()
+const {fetchCutters} = useCuttersStore()
+const {fetchSpecials} = useSpecialStore()
 
 !materials.value.length && await fetchMaterials()
 !toolings.value.length && await fetchToolings()
@@ -70,16 +68,13 @@ const {fetchSpecials, saveSpecial} = useSpecialStore()
 
 
 const switches: Readonly<SwitchTab[]> = [
-    {
-        id: 1, name: "Материалы", list: materials, type: "Material", save: async (tool: Tool) => {
-        }
-    },
-    {id: 2, name: "Инструменты", list: cutters, type: "Tool", save: saveCutter},
-    {id: 3, name: "Специнструменты", list: specials, type: "Tool", save: saveSpecial},
-    {id: 4, name: "Остастка", list: toolings, type: "Tool", save: saveToolings},
+    {id: 1, name: "Материалы", list: materials, type: "Material"},
+    {id: 2, name: "Инструменты", list: cutters, type: "Tool"},
+    {id: 3, name: "Специнструменты", list: specials, type: "Tool"},
+    {id: 4, name: "Остастка", list: toolings, type: "Tool"}
 ] as const
 
-const currentTab = toRef(switches[0])
+const currentTab: Ref<SwitchTab> = toRef(switches[0])
 const currentTool: Ref<CommonType> = ref(toValue(currentTab.value.list).at(0) as Material)
 const list = ref([])
 
@@ -94,6 +89,8 @@ const normalizedList = computed(() => toValue(currentTab.value.list).map((e: Com
     }
 }))
 
+const selectedComponent = computed(() => currentTab.value.type === 'Material' ? MaterialComponent : ToolComponent)
+
 const switchTab = (item: SwitchTab) => {
     currentTab.value = toValue(item)
     currentTool.value = normalizedList.value.at(0)
@@ -101,7 +98,7 @@ const switchTab = (item: SwitchTab) => {
 
 const setCurrentTool = (item: typeof normalizedList.value[0]) => {
     if (!item) return
-    const found = currentTab.value.list.find(e => e.id === item.id)
+    const found = currentTab.value.list.find((e: CommonType) => e.id === item.id)
     found && (currentTool.value = found)
 }
 
@@ -109,14 +106,12 @@ const filterText = ref("")
 const filtredList = computed(() => {
     if (!filterText.value) return normalizedList.value
     return normalizedList.value.filter(e => {
+        if (!e) return false
         const concat = `${e.name} ${e?.description || ""} ${e?.gost1 || ""} ${e?.gost2 || ""}`
         return concat.includes(filterText.value)
     })
 })
 
-const saveTool = async (e: Tool) => {
-    await currentTab.value.save(e)
-}
 
 onMounted(async () => {
     currentTool.value = toValue(currentTab.value.list).at(0) as Material
@@ -129,6 +124,12 @@ watch([currentTab], () => {
 
 
 <style scoped lang="sass">
+.fade-enter-active, .fade-leave-active
+    transition: opacity .5s
+
+.fade-enter-from, .fade-leave-to
+    opacity: 0
+
 .datapage-tabs
     --top: 10px
     margin-top: var(--top)

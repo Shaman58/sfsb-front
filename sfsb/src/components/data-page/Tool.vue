@@ -1,5 +1,6 @@
 <template lang="pug">
-    v-form.material-form(ref="form" v-if="currentTool" @submit="save")
+    v-form.material-form(ref="form" v-if="currentTool" @submit.prevent="save")
+        v-progress-linear(:active="loading" color="orange" height="4" :indeterminate="true")
         v-card.material-form__card
             v-card-title.material-form__title
                 span.material-form__title-name {{ currentTool.toolName}}
@@ -19,6 +20,8 @@
 <script setup lang="ts">
 import {onMounted, type Ref, ref, toRefs, watchEffect} from "vue";
 import {useValidationRules} from "@/mixins/FieldValidationRules";
+import {useToolingStore} from "@/pinia-store/tooling";
+import {storeToRefs} from "pinia";
 
 const props = defineProps<{ item: Partial<Tool> }>()
 const {item} = toRefs(props)
@@ -31,11 +34,15 @@ const {rules} = useValidationRules();
 const currentTool: Ref<Partial<Tool>> = ref(item.value)
 const newFlag: Ref<boolean> = ref(false)
 
+const {loading} = storeToRefs(useToolingStore())
+const {saveToolings} = useToolingStore()
+
 const save = async () => {
     if (!form.value) return
     const valid: { valid: boolean, errors: Ref<string[]> } = await form.value?.validate()
     if (valid.valid) {
-        emit('save', currentTool)
+        await saveToolings(currentTool.value)
+        newFlag.value = false
     }
 }
 
