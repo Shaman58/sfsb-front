@@ -1,36 +1,37 @@
 <template lang="pug">
-v-container
-    v-card.supply
-        v-card-title.supply__title СНАБЖЕНИЕ
-        v-card.supply__main
-            Suspense
-                template(v-slot:fallback)
-                    div.supply__loader
-                SupplyCard.supply__nocost(title="Без цены: " :materials="'materialsNoCost'" @select="selectMaterial($event)" :getData="getMaterialsNoCost")
-            Suspense
-                template(v-slot:fallback)
-                    div.supply__loader
-                SupplyCard.supply__dataexpired(title="Просроченные: " :materials="'materialsDateExpired'" @select="selectMaterial($event)" :getData="getMaterialsDateExpired")
-            Suspense
-                template(v-slot:fallback)
-                    div.supply__loader
-                SupplyCard.supply__alllist(title="Все: " :materials="'materialsAll'" @select="selectMaterial($event)" :getData="getMaterialsAll")
+    v-container
+        v-card.supply
+            v-card-title.supply__title СНАБЖЕНИЕ
+            v-card.supply__main
+                Suspense
+                    template(v-slot:fallback)
+                        div.supply__loader
+                    SupplyCard.supply__nocost(title="Без цены: " :materials="'materialsNoCost'" @select="selectMaterial($event)" :getData="getMaterialsNoCost")
+                Suspense
+                    template(v-slot:fallback)
+                        div.supply__loader
+                    SupplyCard.supply__dataexpired(title="Просроченные: " :materials="'materialsDateExpired'" @select="selectMaterial($event)" :getData="getMaterialsDateExpired")
+                Suspense
+                    template(v-slot:fallback)
+                        div.supply__loader
+                    SupplyCard.supply__alllist(title="Все: " :materials="'materialsAll'" @select="selectMaterial($event)" :getData="getMaterialsAll")
 
-        v-dialog(v-model="selectedMaterial")
-            MaterialCreate(:material="selectedMaterial" :visible="true" :templates="[]" @hide="selectMaterial(null)" @save="save($event)")
+            v-dialog(v-model="wasSelectedMaterial")
+                MaterialCreate(:material="selectedMaterial" :visible="true" :templates="[]" @hide="selectMaterial(null)" @save="save($event)")
 
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { storeToRefs } from 'pinia'
-import { useSupplyStore } from '@/pinia-store/supply'
+import {computed, ref} from 'vue';
+import {useSupplyStore} from '@/pinia-store/supply'
 import SupplyCard from "./SupplyCard.vue"
 import MaterialCreate from "@/components/material/MaterialCreate.vue"
-const { getMaterialsAll, getMaterialsDateExpired, getMaterialsNoCost, saveMaterial } = useSupplyStore()
+
+const {getMaterialsAll, getMaterialsDateExpired, getMaterialsNoCost, saveMaterial} = useSupplyStore()
 
 
 const selectedMaterial = ref<Material | null>(null)
+const wasSelectedMaterial = computed(() => !!selectedMaterial.value)
 
 const selectMaterial = (material: Material) => {
     if (!material) return selectedMaterial.value = null
@@ -67,7 +68,7 @@ const save = async (material: Material) => {
         width: 100%
         height: 30vh
         border-radius: 10px
-        background: linear-gradient(45deg, #7777 0% var(--x), #9997 var(--x) calc(var(--x) + 2%) ,#7777 calc(var(--x) + 2%) 100%)
+        background: linear-gradient(45deg, #7777 0% var(--x), #9997 var(--x) calc(var(--x) + 2%), #7777 calc(var(--x) + 2%) 100%)
         animation: anim 1s infinite ease-in-out
 
     @keyframes anim
