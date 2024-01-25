@@ -8,7 +8,7 @@
 
 import OrderPreviewCard from "@/components/order/OrderPreviewCard.vue";
 import OrderListDialog from "@/components/order/OrderListDialog.vue";
-import {ref} from "vue";
+import {type Ref, ref} from "vue";
 import {storeToRefs} from "pinia";
 import {useOrdersStore} from "@/pinia-store/orders";
 import {useCustomersStore} from "@/pinia-store/customers";
@@ -20,12 +20,12 @@ await getOrders()
 
 const {customers} = storeToRefs(useCustomersStore())
 const visible = ref(false);
-const active = ref(-1);
+const active: Ref<number | undefined> = ref(-1);
 
 const save = async (data: Order) => {
     // const response = await store.dispatch("saveOrder", data);
     const response = await saveOrder(data)
-    active.value = response.id;
+    active.value = response?.id;
 };
 
 const remove = async (data: Order) => await deleteOrder(data);

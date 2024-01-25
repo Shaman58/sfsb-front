@@ -19,7 +19,7 @@
 
 <script setup lang="ts">
 
-import {computed, type MaybeRef, onMounted, type Ref, ref, toRef, toValue, watch} from "vue";
+import {computed, ComputedRef, onMounted, type Ref, ref, toValue, watch} from "vue";
 import {storeToRefs} from "pinia";
 import {useMaterialsStore} from "@/pinia-store/materials";
 import {useToolingStore} from "@/pinia-store/tooling";
@@ -42,12 +42,13 @@ type CommonType = {
     geometry?: string;
     price?: ItemPrice;
     density?: number;
+    name?: string;
 }
 
 interface SwitchTab {
     id: number
-    name: string,
-    list: MaybeRef<CommonType[]>
+    name: string
+    list: Ref<CommonType[]>
     type: "Tool" | "Material"
 }
 
@@ -74,11 +75,11 @@ const switches: Readonly<SwitchTab[]> = [
     {id: 4, name: "Остастка", list: toolings, type: "Tool"}
 ] as const
 
-const currentTab: Ref<SwitchTab> = toRef(switches[0])
-const currentTool: Ref<CommonType> = ref(toValue(currentTab.value.list).at(0) as Material)
+const currentTab: Ref<SwitchTab> = ref(switches[0])
+const currentTool: Ref<CommonType | undefined> = ref(toValue(currentTab.value.list).at(0) as Material)
 const list = ref([])
 
-const normalizedList = computed(() => toValue(currentTab.value.list).map((e: CommonType) => {
+const normalizedList: ComputedRef<(CommonType | undefined)[]> = computed(() => toValue(currentTab.value.list).map((e: CommonType) => {
     if ("materialName" in e) {
         const {materialName, ...other} = e
         return {...other, name: e.materialName}
@@ -98,7 +99,7 @@ const switchTab = (item: SwitchTab) => {
 
 const setCurrentTool = (item: typeof normalizedList.value[0]) => {
     if (!item) return
-    const found = currentTab.value.list.find((e: CommonType) => e.id === item.id)
+    const found = currentTab.value.list.value.find((e: CommonType) => e.id === item.id)
     found && (currentTool.value = found)
 }
 
@@ -118,7 +119,7 @@ onMounted(async () => {
 })
 
 watch([currentTab], () => {
-    currentTool.value = currentTab.value.list[0]
+    currentTool.value = currentTab.value.list.value[0]
 })
 </script>
 
