@@ -19,7 +19,7 @@
 
 <script setup lang="ts">
 
-import {computed, ComputedRef, onMounted, type Ref, ref, toValue, watch} from "vue";
+import {computed, type ComputedRef, onMounted, type Ref, ref, toValue, watch} from "vue";
 import {storeToRefs} from "pinia";
 import {useMaterialsStore} from "@/pinia-store/materials";
 import {useToolingStore} from "@/pinia-store/tooling";
