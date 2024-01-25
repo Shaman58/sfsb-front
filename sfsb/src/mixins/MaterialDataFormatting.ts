@@ -22,7 +22,8 @@ export default function useGeometryFormatting() {
         //TODO: данную функцию надо продебажить
 
         const workpieceDataString = workpieceData && workpieceData.reduce(
-            (acc, e) => acc + (geoms[`geom${e}`] ? geoms[`geom${e}`] : ""),
+            (acc, e) => acc
+                + ((geoms as Record<string, string>)[`geom${e}`] ? (geoms as Record<string, string>)[`geom${e}`] : ""),
             ""
         );
         return material.geometry && workpieceDataString

@@ -32,10 +32,12 @@
 </template>
 
 <script setup lang="ts">
-import {computed, ref, toRefs} from "vue";
+import {ref, toRefs} from "vue";
 import {useValidationRules} from "@/mixins/FieldValidationRules";
 import TechWorkpieceCard from "@/components/technology/TechWorkpieceCard.vue";
 import materialDataFormatting from "@/mixins/MaterialDataFormatting";
+import {storeToRefs} from "pinia";
+import {useMaterialsStore} from "@/pinia-store/materials";
 
 interface Props {
     visible: boolean
@@ -52,8 +54,7 @@ const toolItem = ref({} as AdditionalTool);
 const {formatWorkpieceData} = materialDataFormatting();
 const workpieceCardVisible = ref(false);
 const {additionals, visible} = toRefs(props);
-const materials = computed(() => store.getters.getMaterials);
-
+const {materials} = storeToRefs(useMaterialsStore())
 const showWorkpieceCard = () => {
     workpieceCardVisible.value = true;
 };

@@ -12,7 +12,7 @@ export const useCuttersStore = defineStore("cutters", () => {
 
     const fetchCutters = async () => {
         loading.value = true
-        cutters.value = await query(async () => await api.get("/cutter"), {success: ""})
+        cutters.value = await query(async () => await api.get("/cutter"), {success: ""}) || []
         loading.value = false
     };
 

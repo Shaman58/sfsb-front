@@ -13,7 +13,7 @@ export const useCustomersStore = defineStore("customers", () => {
 
     const fetchCustomers = async () => {
         loading.value = true;
-        customers.value = await query(async () => await api.get("/customer"), {success: ""})
+        customers.value = await query(async () => await api.get("/customer"), {success: ""}) || []
         loading.value = false;
     }
 

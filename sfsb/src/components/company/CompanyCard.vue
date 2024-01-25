@@ -77,7 +77,7 @@ const currentCompany = ref(initialCompany)
 const result = await getCompanyById(+route.params.id)
 
 currentCompany.value = {...result} as Company || {} as Company
-const picture = ref(currentCompany.value.logo?.link)
+const picture: Ref<string | ArrayBuffer | undefined> = ref(currentCompany.value.logo?.link)
 const changeLogo = (event: Event) => {
     const target = event.target as HTMLInputElement
     if (target.files && target.files[0] && target.files[0].size > 1024 * 1024) return toast.error("Максимальный размер файла 1MB")

@@ -21,7 +21,7 @@ export const useOrdersStore = defineStore("orders", () => {
         }
     };
 
-    const saveOrder = async (order: Order): Promise<Order> => {
+    const saveOrder = async (order: Order): Promise<Order | undefined> => {
         const url = order.id
             ? `/order/${order.id}`
             : '/order'
