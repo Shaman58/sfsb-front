@@ -29,7 +29,7 @@
             v-card-actions.material-form__actions
                 v-btn.material-form__btn(@click="save") {{ flagNew ? "Сохранить" : "Изменить" }}
                 v-spacer
-                v-btn.material-form__btn(@click="insert" :disabled="flagNew") Добавить новый
+                v-btn.material-form__btn(@click="insert" :disabled="flagNew" color="orange") Добавить новый
 
 </template>
 
@@ -50,12 +50,15 @@ const {saveMaterial} = useMaterialsStore()
 
 const props = defineProps<{ item: Material }>()
 const {item} = toRefs(props)
+
+const emit = defineEmits(["save"])
+
 const form = ref<HTMLFormElement>()
 const route = useRoute()
 
 const {rules} = useValidationRules();
 const geometries = CONST.GEOMETRIES
-const materialLocal: Ref<Partial<Material>> = ref(item.value)
+const materialLocal = ref<Partial<Material>>(item.value)
 const flagNew = ref(false)
 
 // const isDiffPropsLocal: ComputedRef<boolean> = computed(() => {
@@ -69,7 +72,7 @@ const save = async () => {
     if (!materialLocal.value || !form.value) return
     const valid: { valid: boolean, errors: Ref<string[]> } = await form.value?.validate()
     if (valid.valid) {
-        await saveMaterial(materialLocal.value)
+        emit("save", materialLocal.value)
         flagNew.value = false
     }
 }

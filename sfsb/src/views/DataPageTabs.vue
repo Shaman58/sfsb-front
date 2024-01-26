@@ -14,7 +14,7 @@
                                 .datapage-tabs__list-option(v-if="item.gost2") {{ item.gost2}}
                                 .datapage-tabs__list-option(v-if="item.description") {{ item.description}}
                 .datapage-tabs__card
-                    component(:is="selectedComponent" :item="currentTool")
+                    component(:is="selectedComponent" :item="currentTool" @save="save")
 </template>
 
 <script setup lang="ts">
@@ -52,6 +52,7 @@ interface SwitchTab {
     name: string
     list: Ref<PartialCommonType[]>
     type: "Tool" | "Material"
+    save: (item: Partial<Material> | Partial<Tool>) => Promise<void>
 }
 
 const {materials} = storeToRefs(useMaterialsStore())
@@ -59,10 +60,10 @@ const {toolings} = storeToRefs(useToolingStore())
 const {cutters} = storeToRefs(useCuttersStore())
 const {specials} = storeToRefs(useSpecialStore())
 
-const {fetchMaterials} = useMaterialsStore()
-const {fetchToolings} = useToolingStore()
-const {fetchCutters} = useCuttersStore()
-const {fetchSpecials} = useSpecialStore()
+const {fetchMaterials, saveMaterial} = useMaterialsStore()
+const {fetchToolings, saveToolings} = useToolingStore()
+const {fetchCutters, saveCutter} = useCuttersStore()
+const {fetchSpecials, saveSpecial} = useSpecialStore()
 
 !materials.value.length && await fetchMaterials()
 !toolings.value.length && await fetchToolings()
@@ -71,10 +72,10 @@ const {fetchSpecials} = useSpecialStore()
 
 
 const switches: Readonly<SwitchTab[]> = [
-    {id: 1, name: "Материалы", list: materials, type: "Material"},
-    {id: 2, name: "Инструменты", list: cutters, type: "Tool"},
-    {id: 3, name: "Специнструменты", list: specials, type: "Tool"},
-    {id: 4, name: "Остастка", list: toolings, type: "Tool"}
+    {id: 1, name: "Материалы", list: materials, type: "Material", save: saveMaterial},
+    {id: 2, name: "Инструменты", list: toolings, type: "Tool", save: saveToolings},
+    {id: 3, name: "Специнструменты", list: specials, type: "Tool", save: saveSpecial},
+    {id: 4, name: "Остастка", list: cutters, type: "Tool", save: saveCutter}
 ] as const
 
 const currentTab = ref<SwitchTab>(switches[0])
@@ -110,10 +111,14 @@ const filtredList = computed(() => {
     if (!filterText.value) return normalizedList.value
     return normalizedList.value.filter(e => {
         if (!e) return false
-        const concat = `${e.name} ${e?.description || ""} ${e?.gost1 || ""} ${e?.gost2 || ""}`
-        return concat.includes(filterText.value)
+        const concat = `${e?.name?.toLowerCase()} ${e?.description?.toLowerCase() || ""} ${e?.gost1?.toLowerCase() || ""} ${e?.gost2?.toLowerCase() || ""}`
+        return concat.includes(filterText.value.toLowerCase())
     })
 })
+
+const save = async (ev: CommonType) => {
+    await currentTab.value.save(ev)
+}
 
 
 onMounted(async () => {

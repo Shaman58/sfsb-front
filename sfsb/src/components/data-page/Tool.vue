@@ -12,7 +12,7 @@
             v-card-actions.material-form__actions
                 v-btn.material-form__btn(type="submit") {{ newFlag ? "Сохранить" : "Изменить" }}
                 v-spacer
-                v-btn.material-form__btn(@click="insert" color="orange") Добавить новый
+                v-btn.material-form__btn(@click="insert" color="orange" :disabled="newFlag") Добавить новый
 
 
 </template>
@@ -25,9 +25,10 @@ import {storeToRefs} from "pinia";
 
 const props = defineProps<{ item: Partial<Tool> }>()
 const {item} = toRefs(props)
-const form = ref<HTMLFormElement>()
 
 const emit = defineEmits(["save"])
+
+const form = ref<HTMLFormElement>()
 
 const {rules} = useValidationRules();
 
@@ -41,7 +42,7 @@ const save = async () => {
     if (!form.value) return
     const valid: { valid: boolean, errors: Ref<string[]> } = await form.value?.validate()
     if (valid.valid) {
-        await saveToolings(currentTool.value)
+        emit("save", currentTool.value)
         newFlag.value = false
     }
 }

@@ -25,7 +25,7 @@ export const useSpecialStore = defineStore("specials", () => {
         loading.value = false
     };
 
-    const deleteSpecial = async (special: Tool) => {
+    const deleteSpecial = async (special: Partial<Tool>) => {
         loading.value = true
         await query(async () => await api.delete(`/special/${special.id}`))
         loading.value = false
