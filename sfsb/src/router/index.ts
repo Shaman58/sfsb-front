@@ -34,7 +34,7 @@ const routes = [
         }
     },
     {
-        path: "/date",
+        path: "/data",
         component: DataPage1,
         meta: {
             onlyFor: ["TECHNOLOGIST", "ADMIN"],
