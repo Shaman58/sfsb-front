@@ -32,7 +32,7 @@ const save = async (data: Material) => {
     await saveMaterial(data);
 };
 
-const remove = async (data) => {
+const remove = async (data: Material) => {
     await deleteMaterial(data);
 };
 

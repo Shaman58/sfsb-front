@@ -32,8 +32,8 @@ import ToolComponent from "@/components/data-page/Tool.vue";
 // type CommonType = Partial<Material> & Partial<Tool>
 type CommonType = {
     id: number;
-    created?: string | null;
-    updated?: string | null;
+    created?: string | null | unknown;
+    updated?: string | null | unknown;
     toolName?: string;
     description?: string;
     materialName?: string;
@@ -45,10 +45,12 @@ type CommonType = {
     name?: string;
 }
 
+type PartialCommonType = Partial<CommonType>
+
 interface SwitchTab {
     id: number
     name: string
-    list: Ref<CommonType[]>
+    list: Ref<PartialCommonType[]>
     type: "Tool" | "Material"
 }
 
@@ -75,8 +77,8 @@ const switches: Readonly<SwitchTab[]> = [
     {id: 4, name: "Остастка", list: toolings, type: "Tool"}
 ] as const
 
-const currentTab: Ref<SwitchTab> = ref(switches[0])
-const currentTool: Ref<CommonType | undefined> = ref(toValue(currentTab.value.list).at(0) as Material)
+const currentTab = ref<SwitchTab>(switches[0])
+const currentTool: Ref<PartialCommonType | undefined> = ref(toValue(currentTab.value.list).at(0) as Material)
 const list = ref([])
 
 const normalizedList: ComputedRef<(CommonType | undefined)[]> = computed(() => toValue(currentTab.value.list).map((e: CommonType) => {
@@ -93,13 +95,13 @@ const normalizedList: ComputedRef<(CommonType | undefined)[]> = computed(() => t
 const selectedComponent = computed(() => currentTab.value.type === 'Material' ? MaterialComponent : ToolComponent)
 
 const switchTab = (item: SwitchTab) => {
-    currentTab.value = toValue(item)
+    currentTab.value = item
     currentTool.value = normalizedList.value.at(0)
 }
 
 const setCurrentTool = (item: typeof normalizedList.value[0]) => {
     if (!item) return
-    const found = currentTab.value.list.value.find((e: CommonType) => e.id === item.id)
+    const found = currentTab.value.list.find((e: CommonType) => e.id === item.id)
     found && (currentTool.value = found)
 }
 
@@ -119,7 +121,7 @@ onMounted(async () => {
 })
 
 watch([currentTab], () => {
-    currentTool.value = currentTab.value.list.value[0]
+    currentTool.value = currentTab.value.list[0]
 })
 </script>
 

@@ -42,7 +42,6 @@
 import TechnologyCreateDialog from "@/components/technology/TechnologyCreateDialog.vue";
 import {useOrdersStore} from '@/pinia-store/orders';
 import {storeToRefs} from 'pinia';
-import type {Ref} from 'vue'
 import {ref, watchEffect} from 'vue';
 import {useCurrentUserStore} from '@/pinia-store/currentUser';
 import {useTechnologyStore} from '@/pinia-store/technology';
@@ -68,7 +67,7 @@ const {staff} = storeToRefs(useStaffStore())
 const {getAllStaff} = useStaffStore()
 await getAllStaff()
 
-const currentOrder: Ref<Order | null> = ref(orders.value[0] || null)
+const currentOrder = ref<Order | null>(orders.value[0] || null)
 
 // const technologiesByUser = computed(() => currentOrder && currentOrder.value?.items.filter(item => item.technology.blocked === user.value?.id))
 

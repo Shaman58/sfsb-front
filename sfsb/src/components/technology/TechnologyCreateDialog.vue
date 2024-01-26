@@ -70,7 +70,7 @@
 </template>
 
 <script setup lang="ts">
-import {computed, type ComputedRef, type Ref, ref, watch} from "vue";
+import {computed, type Ref, ref, watch} from "vue";
 import TechWorkpieceCard from "@/components/technology/TechWorkpieceCard.vue";
 import SetupCreateCard from "@/components/technology/SetupCreateCard.vue";
 import 'vue-toast-notification/dist/theme-bootstrap.css'
@@ -164,7 +164,7 @@ const changeOwner = (event: boolean) => {
 }
 
 
-const sortedSetups: ComputedRef<Setup[]> = computed(() => {
+const sortedSetups = computed<Setup[]>(() => {
     if (currentItem.value.technology.setups.length !== 0) {
         const setups = currentItem.value.technology.setups.slice().sort((a: { setupNumber: number; }, b: {
             setupNumber: number;
@@ -183,7 +183,7 @@ const sortedSetups: ComputedRef<Setup[]> = computed(() => {
         }
         return setups;
     }
-    return [];
+    return [] as Setup[];
 });
 
 const additionalTexts = computed(() => {

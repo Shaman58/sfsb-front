@@ -82,7 +82,7 @@ declare interface ItemPrice {
 declare interface Material {
     id: number;
     created: string;
-    updated: null;
+    updated: string | unknown;
     materialName: string;
     gost1: string;
     gost2: string | null;
@@ -94,7 +94,7 @@ declare interface Material {
 declare interface Workpiece {
     id: number;
     created: string;
-    updated: null;
+    updated: string | unknown;
     material: Material;
     geom1: string;
     geom2: string;
@@ -103,16 +103,16 @@ declare interface Workpiece {
 
 declare interface Tool {
     id: number;
-    created: null;
-    updated: null;
+    created: string | null;
+    updated: string | null;
     toolName: string;
     description: string;
 }
 
 declare interface ToolItem {
     id: number;
-    created: string;
-    updated: null;
+    created: string | null | unknown;
+    updated: string | null;
     amount: number;
     price: ItemPrice;
     tool: Tool;
@@ -120,7 +120,7 @@ declare interface ToolItem {
 
 declare interface Operation {
     id: number;
-    created: null;
+    created: string | null;
     updated: string;
     operationName: string;
     paymentPerHour: ItemPrice | null;
@@ -136,7 +136,7 @@ declare interface AdditionalTool extends Tool {
 declare interface Setup {
     id: number;
     created: string;
-    updated: string;
+    updated: string | unknown;
     setupNumber: number;
     operation: Partial<Operation>;
     setupTime: string;
@@ -163,7 +163,7 @@ declare interface Technology {
     updated: string;
     drawingNumber: string;
     drawingName: string;
-    employee: null;
+    employee: unknown;
     quantityOfDefectiveParts: number;
     quantityOfSetUpParts: number;
     quantityOfPartsFromWorkpiece: number;
@@ -192,7 +192,7 @@ declare interface Item {
 declare interface Order {
     applicationNumber: number;
     businessProposal: string;
-    contact: null;
+    contact: unknown | null;
     created: string;
     customer: Customer;
     description: string;

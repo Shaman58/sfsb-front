@@ -9,7 +9,7 @@ const toast = useToast();
 
 export const useTechnologyStore = defineStore("technology", () => {
     const dialogVisible: Ref<boolean> = ref(false);
-    const currentItem: Ref<Item> = ref({} as Item);
+    const currentItem = ref<Item>({} as Item);
     const isBlockedByCurrentUser: Ref<boolean> = ref(false);
 
     const getTechnologyById = async (id: string | number) => {

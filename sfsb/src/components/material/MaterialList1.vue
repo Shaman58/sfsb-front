@@ -63,7 +63,7 @@ const filtered: ComputedRef<Material[]> = computed(() => {
     return materials.value.filter((item: Material) => {
         return (
             (!geometry.value || item.geometry === geometry.value) &&
-            (!filter.value || item.materialName.toLowerCase().includes(filter.value.toLowerCase()) || item.gost1.toLowerCase().includes(filter.value.toLowerCase()) || item.gost2.toLowerCase().includes(filter.value.toLowerCase()))
+            (!filter.value || item.materialName.toLowerCase().includes(filter.value.toLowerCase()) || item.gost1.toLowerCase().includes(filter.value.toLowerCase()) || item.gost2?.toLowerCase().includes(filter.value.toLowerCase()))
         );
     });
 });

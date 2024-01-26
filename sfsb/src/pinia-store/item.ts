@@ -1,13 +1,13 @@
-import { defineStore } from "pinia";
+import {defineStore} from "pinia";
 import api from "@/api/instance";
-import { useToast } from "vue-toast-notification";
-import { Ref, ref } from "vue";
+import {useToast} from "vue-toast-notification";
+import {ref} from "vue";
 
 const toast = useToast();
 
 export const useItemStore = defineStore("items", () => {
-    const items: Ref<Item[]> = ref([] as Item[]);
-    const item: Ref<Item> = ref({} as Item);
+    const items = ref<Item[]>([] as Item[]);
+    const item = ref<Item>({} as Item);
 
     const fetchItems = async () => {
         try {
@@ -30,7 +30,7 @@ export const useItemStore = defineStore("items", () => {
     const calculateItem = async (id: number) => {
         try {
             const response = await api.get("/doc/calculate", {
-                params: { itemId: id },
+                params: {itemId: id},
             });
             if (response.status === 200)
                 return toast.info("Успешно расчитано!");
