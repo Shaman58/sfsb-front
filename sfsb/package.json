@@ -1,12 +1,12 @@
 {
   "name": "sfsb",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "type": "module",
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
     "preview": "vite preview",
-    "docker": "docker build -t voskanvl/sfsb-front:0.1.7 . && docker push voskanvl/sfsb-front:0.1.7"
+    "docker": "docker build -t voskanvl/sfsb-front:0.1.8 . && docker push voskanvl/sfsb-front:0.1.8"
   },
   "dependencies": {
     "@mdi/font": "7.0.96",
