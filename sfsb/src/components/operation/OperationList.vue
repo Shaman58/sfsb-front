@@ -64,6 +64,7 @@ const clearOperation = () => {
 
 
 const filtered: ComputedRef<Operation[]> = computed(() => {
+    if (!props.operations) return []
     return props.operations.filter((item) => {
         return (
             (!filter.value || item.operationName.toLowerCase().includes(filter.value.toLowerCase()))

@@ -21,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import {computed, ref} from "vue";
+import {computed, type Ref, ref} from "vue";
 import ToolTemplateCreate from "@/components/tool/ToolCreate.vue";
 
 interface Props {
@@ -34,8 +34,8 @@ const props = defineProps<Props>();
 
 const emit = defineEmits(["remove", "hide", "save"]);
 
-const filter = ref(null);
-const active: number | string | null = ref(null);
+const filter: Ref<string | null> = ref(null);
+const active: Ref<number | string | null> = ref(null);
 
 const filtered = computed(() => {
     return props.tools.filter((item) => {

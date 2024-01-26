@@ -117,7 +117,7 @@ const specialVisible = ref(false);
 const additionalVisible = ref(false);
 const {formatWorkpieceData} = materialDataFormatting();
 
-const isExist = (!!(setup.operation?.operationName));
+const isExist = (!!(setup.value.operation?.operationName));
 
 const {specials} = storeToRefs(useSpecialStore())
 const {fetchSpecials} = useSpecialStore()
@@ -137,7 +137,7 @@ const {operations} = storeToRefs(useOperationsStore())
 const {fetchOperation} = useOperationsStore()
 !operations.value.length && await fetchOperation()
 
-const setupNumbers = computed(() => currentItem.value.technology.setups.filter(item => item.setupNumber !== setup.setupNumber).map(obj => obj.setupNumber));
+const setupNumbers = computed(() => currentItem.value.technology.setups.filter(item => item.setupNumber !== setup.value.setupNumber).map(obj => obj.setupNumber));
 const unitNumberValidationRule = rules.unitNumberValidation(setupNumbers);
 
 const save = (setup: Partial<Setup>) => emit("save", setup);

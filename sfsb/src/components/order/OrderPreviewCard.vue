@@ -15,7 +15,7 @@ const lastOrders = computed(() => {
     return [...orders].sort((a: Order, b: Order) => {
         const aDate = a.updated || a.created;
         const bDate = b.updated || b.created;
-        return new Date(bDate) - new Date(aDate);
+        return new Date(bDate).getDate() - new Date(aDate).getDate();
     }).slice(0, 3);
 });
 

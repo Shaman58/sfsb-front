@@ -1,7 +1,7 @@
 <template lang="pug">
     v-dialog(v-model="visible" :persistent="true")
         v-card(:title="formatMaterialData(materialLocal)")
-            v-form(ref="form" v-model="valid" @submit.prevent="save(materialLocal)")
+            v-form(ref="form" v-model="valid" @submit.prevent="save(materialLocal)" v-if="materialLocal")
                 v-card-text
                     v-row
                         v-col(cols="4")
@@ -32,7 +32,7 @@
 
 <script setup lang="ts">
 import {useRoute} from "vue-router"
-import {ref} from "vue";
+import {ref, toRefs} from "vue";
 import materialDataFormatting from '@/mixins/MaterialDataFormatting'
 import {useValidationRules} from "@/mixins/FieldValidationRules";
 import CONST from "@/consts"
@@ -46,6 +46,7 @@ const route = useRoute()
 const {user} = storeToRefs(useCurrentUserStore())
 
 const props = defineProps<{ material: Material }>();
+const {material: materialProp} = toRefs(props)
 const emit = defineEmits(["save", "hide"]);
 
 const visible = defineModel("visible")
@@ -61,8 +62,8 @@ const {materialTemplates: templates} = storeToRefs(useMaterialTemplatesStore())
 
 const form = ref<HTMLFormElement | null>(null);
 const valid = ref(false);
-const materialLocal = ref(props.material)
-// const material = ref({...props.material, price: {...props.material?.price}})
+const materialLocal = ref(materialProp)
+const material = ref({...materialProp.value, price: {...materialProp.value.price}})
 
 const save = (material: Material) => {
     if (form.value && form.value.validate()) {
@@ -73,7 +74,7 @@ const save = (material: Material) => {
 
 const hide = () => {
     emit("hide");
-    // material.value = {...props.material, price: {...props.material.price}};
+    material.value = {...materialProp.value, price: {...materialProp.value.price}};
 };
 
 </script>

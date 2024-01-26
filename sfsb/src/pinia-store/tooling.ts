@@ -16,7 +16,7 @@ export const useToolingStore = defineStore("tooling", () => {
         loading.value = false
     };
 
-    const saveToolings = async (tooling: Tool) => {
+    const saveToolings = async (tooling: Partial<Tool>) => {
         const url = tooling.id ? `/tooling/${tooling.id}` : "/tooling";
         const method: keyof Axios = tooling.id ? "put" : "post"
         loading.value = true

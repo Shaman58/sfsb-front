@@ -9,7 +9,7 @@ export const useCompaniesStore = defineStore("companies", () => {
     const companies: Ref<Company[]> = ref([] as Company[]);
 
     const fetchCompaniesData = async () => {
-        companies.value = await query(async () => await api.get("/company/manager"), {success: ""})
+        companies.value = await query(async () => await api.get("/company/manager"), {success: ""}) || []
     };
 
     const getCompanyById = async (id: number) => {

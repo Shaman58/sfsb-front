@@ -61,7 +61,7 @@ const hideOrder = () => {
 
 const hide = () => emit("hide");
 
-const save = (data) => {
+const save = (data: Order) => {
     emit("save", data)
 };
 

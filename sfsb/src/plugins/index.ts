@@ -9,16 +9,9 @@ import vuetify from "./vuetify";
 import router from "@/router/";
 import store from "../store/index.js";
 import piniaStore from "./piniaStore";
-import { App, Plugin } from "vue";
-import keycloakService from "@/plugins/keycloak/service.mjs";
+import {App} from "vue";
 
-const currentUser: Plugin = {
-    install: (app: App) => {
-        app.config.globalProperties.$user = { id: "kjlkjlkjlkjlkj" };
-        // app.config.globalProperties.$user = await keycloakService.keycloak.loadUserProfile();
-    },
-};
 
 export function registerPlugins(app: App<Element>) {
-    app.use(vuetify).use(router).use(store).use(piniaStore).use(currentUser);
+    app.use(vuetify).use(router).use(store).use(piniaStore);
 }

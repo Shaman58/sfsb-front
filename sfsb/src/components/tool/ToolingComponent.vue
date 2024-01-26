@@ -15,19 +15,18 @@
 </template>
 
 <script setup lang="ts">
-import {useStore} from "vuex";
-import {onMounted, ref} from "vue";
+import {ref} from "vue";
 import ToolList from "@/components/tool/ToolList.vue";
 import {storeToRefs} from "pinia";
 import {useToolingStore} from "@/pinia-store/tooling";
 
-onMounted(() => {
-    store.dispatch("fetchToolings");
-});
+// onMounted(() => {
+//     store.dispatch("fetchToolings");
+// });
 
 const visible = ref(false);
 
-const store = useStore();
+// const store = useStore();
 
 // const toolings = computed(() => store.getters.getToolings);
 

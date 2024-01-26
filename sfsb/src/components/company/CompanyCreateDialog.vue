@@ -1,6 +1,6 @@
 <template lang="pug">
     v-dialog(v-model="show" width="1024")
-        v-form(ref="form" v-model="valid" v-on:submit.prevent="save" style="overflow-y: auto;")
+        v-form(ref="form" v-model="valid" v-on:submit.prevent="void save" style="overflow-y: auto;")
             v-card.mx-auto.my-12
                 v-card-title
                     span.text-h5 Карточка организации
@@ -42,23 +42,25 @@
 
 <script setup lang="ts">
 import {useValidationRules} from "@/mixins/FieldValidationRules";
-import {onUpdated, ref, toRefs} from "vue";
+import {type Ref, ref, toRefs, watchEffect} from "vue";
 
-const props = defineProps<{ company: PartialCompany | PartialCustomer, visible: boolean }>();
+const props = defineProps<{ company: PartialCustomer }>();
 const show = defineModel("show")
 
 const {company} = toRefs(props)
-const companyLocal = ref(company)
+const companyLocal = ref(company.value)
+
 
 const emit = defineEmits();
 const {rules} = useValidationRules();
 
-const form = ref(null);
+const form: Ref<HTMLFormElement | undefined> = ref();
 const valid = ref(false);
 
-onUpdated(() => {
-    companyLocal.value = company.value
-})
+watchEffect(() => companyLocal.value = company.value)
+// onUpdated(() => {
+//     companyLocal.value = company.value
+// })
 
 // watch(
 //     () => props.company,
@@ -72,8 +74,10 @@ const hide = () => {
     // companyLocal.value = {...company};
 };
 
-const save = () => {
-    if (form.value && form.value.validate()) {
+const save = async () => {
+    if (!form.value) return
+    const valid: { valid: boolean, errors: Ref<string[]> } = await form.value.validate()
+    if (valid.valid) {
         emit("save", companyLocal.value);
         emit("hide");
     }

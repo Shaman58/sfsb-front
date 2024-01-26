@@ -1,7 +1,7 @@
 <template lang="pug">
     v-dialog(v-model="props.visible")
         v-card
-            v-form(ref="form" v-model="valid" @submit.prevent="save(tool)")
+            v-form(ref="form" v-model="valid" @submit.prevent="void save(tool)")
                 v-card-text
                     v-row
                         v-col(cols="4")
@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import {ref} from "vue";
+import {type Ref, ref} from "vue";
 import {useValidationRules} from "@/mixins/FieldValidationRules";
 
 interface Props {
@@ -29,12 +29,14 @@ const props = defineProps<Props>();
 const emit = defineEmits(["save", "hide"]);
 const {rules} = useValidationRules();
 
-const form = ref(null);
+const form: Ref<HTMLFormElement | undefined> = ref();
 const valid = ref(false);
 const tool = ref({...props.tool});
 
-const save = (data) => {
-    if (form.value.validate()) {
+const save = async (data: Tool) => {
+    if (!form.value) return
+    const valid: { valid: boolean, errors: Ref<string[]> } = await form.value.valdate()
+    if (valid.valid) {
         emit("save", data);
         emit("hide");
     }
