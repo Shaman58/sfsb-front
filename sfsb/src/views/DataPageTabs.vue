@@ -7,7 +7,13 @@
                 .datapage-tabs__list-container
                     v-text-field(label="фильтр" v-model="filterText" )
                     v-list.datapage-tabs__list
-                        v-list-item.datapage-tabs__list-item(v-for="item in filtredList" :key="item.id" @click="setCurrentTool(item)" :variant="item.id === currentTool?.id ? 'tonal' : 'flat'" )
+                        v-list-item.datapage-tabs__list-item(
+                            v-for="(item, index) in filtredList"
+                            :key="item.id"
+                            @click="setCurrentTool(item)"
+                            :active="currentTool?.id === item.id"
+                            :data-last="index === filtredList.length-1"
+                        )
                             .datapage-tabs__list-name {{ item.name }}
                             .datapage-tabs__list-options
                                 .datapage-tabs__list-option(v-if="item.gost1") {{ item.gost1}}
@@ -52,8 +58,11 @@ interface SwitchTab {
     name: string
     list: Ref<PartialCommonType[]>
     type: "Tool" | "Material"
-    save: (item: Partial<Material> | Partial<Tool>) => Promise<void>
+    save: (item: CommonType) => Promise<void>
 }
+
+const isMaterial = (tool: any): tool is Material => "materialName" in tool
+const isTool = (tool: any): tool is Tool => "toolName" in tool
 
 const {materials} = storeToRefs(useMaterialsStore())
 const {toolings} = storeToRefs(useToolingStore())
@@ -73,9 +82,9 @@ const {fetchSpecials, saveSpecial} = useSpecialStore()
 
 const switches: Readonly<SwitchTab[]> = [
     {id: 1, name: "Материалы", list: materials, type: "Material", save: saveMaterial},
-    {id: 2, name: "Инструменты", list: toolings, type: "Tool", save: saveToolings},
+    {id: 2, name: "Инструменты", list: cutters, type: "Tool", save: saveCutter},
     {id: 3, name: "Специнструменты", list: specials, type: "Tool", save: saveSpecial},
-    {id: 4, name: "Остастка", list: cutters, type: "Tool", save: saveCutter}
+    {id: 4, name: "Остастка", list: toolings, type: "Tool", save: saveToolings}
 ] as const
 
 const currentTab = ref<SwitchTab>(switches[0])
@@ -83,11 +92,11 @@ const currentTool: Ref<PartialCommonType | undefined> = ref(toValue(currentTab.v
 const list = ref([])
 
 const normalizedList: ComputedRef<(CommonType | undefined)[]> = computed(() => toValue(currentTab.value.list).map((e: CommonType) => {
-    if ("materialName" in e) {
+    if (isMaterial(e)) {
         const {materialName, ...other} = e
         return {...other, name: e.materialName}
     }
-    if ("toolName" in e) {
+    if (isTool(e)) {
         const {toolName, ...other} = e
         return {...other, name: e.toolName}
     }
@@ -118,6 +127,10 @@ const filtredList = computed(() => {
 
 const save = async (ev: CommonType) => {
     await currentTab.value.save(ev)
+    const last = document.querySelector(".v-list > .v-list-item[data-last='true']")
+    last?.scrollIntoView()
+    currentTool.value = filtredList.value.at(-1)
+
 }
 
 
@@ -202,5 +215,6 @@ watch([currentTab], () => {
 
     &__card-content
         height: 100%
+
 
 </style>

@@ -1,10 +1,8 @@
 import {defineStore} from "pinia";
 import api, {query} from "@/api/instance";
-import {useToast} from "vue-toast-notification";
 import {Ref, ref} from "vue";
 import {Axios} from "axios";
 
-const toast = useToast();
 
 export const useCuttersStore = defineStore("cutters", () => {
     const cutters: Ref<Tool[]> = ref([]);
@@ -16,7 +14,7 @@ export const useCuttersStore = defineStore("cutters", () => {
         loading.value = false
     };
 
-    const saveCutter = async (cutter: Tool) => {
+    const saveCutter = async (cutter: Partial<Tool>) => {
         const url = cutter.id ? `/cutter/${cutter.id}` : "/cutter";
         const method: keyof Axios = cutter.id ? "put" : "post"
         loading.value = true

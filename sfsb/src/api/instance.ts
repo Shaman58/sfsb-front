@@ -35,6 +35,7 @@ api.interceptors.request.use((config) => {
     return config
 }, error => Promise.reject(error))
 
+
 export default api;
 
 export interface ErrorMessages {
@@ -71,7 +72,7 @@ export class CRUD {
         return await query<T>(async () => await api.get(this.url), {success: ""})
     }
 
-    async save(arg: { id: number | string }) {
+    async save(arg: { id?: number | string }) {
         const url = arg.id
             ? `${this.url}/${arg.id}`
             : this.url;
@@ -79,7 +80,7 @@ export class CRUD {
         await query(async () => await api[method](url, arg))
     }
 
-    async saveAndFetch<T>(arg: { id: number | string }) {
+    async saveAndFetch<T>(arg: { id?: number | string }) {
         await this.save(arg)
         return this.fetch<T>()
     }
