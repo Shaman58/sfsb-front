@@ -72,7 +72,7 @@ const companies = companiesList.map(company => company.companyName)
 const {rules} = useValidationRules();
 const {previewCommerce, previewToolOrder, previewPlan1, previewPlan2} = useOfferGenerator();
 
-const form = ref(null);
+const form = ref<HTMLFormElement>(null);
 const valid = ref(false);
 const active: Ref<number | string> = ref(-1);
 
@@ -117,6 +117,8 @@ const save = async (data: Order) => {
             alertDialog.value.hide()
         }
     }
+    const valid: { valid: boolean, errors: Ref<string[]> } | null = form.value && await form.value.validate()
+    if (!valid?.valid) return
     emit("save", data);
     // saveFiles()
     if (!data.id) {
