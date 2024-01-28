@@ -1,6 +1,6 @@
 import {defineStore} from "pinia";
 import api, {CRUD, query} from "@/api/instance";
-import {Ref, ref} from "vue";
+import {ref, Ref} from "vue";
 
 
 const crudOperation = new CRUD("/tooling")
@@ -9,7 +9,7 @@ export const useToolingStore = defineStore("tooling", () => {
     const toolings: Ref<Tool[]> = ref([]);
     const loading: Ref<boolean> = ref(false)
     const offset: Ref<number> = ref(0)
-    const limit: Ref<number> = ref(100)
+    const limit: Ref<number> = ref(20)
 
     const accumulateToolings = (toolings: Tool[]): void => {
 
@@ -40,6 +40,10 @@ export const useToolingStore = defineStore("tooling", () => {
     const incOffset = () => offset.value++
     const decOffset = () => offset.value--
 
+    const nextPageData = async () => {
+        incOffset()
+        await fetchToolings()
+    }
     const setLimit = (value: number) => limit.value = value
 
 
@@ -57,6 +61,8 @@ export const useToolingStore = defineStore("tooling", () => {
     };
 });
 
+// export const useToolingStore = defineStore("tooling", () => new ToolStore<Tool>("/tooling"));
+
 /*
 суть проблемы:
 фильтрация значений списка в "дата"
@@ -66,6 +72,6 @@ export const useToolingStore = defineStore("tooling", () => {
 для получения следующей порции данных с дальнейшим объединением с имеющимися данными
 Если количество записей до 100, то проблема отпадает - устанавливаю лимит 100.
 А если больше 100, то в любом случае мне нужно будет делать дополнительные запросы, конкатинировать данные в итоге это усложняет алгоритм и жрет дополнительные ресурсы
-Насколько я понимаю, сделать 
+Насколько я понимаю, сделать
 
  */
