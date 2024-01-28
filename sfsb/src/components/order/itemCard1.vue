@@ -13,7 +13,7 @@
         transition.item-card__transition(name="fade")
             v-form.item-card__details(v-if="editing" ref="form" @submit.prevent="save")
                 .item-card__details-date
-                    v-text-field.item-card__schema-number(label="Номер чертежа:"
+                    v-text-field.item-card__schema-number(label="Децимальный номер:"
                         v-model="itemLocal.technology.drawingNumber"
                         :disabled="!!itemLocal.technology?.id"
                         placeholder="42"
