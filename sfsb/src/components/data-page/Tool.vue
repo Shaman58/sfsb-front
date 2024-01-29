@@ -1,7 +1,6 @@
 <template lang="pug">
     v-form.material-form(ref="form" v-if="currentTool" @submit.prevent="save")
-        v-progress-linear(:active="loading" color="orange" height="4" :indeterminate="true")
-        v-card.material-form__card
+        v-card.material-form__card(:loading="loading")
             v-card-title.material-form__title
                 span.material-form__title-name {{ currentTool.toolName}}
                 span.material-form__title-description {{ currentTool.description}}
@@ -36,7 +35,6 @@ const currentTool: Ref<Partial<Tool>> = ref(item.value)
 const newFlag: Ref<boolean> = ref(false)
 
 const {loading} = storeToRefs(useToolingStore())
-const {saveToolings} = useToolingStore()
 
 const save = async () => {
     if (!form.value) return

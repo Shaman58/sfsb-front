@@ -83,7 +83,6 @@ import {storeToRefs} from "pinia"
 import AlertDialog from "../common/AlertDialog.vue";
 import {useCurrentUserStore} from "@/pinia-store/currentUser";
 import TechnologyCardMainOptions from "./TechnologyCardMainOptions.vue";
-import {useMaterialsStore} from "@/pinia-store/materials";
 import TechnologyCreateDialogCardPart1
     from "@/components/technology/TechnologyCreateDialogCardParts/TechnologyCreateDialogCardPart1.vue";
 import TechnologyCreateDialogCardPart3
@@ -93,9 +92,7 @@ import TechnologyCreateDialogCardPart2
 import TechnologyCreateDialogCardPart4
     from "@/components/technology/TechnologyCreateDialogCardParts/TechnologyCreateDialogCardPart4.vue";
 import SuspendedComponent from "@/components/common/SuspendedComponent.vue";
-import {useSpecialStore} from "@/pinia-store/specials";
-import {useCuttersStore} from "@/pinia-store/cutters";
-import {useToolingStore} from "@/pinia-store/tooling";
+import {useCuttersStore, useMaterialsStore, useSpecialStore, useToolingStore} from "@/pinia-store/tools";
 import {useOperationsStore} from "@/pinia-store/operations";
 import {useItemStore} from "@/pinia-store/item";
 
@@ -104,17 +101,21 @@ const {saveTechnology, changeBlocked, calculateTechnology, setTechnologyDialogVi
 
 const alertDialog = ref<typeof AlertDialog | null>(null)
 
-const {specials} = storeToRefs(useSpecialStore())
-const {fetchSpecials} = useSpecialStore()
-!specials.value.length && await fetchSpecials()
+const {tools: specials} = storeToRefs(useSpecialStore())
+const {loadAll: loadSpecials} = useSpecialStore()
+!specials.value.length && loadSpecials()
 
-const {cutters} = storeToRefs(useCuttersStore())
-const {fetchCutters} = useCuttersStore()
-!specials.value.length && await fetchCutters()
+const {tools: cutters} = storeToRefs(useCuttersStore())
+const {loadAll: loadCutters} = useCuttersStore()
+!specials.value.length && loadCutters()
 
-const {toolings} = storeToRefs(useToolingStore())
-const {fetchToolings} = useToolingStore()
-!toolings.value.length && await fetchToolings()
+const {tools: toolings} = storeToRefs(useToolingStore())
+const {loadAll: loadToolings} = useToolingStore()
+!toolings.value.length && loadToolings()
+
+const {tools: materials} = storeToRefs(useMaterialsStore())
+const {loadAll: loadMaterials} = useMaterialsStore()
+!materials.value.length && loadMaterials()
 
 const {operations} = storeToRefs(useOperationsStore())
 const {fetchOperation} = useOperationsStore()
@@ -123,6 +124,7 @@ const {fetchOperation} = useOperationsStore()
 const {items} = storeToRefs(useItemStore())
 const {fetchItems, fetchItem} = useItemStore()
 !items.value.length && await fetchItems()
+
 
 const {user} = storeToRefs(useCurrentUserStore())
 
@@ -154,9 +156,6 @@ const item = computed(() => {
     return item;
 });
 
-const {materials} = storeToRefs(useMaterialsStore())
-const {fetchMaterials} = useMaterialsStore()
-await fetchMaterials()
 
 const changeOwner = (event: boolean) => {
     console.log("changeOwner", event)

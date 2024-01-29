@@ -18,7 +18,7 @@
                         v-col(cols="4")
                             v-text-field(label="Номер установки" v-model="setup.setupNumber" :rules="[unitNumberValidationRule, rules.required]")
                         v-col(cols="4")
-                            v-select(label="Название установки" :items="operations" item-title="operationName" return-object v-model="setup.operation" :rules="[rules.required]")
+                            v-combobox(label="Название установки" :items="operations" item-title="operationName" return-object v-model="setup.operation" :rules="[rules.required]")
                         v-col(cols="4" v-if="setup.cooperate")
                             v-text-field(label="Кооперационная цена на деталь" v-model="setup.cooperatePrice.amount" type="number" :rules="[rules.required, rules.numeric, rules.min0Validation]")
                         v-col(cols="4" v-if="setup?.operation?.operationTimeManagement === 'FULL' && !setup.cooperate  || setup?.operation?.operationTimeManagement === 'COMPUTED' && !setup.cooperate  || setup?.operation?.operationTimeManagement === 'PROCESS_TIME_ONLY' && !setup.cooperate")
@@ -28,7 +28,7 @@
                         v-col(cols="4" v-if="setup?.operation?.operationTimeManagement === 'FULL' && !setup.cooperate")
                             v-text-field(label="Наладочное время(чч:мм)" v-model="setup.setupTime" type="time" :rules="[rules.durationNotZeroValidation]")
                         v-col(cols="4" v-if="setup?.operation?.operationTimeManagement === 'FULL' && !setup.cooperate || setup?.operation?.operationTimeManagement === 'PROCESS_TIME_ONLY' && !setup.cooperate")
-                            v-select(v-if="!!toolings" :items="toolings" item-title='toolName' return-object v-model="setup.toolings" label="Выбрать оснастку" :multiple="true")
+                            v-combobox(v-if="!!toolings" :items="toolings" item-title='toolName' return-object v-model="setup.toolings" label="Выбрать оснастку" :multiple="true")
                         v-col(cols="4" v-if="setup?.operation?.operationTimeManagement === 'FULL' && !setup.cooperate || setup?.operation?.operationTimeManagement === 'PROCESS_TIME_ONLY' && !setup.cooperate")
                             v-btn(size="small" variant="text" v-if="setup.measureToolItems?.length === 0" @click="measureVisible = true") Меритель
                             v-list(v-else @click="measureVisible = true")
@@ -70,9 +70,7 @@ import MeasureCreateList from "@/components/technology/MeasureCreateList.vue";
 import {useTechnologyStore} from "@/pinia-store/technology";
 import {storeToRefs} from 'pinia';
 import {useOperationsStore} from "@/pinia-store/operations";
-import {useSpecialStore} from "@/pinia-store/specials";
-import {useCuttersStore} from "@/pinia-store/cutters";
-import {useToolingStore} from "@/pinia-store/tooling";
+import {useCuttersStore, useSpecialStore, useToolingStore} from "@/pinia-store/tools";
 
 interface Props {
     setup: Partial<Setup>
@@ -119,16 +117,16 @@ const {formatWorkpieceData} = materialDataFormatting();
 
 const isExist = (!!(setup.value.operation?.operationName));
 
-const {specials} = storeToRefs(useSpecialStore())
-const {fetchSpecials} = useSpecialStore()
+const {tools: specials} = storeToRefs(useSpecialStore())
+const {fetchTool: fetchSpecials} = useSpecialStore()
 !specials.value.length && await fetchSpecials()
 
-const {cutters} = storeToRefs(useCuttersStore())
-const {fetchCutters} = useCuttersStore()
+const {tools: cutters} = storeToRefs(useCuttersStore())
+const {fetchTool: fetchCutters} = useCuttersStore()
 !specials.value.length && await fetchCutters()
 
-const {toolings} = storeToRefs(useToolingStore())
-const {fetchToolings} = useToolingStore()
+const {tools: toolings} = storeToRefs(useToolingStore())
+const {fetchTool: fetchToolings} = useToolingStore()
 !toolings.value.length && await fetchToolings()
 
 

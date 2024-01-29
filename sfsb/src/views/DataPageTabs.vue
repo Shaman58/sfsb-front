@@ -13,6 +13,7 @@
                             @click="setCurrentTool(item)"
                             :active="currentTool?.id === item.id"
                             :data-last="index === filtredList.length-1"
+                            v-intersect="index === filtredList.length-1 && onIntersect"
                         )
                             .datapage-tabs__list-name {{ item.name }}
                             .datapage-tabs__list-options
@@ -27,10 +28,7 @@
 
 import {computed, type ComputedRef, onMounted, type Ref, ref, toValue, watch} from "vue";
 import {storeToRefs} from "pinia";
-import {useMaterialsStore} from "@/pinia-store/materials";
-import {useToolingStore} from "@/pinia-store/tooling";
-import {useCuttersStore} from "@/pinia-store/cutters";
-import {useSpecialStore} from "@/pinia-store/specials";
+import {useCuttersStore, useMaterialsStore, useSpecialStore, useToolingStore} from "@/pinia-store/tools";
 import MaterialComponent from "@/components/data-page/Material.vue";
 import Material from "@/components/data-page/Material.vue";
 import ToolComponent from "@/components/data-page/Tool.vue";
@@ -54,44 +52,49 @@ type CommonType = {
 type PartialCommonType = Partial<CommonType>
 
 interface SwitchTab {
-    id: number
-    name: string
-    list: Ref<PartialCommonType[]>
-    type: "Tool" | "Material"
-    save: (item: CommonType) => Promise<void>
+    id: number;
+    name: string;
+    list: Material[] | Tool[];
+    type: "Tool" | "Material";
+    save: (item: any) => Promise<void>;
+    newData: () => Promise<void>;
 }
 
 const isMaterial = (tool: any): tool is Material => "materialName" in tool
 const isTool = (tool: any): tool is Tool => "toolName" in tool
 
-const {materials} = storeToRefs(useMaterialsStore())
-const {toolings} = storeToRefs(useToolingStore())
-const {cutters} = storeToRefs(useCuttersStore())
-const {specials} = storeToRefs(useSpecialStore())
+const {tools: materials} = storeToRefs(useMaterialsStore())
+const {tools: toolings} = storeToRefs(useToolingStore())
+const {tools: cutters} = storeToRefs(useCuttersStore())
+const {tools: specials} = storeToRefs(useSpecialStore())
 
-const {fetchMaterials, saveMaterial} = useMaterialsStore()
-const {fetchToolings, saveToolings} = useToolingStore()
-const {fetchCutters, saveCutter} = useCuttersStore()
-const {fetchSpecials, saveSpecial} = useSpecialStore()
+const {fetchTool: fetchMaterials, saveTool: saveMaterial, newData: newDataMaterials} = useMaterialsStore()
+const {fetchTool: fetchToolings, saveTool: saveToolings, newData: newDataToolings} = useToolingStore()
+const {fetchTool: fetchCutters, saveTool: saveCutter, newData: newDataCutters} = useCuttersStore()
+const {fetchTool: fetchSpecials, saveTool: saveSpecial, newData: newDataSpecials} = useSpecialStore()
 
 !materials.value.length && await fetchMaterials()
 !toolings.value.length && await fetchToolings()
+// const {tools: toolingTools} = storeToRefs(useToolingStore())
+// !toolingStore.tools.length && await toolingStore.fetchTool()
 !cutters.value.length && await fetchCutters()
 !specials.value.length && await fetchSpecials()
 
 
-const switches: Readonly<SwitchTab[]> = [
-    {id: 1, name: "Материалы", list: materials, type: "Material", save: saveMaterial},
-    {id: 2, name: "Инструменты", list: cutters, type: "Tool", save: saveCutter},
-    {id: 3, name: "Специнструменты", list: specials, type: "Tool", save: saveSpecial},
-    {id: 4, name: "Остастка", list: toolings, type: "Tool", save: saveToolings}
-] as const
+const switches: Ref<SwitchTab[]> = ref([
+    {id: 1, name: "Материалы", list: materials, type: "Material", save: saveMaterial, newData: newDataMaterials},
+    {id: 2, name: "Инструменты", list: cutters, type: "Tool", save: saveCutter, newData: newDataCutters},
+    {id: 3, name: "Специнструменты", list: specials, type: "Tool", save: saveSpecial, newData: newDataSpecials},
+    {id: 4, name: "Остастка", list: toolings, type: "Tool", save: saveToolings, newData: newDataToolings},
+])
 
-const currentTab = ref<SwitchTab>(switches[0])
+
+const currentTab = ref<SwitchTab>(switches.value[0])
 const currentTool: Ref<PartialCommonType | undefined> = ref(toValue(currentTab.value.list).at(0) as Material)
 const list = ref([])
+const request = ref(false)
 
-const normalizedList: ComputedRef<(CommonType | undefined)[]> = computed(() => toValue(currentTab.value.list).map((e: CommonType) => {
+const normalizedList: ComputedRef<(CommonType | undefined)[]> = computed(() => currentTab.value.list.map((e: CommonType) => {
     if (isMaterial(e)) {
         const {materialName, ...other} = e
         return {...other, name: e.materialName}
@@ -133,7 +136,10 @@ const save = async (ev: CommonType) => {
 
 }
 
-
+const onIntersect = (e: boolean) => {
+    console.log("intersect", e)
+    request.value = e || request.value
+}
 onMounted(async () => {
     currentTool.value = toValue(currentTab.value.list).at(0) as Material
 })
@@ -141,6 +147,15 @@ onMounted(async () => {
 watch([currentTab], () => {
     currentTool.value = currentTab.value.list[0]
 })
+
+watch([request], async () => {
+    console.log("watch", request.value)
+    request.value && await currentTab.value.newData()
+    request.value = false
+})
+
+
+//TODO: вынести list в отдельный компонент
 </script>
 
 
