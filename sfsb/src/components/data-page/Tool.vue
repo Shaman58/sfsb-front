@@ -36,7 +36,6 @@ const currentTool: Ref<Partial<Tool>> = ref(item.value)
 const newFlag: Ref<boolean> = ref(false)
 
 const {loading} = storeToRefs(useToolingStore())
-const {saveToolings} = useToolingStore()
 
 const save = async () => {
     if (!form.value) return

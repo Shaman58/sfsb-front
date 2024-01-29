@@ -7,12 +7,14 @@
                 .datapage-tabs__list-container
                     v-text-field(label="фильтр" v-model="filterText" )
                     v-list.datapage-tabs__list
+                        v-progress-linear(:active="request" color="orange" height="4" :indeterminate="true")
                         v-list-item.datapage-tabs__list-item(
                             v-for="(item, index) in filtredList"
                             :key="item.id"
                             @click="setCurrentTool(item)"
                             :active="currentTool?.id === item.id"
                             :data-last="index === filtredList.length-1"
+                            v-intersect="index === filtredList.length-1 && onIntersect"
                         )
                             .datapage-tabs__list-name {{ item.name }}
                             .datapage-tabs__list-options
@@ -54,44 +56,47 @@ type CommonType = {
 type PartialCommonType = Partial<CommonType>
 
 interface SwitchTab {
-    id: number
-    name: string
-    list: Ref<PartialCommonType[]>
-    type: "Tool" | "Material"
-    save: (item: CommonType) => Promise<void>
+    id: number;
+    name: string;
+    list: Material[] | Tool[];
+    type: "Tool" | "Material";
+    save: (item: any) => Promise<void>
 }
 
 const isMaterial = (tool: any): tool is Material => "materialName" in tool
 const isTool = (tool: any): tool is Tool => "toolName" in tool
 
 const {materials} = storeToRefs(useMaterialsStore())
-const {toolings} = storeToRefs(useToolingStore())
-const {cutters} = storeToRefs(useCuttersStore())
-const {specials} = storeToRefs(useSpecialStore())
+const toolingStore = useToolingStore()
+const {tools: cutters} = storeToRefs(useCuttersStore())
+const {tools: specials} = storeToRefs(useSpecialStore())
 
 const {fetchMaterials, saveMaterial} = useMaterialsStore()
-const {fetchToolings, saveToolings} = useToolingStore()
-const {fetchCutters, saveCutter} = useCuttersStore()
-const {fetchSpecials, saveSpecial} = useSpecialStore()
+// const {fetchToolings, saveToolings} = useToolingStore()
+const {fetchTool: fetchCutters, saveTool: saveCutter} = useCuttersStore()
+const {fetchTool: fetchSpecials, saveTool: saveSpecial} = useSpecialStore()
 
 !materials.value.length && await fetchMaterials()
-!toolings.value.length && await fetchToolings()
+const {tools: toolingTools} = storeToRefs(useToolingStore())
+!toolingStore.tools.length && await toolingStore.fetchTool()
 !cutters.value.length && await fetchCutters()
 !specials.value.length && await fetchSpecials()
 
 
-const switches: Readonly<SwitchTab[]> = [
+const switches: Ref<SwitchTab[]> = ref([
     {id: 1, name: "Материалы", list: materials, type: "Material", save: saveMaterial},
     {id: 2, name: "Инструменты", list: cutters, type: "Tool", save: saveCutter},
     {id: 3, name: "Специнструменты", list: specials, type: "Tool", save: saveSpecial},
-    {id: 4, name: "Остастка", list: toolings, type: "Tool", save: saveToolings}
-] as const
+    {id: 4, name: "Остастка", list: toolingTools, type: "Tool", save: toolingStore.saveTool}
+])
 
-const currentTab = ref<SwitchTab>(switches[0])
+
+const currentTab = ref<SwitchTab>(switches.value[0])
 const currentTool: Ref<PartialCommonType | undefined> = ref(toValue(currentTab.value.list).at(0) as Material)
 const list = ref([])
+const request = ref(false)
 
-const normalizedList: ComputedRef<(CommonType | undefined)[]> = computed(() => toValue(currentTab.value.list).map((e: CommonType) => {
+const normalizedList: ComputedRef<(CommonType | undefined)[]> = computed(() => currentTab.value.list.map((e: CommonType) => {
     if (isMaterial(e)) {
         const {materialName, ...other} = e
         return {...other, name: e.materialName}
@@ -133,7 +138,11 @@ const save = async (ev: CommonType) => {
 
 }
 
+const onIntersect = (e: boolean) => {
+    console.log("intersect", e)
 
+    request.value = e || request.value
+}
 onMounted(async () => {
     currentTool.value = toValue(currentTab.value.list).at(0) as Material
 })
@@ -141,6 +150,20 @@ onMounted(async () => {
 watch([currentTab], () => {
     currentTool.value = currentTab.value.list[0]
 })
+
+watch([request], async () => {
+    console.log("watch", request.value)
+    request.value && await toolingStore.newData()
+    request.value = false
+})
+
+watch([normalizedList], () => console.log("normalizedList", normalizedList.value))
+watch([toolingTools], () => {
+    console.log("toolingTools", toolingTools.value)
+    console.log("switches[3]", switches.value[3])
+})
+
+//TODO: вынести list в отдельный компонент
 </script>
 
 
