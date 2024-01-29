@@ -7,7 +7,6 @@
                 .datapage-tabs__list-container
                     v-text-field(label="фильтр" v-model="filterText" )
                     v-list.datapage-tabs__list
-                        v-progress-linear(:active="request" color="orange" height="4" :indeterminate="true")
                         v-list-item.datapage-tabs__list-item(
                             v-for="(item, index) in filtredList"
                             :key="item.id"
@@ -60,34 +59,36 @@ interface SwitchTab {
     name: string;
     list: Material[] | Tool[];
     type: "Tool" | "Material";
-    save: (item: any) => Promise<void>
+    save: (item: any) => Promise<void>;
+    newData: () => Promise<void>;
 }
 
 const isMaterial = (tool: any): tool is Material => "materialName" in tool
 const isTool = (tool: any): tool is Tool => "toolName" in tool
 
-const {materials} = storeToRefs(useMaterialsStore())
-const toolingStore = useToolingStore()
+const {tools: materials} = storeToRefs(useMaterialsStore())
+const {tools: toolings} = storeToRefs(useToolingStore())
 const {tools: cutters} = storeToRefs(useCuttersStore())
 const {tools: specials} = storeToRefs(useSpecialStore())
 
-const {fetchMaterials, saveMaterial} = useMaterialsStore()
-// const {fetchToolings, saveToolings} = useToolingStore()
-const {fetchTool: fetchCutters, saveTool: saveCutter} = useCuttersStore()
-const {fetchTool: fetchSpecials, saveTool: saveSpecial} = useSpecialStore()
+const {fetchTool: fetchMaterials, saveTool: saveMaterial, newData: newDataMaterials} = useMaterialsStore()
+const {fetchTool: fetchToolings, saveTool: saveToolings, newData: newDataToolings} = useToolingStore()
+const {fetchTool: fetchCutters, saveTool: saveCutter, newData: newDataCutters} = useCuttersStore()
+const {fetchTool: fetchSpecials, saveTool: saveSpecial, newData: newDataSpecials} = useSpecialStore()
 
 !materials.value.length && await fetchMaterials()
-const {tools: toolingTools} = storeToRefs(useToolingStore())
-!toolingStore.tools.length && await toolingStore.fetchTool()
+!toolings.value.length && await fetchToolings()
+// const {tools: toolingTools} = storeToRefs(useToolingStore())
+// !toolingStore.tools.length && await toolingStore.fetchTool()
 !cutters.value.length && await fetchCutters()
 !specials.value.length && await fetchSpecials()
 
 
 const switches: Ref<SwitchTab[]> = ref([
-    {id: 1, name: "Материалы", list: materials, type: "Material", save: saveMaterial},
-    {id: 2, name: "Инструменты", list: cutters, type: "Tool", save: saveCutter},
-    {id: 3, name: "Специнструменты", list: specials, type: "Tool", save: saveSpecial},
-    {id: 4, name: "Остастка", list: toolingTools, type: "Tool", save: toolingStore.saveTool}
+    {id: 1, name: "Материалы", list: materials, type: "Material", save: saveMaterial, newData: newDataMaterials},
+    {id: 2, name: "Инструменты", list: cutters, type: "Tool", save: saveCutter, newData: newDataCutters},
+    {id: 3, name: "Специнструменты", list: specials, type: "Tool", save: saveSpecial, newData: newDataSpecials},
+    {id: 4, name: "Остастка", list: toolings, type: "Tool", save: saveToolings, newData: newDataToolings},
 ])
 
 
@@ -140,7 +141,6 @@ const save = async (ev: CommonType) => {
 
 const onIntersect = (e: boolean) => {
     console.log("intersect", e)
-
     request.value = e || request.value
 }
 onMounted(async () => {
@@ -153,15 +153,10 @@ watch([currentTab], () => {
 
 watch([request], async () => {
     console.log("watch", request.value)
-    request.value && await toolingStore.newData()
+    request.value && await currentTab.value.newData()
     request.value = false
 })
 
-watch([normalizedList], () => console.log("normalizedList", normalizedList.value))
-watch([toolingTools], () => {
-    console.log("toolingTools", toolingTools.value)
-    console.log("switches[3]", switches.value[3])
-})
 
 //TODO: вынести list в отдельный компонент
 </script>

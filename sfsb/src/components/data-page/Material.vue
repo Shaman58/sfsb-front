@@ -1,7 +1,6 @@
 <template lang="pug">
     v-form.material-form(ref="form" v-if="materialLocal" )
-        v-progress-linear(:active="loading" color="orange" height="4" :indeterminate="true")
-        v-card.material-form__card
+        v-card.material-form__card(:loading="loading")
             v-card-title.material-form__title {{ materialLocal.materialName}}
             v-card-text.material-form__controls
                 .material-form__controls-content
