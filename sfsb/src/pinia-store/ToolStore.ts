@@ -18,6 +18,7 @@ export default class ToolStore<T extends { id?: string | number }> {
         this.deleteTool = this.deleteTool.bind(this)
         this.newData = this.newData.bind(this)
         this.crud = new CRUD(url)
+        this.loadAll = this.loadAll.bind(this)
     }
 
     async fetchTool() {
@@ -54,5 +55,15 @@ export default class ToolStore<T extends { id?: string | number }> {
         this.cumulativeTool.value[this.offset.value + 1] = data
         this.offset.value += 1
         this.loading.value = false
+        return true
+    }
+
+    loadAll() {
+        setTimeout(async () => {
+            await this.fetchTool()
+            while (await this.newData()) {
+                console.log(`Loading ${this.url}`, this.offset.value)
+            }
+        })
     }
 }

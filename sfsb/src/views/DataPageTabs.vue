@@ -28,10 +28,7 @@
 
 import {computed, type ComputedRef, onMounted, type Ref, ref, toValue, watch} from "vue";
 import {storeToRefs} from "pinia";
-import {useMaterialsStore} from "@/pinia-store/materials";
-import {useToolingStore} from "@/pinia-store/tooling";
-import {useCuttersStore} from "@/pinia-store/cutters";
-import {useSpecialStore} from "@/pinia-store/specials";
+import {useCuttersStore, useMaterialsStore, useSpecialStore, useToolingStore} from "@/pinia-store/tools";
 import MaterialComponent from "@/components/data-page/Material.vue";
 import Material from "@/components/data-page/Material.vue";
 import ToolComponent from "@/components/data-page/Tool.vue";

@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import {useStore} from "vuex";
+// import {useStore} from "vuex";
 import {ref} from "vue";
 // import MaterialListDialog from "@/components/material/MaterialList.vue";
 import MaterialListDialog1 from "@/components/material/MaterialList1.vue";
@@ -14,8 +14,8 @@ import {useMaterialTemplatesStore} from "@/pinia-store/materialTemplates";
 import {storeToRefs} from "pinia";
 import SuspendedComponent from "@/components/common/SuspendedComponent.vue";
 
-const {materials} = storeToRefs(useMaterialsStore())
-const {fetchMaterials, saveMaterial, deleteMaterial} = useMaterialsStore()
+const {tools: materials} = storeToRefs(useMaterialsStore())
+const {fetchTool: fetchMaterials, saveTool: saveMaterial, deleteTool: deleteMaterial} = useMaterialsStore()
 !materials.value.length && await fetchMaterials()
 
 const {materialTemplates: templates} = storeToRefs(useMaterialTemplatesStore())
@@ -25,7 +25,7 @@ const {fetchMaterialTemplates} = useMaterialTemplatesStore()
 
 const visible = ref(false);
 
-const store = useStore();
+// const store = useStore();
 
 
 const save = async (data: Material) => {
