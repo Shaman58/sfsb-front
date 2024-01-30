@@ -10,11 +10,11 @@
                 v-btn(:color="'white'" v-for="navitem in CONSTS.MAINMENU" :key="navitem.path" :to="navitem.path" rounded="xs"
                     tonal :hidden="navitem.role && navitem.role.length && !user?.roles.some(e => navitem.role?.includes(e))")
                     div(v-if="'submenu' in navitem" )
-                        v-btn(color="white ") {{ navitem.label }}
+                        div(color="white ") {{ navitem.label }}
                             v-menu(activator="parent" open-on-hover)
                                 v-list
                                     v-list-item(v-for="(item, index) in navitem.submenu"  :key="index" :value="index")
-                                        router-link(:to="navitem.path+'/'+item.path" variant="tonal" ) {{ item.label }}
+                                        router-link.navbar__link(:to="navitem.path+'/'+item.path" variant="tonal" ) {{ item.label }}
                     div(v-else) {{ navitem.label }}
 
                 v-menu(open-on-hover="")
@@ -87,6 +87,9 @@ onMounted(async () => {
         height: 30px
         border-radius: 50%
         object-fit: cover
+
+    &__link
+        text-decoration: none
 
 .navbar-exit
     display: flex

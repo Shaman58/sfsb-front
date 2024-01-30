@@ -1,6 +1,6 @@
 <template lang="pug">
-    v-list.datapage-tabs__list
-        v-list-item.datapage-tabs__list-item(
+    v-list.datapage-main__list
+        v-list-item.datapage-main__list-item(
             v-for="(item, index) in props.list"
             :key="item.id"
             @click="selectTool(item)"
@@ -12,12 +12,14 @@
             DataPageToolItem(v-if="isTool(item)" :item="item")
 </template>
 <script setup lang="ts">
-import {ref} from "vue";
+import {ref, watch} from "vue";
 import DataPageMaterialItem from "@/components/data-page/DataPageMaterialItem.vue";
 import DataPageToolItem from "@/components/data-page/DataPageToolItem.vue";
 
 const props = defineProps<{ list: Material[] | Tool[] }>()
-const emit = defineEmits(["select"])
+const emit = defineEmits(["select", "intersected"])
+
+const request = ref(false)
 
 const isMaterial = (tool: any): tool is Material => "materialName" in tool
 const isTool = (tool: any): tool is Tool => "toolName" in tool
@@ -29,8 +31,17 @@ const selectTool = (item: Material | Tool) => {
     emit('select', item)
 }
 
-const onIntersect = () => {
+const onIntersect = (e: boolean) => {
+    console.log("intersect", e)
+    request.value = e || request.value
+    emit("intersected", e)
 }
+
+watch([request], async () => {
+    console.log("watch", request.value)
+    request.value && await currentTab.value.newData()
+    request.value = false
+})
 </script>
 
 
