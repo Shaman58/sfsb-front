@@ -7,7 +7,15 @@
 
             span(:style="{color:'white'}" v-if="width>1160") {{ version }}
             v-toolbar-items.ml-5(style="overflow-x: auto;" v-if="width>=1024")
-                v-btn(:color="'white'" v-for="navitem in CONSTS.MAINMENU" :key="navitem.path" :to="navitem.path" rounded="xs" tonal :hidden="navitem.role && navitem.role.length && !user?.roles.some(e => navitem.role?.includes(e))") {{ navitem.label }}
+                v-btn(:color="'white'" v-for="navitem in CONSTS.MAINMENU" :key="navitem.path" :to="navitem.path" rounded="xs"
+                    tonal :hidden="navitem.role && navitem.role.length && !user?.roles.some(e => navitem.role?.includes(e))")
+                    div(v-if="'submenu' in navitem" )
+                        v-btn(color="white ") {{ navitem.label }}
+                            v-menu(activator="parent" open-on-hover)
+                                v-list
+                                    v-list-item(v-for="(item, index) in navitem.submenu"  :key="index" :value="index")
+                                        router-link(:to="navitem.path+'/'+item.path" variant="tonal" ) {{ item.label }}
+                    div(v-else) {{ navitem.label }}
 
                 v-menu(open-on-hover="")
                     template(#activator="{ props }")

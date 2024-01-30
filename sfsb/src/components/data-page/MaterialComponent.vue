@@ -40,7 +40,7 @@ import CONST from "@/consts";
 import {storeToRefs} from "pinia";
 import {useMaterialTemplatesStore} from "@/pinia-store/materialTemplates";
 import {useMaterialsStore} from "@/pinia-store/materials";
-import Material from "@/components/data-page/Material.vue";
+import Material from "@/components/data-page/MaterialComponent.vue";
 
 const {materialTemplates: templates} = storeToRefs(useMaterialTemplatesStore())
 const {fetchMaterialTemplates} = useMaterialTemplatesStore()

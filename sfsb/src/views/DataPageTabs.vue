@@ -1,27 +1,7 @@
 <template lang="pug">
     .datapage-tabs
-        .datapage-tabs__container
-            .datapage-tabs__switches
-                v-btn( v-for="key in switches" :key="key.id" @click="switchTab(key)" :variant="key.id === currentTab.id ? 'flat' : 'tonal'") {{ key.name }}
-            .datapage-tabs__main
-                .datapage-tabs__list-container
-                    v-text-field(label="фильтр" v-model="filterText" )
-                    v-list.datapage-tabs__list
-                        v-list-item.datapage-tabs__list-item(
-                            v-for="(item, index) in filtredList"
-                            :key="item.id"
-                            @click="setCurrentTool(item)"
-                            :active="currentTool?.id === item.id"
-                            :data-last="index === filtredList.length-1"
-                            v-intersect="index === filtredList.length-1 && onIntersect"
-                        )
-                            .datapage-tabs__list-name {{ item.name }}
-                            .datapage-tabs__list-options
-                                .datapage-tabs__list-option(v-if="item.gost1") {{ item.gost1}}
-                                .datapage-tabs__list-option(v-if="item.gost2") {{ item.gost2}}
-                                .datapage-tabs__list-option(v-if="item.description") {{ item.description}}
-                .datapage-tabs__card
-                    component(:is="selectedComponent" :item="currentTool" @save="save")
+        router-view
+
 </template>
 
 <script setup lang="ts">
@@ -29,9 +9,7 @@
 import {computed, type ComputedRef, onMounted, type Ref, ref, toValue, watch} from "vue";
 import {storeToRefs} from "pinia";
 import {useCuttersStore, useMaterialsStore, useSpecialStore, useToolingStore} from "@/pinia-store/tools";
-import MaterialComponent from "@/components/data-page/Material.vue";
-import Material from "@/components/data-page/Material.vue";
-import ToolComponent from "@/components/data-page/Tool.vue";
+import Material from "@/components/data-page/MaterialComponent.vue";
 
 // type CommonType = Partial<Material> & Partial<Tool>
 type CommonType = {
@@ -75,8 +53,6 @@ const {fetchTool: fetchSpecials, saveTool: saveSpecial, newData: newDataSpecials
 
 !materials.value.length && await fetchMaterials()
 !toolings.value.length && await fetchToolings()
-// const {tools: toolingTools} = storeToRefs(useToolingStore())
-// !toolingStore.tools.length && await toolingStore.fetchTool()
 !cutters.value.length && await fetchCutters()
 !specials.value.length && await fetchSpecials()
 
@@ -105,7 +81,6 @@ const normalizedList: ComputedRef<(CommonType | undefined)[]> = computed(() => c
     }
 }))
 
-const selectedComponent = computed(() => currentTab.value.type === 'Material' ? MaterialComponent : ToolComponent)
 
 const switchTab = (item: SwitchTab) => {
     currentTab.value = item
@@ -119,7 +94,7 @@ const setCurrentTool = (item: typeof normalizedList.value[0]) => {
 }
 
 const filterText = ref("")
-const filtredList = computed(() => {
+const filteredList = computed(() => {
     if (!filterText.value) return normalizedList.value
     return normalizedList.value.filter(e => {
         if (!e) return false
@@ -171,14 +146,15 @@ watch([request], async () => {
     margin-top: var(--top)
     padding-top: 2rem
     height: calc(100dvh - 42px)
+    overflow-y: auto
     background-color: rgba(174, 174, 231, 0.3)
 
     &__container
         margin-inline: 1rem
         height: 100%
 
-        display: grid
-        grid-template-rows: 50px 1fr
+    //display: grid
+    //grid-template-rows: 50px 1fr
 
     &__switches
         display: flex
