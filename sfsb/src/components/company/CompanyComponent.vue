@@ -1,7 +1,7 @@
 <template>
     <v-container>
         <router-link :to="'/company'">
-            <company-preview-card :company="company" @click.stop="visible = true" />
+            <company-preview-card :company="company" @click.stop="visible = true"/>
         </router-link>
         <!-- <company-create-dialog v-if="company.id"
                            :company="company"
@@ -14,9 +14,9 @@
 
 <script setup>
 import CompanyPreviewCard from "@/components/company/CompanyPreviewCard.vue";
-import CompanyCreateDialog from "@/components/company/CompanyCreateDialog.vue";
-import { computed, onMounted, ref } from "vue";
-import { useStore } from "vuex";
+import CompanyCreateDialog from "@/components/customer/CompanyCreateDialog.vue";
+import {computed, onMounted, ref} from "vue";
+import {useStore} from "vuex";
 
 const store = useStore();
 

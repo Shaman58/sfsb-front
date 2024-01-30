@@ -20,7 +20,7 @@
 
 <script setup lang="ts">
 import {type Ref, ref, toRef, toRefs} from "vue";
-import CompanyCreateDialog from "@/components/company/CompanyCreateDialog.vue";
+import CompanyCreateDialog from "@/components/customer/CompanyCreateDialog.vue";
 
 const props = defineProps<{ customers: Customer[], visible: boolean }>();
 const {customers, visible} = toRefs(props)

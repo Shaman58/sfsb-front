@@ -16,9 +16,17 @@ export function useValidationRules() {
             const pattern = /^[0-9]{20}$/
             return pattern.test(value) || 'Неверный формат, введите 20 цифр'
         },
+        accountWithEmptyValidation: (value: string) => {
+            const pattern = /^[0-9]{20}$/
+            return pattern.test(value) || value === "" || 'Неверный формат, введите 20 цифр'
+        },
         bikkppValidation: (value: string) => {
             const pattern = /^[0-9]{9}$/
             return pattern.test(value) || 'Неверный формат, введите 9 цифр'
+        },
+        bikkppWithEmptyValidation: (value: string) => {
+            const pattern = /^[0-9]{9}$/
+            return pattern.test(value) || value === "" || 'Неверный формат, введите 9 цифр'
         },
         ogrnValidation: (value: string) => {
             const pattern = /^[0-9]{13}$/

@@ -8,7 +8,7 @@
                     v-container
                         v-row
                             v-col(cols="12")
-                                v-text-field(label="Название организации*" v-model="companyLocal.companyName" :rules="[rules.required, rules.counter]" counter maxlength="200")
+                                v-text-field(label="Название организации*" ref="orgName" v-model="companyLocal.companyName" :rules="[rules.required, rules.counter]" counter maxlength="200" )
                         v-row
                             v-col(cols="12")
                                 v-text-field(label="Адрес*" v-model="companyLocal.address" :rules="[rules.required, rules.counter]" placeholder="г. Заречный ул. Мира 12" counter maxlength="200")
@@ -26,14 +26,14 @@
                                 v-text-field(label="ОКПО*" v-model="companyLocal.ogrn" :rules="[rules.ogrnValidation]" counter)
                         v-row
                             v-col( cols="12" sm="6" md="4")
-                                v-text-field(label="Банк*" v-model="companyLocal.bank" :rules="[rules.required, rules.counter]" placeholder="ОАО ВТБ" counter maxlength="200")
+                                v-text-field(label="Банк" v-model="companyLocal.bank" :rules="[ rules.counter]" placeholder="ОАО ВТБ" counter maxlength="200")
                             v-col( cols="12" sm="6" md="4")
-                                v-text-field(label="Расчетный счет*" v-model="companyLocal.paymentAccount" :rules="[rules.accountValidation]" counter)
+                                v-text-field(label="Расчетный счет" v-model="companyLocal.paymentAccount" :rules="[rules.accountWithEmptyValidation]" counter)
                             v-col( cols="12" sm="6" md="4")
-                                v-text-field(label="БИК*" v-model="companyLocal.bik" :rules="[rules.bikkppValidation]" counter)
+                                v-text-field(label="БИК" v-model="companyLocal.bik" :rules="[rules.bikkppWithEmptyValidation]" counter)
                         v-row
                             v-col(cols="12" sm="6" md="4")
-                                v-text-field(label="Корсчет*" v-model="companyLocal.correspondentAccount" :rules="[rules.accountValidation]" counter)
+                                v-text-field(label="Корсчет" v-model="companyLocal.correspondentAccount" :rules="[rules.accountWithEmptyValidation]" counter)
                 v-card-actions
                     v-spacer
                     v-btn(color="orange-darken-1" variant="text" @click="show=false") Закрыть
@@ -42,7 +42,7 @@
 
 <script setup lang="ts">
 import {useValidationRules} from "@/mixins/FieldValidationRules";
-import {type Ref, ref, toRefs, watchEffect} from "vue";
+import {type Ref, ref, toRefs, watch, watchEffect} from "vue";
 
 const props = defineProps<{ company: PartialCustomer }>();
 const show = defineModel("show")
@@ -50,17 +50,21 @@ const show = defineModel("show")
 const {company} = toRefs(props)
 const companyLocal = ref(company.value)
 
-
 const emit = defineEmits();
 const {rules} = useValidationRules();
 
 const form: Ref<HTMLFormElement | undefined> = ref();
+const orgName = ref()
 const valid = ref(false);
 
 watchEffect(() => companyLocal.value = company.value)
 // onUpdated(() => {
 //     companyLocal.value = company.value
 // })
+
+watch([orgName], () => {
+    console.log("orgName", orgName.value)
+})
 
 // watch(
 //     () => props.company,
