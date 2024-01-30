@@ -17,6 +17,7 @@ interface SwitchTab {
     save: (item: any) => Promise<void>;
     fetch: () => Promise<void>;
     newData: () => Promise<void>;
+    loading: Ref<boolean>
 }
 
 const useSwitches = (useCuttersStore: CuttersStoreType,
@@ -24,10 +25,10 @@ const useSwitches = (useCuttersStore: CuttersStoreType,
                      useSpecialStore: SpecialStoreType,
                      useToolingStore: ToolingStoreType) => {
 
-    const {tools: materials} = storeToRefs(useMaterialsStore())
-    const {tools: toolings} = storeToRefs(useToolingStore())
-    const {tools: cutters} = storeToRefs(useCuttersStore())
-    const {tools: specials} = storeToRefs(useSpecialStore())
+    const {tools: materials, loading: loadingMaterials} = storeToRefs(useMaterialsStore())
+    const {tools: toolings, loading: loadingToolings} = storeToRefs(useToolingStore())
+    const {tools: cutters, loading: loadingCutters} = storeToRefs(useCuttersStore())
+    const {tools: specials, loading: loadingSpecilas} = storeToRefs(useSpecialStore())
 
     const {fetchTool: fetchMaterials, saveTool: saveMaterial, newData: newDataMaterials} = useMaterialsStore()
     const {fetchTool: fetchToolings, saveTool: saveToolings, newData: newDataToolings} = useToolingStore()
@@ -44,7 +45,8 @@ const useSwitches = (useCuttersStore: CuttersStoreType,
             type: "Material",
             save: saveMaterial,
             fetch: fetchMaterials,
-            newData: newDataMaterials
+            newData: newDataMaterials,
+            loading: loadingMaterials
         },
         {
             id: 2,
@@ -54,7 +56,8 @@ const useSwitches = (useCuttersStore: CuttersStoreType,
             type: "Tool",
             save: saveCutter,
             fetch: fetchCutters,
-            newData: newDataCutters
+            newData: newDataCutters,
+            loading: loadingCutters
         },
         {
             id: 3,
@@ -64,7 +67,8 @@ const useSwitches = (useCuttersStore: CuttersStoreType,
             type: "Tool",
             save: saveSpecial,
             fetch: fetchSpecials,
-            newData: newDataSpecials
+            newData: newDataSpecials,
+            loading: loadingSpecilas
         },
         {
             id: 4,
@@ -74,7 +78,8 @@ const useSwitches = (useCuttersStore: CuttersStoreType,
             type: "Tool",
             save: saveToolings,
             fetch: fetchToolings,
-            newData: newDataToolings
+            newData: newDataToolings,
+            loading: loadingToolings
         },
     ])
     return switches
