@@ -14,18 +14,15 @@ import {computed, ref, watch} from "vue";
 import DataPageList from "@/components/data-page/DataPageList.vue";
 import MaterialComponent from "@/components/data-page/MaterialComponent.vue";
 import ToolComponent from "@/components/data-page/ToolComponent.vue";
-import {useCuttersStore, useMaterialsStore, useSpecialStore, useToolingStore} from "@/pinia-store/tools";
-import useSwitches from "@/mixins/SwitchesDataPge";
+import {useSwitches} from "@/pinia-store/tools";
 
-const switches = useSwitches(useCuttersStore, useMaterialsStore, useSpecialStore, useToolingStore)
+
+const switches = useSwitches()
 
 type MaterialAndTool = Partial<Material> & Partial<Tool>
 
 const route = useRoute()
 const filterText = ref("")
-
-const isMaterial = (tool: any): tool is Material => "materialName" in tool
-const isTool = (tool: any): tool is Tool => "toolName" in tool
 
 const currentTab = computed(() => switches.value.find(e => e.path === route.path) || switches.value[0])
 !currentTab.value.list.length && await currentTab.value.fetch()
@@ -61,8 +58,24 @@ const onIntersect = (e: boolean) => {
     e && currentTab.value.newData()
 }
 
-watch([route], () => {
+const backgroundLoadingLists = () => {
+    switches.value.forEach(e => {
+        if (e.list.length) return
+        setTimeout(async () => await e.fetch())
+    })
+}
+backgroundLoadingLists()
+
+watch([route], async () => {
+    !currentTab.value.list.length && await currentTab.value.fetch()
+})
+watch([currentTab], async () => {
     currentTool.value = currentTab.value.list[0]
+    console.log("currentTab", currentTab.value)
+})
+
+watch([currentTool], () => {
+    console.log("currentTool", currentTool.value)
 })
 </script>
 
