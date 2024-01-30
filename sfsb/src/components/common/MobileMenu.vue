@@ -19,9 +19,9 @@
                             input#submenu-switch.submenu__switcher(type="checkbox" hidden="true")
                             .submenu
                                 .submenu__container
-                                    router-link(v-for="link in i.submenu" :key="link" :to="i.path+'/'+link.path") {{ link.label }}
+                                    router-link(v-for="link in i.submenu" :key="link" :to="i.path+'/'+link.path" @click="close") {{ link.label }}
 
-                        router-link(:to="i.path" v-if="!('submenu' in i)") {{i.label}}
+                        router-link(:to="i.path" v-if="!('submenu' in i)" @click="close") {{i.label}}
             .mobile-menu__footer {{ version }}
 
 </template>
