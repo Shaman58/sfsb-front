@@ -11,6 +11,8 @@ export default class ToolStore<T extends { id?: string | number }> {
 
     public tools = computed(() => this.cumulativeTool.value.flat())
 
+    public filter: Ref<string> = ref("")
+
     constructor(url: string) {
         this.url = url
         this.fetchTool = this.fetchTool.bind(this)
@@ -19,6 +21,7 @@ export default class ToolStore<T extends { id?: string | number }> {
         this.newData = this.newData.bind(this)
         this.crud = new CRUD(url)
         this.loadAll = this.loadAll.bind(this)
+        this.setFilter = this.setFilter.bind(this)
     }
 
     async fetchTool() {
@@ -65,5 +68,15 @@ export default class ToolStore<T extends { id?: string | number }> {
                 console.log(`Loading ${this.url}`, this.offset.value)
             }
         })
+    }
+
+    async setFilter(value: string) {
+        this.filter.value = value
+        this.loading.value = true
+        const data = await query<T[]>(async () =>
+            await api.get(`${this.url}?filter=${this.filter.value}`), {success: ""})
+        if (!data || data.length === 0) return this.loading.value = false
+        this.cumulativeTool.value = [data]
+        this.loading.value = false
     }
 }

@@ -1,18 +1,6 @@
 import {defineStore} from "pinia";
 import ToolStore from "@/pinia-store/ToolStore";
-import {computed, Ref} from "vue";
-
-interface SwitchTab {
-    id: number;
-    path: string;
-    name: string;
-    list: Material[] | Tool[];
-    type: "Tool" | "Material";
-    save: (item: any) => Promise<void>;
-    fetch: () => Promise<void>;
-    newData: () => Promise<void>;
-    loading: Ref<boolean>
-}
+import {computed} from "vue";
 
 export const useToolingStore
     = defineStore("tooling", () => new ToolStore<Tool>("/tooling"));
@@ -42,7 +30,9 @@ export const useSwitches = () => computed(() => [
         save: useMaterialsStore().saveTool,
         fetch: useMaterialsStore().fetchTool,
         newData: useMaterialsStore().newData,
-        loading: useMaterialsStore().loading
+        loading: useMaterialsStore().loading,
+        setFilter: useMaterialsStore().setFilter,
+        filter: useMaterialsStore().filter
     },
     {
         id: 2,
@@ -53,7 +43,9 @@ export const useSwitches = () => computed(() => [
         save: useCuttersStore().saveTool,
         fetch: useCuttersStore().fetchTool,
         newData: useCuttersStore().newData,
-        loading: useCuttersStore().loading
+        loading: useCuttersStore().loading,
+        setFilter: useCuttersStore().setFilter,
+        filter: useCuttersStore().filter
     },
     {
         id: 3,
@@ -64,7 +56,9 @@ export const useSwitches = () => computed(() => [
         save: useSpecialStore().saveTool,
         fetch: useSpecialStore().fetchTool,
         newData: useSpecialStore().newData,
-        loading: useSpecialStore().loading
+        loading: useSpecialStore().loading,
+        setFilter: useSpecialStore().setFilter,
+        filter: useSpecialStore().filter
     },
     {
         id: 4,
@@ -75,7 +69,9 @@ export const useSwitches = () => computed(() => [
         save: useToolingStore().saveTool,
         fetch: useToolingStore().fetchTool,
         newData: useToolingStore().newData,
-        loading: useToolingStore().loading
+        loading: useToolingStore().loading,
+        setFilter: useToolingStore().setFilter,
+        filter: useToolingStore().filter
     },
 ])
 

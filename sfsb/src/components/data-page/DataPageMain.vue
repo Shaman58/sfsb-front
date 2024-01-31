@@ -2,7 +2,7 @@
     .datapage-main
         h1.datapage-main__title {{ currentTab?.name }}
         .datapage-main__container
-            v-text-field.datapage-main__list-filter(label="фильтр" v-model="filterText" )
+            v-text-field.datapage-main__list-filter(label="фильтр" v-model="filterText")
             DataPageList.datapage-main__list(:list="selectedList" @select="setCurrentTool" @intersected="onIntersect")
             .datapage-main__card
                 v-card.datapage-main__card-content
@@ -19,6 +19,7 @@ import {useSwitches} from "@/pinia-store/tools";
 
 const switches = useSwitches()
 
+
 type MaterialAndTool = Partial<Material> & Partial<Tool>
 
 const route = useRoute()
@@ -30,16 +31,8 @@ const currentTab = computed(() => switches.value.find(e => e.path === route.path
 const currentTool = ref(currentTab.value.list[0])
 
 
-const filteredMaterialList = computed(() => {
-    if (!filterText.value) return currentTab.value.list as Material[]
-    return (currentTab.value.list as Material[]).filter(e => `${e.materialName.toLowerCase()} ${e?.gost1?.toLowerCase() || ""} ${e?.gost2?.toLowerCase() || ""}`.includes(filterText.value.toLowerCase()))
-})
-const filteredToolList = computed(() => {
-    if (!filterText.value) return currentTab.value.list as Tool[]
-    return (currentTab.value.list as Tool[]).filter(e => `${e.toolName.toLowerCase()} ${e.description.toLowerCase()}`.includes(filterText.value.toLowerCase()))
-})
 const selectedList = computed(() => {
-    return currentTab.value.type === 'Material' ? filteredMaterialList.value : filteredToolList.value
+    return currentTab.value.type === 'Material' ? currentTab.value.list as Material[] : currentTab.value.list as Tool[]
 })
 const selectedComponent = computed(() => currentTab.value.type === 'Material' ? MaterialComponent : ToolComponent)
 const setCurrentTool = (item: MaterialAndTool) => {
@@ -58,6 +51,7 @@ const onIntersect = (e: boolean) => {
     e && currentTab.value.newData()
 }
 
+
 const backgroundLoadingLists = () => {
     switches.value.forEach(e => {
         if (e.list.length) return
@@ -74,8 +68,9 @@ watch([currentTab], async () => {
     console.log("currentTab", currentTab.value)
 })
 
-watch([currentTool], () => {
-    console.log("currentTool", currentTool.value)
+watch([filterText], async () => {
+    console.log("=>(DataPageMain.vue:85) filterText", filterText);
+    await currentTab.value.setFilter(filterText.value)
 })
 </script>
 
