@@ -24,12 +24,9 @@ const switches = useSwitches()
 const {currentTool: currentTab} = storeToRefs(useCurrentTool())
 
 
-type MaterialAndTool = Partial<Material> & Partial<Tool>
-
 const route = useRoute()
 const filterText = ref("")
 
-// const currentTab = computed(() => switches.value.find(e => e.path === route.path) || switches.value[0])
 !currentTab.value?.list.length && await currentTab.value?.fetch()
 
 const currentTool = ref(currentTab.value?.list[0])
@@ -39,7 +36,7 @@ const selectedList = computed(() => {
     return currentTab.value?.type === 'Material' ? currentTab.value?.list as Material[] : currentTab.value?.list as Tool[]
 })
 const selectedComponent = computed(() => currentTab.value?.type === 'Material' ? MaterialComponent : ToolComponent)
-const setCurrentTool = (item: MaterialAndTool) => {
+const setCurrentTool = (item: Material | Tool) => {
     if (!item) return
     const found = currentTab.value?.list.find(e => e.id === item.id)
     found && (currentTool.value = found)
