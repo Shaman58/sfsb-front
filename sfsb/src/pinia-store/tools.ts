@@ -1,6 +1,6 @@
 import {defineStore} from "pinia";
 import ToolStore from "@/pinia-store/ToolStore";
-import {computed} from "vue";
+import {computed, ref} from "vue";
 
 export const useToolingStore
     = defineStore("tooling", () => new ToolStore<Tool>("/tooling"));
@@ -75,3 +75,25 @@ export const useSwitches = () => computed(() => [
     },
 ])
 
+export const useCurrentTool = defineStore("currentTool", () => {
+    const currentRoute = ref("/")
+    const switchTool = useSwitches()
+    const currentTool = computed({
+        get: () => {
+            const res = switchTool.value.find(e => e.path === currentRoute.value)
+            return res
+        },
+        set: () => {
+        }
+    })
+
+    const setCurrentRoute = (route: string) => {
+        currentRoute.value = route
+    }
+
+
+    return {
+        currentTool,
+        setCurrentRoute
+    }
+})

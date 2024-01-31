@@ -12,6 +12,7 @@ import CompanyPage from "@/views/CompanyPage.vue";
 import Company1 from "@/components/company/Company1.vue";
 import DataPage1 from "@/views/DataPage1.vue";
 import DataPageMain from "@/components/data-page/DataPageMain.vue";
+import {useCurrentTool} from "@/pinia-store/tools";
 
 const toast = useToast();
 
@@ -105,6 +106,8 @@ const router = createRouter({
 router.beforeEach(async (to, _, next) => {
     const {fetchUser} = useCurrentUserStore();
     const {user} = storeToRefs(useCurrentUserStore());
+    const {setCurrentRoute} = useCurrentTool()
+    setCurrentRoute(to.path)
 
     !user.value && await fetchUser();
 

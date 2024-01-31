@@ -3,7 +3,7 @@
         h1.datapage-main__title {{ currentTab?.name }}
         .datapage-main__container
             v-text-field.datapage-main__list-filter(label="фильтр" v-model="filterText")
-            DataPageList.datapage-main__list(:list="selectedList" @select="setCurrentTool" @intersected="onIntersect")
+            data-page-list.datapage-main__list(:list="selectedList" @select="setCurrentTool" @intersected="onIntersect")
             .datapage-main__card
                 v-card.datapage-main__card-content
                     component(:is="selectedComponent" :item="currentTool" @save="save")
@@ -14,11 +14,14 @@ import {computed, ref, watch} from "vue";
 import DataPageList from "@/components/data-page/DataPageList.vue";
 import MaterialComponent from "@/components/data-page/MaterialComponent.vue";
 import ToolComponent from "@/components/data-page/ToolComponent.vue";
-import {useSwitches} from "@/pinia-store/tools";
+import {useCurrentTool, useSwitches} from "@/pinia-store/tools";
 import debounce from "@/mixins/Debounce";
+import {storeToRefs} from "pinia";
 
 
 const switches = useSwitches()
+
+const {currentTool: currentTab} = storeToRefs(useCurrentTool())
 
 
 type MaterialAndTool = Partial<Material> & Partial<Tool>
@@ -26,30 +29,30 @@ type MaterialAndTool = Partial<Material> & Partial<Tool>
 const route = useRoute()
 const filterText = ref("")
 
-const currentTab = computed(() => switches.value.find(e => e.path === route.path) || switches.value[0])
-!currentTab.value.list.length && await currentTab.value.fetch()
+// const currentTab = computed(() => switches.value.find(e => e.path === route.path) || switches.value[0])
+!currentTab.value?.list.length && await currentTab.value?.fetch()
 
-const currentTool = ref(currentTab.value.list[0])
+const currentTool = ref(currentTab.value?.list[0])
 
 
 const selectedList = computed(() => {
-    return currentTab.value.type === 'Material' ? currentTab.value.list as Material[] : currentTab.value.list as Tool[]
+    return currentTab.value?.type === 'Material' ? currentTab.value?.list as Material[] : currentTab.value?.list as Tool[]
 })
-const selectedComponent = computed(() => currentTab.value.type === 'Material' ? MaterialComponent : ToolComponent)
+const selectedComponent = computed(() => currentTab.value?.type === 'Material' ? MaterialComponent : ToolComponent)
 const setCurrentTool = (item: MaterialAndTool) => {
     if (!item) return
-    const found = currentTab.value.list.find(e => e.id === item.id)
+    const found = currentTab.value?.list.find(e => e.id === item.id)
     found && (currentTool.value = found)
 }
 const save = async (ev: Material | Tool) => {
-    await currentTab.value.save(ev)
+    await currentTab.value?.save(ev)
     const last = document.querySelector(".v-list > .v-list-item[data-last='true']")
     last?.scrollIntoView()
-    currentTool.value = selectedList.value.at(-1) || currentTab.value.list.at(-1)
+    currentTool.value = selectedList.value.at(-1) || currentTab.value?.list.at(-1)
 }
 
 const onIntersect = (e: boolean) => {
-    e && currentTab.value.newData()
+    e && currentTab.value?.newData()
 }
 
 
@@ -63,15 +66,15 @@ backgroundLoadingLists()
 
 watch([route], async () => {
     filterText.value = ""
-    !currentTab.value.list.length && await currentTab.value.fetch()
+    !currentTab.value?.list.length && await currentTab.value?.fetch()
 })
 watch([currentTab], async () => {
-    currentTool.value = currentTab.value.list[0]
+    currentTool.value = currentTab.value?.list[0]
     console.log("currentTab", currentTab.value)
 })
 
 watch([filterText], debounce(async () =>
-        await currentTab.value.setFilter(filterText.value)
+        await currentTab.value?.setFilter(filterText.value)
     , 250))
 </script>
 
