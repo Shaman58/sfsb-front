@@ -106,7 +106,7 @@ router.beforeEach(async (to, _, next) => {
     const {fetchUser} = useCurrentUserStore();
     const {user} = storeToRefs(useCurrentUserStore());
 
-    await fetchUser();
+    !user.value && await fetchUser();
 
     if (!user.value) {
         toast.error("Текущий пользователь не определен");

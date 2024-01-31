@@ -9,11 +9,11 @@
             v-toolbar-items.ml-5.navbar__menu(style="overflow-x: auto;")
                 .navbar__item(v-for="navitem in CONSTS.MAINMENU" :key="navitem.path" :hidden="navitem.role && navitem.role.length && !user?.roles.some(e => navitem.role?.includes(e))")
                     div(v-if="'submenu' in navitem" )
-                        div(color="white ")
+                        div
                             span {{ navitem.label }}
                             v-icon(icon="mdi:mdi-chevron-down" )
-                            v-menu(activator="parent" open-on-hover color="#777")
-                                v-list
+                            v-menu(activator="parent"  :open-on-hover="true")
+                                v-list(color="#777")
                                     v-list-item(v-for="(item, index) in navitem.submenu"  :key="index" :value="index")
                                         router-link.navbar__link(:to="navitem.path+'/'+item.path" variant="tonal" ) {{ item.label }}
                     router-link(:to="navitem.path" v-else) {{ navitem.label }}
@@ -104,6 +104,7 @@ onMounted(async () => {
     &__item > *
         color: white
         text-decoration: none
+        text-transform: uppercase
         cursor: pointer
 
     &__name

@@ -12,7 +12,7 @@
             DataPageToolItem(v-if="isTool(item)" :item="item")
 </template>
 <script setup lang="ts">
-import {ref, watch} from "vue";
+import {ref} from "vue";
 import DataPageMaterialItem from "@/components/data-page/DataPageMaterialItem.vue";
 import DataPageToolItem from "@/components/data-page/DataPageToolItem.vue";
 
@@ -36,12 +36,6 @@ const onIntersect = (e: boolean) => {
     request.value = e || request.value
     emit("intersected", e)
 }
-
-watch([request], async () => {
-    console.log("watch", request.value)
-    request.value && await currentTab.value.newData()
-    request.value = false
-})
 </script>
 
 
