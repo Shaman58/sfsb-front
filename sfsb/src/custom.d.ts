@@ -35,6 +35,7 @@ declare interface NavItem {
     path: string;
     label: string;
     role?: string[];
+    submenu?: NavItem[]
 }
 
 declare interface OrderFile {

@@ -8,10 +8,10 @@
 import {ref} from "vue";
 import ToolList from "@/components/tool/ToolList.vue";
 import {storeToRefs} from "pinia";
-import {useSpecialStore} from "@/pinia-store/specials";
+import {useSpecialStore} from "@/pinia-store/tools";
 
-const {specials, loading} = storeToRefs(useSpecialStore())
-const {fetchSpecials, deleteSpecial, saveSpecial} = useSpecialStore()
+const {tools: specials, loading} = storeToRefs(useSpecialStore())
+const {fetchTool: fetchSpecials, deleteTool: deleteSpecial, saveTool: saveSpecial} = useSpecialStore()
 
 await fetchSpecials()
 

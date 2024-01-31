@@ -18,7 +18,7 @@
 import {ref} from "vue";
 import ToolList from "@/components/tool/ToolList.vue";
 import {storeToRefs} from "pinia";
-import {useToolingStore} from "@/pinia-store/tooling";
+import {useToolingStore} from "@/pinia-store/tools";
 
 // onMounted(() => {
 //     store.dispatch("fetchToolings");
@@ -30,8 +30,8 @@ const visible = ref(false);
 
 // const toolings = computed(() => store.getters.getToolings);
 
-const {toolings, loading} = storeToRefs(useToolingStore())
-const {saveToolings, fetchToolings, deleteTooling} = useToolingStore()
+const {tools: toolings, loading} = storeToRefs(useToolingStore())
+const {saveTool: saveToolings, fetchTool: fetchToolings, deleteTool: deleteTooling} = useToolingStore()
 
 await fetchToolings()
 const save = async (data: Tool) => {

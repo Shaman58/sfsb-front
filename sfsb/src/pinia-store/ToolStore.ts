@@ -11,6 +11,8 @@ export default class ToolStore<T extends { id?: string | number }> {
 
     public tools = computed(() => this.cumulativeTool.value.flat())
 
+    public filter: Ref<string> = ref("")
+
     constructor(url: string) {
         this.url = url
         this.fetchTool = this.fetchTool.bind(this)
@@ -19,12 +21,13 @@ export default class ToolStore<T extends { id?: string | number }> {
         this.newData = this.newData.bind(this)
         this.crud = new CRUD(url)
         this.loadAll = this.loadAll.bind(this)
+        this.setFilter = this.setFilter.bind(this)
     }
 
     async fetchTool() {
         this.loading.value = true
         this.cumulativeTool.value[this.offset.value] = await query(async () =>
-            await api.get<T[]>(`${this.url}?offset=${this.offset.value}&limit=${this.limit.value}`), {success: ""}) || [] as T[]
+            await api.get<T[]>(`${this.url}?offset=${this.offset.value}&limit=${this.limit.value}&filter=${this.filter.value}`), {success: ""}) || [] as T[]
         this.loading.value = false
     }
 
@@ -50,7 +53,7 @@ export default class ToolStore<T extends { id?: string | number }> {
     async newData() {
         this.loading.value = true
         const data = await query<T[]>(async () =>
-            await api.get(`${this.url}?offset=${this.offset.value + 1}&limit=${this.limit.value}`), {success: ""})
+            await api.get(`${this.url}?offset=${this.offset.value + 1}&limit=${this.limit.value}&filter=${this.filter.value}`), {success: ""})
         if (!data || data.length === 0) return this.loading.value = false
         this.cumulativeTool.value[this.offset.value + 1] = data
         this.offset.value += 1
@@ -65,5 +68,10 @@ export default class ToolStore<T extends { id?: string | number }> {
                 console.log(`Loading ${this.url}`, this.offset.value)
             }
         })
+    }
+
+    async setFilter(value: string) {
+        this.filter.value = value
+        await this.fetchTool()
     }
 }

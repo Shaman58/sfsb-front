@@ -13,7 +13,15 @@
                         v-icon(icon="mdi-exit-to-app" class="ml-2" color="red")
             .mobile-menu__body
                 .mobile-menu__body-wrapper
-                    a.mobile-menu__link(v-for="i in CONSTS.MAINMENU" :href="i.path") {{i.label}}
+                    .mobile-menu__link(v-for="i in CONSTS.MAINMENU" )
+                        div(v-if="'submenu' in i")
+                            label.submenu__label(for="submenu-switch") {{ i.label }}
+                            input#submenu-switch.submenu__switcher(type="checkbox" hidden="true")
+                            .submenu
+                                .submenu__container
+                                    router-link(v-for="link in i.submenu" :key="link" :to="i.path+'/'+link.path" @click="close") {{ link.label }}
+
+                        router-link(:to="i.path" v-if="!('submenu' in i)" @click="close") {{i.label}}
             .mobile-menu__footer {{ version }}
 
 </template>
@@ -52,8 +60,6 @@ const exit = () => {
 }
 
 </script>
-
-
 <style scoped lang="sass">
 .mobile-menu
     position: fixed
@@ -138,5 +144,24 @@ const exit = () => {
         height: 30px
         border-radius: 50%
         object-fit: cover
+
+.submenu
+    display: grid
+    grid-template-rows: 0fr
+    transition: grid-template-rows 0.5s
+
+    &__container
+        height: 100%
+        overflow-y: hidden
+        display: flex
+        flex-direction: column
+        gap: .5rem
+
+    &__switcher:checked + .submenu
+        grid-template-rows: 1fr
+
+    &__label
+        margin-bottom: 0.5rem
+
 
 </style>

@@ -33,22 +33,22 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, type Ref, ref, toRefs, toValue, watchEffect} from "vue";
+import {onMounted, type Ref, ref, toValue, watchEffect} from "vue";
 import {useValidationRules} from "@/mixins/FieldValidationRules";
 import {useRoute} from "vue-router";
 import CONST from "@/consts";
 import {storeToRefs} from "pinia";
 import {useMaterialTemplatesStore} from "@/pinia-store/materialTemplates";
-import {useMaterialsStore} from "@/pinia-store/materials";
-import Material from "@/components/data-page/Material.vue";
+import {useMaterialsStore} from "@/pinia-store/tools";
+import Material from "@/components/data-page/MaterialComponent.vue";
 
 const {materialTemplates: templates} = storeToRefs(useMaterialTemplatesStore())
 const {fetchMaterialTemplates} = useMaterialTemplatesStore()
 const {loading} = storeToRefs(useMaterialsStore())
-const {saveMaterial} = useMaterialsStore()
+const {saveTool: saveMaterial} = useMaterialsStore()
 
 const props = defineProps<{ item: Material }>()
-const {item} = toRefs(props)
+// const {item} = toRefs(props)
 
 const emit = defineEmits(["save"])
 
@@ -57,15 +57,9 @@ const route = useRoute()
 
 const {rules} = useValidationRules();
 const geometries = CONST.GEOMETRIES
-const materialLocal = ref<Partial<Material>>(item.value)
+const materialLocal = ref<Partial<Material>>(props.item)
 const flagNew = ref(false)
 
-// const isDiffPropsLocal: ComputedRef<boolean> = computed(() => {
-//     if (!materialLocal || !materialLocal.value || !material.value) return false
-//     return (Object.keys(material.value) as Array<keyof typeof material.value>)
-//         .every((key: keyof typeof material.value) => material.value[key] === materialLocal.value[key]
-//         )
-// })
 
 const save = async () => {
     if (!materialLocal.value || !form.value) return
@@ -91,12 +85,12 @@ const insert = () => {
 }
 onMounted(async () => {
     !templates.value.length && await fetchMaterialTemplates()
-    materialLocal.value = toValue(item) as Material
+    materialLocal.value = toValue(props.item) as Material
 
 })
 
 watchEffect(() => {
-    materialLocal.value = item.value
+    materialLocal.value = props.item
     flagNew.value = false
 })
 

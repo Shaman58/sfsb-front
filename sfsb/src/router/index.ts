@@ -11,6 +11,8 @@ import {storeToRefs} from "pinia";
 import CompanyPage from "@/views/CompanyPage.vue";
 import Company1 from "@/components/company/Company1.vue";
 import DataPage1 from "@/views/DataPage1.vue";
+import DataPageMain from "@/components/data-page/DataPageMain.vue";
+import {useCurrentTool} from "@/pinia-store/tools";
 
 const toast = useToast();
 
@@ -39,6 +41,28 @@ const routes = [
         meta: {
             onlyFor: ["TECHNOLOGIST", "ADMIN"],
         },
+        children: [
+            {
+                path: "materials", component: DataPageMain, meta: {
+                    onlyFor: ["TECHNOLOGIST", "ADMIN"],
+                },
+            },
+            {
+                path: "cutters", component: DataPageMain, meta: {
+                    onlyFor: ["TECHNOLOGIST", "ADMIN"],
+                },
+            },
+            {
+                path: "specials", component: DataPageMain, meta: {
+                    onlyFor: ["TECHNOLOGIST", "ADMIN"],
+                },
+            },
+            {
+                path: "toolings", component: DataPageMain, meta: {
+                    onlyFor: ["TECHNOLOGIST", "ADMIN"],
+                },
+            },
+        ]
     },
     {
         path: "/supplier",
@@ -82,8 +106,10 @@ const router = createRouter({
 router.beforeEach(async (to, _, next) => {
     const {fetchUser} = useCurrentUserStore();
     const {user} = storeToRefs(useCurrentUserStore());
+    const {setCurrentRoute} = useCurrentTool()
+    setCurrentRoute(to.path)
 
-    await fetchUser();
+    !user.value && await fetchUser();
 
     if (!user.value) {
         toast.error("Текущий пользователь не определен");

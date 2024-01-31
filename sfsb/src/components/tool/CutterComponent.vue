@@ -7,11 +7,11 @@
 // import {useStore} from "vuex";
 import {ref} from "vue";
 import ToolList from "@/components/tool/ToolList.vue";
-import {useCuttersStore} from "@/pinia-store/cutters";
+import {useCuttersStore} from "@/pinia-store/tools";
 import {storeToRefs} from "pinia";
 
-const {cutters, loading} = storeToRefs(useCuttersStore())
-const {saveCutter, fetchCutters, deleteCutter} = useCuttersStore()
+const {tools: cutters, loading} = storeToRefs(useCuttersStore())
+const {saveTool: saveCutter, fetchTool: fetchCutters, deleteTool: deleteCutter} = useCuttersStore()
 
 await fetchCutters()
 

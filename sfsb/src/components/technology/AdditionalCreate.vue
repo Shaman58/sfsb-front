@@ -37,7 +37,7 @@ import {useValidationRules} from "@/mixins/FieldValidationRules";
 import TechWorkpieceCard from "@/components/technology/TechWorkpieceCard.vue";
 import materialDataFormatting from "@/mixins/MaterialDataFormatting";
 import {storeToRefs} from "pinia";
-import {useMaterialsStore} from "@/pinia-store/materials";
+import {useMaterialsStore} from "@/pinia-store/tools";
 
 interface Props {
     visible: boolean
