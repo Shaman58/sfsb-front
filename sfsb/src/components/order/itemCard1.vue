@@ -17,6 +17,7 @@
                         v-model="itemLocal.technology.drawingNumber"
                         :disabled="!!itemLocal.technology?.id"
                         placeholder="42"
+                        :rules="[rules.required]"
                     )
                     v-text-field.item-card__schema-name(label="Название чертежа:"
                         v-model="itemLocal.technology.drawingName"
