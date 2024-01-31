@@ -9,7 +9,7 @@
 import {ref} from "vue";
 // import MaterialListDialog from "@/components/material/MaterialList.vue";
 import MaterialListDialog1 from "@/components/material/MaterialList1.vue";
-import {useMaterialsStore} from "@/pinia-store/materials.js";
+import {useMaterialsStore} from "@/pinia-store/tools";
 import {useMaterialTemplatesStore} from "@/pinia-store/materialTemplates";
 import {storeToRefs} from "pinia";
 import SuspendedComponent from "@/components/common/SuspendedComponent.vue";

@@ -39,7 +39,7 @@ import {useRoute} from "vue-router";
 import CONST from "@/consts";
 import {storeToRefs} from "pinia";
 import {useMaterialTemplatesStore} from "@/pinia-store/materialTemplates";
-import {useMaterialsStore} from "@/pinia-store/materials";
+import {useMaterialsStore} from "@/pinia-store/tools";
 import Material from "@/components/data-page/MaterialComponent.vue";
 
 const {materialTemplates: templates} = storeToRefs(useMaterialTemplatesStore())

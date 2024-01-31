@@ -30,7 +30,7 @@ import materialDataFormatting from '@/mixins/MaterialDataFormatting'
 import MaterialCreate from "@/components/material/MaterialCreate.vue";
 import CONSTS from "@/consts"
 import {storeToRefs} from "pinia";
-import {useMaterialsStore} from "@/pinia-store/materials";
+import {useMaterialsStore} from "@/pinia-store/tools";
 import {useMaterialTemplatesStore} from "@/pinia-store/materialTemplates";
 
 const props = defineProps<{ visible: boolean }>()

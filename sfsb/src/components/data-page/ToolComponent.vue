@@ -19,7 +19,7 @@
 <script setup lang="ts">
 import {onMounted, type Ref, ref, toRefs, watchEffect} from "vue";
 import {useValidationRules} from "@/mixins/FieldValidationRules";
-import {useToolingStore} from "@/pinia-store/tooling";
+import {useToolingStore} from "@/pinia-store/tools";
 import {storeToRefs} from "pinia";
 
 const props = defineProps<{ item: Partial<Tool> }>()
