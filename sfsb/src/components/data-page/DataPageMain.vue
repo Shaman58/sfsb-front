@@ -15,6 +15,7 @@ import DataPageList from "@/components/data-page/DataPageList.vue";
 import MaterialComponent from "@/components/data-page/MaterialComponent.vue";
 import ToolComponent from "@/components/data-page/ToolComponent.vue";
 import {useSwitches} from "@/pinia-store/tools";
+import debounce from "@/mixins/Debounce";
 
 
 const switches = useSwitches()
@@ -61,6 +62,7 @@ const backgroundLoadingLists = () => {
 backgroundLoadingLists()
 
 watch([route], async () => {
+    filterText.value = ""
     !currentTab.value.list.length && await currentTab.value.fetch()
 })
 watch([currentTab], async () => {
@@ -68,10 +70,9 @@ watch([currentTab], async () => {
     console.log("currentTab", currentTab.value)
 })
 
-watch([filterText], async () => {
-    console.log("=>(DataPageMain.vue:85) filterText", filterText);
-    await currentTab.value.setFilter(filterText.value)
-})
+watch([filterText], debounce(async () =>
+        await currentTab.value.setFilter(filterText.value)
+    , 250))
 </script>
 
 
