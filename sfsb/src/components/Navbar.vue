@@ -12,9 +12,9 @@
                         div
                             span {{ navitem.label }}
                             v-icon(icon="mdi:mdi-chevron-down" )
-                            v-menu(activator="parent"  :open-on-hover="true")
-                                v-list(color="#777")
-                                    v-list-item(v-for="(item, index) in navitem.submenu"  :key="index" :value="index")
+                            v-menu(activator="parent"  :open-on-hover="true" content-class="submenu" )
+                                v-list.submenu__list
+                                    v-list-item.submenu__list-item(v-for="(item, index) in navitem.submenu"  :key="index" :value="index")
                                         router-link.navbar__link(:to="navitem.path+'/'+item.path" variant="tonal" ) {{ item.label }}
                     router-link(:to="navitem.path" v-else) {{ navitem.label }}
 
@@ -120,5 +120,15 @@ onMounted(async () => {
     display: flex
     align-items: center
 
+.submenu
+    background-color: #2F477E
 
+    &__list-item
+        background-color: #2F477E
+
+        & a
+            color: #fff
+
+.v-menu > .v-overlay__content > .v-list.submenu__list
+    background-color: #2F477E
 </style>

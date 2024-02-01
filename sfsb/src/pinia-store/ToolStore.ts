@@ -72,6 +72,7 @@ export default class ToolStore<T extends { id?: string | number }> {
 
     async setFilter(value: string) {
         this.filter.value = value
+        this.offset.value = 0
         await this.fetchTool()
     }
 }
