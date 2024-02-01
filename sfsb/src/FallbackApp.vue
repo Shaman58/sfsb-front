@@ -19,11 +19,10 @@ body {
 .container {
     position: fixed;
     z-index: 4;
-    margin: 0 auto;
     left: 35px;
     right: 0;
     top: 50%;
-    margin-top: -45px;
+    margin: -45px auto 0;
     width: 120px;
     height: 80px;
     list-style: none;
@@ -33,11 +32,10 @@ body {
 .loader {
     position: fixed;
     z-index: 3;
-    margin: 0 auto;
     left: 0;
     right: 0;
     top: 50%;
-    margin-top: -30px;
+    margin: -30px auto 0;
     width: 90px;
     height: 60px;
     list-style: none;

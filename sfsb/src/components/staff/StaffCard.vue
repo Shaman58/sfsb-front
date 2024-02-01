@@ -49,7 +49,7 @@ import {useStaffStore} from '@/pinia-store/staff'
 import {useRolesStore} from '@/pinia-store/roles'
 import {storeToRefs} from 'pinia'
 
-const personForm = ref(null)
+const personForm = ref<HTMLFormElement>()
 const newAvatarFD: Ref<string | Blob | null> = ref(null)
 
 const toast = useToast();
@@ -72,7 +72,6 @@ const newPass = ref("")
 const newPassRepeat = ref("")
 
 const required = (v: string) => !!v.length || "Поле обязательно для заполнения"
-// const { rules:{emailValidation} } = useValidationRules()
 const emailValidation = (value: string) => {
     const pattern = /^\w+([.-]?\w+){2,}@\w+([.-]?\w+)*(\.\w{2,5})+$/
     return value === "" || pattern.test(value) || 'Неверный формат'
