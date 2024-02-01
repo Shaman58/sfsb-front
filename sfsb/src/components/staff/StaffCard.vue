@@ -1,54 +1,53 @@
 <template lang="pug">
-v-container.person-card__container
-    v-form(id="person-form" ref="personForm")
-        .person-card
-            .person-card__header
-                label.person-card__picture(for="avatar")
-                    img.person-card__img(:src="personLocal.picture ? personLocal.picture : '/images/user-profile.png'" alt="avatar" title="Заменить аватар")
-                    input.person-card__input(type="file" id="avatar" @change="changeAvatar($event)" hidden)
-                h2.person-card__title
-                    span {{ personLocal.firstName }}
-                    span {{ personLocal.lastName }}
-                    span.person-card__username [ {{ personLocal.username }} ]
-            v-card.person-card__main
-                form.person-card__form
-                    .person-card__form-name
-                        v-text-field(label="username" v-model="personLocal.username" :rules="[required]" v-if="!person.id")
-                        v-text-field(label="Имя" v-model="personLocal.firstName" :rules="[required]")
-                        v-text-field(label="Фамилия" v-model="personLocal.lastName" :rules="[required]")
-                    .person-card__form-contacts
-                        v-text-field(label="Email" v-model="personLocal.email" :rules="[emailValidation]")
-                    .person-card__form-roles
-                        v-checkbox(v-for="role in roles" :label="role" v-model="personLocal.roles" :value="role")
-                v-card.person-card__pass
-                    v-btn.person-card__pass-btn(variant="plain" @click="showChangePass=true") Изменить пароль
+    v-container.person-card__container
+        v-form(id="person-form" ref="personForm")
+            .person-card
+                .person-card__header
+                    label.person-card__picture(for="avatar")
+                        img.person-card__img(:src="personLocal.picture ? personLocal.picture : '/images/user-profile.png'" alt="avatar" title="Заменить аватар")
+                        input.person-card__input(type="file" id="avatar" @change="changeAvatar($event)" hidden)
+                    h2.person-card__title
+                        span {{ personLocal.firstName }}
+                        span {{ personLocal.lastName }}
+                        span.person-card__username [ {{ personLocal.username }} ]
+                v-card.person-card__main
+                    form.person-card__form
+                        .person-card__form-name
+                            v-text-field(label="username" v-model="personLocal.username" :rules="[required]" v-if="!person.id")
+                            v-text-field(label="Имя" v-model="personLocal.firstName" :rules="[required]")
+                            v-text-field(label="Фамилия" v-model="personLocal.lastName" :rules="[required]")
+                        .person-card__form-contacts
+                            v-text-field(label="Email" v-model="personLocal.email" :rules="[emailValidation]")
+                        .person-card__form-roles
+                            v-checkbox(v-for="role in roles" :label="role" v-model="personLocal.roles" :value="role")
+                    v-card.person-card__pass
+                        v-btn.person-card__pass-btn(variant="plain" @click="showChangePass=true") Изменить пароль
 
-            .person-card__footer
-                v-btn(prepend-icon="$success" variant="plain" @click="save" color="green" :disabled="!wasPersonChanged || !isValidForm") Сохранить
-                v-btn(prepend-icon="$error" variant="plain"  @click="reset") Отменить изменения
-                v-btn(prepend-icon="$info" variant="plain"  @click="deletePerson" color="red") Удалить пользователя
-                v-btn(prepend-icon="$next" variant="plain" @click="emit('exit')" color="blue") Выйти
+                .person-card__footer
+                    v-btn(prepend-icon="$success" variant="plain" @click="save" color="green" :disabled="!wasPersonChanged || !isValidForm") Сохранить
+                    v-btn(prepend-icon="$error" variant="plain"  @click="reset") Отменить изменения
+                    v-btn(prepend-icon="$info" variant="plain"  @click="deletePerson" color="red") Удалить пользователя
+                    v-btn(prepend-icon="$next" variant="plain" @click="emit('exit')" color="blue") Выйти
 
-            v-dialog(v-model="showChangePass")
-                v-card
-                    v-card-title Заменить пароль
-                    v-card-text
-                        v-text-field(label="Новый пароль" v-model="newPass" type="password")
-                        v-text-field(label="Повторите новый пароль" v-model="newPassRepeat" type="password"  :rules="[newPassRepeat===newPass||'Ошибка! Пароли не совпадают']")
-                    v-card-actions
-                        v-btn(color="primary" variant="plain" @click="changePass") Сохранить
-                        v-btn(color="error" variant="plain" @click="showChangePass=false") Отменить
+                v-dialog(v-model="showChangePass")
+                    v-card
+                        v-card-title Заменить пароль
+                        v-card-text
+                            v-text-field(label="Новый пароль" v-model="newPass" type="password")
+                            v-text-field(label="Повторите новый пароль" v-model="newPassRepeat" type="password"  :rules="[newPassRepeat===newPass||'Ошибка! Пароли не совпадают']")
+                        v-card-actions
+                            v-btn(color="primary" variant="plain" @click="changePass") Сохранить
+                            v-btn(color="error" variant="plain" @click="showChangePass=false") Отменить
 
 </template>
 
 <script setup lang="ts">
-import { reactive, watch, ref, computed } from 'vue';
-import type { Ref } from "vue"
-// import roles from "./fakeRolesData"
-import { useToast } from 'vue-toast-notification';
-import { useStaffStore } from '@/pinia-store/staff'
-import { useRolesStore } from '@/pinia-store/roles'
-import { storeToRefs } from 'pinia'
+import type {Ref} from "vue"
+import {computed, reactive, ref, watch} from 'vue';
+import {useToast} from 'vue-toast-notification';
+import {useStaffStore} from '@/pinia-store/staff'
+import {useRolesStore} from '@/pinia-store/roles'
+import {storeToRefs} from 'pinia'
 
 const personForm = ref(null)
 const newAvatarFD: Ref<string | Blob | null> = ref(null)
@@ -57,12 +56,12 @@ const toast = useToast();
 const staffStore = useStaffStore()
 
 const rolesStore = useRolesStore()
-const { roles } = storeToRefs(rolesStore)
+const {roles} = storeToRefs(rolesStore)
 
-const { person } = defineProps<{ person: Person }>()
+const {person} = defineProps<{ person: Person }>()
 const emit = defineEmits(["exit"])
 
-let personLocal: Person = reactive({ ...person })
+let personLocal: Person = reactive({...person})
 
 const wasPersonChanged = ref(false)
 const wasAvatarChanged = ref(false)
@@ -76,11 +75,10 @@ const required = (v: string) => !!v.length || "Поле обязательно �
 // const { rules:{emailValidation} } = useValidationRules()
 const emailValidation = (value: string) => {
     const pattern = /^\w+([.-]?\w+){2,}@\w+([.-]?\w+)*(\.\w{2,5})+$/
-    return value==="" || pattern.test(value) || 'Неверный формат'
+    return value === "" || pattern.test(value) || 'Неверный формат'
 }
 const isValidForm = computed(() => !!personLocal.firstName.length
-                            && !!personLocal.lastName.length
-                            && emailValidation(personLocal.email)===true)
+    && !!personLocal.lastName.length)
 
 const changePass = () => {
     if (newPass.value !== newPassRepeat.value) return toast.error("Пароли не совпадают")
@@ -92,7 +90,7 @@ const changeAvatar = async (e: Event) => {
     const target = e.target as HTMLInputElement
     target && target.files && console.log(target.files[0])
 
-    if(target.files && target.files[0] && target.files[0].size>1024 * 1024) return toast.error("Максимальный размер файла 1MB")
+    if (target.files && target.files[0] && target.files[0].size > 1024 * 1024) return toast.error("Максимальный размер файла 1MB")
 
     newAvatarFD.value = target.files && target.files[0]
 
@@ -112,7 +110,7 @@ const changeAvatar = async (e: Event) => {
 const save = async () => {
     console.log("personLocal from component", personLocal);
     if (!isValidForm) return toast.error("Поля не заполнены")
-    if(!person.username && !personLocal.password) return toast.error("Вы забыли задать пароль")
+    if (!person.username && !personLocal.password) return toast.error("Вы забыли задать пароль")
     await staffStore.saveStaff(personLocal)
     emit("exit")
 }
