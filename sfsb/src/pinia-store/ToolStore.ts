@@ -73,6 +73,11 @@ export default class ToolStore<T extends { id?: string | number }> {
     async setFilter(value: string) {
         this.filter.value = value
         this.offset.value = 0
-        await this.fetchTool()
+        this.loading.value = true
+        const data = await query<T[]>(async () =>
+            await api.get(`${this.url}?limit=${this.limit.value}&filter=${this.filter.value}`), {success: ""})
+        if (!data || data.length === 0) return this.loading.value = false
+        this.cumulativeTool.value = [data]
+        this.loading.value = false
     }
 }
