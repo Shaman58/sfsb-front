@@ -5,7 +5,7 @@
                 .person-card__header
                     label.person-card__picture(for="avatar")
                         img.person-card__img(:src="personLocal.picture ? personLocal.picture : '/images/user-profile.png'" alt="avatar" title="Заменить аватар")
-                        input.person-card__input(type="file" id="avatar" @change="changeAvatar($event)" hidden)
+                        input.person-card__input(type="file" id="avatar" @change="void changeAvatar($event)" hidden)
                     h2.person-card__title
                         span {{ personLocal.firstName }}
                         span {{ personLocal.lastName }}
