@@ -259,3 +259,12 @@ declare interface Operation {
 
 declare type Role = string;
 declare type Roles = string[];
+
+declare interface FileOrder {
+    id: number,
+    created: string | null,
+    "updated": string | null,
+    "filename": string,
+    "link": string,
+    "user": unknown | null
+}

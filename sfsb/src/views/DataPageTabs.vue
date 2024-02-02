@@ -17,9 +17,8 @@
     opacity: 0
 
 .datapage-tabs
-    --top: 10px
+    --top: 0px
     margin-top: var(--top)
-    padding-top: 2rem
     height: calc(100dvh - 42px)
     overflow-y: auto
     background-color: rgba(174, 174, 231, 0.3)

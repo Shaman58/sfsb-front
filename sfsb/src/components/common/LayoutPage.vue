@@ -16,17 +16,18 @@
 <style scoped lang="sass">
 .layout-page
     --scroll-color: rgba(47, 71, 126, 0.5)
-    padding-inline: 1rem
+    padding: 0 1rem 1rem
     height: calc(100dvh - 3rem)
     display: grid
     grid-template-rows: 50px 1fr
+    background-color: #00acc120
 
     &__title
         margin-bottom: 1rem
 
     &__container
         display: grid
-        grid-template-columns: 1fr 3fr
+        grid-template-columns: 1fr 4fr
         grid-template-rows: 56px 1fr
         grid-template-areas: "filter card" "list card"
         gap: 0.5rem
