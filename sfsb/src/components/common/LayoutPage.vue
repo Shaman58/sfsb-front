@@ -3,8 +3,10 @@
         h1.layout-page__title
             slot(name="title")
         .layout-page__container
-            slot.layout-page__list-filter(name="filter")
-            slot.layout-page__list(name="list")
+            .layout-page__list-filter
+                slot(name="filter")
+            .layout-page__list
+                slot(name="list")
             .layout-page__card
                 v-card.layout-page__card-content
                     slot(name="card")
@@ -13,8 +15,9 @@
 </script>
 <style scoped lang="sass">
 .layout-page
+    --scroll-color: rgba(47, 71, 126, 0.5)
     padding-inline: 1rem
-    height: calc(100% - 2rem)
+    height: calc(100dvh - 3rem)
     display: grid
     grid-template-rows: 50px 1fr
 
@@ -24,7 +27,7 @@
     &__container
         display: grid
         grid-template-columns: 1fr 3fr
-        grid-template-rows: 56px auto
+        grid-template-rows: 56px 1fr
         grid-template-areas: "filter card" "list card"
         gap: 0.5rem
         height: 100%
@@ -45,12 +48,24 @@
 
         &::-webkit-scrollbar-thumb
             width: 4px
-            background-color: #777
+            background-color: var(--scroll-color)
             border-radius: 8px
 
     &__card
         grid-area: card
+        height: 100%
 
     &__card-content
         height: 100%
+        overflow-y: auto
+
+        &::-webkit-scrollbar
+            width: 4px
+            background-color: transparent
+
+        &::-webkit-scrollbar-thumb
+            width: 4px
+            background-color: var(--scroll-color)
+            border-radius: 8px
+
 </style>

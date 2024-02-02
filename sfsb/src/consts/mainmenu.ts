@@ -9,7 +9,13 @@ const navItems: NavItem[] = [
             {path: "toolings", label: "Остастка", role: ["TECHNOLOGIST", "ADMIN"]},
         ]
     },
-    {path: "/commerce", label: "Коммерция", role: ["COMMERCE", "ADMIN"]},
+    {
+        path: "/commerce", label: "Коммерция", role: ["COMMERCE", "ADMIN"], submenu: [
+            {path: "clients", label: "Контрагенты", role: ["COMMERCE", "ADMIN"]},
+            {path: "orders", label: "Заявки", role: ["COMMERCE", "ADMIN"]},
+            {path: "operations", label: "Операции", role: ["COMMERCE", "ADMIN"]},
+        ]
+    },
     {
         path: "/technology",
         label: "Технология",

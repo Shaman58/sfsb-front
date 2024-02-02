@@ -13,6 +13,8 @@ import Company1 from "@/components/company/Company1.vue";
 import DataPage1 from "@/views/DataPage1.vue";
 import DataPageMain from "@/components/data-page/DataPageMain.vue";
 import {useCurrentTool} from "@/pinia-store/tools";
+import ClientsComponent from "@/components/commerce/ClientsComponent.vue";
+import OrdersComponent from "@/components/commerce/OrdersComponent.vue";
 
 const toast = useToast();
 
@@ -84,6 +86,18 @@ const routes = [
         meta: {
             onlyFor: ["COMMERCE", "ADMIN"],
         },
+        children: [
+            {
+                path: "clients", component: ClientsComponent, meta: {
+                    onlyFor: ["COMMERCE", "ADMIN"],
+                },
+            },
+            {
+                path: "orders", component: OrdersComponent, meta: {
+                    onlyFor: ["COMMERCE", "ADMIN"],
+                },
+            },
+        ]
     },
     {
         path: "/technology",
