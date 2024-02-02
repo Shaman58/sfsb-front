@@ -1,12 +1,13 @@
 <template lang="pug">
-    .datapage-main
-        h1.datapage-main__title {{ currentTab?.name }}
-        .datapage-main__container
+    layout-page
+        template(#title) {{ currentTab?.name }}
+        template(#filter)
             v-text-field.datapage-main__list-filter(label="фильтр" v-model="filterText")
-            data-page-list.datapage-main__list(:list="selectedList" @select="setCurrentTool" @intersected="onIntersect")
-            .datapage-main__card
-                v-card.datapage-main__card-content
-                    component(:is="selectedComponent" :item="currentTool" @save="save")
+        template(#list)
+            data-page-list(:list="selectedList" @select="setCurrentTool" @intersected="onIntersect")
+        template(#card)
+            component(:is="selectedComponent" :item="currentTool" @save="save")
+
 </template>
 <script setup lang="ts">
 import {useRoute} from "vue-router";
@@ -17,7 +18,7 @@ import ToolComponent from "@/components/data-page/ToolComponent.vue";
 import {useCurrentTool, useSwitches} from "@/pinia-store/tools";
 import debounce from "@/mixins/Debounce";
 import {storeToRefs} from "pinia";
-
+import LayoutPage from "@/components/common/LayoutPage.vue";
 
 const switches = useSwitches()
 
@@ -77,51 +78,4 @@ watch([filterText], debounce(async () =>
 
 
 <style scoped lang="sass">
-.datapage-main
-    padding-inline: 1rem
-    height: calc(100% - 2rem)
-    display: grid
-    grid-template-rows: 50px 1fr
-
-    &__title
-        margin-bottom: 1rem
-
-    &__container
-        display: grid
-        grid-template-columns: 1fr 3fr
-        grid-template-rows: 56px auto
-        grid-template-areas: "filter card" "list card"
-        gap: 0.5rem
-        height: 100%
-        overflow-y: hidden
-
-    &__list-container
-        height: 100%
-        display: grid
-        grid-template-rows: 56px 1fr
-        gap: 0.2rem
-
-    &__filter
-        grid-area: filter
-
-    &__list
-        grid-area: list
-        height: 100%
-        overflow-y: auto
-        border-radius: 4px
-
-        &::-webkit-scrollbar
-            width: 4px
-            background-color: transparent
-
-        &::-webkit-scrollbar-thumb
-            width: 4px
-            background-color: #777
-            border-radius: 8px
-
-    &__card
-        grid-area: card
-
-    &__card-content
-        height: 100%
 </style>
