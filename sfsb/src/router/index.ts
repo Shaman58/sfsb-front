@@ -103,11 +103,6 @@ const routes = [
                             onlyFor: ["COMMERCE", "ADMIN"],
                         },
                     },
-                    {
-                        path: "",
-                        redirectTo: "/commerce/clients/1"
-
-                    }
                 ]
             },
             {
