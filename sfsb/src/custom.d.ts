@@ -51,7 +51,7 @@ declare interface Customer {
     bank: string;
     bik: string;
     companyName: string;
-    contacts: any[];
+    contacts?: any[];
     correspondentAccount: string;
     created: string;
     email: string;

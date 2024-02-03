@@ -1,5 +1,5 @@
 <template lang="pug">
-    v-form.overflow-auto(ref="form" v-model="valid" v-on:submit.prevent="void save")
+    v-form.overflow-auto(ref="form" v-model="valid" @submit.prevent="save")
         v-card.mx-auto(:loading)
             v-card-title
                 span.text-h4 {{companyLocal.companyName}}
@@ -36,28 +36,38 @@
             v-card-actions
                 //v-btn(color="orange-darken-1" variant="text" @click="show=false") Закрыть
                 v-btn(color="orange-darken-1" variant="text" type="submit" :disabled="!valid") Сохранить
-                v-spacer
-                v-btn(color="orange-darken-1" variant="text") Создать
+
 
 </template>
 <script setup lang="ts">
-import {ref, toRefs, watch} from "vue";
+import {computed, type Ref, ref, toRefs} from "vue";
 import {useValidationRules} from "@/mixins/FieldValidationRules";
+import {useRoute} from "vue-router";
+import {storeToRefs} from "pinia";
+import {useCustomersStore} from "@/pinia-store/customers";
+import emptyCompany from "./EmptyCompany"
 
-const props = defineProps<{ company: PartialCustomer, loading: boolean }>();
-const {company, loading} = toRefs(props)
-const companyLocal = ref(company.value)
+// const props = defineProps<{ company: PartialCustomer, loading: boolean }>();
+// const {company, loading} = toRefs(props)
+const {params} = toRefs(useRoute())
+
+const {customers, loading} = storeToRefs(useCustomersStore())
+const {saveCustomer} = useCustomersStore()
+const companyLocal = computed(() => params.value.id === "new"
+    ? emptyCompany()
+    : customers.value.find(e => e.id === +params.value.id) || customers.value[0]
+)
 
 const form = ref<HTMLFormElement>()
 const valid = ref(false);
 const {rules} = useValidationRules();
 
-const save = () => {
+const save = async () => {
+    const valid: { valid: boolean, errors: Ref<string[]> } = form.value && await form.value.validate()
+    if (!valid.valid) return
+    await saveCustomer(companyLocal.value)
 }
 
-watch([company], () => {
-    companyLocal.value = company.value
-})
 </script>
 <style scoped lang="sass">
 

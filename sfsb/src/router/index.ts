@@ -15,6 +15,7 @@ import DataPageMain from "@/components/data-page/DataPageMain.vue";
 import {useCurrentTool} from "@/pinia-store/tools";
 import ClientsComponent from "@/components/commerce/ClientsComponent.vue";
 import OrdersComponent from "@/components/commerce/OrdersComponent.vue";
+import ClientCard from "@/components/commerce/ClientCard.vue";
 
 const toast = useToast();
 
@@ -87,10 +88,27 @@ const routes = [
             onlyFor: ["COMMERCE", "ADMIN"],
         },
         children: [
+
             {
-                path: "clients", component: ClientsComponent, meta: {
+                path: "clients",
+                component: ClientsComponent,
+                meta: {
                     onlyFor: ["COMMERCE", "ADMIN"],
                 },
+                children: [
+                    {
+                        path: ":id",
+                        component: ClientCard,
+                        meta: {
+                            onlyFor: ["COMMERCE", "ADMIN"],
+                        },
+                    },
+                    {
+                        path: "",
+                        redirectTo: "/commerce/clients/1"
+
+                    }
+                ]
             },
             {
                 path: "orders", component: OrdersComponent, meta: {
