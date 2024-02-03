@@ -9,7 +9,7 @@
                 v-list-item(v-for="i in orders" @click="currentOrder=i"
                     :key="i.id" :active="currentOrder.id===i.id") {{i.id}} {{i.customer.companyName}}
         template(#card)
-            OrderCard(:order="currentOrder")
+            OrderCard(v-model:order="currentOrder")
 
 </template>
 <script setup lang="ts">
@@ -18,6 +18,7 @@ import {ref} from "vue";
 import LayoutPage from "@/components/common/LayoutPage.vue";
 import {useOrdersStore} from "@/pinia-store/orders";
 import OrderCard from "@/components/commerce/OrderCard.vue";
+import emptyOrder from "@/components/commerce/EmptyOrder";
 
 const {orders} = storeToRefs(useOrdersStore())
 const {getOrders} = useOrdersStore()
@@ -27,6 +28,7 @@ const filterText = ref("")
 const currentOrder = ref<Order>(orders.value[0])
 
 const addNew = () => {
+    currentOrder.value = emptyOrder()
 }
 
 </script>

@@ -1,16 +1,16 @@
 <template lang="pug">
     .order-card
         v-toolbar.order-card__controls.pa-2
-            v-menu()
+            v-menu
                 template(#activator="{ props }")
                     v-btn(color="primary" v-bind="props" :disabled="!isOrderComputed")
                         ControlButton(tooltip="Коммерческое предложение" icon-name="mdi-offer")
                 v-list(@click:select="selectCompany")
                     v-list-item(v-for="company in companiesList" :key="company.id" :value="company.companyName")
                         v-list-item-title {{ company.companyName }}
-            ControlButton(@click="void previewToolOrder(order, 1, 2)" :disabled="!isAllComputed" tooltip="Заявка на инструмент" icon-name="mdi-tools")
-            ControlButton(@click="void previewPlan1(order)" :disabled="!isAllComputed" tooltip="План1" icon-name="mdi-list-status")
-            ControlButton(@click="void previewPlan2(order)" :disabled="!isAllComputed"  tooltip="План2" icon-name="mdi-list-status")
+            ControlButton(@click="order && void previewToolOrder(order, 1, 2)" :disabled="!isAllComputed" tooltip="Заявка на инструмент" icon-name="mdi-tools")
+            ControlButton(@click="order && void previewPlan1(order)" :disabled="!isAllComputed" tooltip="План1" icon-name="mdi-list-status")
+            ControlButton(@click="order && void previewPlan2(order)" :disabled="!isAllComputed"  tooltip="План2" icon-name="mdi-list-status")
             v-spacer
             ControlButton(color="orange-darken-1" variant="text" type="submit" :disabled="!valid" tooltip="Сохранить" icon-name="mdi-floppy")
         v-form.order-card__form(ref="form" v-model="valid")
@@ -19,13 +19,13 @@
                     v-expansion-panel-title ОБЩИЕ ДАННЫЕ
                     v-expansion-panel-text
                         div(style="margin-top: 1rem;" v-if="order && order.user") Автор:
-                            strong {{ order.user.lastName }}&nbsp;
-                            strong {{ order.user.firstName }}
-                        v-row
+                            strong {{ order?.user.lastName }}&nbsp;
+                            strong {{ order?.user.firstName }}
+                        v-row(v-if="orderLocal")
                             v-col(cols="3")
                                 v-text-field(label="Номер заявки:" v-model="orderLocal.applicationNumber" :rules="[rules.required]" maxlength="5")
                             v-col(cols="9")
-                                v-select(v-if="customers" :items="customers" :item-title="'companyName'" return-object v-model="orderLocal.customer" :rules="[rules.required]" @update:modelValue="orderLocal.contact = null" label="Заказчик")
+                                v-select(v-if="customers" :items="customers" :item-title="'companyName'" return-object v-model="orderLocal.customer" :rules="[rules.required]" @update:modelValue="orderLocal && (orderLocal.contact = null)" label="Заказчик")
                 v-expansion-panel.order-card__group-items(value="items")
                     v-expansion-panel-title ПОЗИЦИИ ЗАКАЗА
                     v-expansion-panel-text
@@ -59,7 +59,7 @@
                     v-expansion-panel-title ФАЙЛЫ
                     v-expansion-panel-text
                         suspended-component
-                            OrderFiles(:order-id="order.id")
+                            OrderFiles(:order-id="order?.id")
 
                 v-expansion-panel.order-card__descriptions(value="descriptions")
                     v-expansion-panel-title ДОПОЛНИТЕЛЬНЫЕ ДАННЫЕ
@@ -71,7 +71,7 @@
 </template>
 <script setup lang="ts">
 
-import {computed, ref, toRefs, watchEffect} from "vue";
+import {computed, type ModelRef, ref, watchEffect} from "vue";
 import OrderItem from "@/components/commerce/OrderItem.vue";
 import SuspendedComponent from "@/components/common/SuspendedComponent.vue";
 import OrderFiles from "@/components/commerce/OrderFiles.vue";
@@ -83,13 +83,13 @@ import {useCustomersStore} from "@/pinia-store/customers";
 import ControlButton from "@/components/commerce/ControlButton.vue";
 import emptyItem from "@/components/commerce/EmptyItem";
 
-const props = defineProps<{ order: Order }>()
-const {order} = toRefs(props)
+const order: ModelRef<Order | undefined, string> = defineModel("order")
+// const {order} = toRefs(props)
 
-const orderLocal = ref<Order>(order.value)
+const orderLocal = ref<Order>(order.value as Order)
 
-const description = ref(order.value.description)
-const businessProposal = ref(order.value.businessProposal)
+const description = ref(order.value?.description)
+const businessProposal = ref(order.value?.businessProposal)
 
 const form = ref<HTMLFormElement>()
 const valid = ref(false)
@@ -97,7 +97,7 @@ const panel = ref<string[]>(["items"])
 
 const {rules} = useValidationRules()
 
-const currentItem = ref<Item>(order.value.items[0])
+const currentItem = ref(orderLocal.value.items[0])
 
 const {getShortList} = useCompaniesStore()
 const companiesList = await getShortList()
@@ -109,24 +109,24 @@ const {fetchCustomers} = useCustomersStore()
 
 const {previewCommerce, previewToolOrder, previewPlan1, previewPlan2} = useOfferGenerator();
 
-const isAllComputed = computed(() => order.value.items.every((e: Item) => e.technology.computed))
-const isAllWorkpieced = computed(() => order.value.items.every((e: Item) => e.customerMaterial || e.technology.assembly || e.technology.workpiece.material.price.amount))
+const isAllComputed = computed(() => order.value?.items.every((e: Item) => e.technology.computed))
+const isAllWorkpieced = computed(() => order.value?.items.every((e: Item) => e.customerMaterial || e.technology.assembly || e.technology.workpiece.material.price.amount))
 const isOrderComputed = computed(() => isAllComputed.value && isAllWorkpieced.value)
 
 const selectCompany = async ({id}: { id: string }) => {
     const selectedCompany = companiesList.find(company => company.companyName === id)
     const selectedId = selectedCompany && selectedCompany.id
-    await previewCommerce(order.value, selectedId)
+    order.value && await previewCommerce(order.value, selectedId)
 }
 const addNewItem = () => {
-    orderLocal.value.items.push(emptyItem())
+    orderLocal.value && orderLocal.value.items.push(emptyItem())
 }
 
 watchEffect(() => {
-    orderLocal.value = order.value
-    currentItem.value = order.value.items[0]
-    businessProposal.value = order.value.businessProposal
-    description.value = order.value.description
+    orderLocal.value = order.value as Order
+    currentItem.value = (order.value as Order).items[0]
+    businessProposal.value = order.value?.businessProposal
+    description.value = order.value?.description
 })
 
 </script>
