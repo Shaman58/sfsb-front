@@ -22,7 +22,7 @@
                         v-col(cols="12" sm="6" md="4")
                             v-text-field(label="КПП*" v-model="companyLocal.kpp" :rules="[rules.bikkppValidation]" counter)
                         v-col(cols="12" sm="6" md="4")
-                            v-text-field(label="ОКПО*" v-model="companyLocal.ogrn" :rules="[rules.ogrnValidation]" counter)
+                            v-text-field(label="ОГРН*" v-model="companyLocal.ogrn" :rules="[rules.ogrnValidation]" counter)
                     v-row
                         v-col( cols="12" sm="6" md="4")
                             v-text-field(label="Банк" v-model="companyLocal.bank" :rules="[ rules.counter]" placeholder="ОАО ВТБ" counter maxlength="200")
@@ -40,7 +40,7 @@
 
 </template>
 <script setup lang="ts">
-import {computed, type Ref, ref, toRefs} from "vue";
+import {computed, type ComputedRef, type Ref, ref, toRefs} from "vue";
 import {useValidationRules} from "@/mixins/FieldValidationRules";
 import {useRoute} from "vue-router";
 import {storeToRefs} from "pinia";
@@ -53,7 +53,7 @@ const {params} = toRefs(useRoute())
 
 const {customers, loading} = storeToRefs(useCustomersStore())
 const {saveCustomer} = useCustomersStore()
-const companyLocal = computed(() => params.value.id === "new"
+const companyLocal: ComputedRef<Customer> = computed(() => params.value.id === "new"
     ? emptyCompany()
     : customers.value.find(e => e.id === +params.value.id) || customers.value[0]
 )

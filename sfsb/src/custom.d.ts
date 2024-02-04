@@ -225,21 +225,7 @@ declare interface Logo {
     user: null | Person
 }
 
-declare interface Company {
-    id: number,
-    created: string | null,
-    updated: string | null,
-    companyName: string,
-    address: string,
-    inn: number,
-    kpp: number,
-    ogrn: number,
-    paymentAccount: number,
-    bank: string,
-    bik: number,
-    correspondentAccount: number,
-    phoneNumber: string,
-    email: string
+declare interface Company extends Customer {
     logo: null | Logo
 }
 
