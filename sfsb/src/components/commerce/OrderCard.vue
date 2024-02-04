@@ -12,7 +12,8 @@
             ControlButton(@click="order && void previewPlan1(order)" :disabled="!isAllComputed" tooltip="План1" icon-name="mdi-list-status")
             ControlButton(@click="order && void previewPlan2(order)" :disabled="!isAllComputed"  tooltip="План2" icon-name="mdi-list-status")
             v-spacer
-            ControlButton(color="orange-darken-1" variant="text" type="submit" :disabled="!valid" tooltip="Сохранить" icon-name="mdi-floppy")
+            ControlButton(@click="refresh"  tooltip="Обновить" icon-name="mdi-refresh")
+            ControlButton(@click="save" color="orange-darken-1" variant="text" type="submit" :disabled="!valid" tooltip="Сохранить" icon-name="mdi-floppy")
         v-form.order-card__form(ref="form" v-model="valid")
             v-expansion-panels.order-card__container(:multiple="true" v-model="panel" )
                 v-expansion-panel.order-card__common(value="common")
@@ -31,11 +32,11 @@
                     v-expansion-panel-text
                         .order-card__items
                             v-list.order-card__items-list
-                                v-list-item(@click="addNewItem") Добавить новую позицию
-                                v-list-item(v-for="i in orderLocal.items" @click="currentItem = i" :key="i.id"
-                                    :active="currentItem.id===i.id")
-                                    OrderItem(:item="i")
-                            .order-card__details-item(v-if="currentItem" )
+                                v-list-item(@click="addNewItem" :disabled="!canAddNewItem") Добавить новую позицию
+                                v-list-item(v-for="(i,index) in orderLocal.items" @click="currentItem = i" :key="index"
+                                    :active="isActive(i)")
+                                    OrderItem(:item="i" @remove="removeItem(i)")
+                            .order-card__details-item(v-if="currentItem" ref="itemForm")
                                 v-text-field.item-card__schema-number(label="Децимальный номер:"
                                     v-model="currentItem.technology.drawingNumber"
                                     placeholder="42"
@@ -71,7 +72,7 @@
 </template>
 <script setup lang="ts">
 
-import {computed, type ModelRef, ref, watchEffect} from "vue";
+import {computed, type ModelRef, ref, watch, watchEffect} from "vue";
 import OrderItem from "@/components/commerce/OrderItem.vue";
 import SuspendedComponent from "@/components/common/SuspendedComponent.vue";
 import OrderFiles from "@/components/commerce/OrderFiles.vue";
@@ -84,7 +85,7 @@ import ControlButton from "@/components/commerce/ControlButton.vue";
 import emptyItem from "@/components/commerce/EmptyItem";
 
 const order: ModelRef<Order | undefined, string> = defineModel("order")
-// const {order} = toRefs(props)
+const emit = defineEmits(["save", "refresh"])
 
 const orderLocal = ref<Order>(order.value as Order)
 
@@ -95,9 +96,12 @@ const form = ref<HTMLFormElement>()
 const valid = ref(false)
 const panel = ref<string[]>(["items"])
 
+const canAddNewItem = ref(true)
+
 const {rules} = useValidationRules()
 
 const currentItem = ref(orderLocal.value.items[0])
+const newItem = ref<Item | null>(null)
 
 const {getShortList} = useCompaniesStore()
 const companiesList = await getShortList()
@@ -112,6 +116,11 @@ const {previewCommerce, previewToolOrder, previewPlan1, previewPlan2} = useOffer
 const isAllComputed = computed(() => order.value?.items.every((e: Item) => e.technology.computed))
 const isAllWorkpieced = computed(() => order.value?.items.every((e: Item) => e.customerMaterial || e.technology.assembly || e.technology.workpiece.material.price.amount))
 const isOrderComputed = computed(() => isAllComputed.value && isAllWorkpieced.value)
+const isActive = (item: Item): boolean => {
+    const currentIndex = `${currentItem.value.id}${currentItem.value.uid}`
+    const itemIndex = `${item.id}${item.uid}`
+    return currentIndex === itemIndex
+}
 
 const selectCompany = async ({id}: { id: string }) => {
     const selectedCompany = companiesList.find(company => company.companyName === id)
@@ -119,15 +128,42 @@ const selectCompany = async ({id}: { id: string }) => {
     order.value && await previewCommerce(order.value, selectedId)
 }
 const addNewItem = () => {
-    orderLocal.value && orderLocal.value.items.push(emptyItem())
+    newItem.value = emptyItem()
+    newItem.value.uid = Date.now().toString(36)
+    orderLocal.value && orderLocal.value.items.push(newItem.value)
+    currentItem.value = newItem.value
+    canAddNewItem.value = false
 }
 
+const removeItem = (item: Item) => {
+    const index = orderLocal.value.items.indexOf(item)
+    index >= 0 && orderLocal.value.items.splice(index, 1)
+}
+const refresh = () => {
+    emit("refresh")
+}
+const save = () => {
+    emit("save")
+}
 watchEffect(() => {
     orderLocal.value = order.value as Order
     currentItem.value = (order.value as Order).items[0]
     businessProposal.value = order.value?.businessProposal
     description.value = order.value?.description
 })
+
+watch([orderLocal], () => {
+    console.log("orderLocal", orderLocal.value)
+    order.value = orderLocal.value
+}, {deep: true})
+
+watch([newItem], () => {
+    if (!newItem.value) return
+    if (newItem.value.technology.drawingNumber && newItem.value.technology.drawingNumber && newItem.value.quantity) {
+        canAddNewItem.value = true
+    }
+}, {deep: true})
+
 
 </script>
 <style scoped lang="sass">
@@ -167,5 +203,19 @@ watchEffect(() => {
         display: grid
         grid-template-columns: repeat(2, 1fr)
         gap: 0.5rem
+        height: min(500px, 100%)
+
+    &__items-list
+        height: 100%
+        overflow-y: auto
+
+        &::-webkit-scrollbar
+            width: 4px
+            background-color: transparent
+
+        &::-webkit-scrollbar-thumb
+            width: 4px
+            background-color: var(--scroll-color)
+            border-radius: 8px
 
 </style>

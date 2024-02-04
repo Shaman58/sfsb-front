@@ -9,8 +9,10 @@ const toast = useToast();
 
 export const useOrdersStore = defineStore("orders", () => {
     const orders: Ref<Order[]> = ref([]);
+    const loading = ref(false);
 
     const getOrders = async (search?: string) => {
+        loading.value = true
         const url = search ? "/order/find" : "/order";
         try {
             const response = await api.get(url, {params: {search}});
@@ -18,6 +20,8 @@ export const useOrdersStore = defineStore("orders", () => {
             orders.value = response.data;
         } catch (error) {
             toast.error("Ошибка получения списка заказов " + error);
+        } finally {
+            loading.value = false
         }
     };
 
@@ -34,6 +38,7 @@ export const useOrdersStore = defineStore("orders", () => {
     }
     return {
         orders,
+        loading,
         getOrders,
         saveOrder,
         deleteOrder
