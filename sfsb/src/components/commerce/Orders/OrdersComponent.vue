@@ -19,8 +19,8 @@ import {storeToRefs} from "pinia";
 import {ref, watch} from "vue";
 import LayoutPage from "@/components/common/LayoutPage.vue";
 import {useOrdersStore} from "@/pinia-store/orders";
-import OrderCard from "@/components/commerce/OrderCard.vue";
-import emptyOrder from "@/components/commerce/EmptyOrder";
+import OrderCard from "@/components/commerce/Orders/OrderCard.vue";
+import emptyOrder from "@/components/commerce/Orders/EmptyOrder";
 
 const {orders, loading} = storeToRefs(useOrdersStore())
 const {getOrders, saveOrder} = useOrdersStore()

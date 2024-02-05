@@ -13,9 +13,11 @@ import Company1 from "@/components/company/Company1.vue";
 import DataPage1 from "@/views/DataPage1.vue";
 import DataPageMain from "@/components/data-page/DataPageMain.vue";
 import {useCurrentTool} from "@/pinia-store/tools";
-import ClientsComponent from "@/components/commerce/ClientsComponent.vue";
-import OrdersComponent from "@/components/commerce/OrdersComponent.vue";
-import ClientCard from "@/components/commerce/ClientCard.vue";
+import ClientsComponent from "@/components/commerce/Clients/ClientsComponent.vue";
+import OrdersComponent from "@/components/commerce/Orders/OrdersComponent.vue";
+import ClientCard from "@/components/commerce/Clients/ClientCard.vue";
+import OperationsComponent from "@/components/commerce/Operations/OperationsComponent.vue";
+import OperationCard from "@/components/commerce/Operations/OperationCard.vue";
 
 const toast = useToast();
 
@@ -109,6 +111,20 @@ const routes = [
                 path: "orders", component: OrdersComponent, meta: {
                     onlyFor: ["COMMERCE", "ADMIN"],
                 },
+            },
+            {
+                path: "operations", component: OperationsComponent, meta: {
+                    onlyFor: ["COMMERCE", "ADMIN"],
+                },
+                children: [
+                    {
+                        path: ":id",
+                        component: OperationCard,
+                        meta: {
+                            onlyFor: ["COMMERCE", "ADMIN"],
+                        },
+                    },
+                ]
             },
         ]
     },

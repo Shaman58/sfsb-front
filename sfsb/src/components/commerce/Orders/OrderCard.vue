@@ -73,16 +73,16 @@
 <script setup lang="ts">
 
 import {computed, type ModelRef, ref, watch, watchEffect} from "vue";
-import OrderItem from "@/components/commerce/OrderItem.vue";
+import OrderItem from "@/components/commerce/Orders/OrderItem.vue";
 import SuspendedComponent from "@/components/common/SuspendedComponent.vue";
-import OrderFiles from "@/components/commerce/OrderFiles.vue";
+import OrderFiles from "@/components/commerce/Orders/OrderFiles.vue";
 import {useValidationRules} from "@/mixins/FieldValidationRules";
 import {useCompaniesStore} from "@/pinia-store/companies";
 import {useOfferGenerator} from "@/mixins/OfferGenerator";
 import {storeToRefs} from "pinia";
 import {useCustomersStore} from "@/pinia-store/customers";
-import ControlButton from "@/components/commerce/ControlButton.vue";
-import emptyItem from "@/components/commerce/EmptyItem";
+import ControlButton from "@/components/commerce/Orders/ControlButton.vue";
+import emptyItem from "@/components/commerce/Orders/EmptyItem";
 
 const order: ModelRef<Order | undefined, string> = defineModel("order")
 const emit = defineEmits(["save", "refresh"])
