@@ -1,15 +1,15 @@
 <template lang="pug">
-    v-card(:style="{height:'100%'}")
-        v-form(ref="form" v-model="valid" @submit.prevent="save")
-            v-card-text(v-if="operationLocal")
-                v-text-field( label="Название операции:" v-model="operationLocal.operationName" :rules="[rules.required, rules.nameValidation]" counter :disabled="operationLocal.id<3")
-                v-select(label="Описание:" :items="CONST.OPERATIONS" item-title="title" item-value="label" v-model="operationLocal.operationTimeManagement" :disabled="operationLocal.id<3")
-                v-text-field( label="Стоимость за час:" v-model="operationLocal.paymentPerHour.amount" :rules="[rules.required,rules.numeric]" type="number")
-                v-container(v-if="!operationLocal?.id||operationLocal?.id>=3")
-                    OperationDescriptions
-                v-card-actions
-                    v-spacer
-                    v-btn(color="orange-darken-1" variant="text" type="submit" :disabled="!valid") Сохранить
+    LayoutMain
+        v-card(:style="{height:'100%'}")
+            v-form(ref="form" v-model="valid" @submit.prevent="save")
+                v-card-text(v-if="operationLocal")
+                    v-text-field( label="Название операции:" v-model="operationLocal.operationName" :rules="[rules.required, rules.nameValidation]" counter :disabled="operationLocal.id<3")
+                    v-select(label="Описание:" :items="CONST.OPERATIONS" item-title="title" item-value="label" v-model="operationLocal.operationTimeManagement" :disabled="operationLocal.id<3")
+                    v-text-field( label="Стоимость за час:" v-model="operationLocal.paymentPerHour.amount" :rules="[rules.required,rules.numeric]" type="number")
+                    v-container(v-if="!operationLocal?.id||operationLocal?.id>=3")
+                        OperationDescriptions
+        template(#footer)
+            v-btn(color="orange-darken-1" variant="text" type="submit" :disabled="!valid") Сохранить
 </template>
 <script setup lang="ts">
 
@@ -21,6 +21,7 @@ import {useValidationRules} from "@/mixins/FieldValidationRules";
 import emptyOperation from "@/components/commerce/Operations/EmptyOperation";
 import CONST from "@/consts";
 import OperationDescriptions from "@/components/commerce/Operations/OperationDescriptions.vue";
+import LayoutMain from "@/components/common/LayoutMain.vue";
 
 const {params} = toRefs(useRoute())
 

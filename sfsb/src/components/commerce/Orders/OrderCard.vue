@@ -1,72 +1,75 @@
 <template lang="pug">
-    .order-card
-        v-toolbar.order-card__controls.pa-2
-            v-menu
-                template(#activator="{ props }")
-                    v-btn(color="primary" v-bind="props" :disabled="!isOrderComputed")
-                        ControlButton(tooltip="Коммерческое предложение" icon-name="mdi-offer")
-                v-list(@click:select="selectCompany")
-                    v-list-item(v-for="company in companiesList" :key="company.id" :value="company.companyName")
-                        v-list-item-title {{ company.companyName }}
-            ControlButton(@click="order && void previewToolOrder(order, 1, 2)" :disabled="!isAllComputed" tooltip="Заявка на инструмент" icon-name="mdi-tools")
-            ControlButton(@click="order && void previewPlan1(order)" :disabled="!isAllComputed" tooltip="План1" icon-name="mdi-list-status")
-            ControlButton(@click="order && void previewPlan2(order)" :disabled="!isAllComputed"  tooltip="План2" icon-name="mdi-list-status")
-            v-spacer
-            ControlButton(@click="refresh"  tooltip="Обновить" icon-name="mdi-refresh")
-            ControlButton(@click="save" color="orange-darken-1" variant="text" type="submit" :disabled="!valid" tooltip="Сохранить" icon-name="mdi-floppy")
-        v-form.order-card__form(ref="form" v-model="valid")
-            v-expansion-panels.order-card__container(:multiple="true" v-model="panel" )
-                v-expansion-panel.order-card__common(value="common")
-                    v-expansion-panel-title ОБЩИЕ ДАННЫЕ
-                    v-expansion-panel-text
-                        div(style="margin-top: 1rem;" v-if="order && order.user") Автор:
-                            strong {{ order?.user.lastName }}&nbsp;
-                            strong {{ order?.user.firstName }}
-                        v-row(v-if="orderLocal")
-                            v-col(cols="3")
-                                v-text-field(label="Номер заявки:" v-model="orderLocal.applicationNumber" :rules="[rules.required]" maxlength="5")
-                            v-col(cols="9")
-                                v-select(v-if="customers" :items="customers" :item-title="'companyName'" return-object v-model="orderLocal.customer" :rules="[rules.required]" @update:modelValue="orderLocal && (orderLocal.contact = null)" label="Заказчик")
-                v-expansion-panel.order-card__group-items(value="items")
-                    v-expansion-panel-title ПОЗИЦИИ ЗАКАЗА
-                    v-expansion-panel-text
-                        .order-card__items
-                            v-list.order-card__items-list
-                                v-list-item(@click="addNewItem" :disabled="!canAddNewItem") Добавить новую позицию
-                                v-list-item(v-for="(i,index) in orderLocal.items" @click="currentItem = i" :key="index"
-                                    :active="isActive(i)")
-                                    OrderItem(:item="i" @remove="removeItem(i)")
-                            .order-card__details-item(v-if="currentItem" ref="itemForm")
-                                v-text-field.item-card__schema-number(label="Децимальный номер:"
-                                    v-model="currentItem.technology.drawingNumber"
-                                    placeholder="42"
-                                    :rules="[rules.required]"
-                                )
-                                v-text-field.item-card__schema-name(label="Название чертежа:"
-                                    v-model="currentItem.technology.drawingName"
-                                    placeholder="Гайка M10"
-                                    :rules="[rules.required]"
-                                )
-                                v-text-field.item-card__schema-amount(label="Количество:"
-                                    v-model="currentItem.quantity"
-                                    type="number"
-                                    placeholder="100"
-                                    :rules="[rules.required]"
-                                )
-                                v-switch.item-card__outsource-material(v-model="currentItem.customerMaterial",
-                                    :label="currentItem.customerMaterial ? 'Материал заказчика' : 'Наш материал'")
+    LayoutMain
+        template(#header)
+            v-toolbar.order-card__controls.pa-2
+                v-menu
+                    template(#activator="{ props }")
+                        v-btn(color="primary" v-bind="props" :disabled="!isOrderComputed")
+                            ControlButton(tooltip="Коммерческое предложение" icon-name="mdi-offer")
+                    v-list(@click:select="selectCompany")
+                        v-list-item(v-for="company in companiesList" :key="company.id" :value="company.companyName")
+                            v-list-item-title {{ company.companyName }}
+                ControlButton(@click="order && void previewToolOrder(order, 1, 2)" :disabled="!isAllComputed" tooltip="Заявка на инструмент" icon-name="mdi-tools")
+                ControlButton(@click="order && void previewPlan1(order)" :disabled="!isAllComputed" tooltip="План1" icon-name="mdi-list-status")
+                ControlButton(@click="order && void previewPlan2(order)" :disabled="!isAllComputed"  tooltip="План2" icon-name="mdi-list-status")
+                v-spacer
+                ControlButton(@click="refresh"  tooltip="Обновить" icon-name="mdi-refresh")
+                ControlButton(@click="save" color="orange-darken-1" variant="text" type="submit" :disabled="!valid" tooltip="Сохранить" icon-name="mdi-floppy")
 
-                v-expansion-panel.order-card__files(value="files")
-                    v-expansion-panel-title ФАЙЛЫ
-                    v-expansion-panel-text
-                        suspended-component
-                            OrderFiles(:order-id="order?.id")
+        .order-card
+            v-form.order-card__form(ref="form" v-model="valid")
+                v-expansion-panels.order-card__container(:multiple="true" v-model="panel" )
+                    v-expansion-panel.order-card__common(value="common")
+                        v-expansion-panel-title ОБЩИЕ ДАННЫЕ
+                        v-expansion-panel-text
+                            div(style="margin-top: 1rem;" v-if="order && order.user") Автор:
+                                strong {{ order?.user.lastName }}&nbsp;
+                                strong {{ order?.user.firstName }}
+                            v-row(v-if="orderLocal")
+                                v-col(cols="3")
+                                    v-text-field(label="Номер заявки:" v-model="orderLocal.applicationNumber" :rules="[rules.required]" maxlength="5")
+                                v-col(cols="9")
+                                    v-select(v-if="customers" :items="customers" :item-title="'companyName'" return-object v-model="orderLocal.customer" :rules="[rules.required]" @update:modelValue="orderLocal && (orderLocal.contact = null)" label="Заказчик")
+                    v-expansion-panel.order-card__group-items(value="items")
+                        v-expansion-panel-title ПОЗИЦИИ ЗАКАЗА
+                        v-expansion-panel-text
+                            .order-card__items
+                                v-list.order-card__items-list
+                                    v-list-item(@click="addNewItem" :disabled="!canAddNewItem") Добавить новую позицию
+                                    v-list-item(v-for="(i,index) in orderLocal.items" @click="currentItem = i" :key="index"
+                                        :active="isActive(i)")
+                                        OrderItem(:item="i" @remove="removeItem(i)")
+                                .order-card__details-item(v-if="currentItem" ref="itemForm")
+                                    v-text-field.item-card__schema-number(label="Децимальный номер:"
+                                        v-model="currentItem.technology.drawingNumber"
+                                        placeholder="42"
+                                        :rules="[rules.required]"
+                                    )
+                                    v-text-field.item-card__schema-name(label="Название чертежа:"
+                                        v-model="currentItem.technology.drawingName"
+                                        placeholder="Гайка M10"
+                                        :rules="[rules.required]"
+                                    )
+                                    v-text-field.item-card__schema-amount(label="Количество:"
+                                        v-model="currentItem.quantity"
+                                        type="number"
+                                        placeholder="100"
+                                        :rules="[rules.required]"
+                                    )
+                                    v-switch.item-card__outsource-material(v-model="currentItem.customerMaterial",
+                                        :label="currentItem.customerMaterial ? 'Материал заказчика' : 'Наш материал'")
 
-                v-expansion-panel.order-card__descriptions(value="descriptions")
-                    v-expansion-panel-title ДОПОЛНИТЕЛЬНЫЕ ДАННЫЕ
-                    v-expansion-panel-text
-                        v-textarea(v-model="description")
-                        v-textarea(v-model="businessProposal")
+                    v-expansion-panel.order-card__files(value="files")
+                        v-expansion-panel-title ФАЙЛЫ
+                        v-expansion-panel-text
+                            suspended-component
+                                OrderFiles(:order-id="order?.id")
+
+                    v-expansion-panel.order-card__descriptions(value="descriptions")
+                        v-expansion-panel-title ДОПОЛНИТЕЛЬНЫЕ ДАННЫЕ
+                        v-expansion-panel-text
+                            v-textarea(v-model="description")
+                            v-textarea(v-model="businessProposal")
 
 
 </template>
@@ -83,6 +86,7 @@ import {storeToRefs} from "pinia";
 import {useCustomersStore} from "@/pinia-store/customers";
 import ControlButton from "@/components/commerce/Orders/ControlButton.vue";
 import emptyItem from "@/components/commerce/Orders/EmptyItem";
+import LayoutMain from "@/components/common/LayoutMain.vue";
 
 const order: ModelRef<Order | undefined, string> = defineModel("order")
 const emit = defineEmits(["save", "refresh"])
@@ -169,7 +173,6 @@ watch([newItem], () => {
 <style scoped lang="sass">
 .order-card
     display: grid
-    grid-template-rows: 50px 1fr
     gap: 0.5rem
     height: 100%
 
