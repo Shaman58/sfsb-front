@@ -1,7 +1,6 @@
 import {createRouter, createWebHistory} from "vue-router";
 import Commerce from "@/views/Commerce.vue";
 import Technology from "@/views/Technology.vue";
-import Staff from "@/views/Staff.vue";
 import Supplier from "@/views/Supplier.vue";
 import NotFound from "@/views/NotFound.vue";
 import StartPage from "@/views/StartPage.vue";
@@ -18,6 +17,8 @@ import OrdersComponent from "@/components/commerce/Orders/OrdersComponent.vue";
 import ClientCard from "@/components/commerce/Clients/ClientCard.vue";
 import OperationsComponent from "@/components/commerce/Operations/OperationsComponent.vue";
 import OperationCard from "@/components/commerce/Operations/OperationCard.vue";
+import UsersComponent from "@/components/users/UsersComponent.vue";
+import UserCard from "@/components/users/UserCard.vue";
 
 const toast = useToast();
 
@@ -78,10 +79,19 @@ const routes = [
     },
     {
         path: "/staff",
-        component: Staff,
+        component: UsersComponent,
         meta: {
             onlyFor: ["HR", "ADMIN"],
         },
+        children: [
+            {
+                path: ":id",
+                component: UserCard,
+                meta: {
+                    onlyFor: ["HR", "ADMIN"],
+                },
+            },
+        ]
     },
     {
         path: "/commerce",
