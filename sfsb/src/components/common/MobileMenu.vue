@@ -13,10 +13,12 @@
                         v-icon(icon="mdi-exit-to-app" class="ml-2" color="red")
             .mobile-menu__body
                 .mobile-menu__body-wrapper
-                    .mobile-menu__link(v-for="i in CONSTS.MAINMENU" )
+                    .mobile-menu__link(v-for="(i, index) in CONSTS.MAINMENU" )
                         div(v-if="'submenu' in i")
-                            label.submenu__label(for="submenu-switch") {{ i.label }}
-                            input#submenu-switch.submenu__switcher(type="checkbox" hidden="true")
+                            label.submenu__label(:for="`submenu-switch${index}`")
+                                span {{ i.label }}
+                                v-icon(icon="mdi:mdi-chevron-down")
+                            input.submenu__switcher(:id="`submenu-switch${index}`" type="checkbox" hidden="true")
                             .submenu
                                 .submenu__container
                                     router-link(v-for="link in i.submenu" :key="link" :to="i.path+'/'+link.path" @click="close") {{ link.label }}
@@ -149,6 +151,7 @@ const exit = () => {
     display: grid
     grid-template-rows: 0fr
     transition: grid-template-rows 0.5s
+    background: #fff
 
     &__container
         height: 100%
@@ -162,6 +165,7 @@ const exit = () => {
 
     &__label
         margin-bottom: 0.5rem
+        cursor: pointer
 
 
 </style>
