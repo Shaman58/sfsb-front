@@ -15,6 +15,7 @@ const useOrderFiles = defineStore("orderFiles", () => {
     }
     return ({
         files,
+        loading,
         getAllFilesByOrder
     })
 })
