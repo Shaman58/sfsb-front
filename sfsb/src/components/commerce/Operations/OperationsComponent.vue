@@ -7,12 +7,12 @@
             v-list
                 v-list-item
                     v-list-item-title
-                        router-link(:to="`/commerce/operations/new`")
-                            span(style="{color: 'orange'}") Добавить новую операцию
+                        router-link.list-link(:to="`/commerce/operations/new`")
+                            span(:style="{color: 'orange'}") Добавить новую операцию
                 v-list-item(v-for="i in operations" @click="currentOperation=i"
                     :key="i.id" :active="+page===i.id")
                     v-list-item-title
-                        router-link(:to="`/commerce/operations/${i.id}`") {{i.operationName}}
+                        router-link.list-link(:to="`/commerce/operations/${i.id}`") {{i.operationName}}
         template(#card)
             router-view
             //ClientCard(:company="currentCompany" :loading)
@@ -50,6 +50,9 @@ watchEffect(() => {
     console.log("loading", loading)
 })
 </script>
-<style scoped lang="sass">
-
+<style lang="sass">
+.list-link
+    display: block
+    color: black
+    text-decoration: none
 </style>

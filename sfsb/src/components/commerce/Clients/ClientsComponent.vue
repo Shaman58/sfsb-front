@@ -7,12 +7,12 @@
             v-list
                 v-list-item
                     v-list-item-title
-                        router-link(:to="`/commerce/clients/new`")
-                            span(style="{color: 'orange'}") Добавить новую компанию
+                        router-link.list-link(:to="`/commerce/clients/new`")
+                            div(:style="{color: 'orange'}") Добавить новую компанию
                 v-list-item(v-for="i in customers" @click="currentCompany=i"
                     :key="i.id" :active="+page===i.id")
                     v-list-item-title
-                        router-link(:to="`/commerce/clients/${i.id}`") {{i.companyName}}
+                        router-link.list-link(:to="`/commerce/clients/${i.id}`") {{i.companyName}}
         template(#card)
             router-view
             //ClientCard(:company="currentCompany" :loading)
