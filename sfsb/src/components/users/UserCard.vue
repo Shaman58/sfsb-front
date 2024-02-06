@@ -1,12 +1,13 @@
 <template lang="pug">
     LayoutMain.user-card
         template(#header)
-            .user-card__toolbar
+            v-card.user-card__toolbar
                 ControlButton(@click="deletePerson"  tooltip="Удалить пользователя" icon-name="mdi-delete")
                 ControlButton(@click="reset"  tooltip="Отменить изменения" icon-name="mdi-refresh")
                 ControlButton(@click="save" color="orange-darken-1" variant="text" type="submit" :disabled=" !isValidForm" tooltip="Сохранить" icon-name="mdi-floppy")
-        v-form(id="person-form" ref="personForm")
-            .user-card__main
+        v-card.user-card__main
+            v-form(id="person-form" ref="personForm")
+
                 .user-card__header
                     UserAvatar.user-card__picture(:picture="personLocal.picture" :user-id="personLocal.id")
                     h2.user-card__title
@@ -24,7 +25,7 @@
                         .user-card__form-roles
                             v-checkbox(v-for="(role, index) in roles" :label="role" :value="role" v-model="personLocal.roles" :key="role")
         template(#footer)
-            .user-card__footer
+            v-card.user-card__footer
                 v-btn(variant="text" @click="showChangePass=true") Изменить пароль
 
                 v-dialog(v-model="showChangePass")
@@ -128,9 +129,11 @@ watchEffect(() => {
         display: flex
         align-items: center
         justify-content: flex-end
+        height: 100%
 
     &__main
         padding: 1rem
+        height: 100%
 
     &__header
         display: grid
@@ -152,6 +155,10 @@ watchEffect(() => {
 
     &__footer
         padding-inline: 1rem
+        width: 100%
+        height: 100%
+        display: grid
+        place-items: center start
 
     &__form-name, &__form-contacts
         display: flex

@@ -8,7 +8,7 @@
             .layout-page__list
                 slot(name="list")
             .layout-page__card
-                v-card.layout-page__card-content
+                .layout-page__card-content
                     slot(name="card")
 </template>
 <script setup lang="ts">

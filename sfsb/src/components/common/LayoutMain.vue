@@ -23,6 +23,7 @@ const footer = slots.footer ? "60px" : "0px"
     height: 100%
     display: grid
     grid-template-rows: v-bind("header") 1fr v-bind("footer")
+    gap: 0.5rem
 
     &__main
         height: 100%

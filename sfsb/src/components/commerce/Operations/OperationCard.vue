@@ -1,5 +1,5 @@
 <template lang="pug">
-    LayoutMain
+    LayoutMain.operation-card
         v-card(:style="{height:'100%'}")
             v-form(ref="form" v-model="valid" @submit.prevent="save")
                 v-card-text(v-if="operationLocal")
@@ -9,7 +9,8 @@
                     v-container(v-if="!operationLocal?.id||operationLocal?.id>=3")
                         OperationDescriptions
         template(#footer)
-            v-btn(color="orange-darken-1" variant="text" type="submit" :disabled="!valid") Сохранить
+            v-card.operation-card__footer
+                v-btn(color="orange-darken-1" variant="text" type="submit" :disabled="!valid") Сохранить
 </template>
 <script setup lang="ts">
 
@@ -44,5 +45,11 @@ const save = async () => {
 
 </script>
 <style scoped lang="sass">
+.operation-card
 
+    &__footer
+        width: 100%
+        height: 100%
+        display: grid
+        place-items: center start
 </style>

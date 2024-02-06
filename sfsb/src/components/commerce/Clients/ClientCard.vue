@@ -1,5 +1,5 @@
 <template lang="pug">
-    LayoutMain
+    LayoutMain.clients-card
         v-form.overflow-auto(ref="form" v-model="valid" @submit.prevent="save")
             v-card.mx-auto(:loading)
                 v-card-title
@@ -35,7 +35,8 @@
                             v-col(cols="12" sm="6" md="4")
                                 v-text-field(label="Корсчет" v-model="companyLocal.correspondentAccount" :rules="[rules.accountWithEmptyValidation]" counter)
         template(#footer)
-            v-btn(color="orange-darken-1" variant="text" type="submit" :disabled="!valid") Сохранить
+            v-card.clients-card__footer
+                v-btn(color="orange-darken-1" variant="text" type="submit" :disabled="!valid") Сохранить
 
 
 </template>
@@ -71,5 +72,11 @@ const save = async () => {
 
 </script>
 <style scoped lang="sass">
+.clients-card
 
+    &__footer
+        width: 100%
+        height: 100%
+        display: grid
+        place-items: center start
 </style>

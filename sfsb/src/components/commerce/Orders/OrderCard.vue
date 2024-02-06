@@ -22,7 +22,7 @@
                     v-expansion-panel.order-card__common(value="common")
                         v-expansion-panel-title ОБЩИЕ ДАННЫЕ
                         v-expansion-panel-text
-                            div(style="margin-top: 1rem;" v-if="order && order.user") Автор:
+                            div(style="margin-bottom: 1rem;" v-if="order && order.user") Автор:
                                 strong {{ order?.user.lastName }}&nbsp;
                                 strong {{ order?.user.firstName }}
                             v-row(v-if="orderLocal")
@@ -75,7 +75,7 @@
 </template>
 <script setup lang="ts">
 
-import {computed, type ModelRef, ref, watch, watchEffect} from "vue";
+import {computed, ref, watch, watchEffect} from "vue";
 import OrderItem from "@/components/commerce/Orders/OrderItem.vue";
 import SuspendedComponent from "@/components/common/SuspendedComponent.vue";
 import OrderFiles from "@/components/commerce/Orders/OrderFiles.vue";
@@ -88,7 +88,7 @@ import ControlButton from "@/components/commerce/Orders/ControlButton.vue";
 import emptyItem from "@/components/commerce/Orders/EmptyItem";
 import LayoutMain from "@/components/common/LayoutMain.vue";
 
-const order: ModelRef<Order | undefined, string> = defineModel("order")
+const order = defineModel<Order>("order")
 const emit = defineEmits(["save", "refresh"])
 
 const orderLocal = ref<Order>(order.value as Order)
