@@ -1,5 +1,5 @@
 <template lang="pug">
-    LayoutPage.users
+    LayoutPage.users(:background="'#BB00C120'")
         template(#title) Управление пользователями
         template(#filter)
             v-text-field(label="фильтр" v-model="filterText" )

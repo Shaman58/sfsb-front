@@ -12,6 +12,11 @@
                     slot(name="card")
 </template>
 <script setup lang="ts">
+import {toRefs} from "vue";
+
+const props = defineProps<{ background: string }>()
+const {background} = toRefs(props)
+const backgroundWithDefault = background.value || "#00acc120"
 </script>
 <style scoped lang="sass">
 .layout-page
@@ -19,11 +24,14 @@
     padding: 0 1rem 1rem
     height: calc(100dvh - 3rem)
     display: grid
-    grid-template-rows: 50px 1fr
-    background-color: #00acc120
+    grid-template-rows: 80px 1fr
+    background-color: v-bind("backgroundWithDefault")
 
     &__title
-        margin-bottom: 1rem
+        display: grid
+        place-items: center start
+        color: #333
+        text-shadow: 2px 2px 1px #fff
 
     &__container
         display: grid

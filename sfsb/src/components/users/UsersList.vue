@@ -4,7 +4,7 @@
             v-list-item-title
                 router-link.list-link(:to="`/staff/new`")
                     div(:style="{color: 'orange'}") Добавить нового пользователя
-        v-list-item(v-for='(user, index) in staff', :key='user.id')
+        v-list-item(v-for='user in staff', :key='user.id')
             router-link(:to='`/staff/${user.id}`')
                 span {{user.firstName}} {{user.lastName}}
 </template>
@@ -24,6 +24,8 @@ const page = computed(() => path.value.split("/").at(-1))
 
 const firstId = computed(() => staff.value.length && staff.value[0].id)
 page.value === "staff" && await router.push(`/staff/${firstId.value}`)
+
+
 </script>
 
 

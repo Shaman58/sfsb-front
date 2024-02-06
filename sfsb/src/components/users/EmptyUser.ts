@@ -6,7 +6,7 @@ const emptyUser = (): Person => ({
     picture: "",
     username: "",
     phoneNumber: "",
-    roles: [""]
+    roles: [] as string[]
 } as Person)
 
 export default emptyUser

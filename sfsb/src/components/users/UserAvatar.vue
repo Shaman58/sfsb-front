@@ -10,7 +10,7 @@ import {useStaffStore} from "@/pinia-store/staff";
 
 const toast = useToast()
 
-const props = defineProps<{ picture: string | null, userId: string }>()
+const props = defineProps<{ picture: string | null, userId?: string }>()
 const {picture, userId} = toRefs(props)
 
 const newAvatarFD: Ref<string | Blob | null> = ref(null)
@@ -34,7 +34,7 @@ const changeAvatar = async (e: Event) => {
 
         const fd = new FormData()
         newAvatarFD.value && fd.append("file", newAvatarFD.value)
-        await saveAvatar(userId.value, fd)
+        userId.value && await saveAvatar(userId.value, fd)
     }
     target && target.files && reader.readAsDataURL(target.files[0])
 };
