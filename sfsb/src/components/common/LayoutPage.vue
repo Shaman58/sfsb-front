@@ -14,7 +14,7 @@
 <script setup lang="ts">
 import {toRefs} from "vue";
 
-const props = defineProps<{ background: string }>()
+const props = defineProps<{ background?: string }>()
 const {background} = toRefs(props)
 const backgroundWithDefault = background.value || "#00acc120"
 </script>

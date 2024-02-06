@@ -76,7 +76,7 @@ declare interface Department {
 
 declare interface ItemPrice {
     amount: number;
-    currency: string;
+    currency: "RUB";
     formatted?: string;
 }
 
@@ -180,14 +180,14 @@ declare interface Technology {
 }
 
 declare interface Item {
-    created: string;
+    created?: string;
     customerMaterial: boolean;
-    id: number;
+    id?: number;
     uid?: number | string
     price: ItemPrice;
     quantity: number;
     technology: Technology;
-    updated: string;
+    updated?: string;
 }
 
 declare interface Order {

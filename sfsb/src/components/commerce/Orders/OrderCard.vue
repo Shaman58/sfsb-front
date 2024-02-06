@@ -1,21 +1,7 @@
 <template lang="pug">
     LayoutMain
         template(#header)
-            v-toolbar.order-card__controls.pa-2
-                v-menu
-                    template(#activator="{ props }")
-                        v-btn(color="primary" v-bind="props" :disabled="!isOrderComputed")
-                            ControlButton(tooltip="Коммерческое предложение" icon-name="mdi-offer")
-                    v-list(@click:select="selectCompany")
-                        v-list-item(v-for="company in companiesList" :key="company.id" :value="company.companyName")
-                            v-list-item-title {{ company.companyName }}
-                ControlButton(@click="order && void previewToolOrder(order, 1, 2)" :disabled="!isAllComputed" tooltip="Заявка на инструмент" icon-name="mdi-tools")
-                ControlButton(@click="order && void previewPlan1(order)" :disabled="!isAllComputed" tooltip="План1" icon-name="mdi-list-status")
-                ControlButton(@click="order && void previewPlan2(order)" :disabled="!isAllComputed"  tooltip="План2" icon-name="mdi-list-status")
-                v-spacer
-                ControlButton(@click="refresh"  tooltip="Обновить" icon-name="mdi-refresh")
-                ControlButton(@click="save" color="orange-darken-1" variant="text" type="submit" :disabled="!valid" tooltip="Сохранить" icon-name="mdi-floppy")
-
+            OrderToolbar(:order :valid @save="save" @refresh="refresh")
         .order-card
             v-form.order-card__form(ref="form" v-model="valid")
                 v-expansion-panels.order-card__container(:multiple="true" v-model="panel" )
@@ -75,18 +61,16 @@
 </template>
 <script setup lang="ts">
 
-import {computed, ref, watch, watchEffect} from "vue";
+import {ref, watch, watchEffect} from "vue";
 import OrderItem from "@/components/commerce/Orders/OrderItem.vue";
 import SuspendedComponent from "@/components/common/SuspendedComponent.vue";
 import OrderFiles from "@/components/commerce/Orders/OrderFiles.vue";
 import {useValidationRules} from "@/mixins/FieldValidationRules";
-import {useCompaniesStore} from "@/pinia-store/companies";
-import {useOfferGenerator} from "@/mixins/OfferGenerator";
 import {storeToRefs} from "pinia";
 import {useCustomersStore} from "@/pinia-store/customers";
-import ControlButton from "@/components/commerce/Orders/ControlButton.vue";
 import emptyItem from "@/components/commerce/Orders/EmptyItem";
 import LayoutMain from "@/components/common/LayoutMain.vue";
+import OrderToolbar from "@/components/commerce/Orders/OrderToolbar.vue";
 
 const order = defineModel<Order>("order")
 const emit = defineEmits(["save", "refresh"])
@@ -107,30 +91,19 @@ const {rules} = useValidationRules()
 const currentItem = ref(orderLocal.value.items[0])
 const newItem = ref<Item | null>(null)
 
-const {getShortList} = useCompaniesStore()
-const companiesList = await getShortList()
-const companies = companiesList.map(company => company.companyName)
 
 const {customers} = storeToRefs(useCustomersStore())
 const {fetchCustomers} = useCustomersStore()
 !customers.value.length && await fetchCustomers()
 
-const {previewCommerce, previewToolOrder, previewPlan1, previewPlan2} = useOfferGenerator();
 
-const isAllComputed = computed(() => order.value?.items.every((e: Item) => e.technology.computed))
-const isAllWorkpieced = computed(() => order.value?.items.every((e: Item) => e.customerMaterial || e.technology.assembly || e.technology.workpiece.material.price.amount))
-const isOrderComputed = computed(() => isAllComputed.value && isAllWorkpieced.value)
 const isActive = (item: Item): boolean => {
     const currentIndex = `${currentItem.value.id}${currentItem.value.uid}`
     const itemIndex = `${item.id}${item.uid}`
     return currentIndex === itemIndex
 }
 
-const selectCompany = async ({id}: { id: string }) => {
-    const selectedCompany = companiesList.find(company => company.companyName === id)
-    const selectedId = selectedCompany && selectedCompany.id
-    order.value && await previewCommerce(order.value, selectedId)
-}
+
 const addNewItem = () => {
     newItem.value = emptyItem()
     newItem.value.uid = Date.now().toString(36)
