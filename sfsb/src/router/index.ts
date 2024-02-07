@@ -1,6 +1,5 @@
 import {createRouter, createWebHistory} from "vue-router";
 import Commerce from "@/views/Commerce.vue";
-import Technology from "@/views/Technology.vue";
 import Supplier from "@/views/Supplier.vue";
 import NotFound from "@/views/NotFound.vue";
 import StartPage from "@/views/StartPage.vue";
@@ -20,6 +19,8 @@ import OperationCard from "@/components/commerce/Operations/OperationCard.vue";
 import UsersComponent from "@/components/users/UsersComponent.vue";
 import UserCard from "@/components/users/UserCard.vue";
 import OrderCard from "@/components/commerce/Orders/OrderCard.vue";
+import TechnologyComponent from "@/components/technology-new/TechnologyComponent.vue";
+import TechnologyCard from "@/components/technology-new/TechnologyCard.vue";
 
 const toast = useToast();
 
@@ -152,10 +153,19 @@ const routes = [
     },
     {
         path: "/technology",
-        component: Technology,
+        component: TechnologyComponent,
         meta: {
             onlyFor: ["TECHNOLOGIST", "ADMIN"],
         },
+        children: [
+            {
+                path: ":id",
+                component: TechnologyCard,
+                meta: {
+                    onlyFor: ["TECHNOLOGIST", "ADMIN"],
+                },
+            }
+        ]
     },
     {
         path: "/not-found",
