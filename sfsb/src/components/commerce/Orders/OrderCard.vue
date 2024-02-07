@@ -35,12 +35,13 @@
                         v-expansion-panel-text
                             v-textarea(v-model="orderLocal.description")
                             v-textarea(v-model="orderLocal.businessProposal")
+        AlertDialog(ref="alertDialog")
 
 
 </template>
 <script setup lang="ts">
 
-import {computed, ref, toRefs, watch, watchEffect} from "vue";
+import {computed, type Ref, ref, toRefs, watchEffect} from "vue";
 import SuspendedComponent from "@/components/common/SuspendedComponent.vue";
 import OrderFiles from "@/components/commerce/Orders/OrderFiles.vue";
 import {useValidationRules} from "@/mixins/FieldValidationRules";
@@ -52,6 +53,8 @@ import OrderItems from "@/components/commerce/Orders/OrderItems.vue";
 import {useRoute, useRouter} from "vue-router";
 import {useOrdersStore} from "@/pinia-store/orders";
 import emptyOrder from "@/components/commerce/Orders/EmptyOrder";
+import AlertDialog from "@/components/common/AlertDialog.vue";
+import {useCurrentUserStore} from "@/pinia-store/currentUser";
 
 const router = useRouter()
 const {params} = toRefs(useRoute())
@@ -60,18 +63,17 @@ const {orders, loading} = storeToRefs(useOrdersStore())
 const {saveOrder, getOrders} = useOrdersStore()
 
 const hasCurrentOrder = orders.value.find(e => e.id + "" === params.value.id)
-if (!hasCurrentOrder) router.push("/not-found")
+if (!hasCurrentOrder && params.value.id !== "new") router.push("/not-found")
 
 const order = computed(() => params.value.id === 'new' ? emptyOrder() : orders.value.find(e => e.id + "" === params.value.id) || orders.value[0])
 
 const orderLocal = ref<Order>(order.value as Order)
 
-// const description = ref(orderLocal.value?.description)
-// const businessProposal = ref(orderLocal.value?.businessProposal)
+const alertDialog = ref<typeof AlertDialog | undefined>()
 
 const form = ref<HTMLFormElement>()
 const valid = ref(false)
-const panel = ref<string[]>(["items"])
+const panel = ref<string[]>(params.value.id === "new" ? ["common", "items"] : ["items"])
 
 const {rules} = useValidationRules()
 
@@ -79,10 +81,28 @@ const {customers} = storeToRefs(useCustomersStore())
 const {fetchCustomers} = useCustomersStore()
 !customers.value.length && await fetchCustomers()
 
+
+const {user} = storeToRefs(useCurrentUserStore())
+const isSameUser = () => {
+    return orderLocal.value.user && orderLocal.value.user.id === user.value?.id;
+}
 const refresh = async () => {
     await getOrders()
 }
 const save = async () => {
+    if (orderLocal.value.user && !isSameUser() && alertDialog.value) {
+        try {
+            alertDialog.value.show()
+            const res = await alertDialog.value.getAnswer()
+            console.log("res", res);
+        } catch (error) {
+            return
+        } finally {
+            alertDialog.value.hide()
+        }
+    }
+    const valid: { valid: boolean, errors: Ref<string[]> } | null = form.value && await form.value.validate()
+    if (!valid?.valid) return
     await saveOrder(orderLocal.value)
     await getOrders()
     const id = orders.value.find(e => e.applicationNumber === orderLocal.value.applicationNumber)
@@ -90,16 +110,6 @@ const save = async () => {
 }
 watchEffect(() => {
     orderLocal.value = order.value as Order
-    // businessProposal.value = order.value?.businessProposal
-    // description.value = order.value?.description
-})
-
-watch([orderLocal], () => {
-    console.log("orderLocal", orderLocal.value)
-}, {deep: true})
-
-watch([params], () => {
-    console.log("params", params.value)
 })
 
 
