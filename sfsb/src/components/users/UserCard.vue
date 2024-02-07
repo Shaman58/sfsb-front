@@ -134,6 +134,16 @@ watchEffect(() => {
     &__main
         padding: 1rem
         height: 100%
+        overflow-y: auto
+
+        &::-webkit-scrollbar
+            width: 4px
+            background-color: transparent
+
+        &::-webkit-scrollbar-thumb
+            width: 4px
+            background-color: var(--scroll-color)
+            border-radius: 8px
 
     &__header
         display: grid
