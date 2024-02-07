@@ -1,6 +1,8 @@
 <template lang="pug">
     LayoutMain
         template(#header)
+            div(style="height: 8px; width: 100%;")
+                v-progress-linear(v-show="loading" :indeterminate="true" color="#2F477E")
             OrderToolbar(:order="orderLocal" :valid="valid"  @save="save" @refresh="refresh")
         .order-card
             v-form.order-card__form(ref="form" v-model="valid")
@@ -41,7 +43,7 @@
 </template>
 <script setup lang="ts">
 
-import {computed, type Ref, ref, toRefs, watchEffect} from "vue";
+import {computed, type Ref, ref, toRefs, watch, watchEffect} from "vue";
 import SuspendedComponent from "@/components/common/SuspendedComponent.vue";
 import OrderFiles from "@/components/commerce/Orders/OrderFiles.vue";
 import {useValidationRules} from "@/mixins/FieldValidationRules";
@@ -105,11 +107,17 @@ const save = async () => {
     if (!valid?.valid) return
     await saveOrder(orderLocal.value)
     await getOrders()
-    const id = orders.value.find(e => e.applicationNumber === orderLocal.value.applicationNumber)
-    id && await router.push(`/commerce/orders/${id}`)
+    setTimeout(async () => {
+        const refreshedOrder = orders.value.find(e => e.applicationNumber === +orderLocal.value.applicationNumber)
+        refreshedOrder?.id && await router.push(`/commerce/orders/${refreshedOrder.id}`)
+    }, 500)
 }
 watchEffect(() => {
     orderLocal.value = order.value as Order
+})
+
+watch([params], () => {
+    panel.value = params.value.id === "new" ? ["common", "items"] : panel.value
 })
 
 
