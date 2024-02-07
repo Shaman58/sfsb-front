@@ -66,6 +66,10 @@ watch([newItem], () => {
         canAddNewItem.value = true
     }
 }, {deep: true})
+
+watch(items, () => {
+    currentItem.value = items.value[0]
+})
 </script>
 
 

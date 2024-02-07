@@ -1,7 +1,11 @@
 const emptyItem = (): Item => ({
     technology: {
         drawingName: "",
-        drawingNumber: ""
+        drawingNumber: "",
+        outsourcedCosts: {
+            amount: 0,
+            currency: "RUB"
+        }
     },
     quantity: 0,
     price: {
