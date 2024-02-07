@@ -5,47 +5,39 @@
             v-text-field(label="фильтр" v-model="filterText")
         template(#list)
             v-list.orders__list
-                v-list-item(@click="addNew")
-                    span(:style="{color:'orange'}") Добавить новый заказ
-                v-list-item(v-for="i in orders" @click="currentOrder=i"
-                    :key="i.id" :active="currentOrder.id===i.id") {{i.id}} {{i.customer.companyName}}
+                v-list-item
+                    router-link(:to="'/commerce/orders/new'")
+                        span(:style="{color:'orange'}") Добавить новый заказ
+                v-list-item(v-for="i in orders" :key="i.id" :active="+id===i.id")
+                    router-link(:to="`/commerce/orders/${i.id}`") {{i.id}} {{i.customer.companyName}}
         template(#card)
-            v-progress-linear(v-show="loading" :indeterminate="true"  color="#2F477E")
-            OrderCard(v-model:order="currentOrder"  @save="save" @refresh="refresh")
+            //v-progress-linear(v-show="loading" :indeterminate="true"  color="#2F477E")
+            //OrderCard(v-model:order="currentOrder"  @save="save" @refresh="refresh")
+            router-view
 
 </template>
 <script setup lang="ts">
 import {storeToRefs} from "pinia";
-import {ref, watch} from "vue";
+import {computed, ref, toRefs, watch} from "vue";
 import LayoutPage from "@/components/common/LayoutPage.vue";
 import {useOrdersStore} from "@/pinia-store/orders";
-import OrderCard from "@/components/commerce/Orders/OrderCard.vue";
-import emptyOrder from "@/components/commerce/Orders/EmptyOrder";
+import {useRoute, useRouter} from "vue-router";
+
+const router = useRouter();
 
 const {orders, loading} = storeToRefs(useOrdersStore())
 const {getOrders, saveOrder} = useOrdersStore()
 !orders.value.length && await getOrders()
 
+const {path} = toRefs(useRoute())
+const id = computed(() => path.value.split("/").at(-1))
+id.value === "orders" && router.push(`/commerce/orders/${orders.value[0].id}`)
+
 const filterText = ref("")
-const currentOrder = ref<Order>(orders.value[0])
 
-const addNew = () => {
-    currentOrder.value = emptyOrder() as Order
-}
-
-const save = async (event: Order) => {
-    await saveOrder(currentOrder.value)
-}
-
-const refresh = async () => {
-    await getOrders()
-    currentOrder.value = orders.value.find((i) => i.id === currentOrder.value.id) || currentOrder.value
-
-}
-
-watch([currentOrder], () => {
-    console.log("=>(OrdersComponent.vue:35) currentOrder", currentOrder.value);
-}, {deep: true})
+watch([id], () => {
+    console.log("params id", id.value)
+})
 
 </script>
 <style scoped lang="sass">

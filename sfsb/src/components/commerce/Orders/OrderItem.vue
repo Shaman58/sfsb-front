@@ -26,7 +26,7 @@ const isMaterial = computed(() => !!item.value?.customerMaterial || !!item.value
 <style scoped lang="sass">
 .order-item
     display: grid
-    grid-template-columns: 60px minmax(100px, 2fr) 1fr auto
+    grid-template-columns: 60px minmax(100px, 1fr) 2rem auto
     align-items: center
     gap: .5rem
 

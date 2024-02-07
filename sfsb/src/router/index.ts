@@ -19,6 +19,7 @@ import OperationsComponent from "@/components/commerce/Operations/OperationsComp
 import OperationCard from "@/components/commerce/Operations/OperationCard.vue";
 import UsersComponent from "@/components/users/UsersComponent.vue";
 import UserCard from "@/components/users/UserCard.vue";
+import OrderCard from "@/components/commerce/Orders/OrderCard.vue";
 
 const toast = useToast();
 
@@ -118,9 +119,20 @@ const routes = [
                 ]
             },
             {
-                path: "orders", component: OrdersComponent, meta: {
+                path: "orders",
+                component: OrdersComponent,
+                meta: {
                     onlyFor: ["COMMERCE", "ADMIN"],
                 },
+                children: [
+                    {
+                        path: ":id",
+                        component: OrderCard,
+                        meta: {
+                            onlyFor: ["COMMERCE", "ADMIN"],
+                        },
+                    }
+                ]
             },
             {
                 path: "operations", component: OperationsComponent, meta: {
@@ -144,6 +156,10 @@ const routes = [
         meta: {
             onlyFor: ["TECHNOLOGIST", "ADMIN"],
         },
+    },
+    {
+        path: "/not-found",
+        component: NotFound
     },
     {
         path: "/:catchAll(.*)",

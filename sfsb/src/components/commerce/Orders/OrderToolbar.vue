@@ -12,7 +12,7 @@
         ControlButton(@click="void previewPlan2(order)" :disabled="!isAllComputed"  tooltip="План2" icon-name="mdi-list-status")
         v-spacer
         ControlButton(@click="emit('refresh')"  tooltip="Обновить" icon-name="mdi-refresh")
-        ControlButton(@click="emit('save')" color="orange-darken-1" variant="text" type="submit" :disabled="!valid" tooltip="Сохранить" icon-name="mdi-floppy")
+        ControlButton(@click="save" color="orange-darken-1" variant="text" type="submit" :disabled="!valid" tooltip="Сохранить" icon-name="mdi-floppy")
 
 </template>
 <script setup lang="ts">
@@ -38,6 +38,10 @@ const selectCompany = async ({id}: { id: string }) => {
     const selectedCompany = companiesList.find(company => company.companyName === id)
     const selectedId = selectedCompany && selectedCompany.id
     order.value && await previewCommerce(order.value, selectedId)
+}
+
+const save = () => {
+    emit("save")
 }
 </script>
 
