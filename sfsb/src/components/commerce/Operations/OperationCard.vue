@@ -26,14 +26,25 @@ import LayoutMain from "@/components/common/LayoutMain.vue";
 
 const {params} = toRefs(useRoute())
 
-const {operations, loading} = storeToRefs(useOperationsStore())
-const {saveOperation, fetchOperation} = useOperationsStore()
+const {operations, loading, setupPrice, techPrice} = storeToRefs(useOperationsStore())
+const {
+    saveOperation,
+    fetchOperation,
+    fetchSetupPrice,
+    fetchTechPrice,
+    saveSetupPrice,
+    saveTechPrice
+} = useOperationsStore()
 !operations.value.length && await fetchOperation()
 
-const operationLocal: Ref<Operation> = ref(params.value.id === "new"
-    ? emptyOperation() satisfies Operation
-    : operations.value.find(e => e.id === +params.value.id) || operations.value[0]
-)
+const operationMap = {
+    new: emptyOperation() satisfies Operation,
+    setup: setupPrice.value,
+    tech: techPrice.value,
+    default: operations.value.find(e => e.id === +params.value.id) || operations.value[0]
+}
+
+const operationLocal: Ref<Operation> = ref(params.value.id in operationMap ? operationMap[params.value.id] : operationMap["default"])
 
 const form = ref<HTMLFormElement>()
 const valid = ref(false);
@@ -44,9 +55,7 @@ const save = async () => {
 }
 
 watch(params, () => {
-    operationLocal.value = params.value.id === "new"
-        ? emptyOperation() satisfies Operation
-        : operations.value.find(e => e.id === +params.value.id) || operations.value[0]
+    operationLocal.value = params.value.id in operationMap ? operationMap[params.value.id] : operationMap["default"]
 
 }, {immediate: true})
 

@@ -44,7 +44,7 @@ const operationLocal = ref(operation);
 
 const save = () => {
     if (form.value.validate()) {
-        emit("save", operationLocal);
+        emit("save", operationLocal.value);
         emit("hide");
     }
 };
