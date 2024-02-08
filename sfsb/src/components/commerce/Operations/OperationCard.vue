@@ -1,7 +1,7 @@
 <template lang="pug">
     LayoutMain.operation-card
         v-card(:style="{height:'100%'}")
-            v-form(ref="form" v-model="valid" @submit.prevent="save")
+            v-form#operation-form(ref="form" v-model="valid" @submit.prevent="save")
                 v-card-text(v-if="operationLocal")
                     v-text-field( label="Название операции:" v-model="operationLocal.operationName" :rules="[rules.required, rules.nameValidation]" counter :disabled="operationLocal.id<3")
                     v-select(label="Описание:" :items="CONST.OPERATIONS" item-title="title" item-value="label" v-model="operationLocal.operationTimeManagement" :disabled="operationLocal.id<3")
@@ -10,7 +10,7 @@
                         OperationDescriptions
         template(#footer)
             v-card.operation-card__footer
-                v-btn(color="orange-darken-1" variant="text" type="submit" :disabled="!valid") Сохранить
+                v-btn(color="orange-darken-1" variant="text" type="submit" :disabled="!valid" form="operation-form") Сохранить
 </template>
 <script setup lang="ts">
 
