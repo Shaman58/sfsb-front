@@ -35,16 +35,23 @@ const {
     saveSetupPrice,
     saveTechPrice
 } = useOperationsStore()
-!operations.value.length && await fetchOperation()
 
-const operationMap = {
-    new: emptyOperation() satisfies Operation,
-    setup: setupPrice.value,
-    tech: techPrice.value,
-    default: operations.value.find(e => e.id === +params.value.id) || operations.value[0]
+const refetchData = async () => {
+    !operations.value.length && await fetchOperation()
+    !Object.keys(techPrice.value).length && await fetchTechPrice()
+    !Object.keys(setupPrice.value).length && await fetchSetupPrice()
 }
 
-const operationLocal: Ref<Operation> = ref(params.value.id in operationMap ? operationMap[params.value.id] : operationMap["default"])
+await refetchData()
+
+const operationMap = {
+    new: () => emptyOperation() satisfies Operation,
+    setup: () => setupPrice.value,
+    tech: () => techPrice.value,
+    default: () => operations.value.find(e => e.id === +params.value.id) || operations.value[0]
+}
+
+const operationLocal: Ref<Operation> = ref(params.value.id in operationMap ? operationMap[params.value.id]() : operationMap["default"]())
 
 const form = ref<HTMLFormElement>()
 const valid = ref(false);
@@ -55,7 +62,8 @@ const save = async () => {
 }
 
 watch(params, () => {
-    operationLocal.value = params.value.id in operationMap ? operationMap[params.value.id] : operationMap["default"]
+    refetchData()
+    operationLocal.value = params.value.id in operationMap ? operationMap[params.value.id]() : operationMap["default"]()
 
 }, {immediate: true})
 
