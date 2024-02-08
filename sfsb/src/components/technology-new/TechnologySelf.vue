@@ -1,7 +1,9 @@
 <template lang="pug">
-    v-list.list
-        v-list-item(v-for="i in items||[]" :key="i.id" @click="emit('select',i)")
-            span {{ i.technology.drawingNumber }} {{ i.technology.drawingName }}
+    v-card
+        v-card-title У меня в работе
+        v-list.list
+            v-list-item(v-for="i in items||[]" :key="i.id" @click="emit('select',i)")
+                span {{ i.technology.drawingNumber }} {{ i.technology.drawingName }}
 </template>
 <script setup lang="ts">
 import {storeToRefs} from "pinia";

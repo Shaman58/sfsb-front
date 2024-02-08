@@ -1,5 +1,5 @@
 <template lang="pug">
-    v-container(fluid v-if="currentItem")
+    v-container.pa-0(fluid v-if="currentItem")
         v-dialog(v-model="dialogVisible" :fullscreen="true")
             v-form(ref="form" v-model="valid" @submit.prevent="save" style="overflow-y: auto;")
                 v-card.dialog-content
@@ -234,7 +234,7 @@ const createNewSetup = () => ({
     cooperatePrice: {amount: 0, currency: 'RUB'}
 });
 
-const newSetup = ref(createNewSetup());
+const newSetup = ref(createNewSetup())
 
 const pushSetup = (setup: Setup) => {
     hideSetup();
@@ -290,8 +290,7 @@ const save = async () => {
     if (!saveActive.value) return;
     saveActive.value = false;
     currentItem.value.technology.computed = false;
-    //   await store.dispatch("saveTechnology", currentItem.value.technology);
-    await fetchItem(currentItem.value.id);
+    currentItem.value.id && await fetchItem(currentItem.value.id);
     await fetchItems();
     saveActive.value = true;
     await saveTechnology(currentItem.value.technology);

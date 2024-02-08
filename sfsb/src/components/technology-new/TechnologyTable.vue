@@ -41,4 +41,14 @@ const refresh = () => {
 <style scoped lang="sass">
 .table
     height: 100%
+    overflow-y: auto
+
+    &::-webkit-scrollbar
+        width: 4px
+        background-color: transparent
+
+    &::-webkit-scrollbar-thumb
+        width: 4px
+        background-color: var(--scroll-color)
+        border-radius: 8px
 </style>
