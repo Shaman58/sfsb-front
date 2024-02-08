@@ -8,7 +8,7 @@
                     th НАИМЕНОВАНИЕ
                     th Работает
             tbody
-                tr.technology-dialog__order-item(v-for="i in items||[]" :key="i.id" @click="emit('select',i)")
+                tr.table__order-item(v-for="i in items||[]" :key="i.id" @click="emit('select',i)")
                     td(width="10%")
                         v-icon(:icon="i.technology?.computed?'mdi-check-circle':'mdi-radiobox-blank'" )
                     td
@@ -51,4 +51,7 @@ const refresh = () => {
         width: 4px
         background-color: var(--scroll-color)
         border-radius: 8px
+
+    &__order-item
+        cursor: pointer
 </style>

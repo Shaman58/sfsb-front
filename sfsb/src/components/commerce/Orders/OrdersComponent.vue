@@ -11,8 +11,6 @@
                 v-list-item(v-for="i in orders" :key="i.id" :active="+id===i.id" @click="()=>{}")
                     router-link.list-link.orders__link(:to="`/commerce/orders/${i.id}`") {{i.id}} {{i.customer.companyName}}
         template(#card)
-            //v-progress-linear(v-show="loading" :indeterminate="true"  color="#2F477E")
-            //OrderCard(v-model:order="currentOrder"  @save="save" @refresh="refresh")
             router-view
 
 </template>
