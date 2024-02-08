@@ -136,7 +136,9 @@ const routes = [
                 ]
             },
             {
-                path: "operations", component: OperationsComponent, meta: {
+                path: "operations",
+                component: OperationsComponent,
+                meta: {
                     onlyFor: ["COMMERCE", "ADMIN"],
                 },
                 children: [
