@@ -10,5 +10,7 @@ import {useRoute, useRouter} from "vue-router";
 
 const router = useRouter();
 const {path} = toRefs(useRoute())
-path.value.split("/").at(-1) === 'commerce' && router.push("/commerce/orders")
+const defaultRoute = "/commerce/orders";
+
+path.value.split("/").at(-1) === 'commerce' && router.push(defaultRoute)
 </script>
