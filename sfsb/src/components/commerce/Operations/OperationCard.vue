@@ -4,7 +4,7 @@
             v-form#operation-form(ref="form" v-model="valid" @submit.prevent="save")
                 v-card-text(v-if="operationLocal")
                     v-text-field( label="Название операции:" v-model="operationLocal.operationName" :rules="[rules.required, rules.nameValidation]" counter :disabled="operationLocal.id<3")
-                    v-select(label="Описание:" :items="CONST.OPERATIONS" item-title="title" item-value="label" v-model="operationLocal.operationTimeManagement" :disabled="operationLocal.id<3")
+                    v-select(label="Описание:" :items="CONST.OPERATIONS" item-title="title" item-value="label" v-model="operationLocal.operationTimeManagement" :disabled="operationLocal.id<3" )
                     v-text-field( label="Стоимость за час:" v-model="operationLocal.paymentPerHour.amount" :rules="[rules.required,rules.numeric]" type="number")
                     v-container(v-if="!operationLocal?.id||operationLocal?.id>=3")
                         OperationDescriptions
@@ -17,7 +17,7 @@
 import {useRoute} from "vue-router";
 import {storeToRefs} from "pinia";
 import {useOperationsStore} from "@/pinia-store/operations";
-import {computed, type ComputedRef, ref, toRefs} from "vue";
+import {ref, type Ref, toRefs, watch} from "vue";
 import {useValidationRules} from "@/mixins/FieldValidationRules";
 import emptyOperation from "@/components/commerce/Operations/EmptyOperation";
 import CONST from "@/consts";
@@ -27,10 +27,11 @@ import LayoutMain from "@/components/common/LayoutMain.vue";
 const {params} = toRefs(useRoute())
 
 const {operations, loading} = storeToRefs(useOperationsStore())
-const {saveOperation} = useOperationsStore()
+const {saveOperation, fetchOperation} = useOperationsStore()
+!operations.value.length && await fetchOperation()
 
-const operationLocal: ComputedRef<Operation> = computed(() => params.value.id === "new"
-    ? emptyOperation()
+const operationLocal: Ref<Operation> = ref(params.value.id === "new"
+    ? emptyOperation() satisfies Operation
     : operations.value.find(e => e.id === +params.value.id) || operations.value[0]
 )
 
@@ -40,8 +41,14 @@ const {rules} = useValidationRules();
 
 const save = async () => {
     await saveOperation(operationLocal.value)
-
 }
+
+watch(params, () => {
+    operationLocal.value = params.value.id === "new"
+        ? emptyOperation() satisfies Operation
+        : operations.value.find(e => e.id === +params.value.id) || operations.value[0]
+
+}, {immediate: true})
 
 </script>
 <style scoped lang="sass">

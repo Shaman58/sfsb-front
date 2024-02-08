@@ -4,6 +4,7 @@ const emptyOperation = (): Operation => ({
     updated: "",
     paymentPerHour: {
         amount: 0,
+        currency: "RUB"
     },
     operationTimeManagement: ""
 } as Operation)
