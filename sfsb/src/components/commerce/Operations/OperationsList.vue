@@ -1,19 +1,15 @@
 <template lang="pug">
     v-list
-        v-list-item
-            v-list-item-title
-                router-link.list-link(:to="`/commerce/operations/new`")
-                    span(:style="{color: 'orange'}") Добавить новую операцию
-        v-list-item
-            v-list-item-title
-                router-link.list-link(:to="`/commerce/operations/setup`") Наладочная
-        v-list-item
-            v-list-item-title
-                router-link.list-link(:to="`/commerce/operations/tech`") Технолог
+        v-list-item(@click="()=>{}" :active="page==='new'")
+            router-link.list-link(:to="`/commerce/operations/new`")
+                span(:style="{color: 'orange'}") Добавить новую операцию
+        v-list-item(@click="()=>{}" :active="page==='setup'")
+            router-link.list-link(:to="`/commerce/operations/setup`") Наладочная
+        v-list-item(@click="()=>{}" :active="page==='tech'")
+            router-link.list-link(:to="`/commerce/operations/tech`") Технолог
         v-list-item(v-for="i in operations" @click="currentOperation=i"
             :key="i.id" :active="+page===i.id")
-            v-list-item-title
-                router-link.list-link(:to="`/commerce/operations/${i.id}`") {{i.operationName}}
+            router-link.list-link(:to="`/commerce/operations/${i.id}`") {{i.operationName}}
 </template>
 <script setup lang="ts">
 import {storeToRefs} from "pinia";
