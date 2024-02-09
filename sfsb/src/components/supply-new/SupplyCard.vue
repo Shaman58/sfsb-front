@@ -3,10 +3,9 @@
         template(#header)
             .supply-card__header
                 v-autocomplete(label="Вид" :items="geometries" v-model="selectedType" )
-                v-text-field(v-model="filterText" label="Найти материал")
+                v-text-field(v-model="search" label="Найти материал")
         .supply-card__main
-            h3 {{supplyMap[type].title}}
-            v-data-table(:items="currentData" :headers)
+            v-data-table.supply-card__table(:items="typedCurrentData" :headers  :search )
                 //template(#item.actions="{ item }")
                 //    v-icon( size="small"  @click="console.log(item)") mdi-pencil
                 template(#item="{item}" )
@@ -33,14 +32,11 @@ import CONST from "@/consts";
 import {useSupplyStore} from "@/pinia-store/supply";
 import {storeToRefs} from "pinia";
 
-const a = ref(false)
-
-
 const props = defineProps<{ type: keyof typeof supplyMap }>()
 const {type} = toRefs(props)
 
+const search = ref("")
 
-const filterText = ref("")
 const geometries = CONST.GEOMETRIES
 const selectedType: Ref<string | null> = ref(null)
 
@@ -53,7 +49,13 @@ const {saveMaterial, getMaterialsAll, getMaterialsNoCost, getMaterialsDateExpire
 
 const supplyMap = SupplyMap(useSupplyStore)
 
+const titleToLabel = (title: string): string | undefined => {
+    const found = geometries.find(e => e.title === title)
+    if (found) return found.label
+}
+
 const currentData = computed(() => supplyMap[type.value].data)
+const typedCurrentData = computed(() => currentData.value.filter(e => selectedType.value ? e.geometry === titleToLabel(selectedType.value || "") : true))
 const currentItem: Ref<Material | null> = ref(null)
 const currentInput = ref<HTMLInputElement>()
 
@@ -62,14 +64,17 @@ const editing = computed(() => !!currentItem)
 const previousPrice: Ref<number | undefined> = ref()
 
 const headers = [
-    {title: "Название", value: "materialName"},
+    {title: "Название", value: "materialName", key: "materialName"},
     {title: "ГОСТ на материал", value: "gost1"},
     {title: "ГОСТ на сортамент", value: "gost2"},
-    {title: "Геометрия", value: "geometry"},
+    {title: "Геометрия", value: "geometry", key: "geometry"},
     {title: "Плотность", value: "density"},
-    {title: "Стоимость", value: "amount"},
-    {title: "Редакировать", value: "editing"}
+    {title: "Стоимость", value: "price.amount", key: "price.amount"},
+    {title: "Сохранить", value: "editing"}
 ]
+
+
+const i = ref(0)
 
 const doEdit = (item: Material) => {
     currentItem.value = item
@@ -90,31 +95,12 @@ const geometryByLabel = (material: string) => {
 }
 
 
-// const supplyStore = storeToRefs(useSupplyStore())
-//
-// await getData()
-//
-// const materialList = supplyStore[materials as keyof typeof supplyStore]
-//
-// const filteredList: ComputedRef<Material[]> = computed(() => materialList.value.filter(e =>
-//     `${e.materialName} ${e.gost1} ${e.gost2}`
-//         .toLowerCase()
-//         .includes(filterText.value.toLowerCase()))
-//     .filter(e => {
-//         const label = geometries.find(v => v.title === selectedType.value)?.label || null
-//         return selectedType.value ? e.geometry === label : true
-//     }))
-//
-// const geometryByLabel = (material: string) => {
-//     const geometry = CONST.GEOMETRIES.find(e => e.label === material)
-//     return geometry && geometry.title
-// }
-
 </script>
 
-<style lang="sass" scoped>
+<style lang="sass">
 .supply-card
     --control-width: 90px
+    height: 100%
 
     &__header
         width: 100%
@@ -122,6 +108,22 @@ const geometryByLabel = (material: string) => {
         align-items: center
         justify-content: space-between
         gap: 0.5rem
+
+    &__main, &__table
+        height: 100%
+
+    &__table
+
+        & .v-table__wrapper
+
+            &::-webkit-scrollbar
+                width: 4px
+                background-color: transparent
+
+            &::-webkit-scrollbar-thumb
+                width: 4px
+                background-color: var(--scroll-color)
+                border-radius: 8px
 
     &__price-span
         width: var(--control-width)
