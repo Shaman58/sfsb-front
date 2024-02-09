@@ -1,7 +1,7 @@
 <template lang="pug">
     v-dialog(v-model="show" width="1024")
         v-form(ref="form" v-model="valid" v-on:submit.prevent="void save" style="overflow-y: auto;")
-            v-card.mx-auto.my-12
+            v-card.my-12
                 v-card-title
                     span.text-h5 Карточка организации
                 v-card-text

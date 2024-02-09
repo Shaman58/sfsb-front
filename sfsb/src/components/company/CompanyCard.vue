@@ -18,7 +18,7 @@
                     .d-flex
                         v-text-field(label="ИНН" variant="underlined" v-model="currentCompany.inn" :rules="[rules.innValidation]")
                         v-text-field(label="КПП" variant="underlined" v-model="currentCompany.kpp" :rules="[rules.bikkppValidation]")
-                        v-text-field(label="ОГРН" variant="underlined" v-model="currentCompany.ogrn" :rules="[rules.ogrnValidation]")
+                        v-text-field(label="ОКПО" variant="underlined" v-model="currentCompany.ogrn" :rules="[rules.ogrnValidation]")
                 v-card.company__card(title="Банковские реквизиты" prepend-icon="mdi-bank" )
                     v-text-field(label="Банк" variant="underlined" v-model="currentCompany.bank" :rules="[rules.required, rules.counter]")
                     .d-flex

@@ -234,6 +234,7 @@ declare interface Company {
     inn: number,
     kpp: number,
     ogrn: number,
+    okpo: number,
     paymentAccount: number,
     bank: string,
     bik: number,
