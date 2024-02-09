@@ -10,47 +10,30 @@
                 //template(#item.actions="{ item }")
                 //    v-icon( size="small"  @click="console.log(item)") mdi-pencil
                 template(#item="{item}" )
-                    tr(@click="showDetails(item)")
+                    tr(@click="currentItem=item")
                         td
                             strong {{item.materialName}}
                         td {{item.gost1}}
                         td {{item.gost2}}
                         td {{geometryByLabel(item.geometry)}}
                         td {{item.density}}
-                        td {{item.price.amount}}
-            //v-table(density="compact")
-                //thead
-                //    th Наимменование
-                //    th ГОСТ1
-                //    th ГОСТ2
-                //    th Геометрия
-                //    th Цена
-                //
-                //tbody
-                //    tr(v-for="item in currentData" :key="item.id")
-                //        td {{item.materialName}}
-                //        td {{item.gost1}}
-                //        td {{item.gost2}}
-                //        td {{item.geometry}}
-                //        td
-                //            v-text-field(v-model="item.price.amount"  variant="underlined")
-    //    v-list.supply-card__list
-    //        v-list-item.supply-card__item(v-for="material in filteredList" @click="$emit('select',material)" :key="material.id")
-    //            span {{geometryByLabel(material.geometry)}} {{ material.materialName }} {{ material.gost1 || "" }} {{ material.gost2 || "" }}
-    //            .supply-card__dates
-    //                span обновлен: {{ material.updated }}
-
-    MaterialCard(v-if="visible" :material="currentItem" v-model="visible" )
+                        td
+                            input.supply-card__price-input(v-if="currentItem && currentItem.id===item.id" type="number"
+                                :value="item.price.amount"  ref="currentInput")
+                            .supply-card__price-span(v-else) {{item.price.amount}}
+                        td
+                            v-icon.me-2.supply-card__save-item(size="small" @click="save") mdi-floppy
 </template>
 
 <script setup lang="ts">
-import {computed, type Ref, ref, toRefs, watchEffect} from "vue"
+import {computed, type Ref, ref, toRefs} from "vue"
 import SupplyMap from "./SupplyMap"
 import LayoutMain from "@/components/common/LayoutMain.vue";
 import CONST from "@/consts";
 import {useSupplyStore} from "@/pinia-store/supply";
 import {storeToRefs} from "pinia";
-import MaterialCard from "@/components/supply-new/MaterialCard.vue";
+
+const a = ref(false)
 
 
 const props = defineProps<{ type: keyof typeof supplyMap }>()
@@ -72,7 +55,11 @@ const supplyMap = SupplyMap(useSupplyStore)
 
 const currentData = computed(() => supplyMap[type.value].data)
 const currentItem: Ref<Material | null> = ref(null)
-const visible = ref(false)
+const currentInput = ref<HTMLInputElement>()
+
+const editing = computed(() => !!currentItem)
+
+const previousPrice: Ref<number | undefined> = ref()
 
 const headers = [
     {title: "Название", value: "materialName"},
@@ -80,19 +67,28 @@ const headers = [
     {title: "ГОСТ на сортамент", value: "gost2"},
     {title: "Геометрия", value: "geometry"},
     {title: "Плотность", value: "density"},
-    {title: "Стоимость килограмма", value: "amount"},
+    {title: "Стоимость", value: "amount"},
+    {title: "Редакировать", value: "editing"}
 ]
 
-const showDetails = (item: Material) => {
+const doEdit = (item: Material) => {
     currentItem.value = item
-    visible.value = true
+    previousPrice.value = currentItem.value.price.amount
+    setTimeout(() => {
+        currentInput.value && currentInput.value.focus()
+    })
 }
+
+const save = async () => {
+    currentItem.value && currentInput.value && (currentItem.value.price.amount = +currentInput.value.value)
+    currentItem.value && await saveMaterial(currentItem.value)
+}
+
 const geometryByLabel = (material: string) => {
     const geometry = CONST.GEOMETRIES.find(e => e.label === material)
     return geometry && geometry.title
 }
 
-watchEffect(() => console.log("currentData", currentData.value))
 
 // const supplyStore = storeToRefs(useSupplyStore())
 //
@@ -118,6 +114,7 @@ watchEffect(() => console.log("currentData", currentData.value))
 
 <style lang="sass" scoped>
 .supply-card
+    --control-width: 90px
 
     &__header
         width: 100%
@@ -125,4 +122,16 @@ watchEffect(() => console.log("currentData", currentData.value))
         align-items: center
         justify-content: space-between
         gap: 0.5rem
+
+    &__price-span
+        width: var(--control-width)
+
+    &__price-input
+        width: var(--control-width)
+        outline: 1px solid #000
+
+    &__save-item
+        translate: 0
+        z-index: 2
+
 </style>

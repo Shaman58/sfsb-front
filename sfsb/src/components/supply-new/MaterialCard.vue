@@ -19,8 +19,7 @@
                                 :rules="[rules.required, rules.numeric]" :disabled="route.path !== '/date'")
                         v-col(cols="2")
                             v-text-field(label="Стоимость килограмма:" v-model="materialLocal.price.amount"
-                                :rules="[rules.required, rules.numeric]" type="number"
-                                :disabled="route.path !== '/date' && route.path !== '/supplier'")
+                                :rules="[rules.required, rules.numeric]" type="number")
                         v-col(cols="4")
                             v-text-field(label="Гост на сортамент:" v-model="materialLocal.gost2"
                                 :disabled="route.path !== '/date'")
