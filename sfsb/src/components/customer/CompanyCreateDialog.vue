@@ -1,6 +1,6 @@
 <template lang="pug">
     v-dialog(v-model="show" width="1024")
-        v-form(ref="form" v-model="valid" v-on:submit.prevent="void save" style="overflow-y: auto;")
+        v-form#company-create-form(ref="form" v-model="valid" v-on:submit.prevent="void save" style="overflow-y: auto;")
             v-card.mx-auto.my-12
                 v-card-title
                     span.text-h5 Карточка организации
@@ -37,12 +37,13 @@
                 v-card-actions
                     v-spacer
                     v-btn(color="orange-darken-1" variant="text" @click="show=false") Закрыть
-                    v-btn(color="orange-darken-1" variant="text" type="submit" :disabled="!valid") Сохранить
+                    v-btn(color="orange-darken-1" variant="text" :disabled="!valid" @click="save") Сохранить
 </template>
 
 <script setup lang="ts">
 import {useValidationRules} from "@/mixins/FieldValidationRules";
 import {type Ref, ref, toRefs, watch, watchEffect} from "vue";
+import {useCustomersStore} from "@/pinia-store/customers";
 
 const props = defineProps<{ company: PartialCustomer }>();
 const show = defineModel("show")
@@ -56,6 +57,8 @@ const {rules} = useValidationRules();
 const form: Ref<HTMLFormElement | undefined> = ref();
 const orgName = ref()
 const valid = ref(false);
+
+const {saveCustomer} = useCustomersStore()
 
 watchEffect(() => companyLocal.value = company.value)
 // onUpdated(() => {
@@ -82,8 +85,9 @@ const save = async () => {
     if (!form.value) return
     const valid: { valid: boolean, errors: Ref<string[]> } = await form.value.validate()
     if (valid.valid) {
-        emit("save", companyLocal.value);
-        emit("hide");
+        // emit("save", companyLocal.value);
+        await saveCustomer(companyLocal.value as Customer)
+        show.value = false
     }
 };
 
