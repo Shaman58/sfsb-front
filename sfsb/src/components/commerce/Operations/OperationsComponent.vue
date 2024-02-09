@@ -9,7 +9,6 @@
         template(#card)
             suspended-component
                 router-view
-            //ClientCard(:company="currentCompany" :loading)
 
 </template>
 <script setup lang="ts">

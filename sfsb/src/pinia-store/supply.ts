@@ -1,7 +1,7 @@
-import { defineStore } from "pinia";
+import {defineStore} from "pinia";
 import api from "@/api/instance";
-import { useToast } from "vue-toast-notification";
-import { Ref, ref } from "vue";
+import {useToast} from "vue-toast-notification";
+import {ref} from "vue";
 
 const toast = useToast();
 
@@ -12,7 +12,7 @@ export const useSupplyStore = defineStore("supply", () => {
 
     const getMaterialsNoCost = async () => {
         try {
-            const { data } = await api.get<Material[]>(`/material/no-cost`);
+            const {data} = await api.get<Material[]>(`/material/no-cost`);
             materialsNoCost.value = data;
         } catch (error) {
             toast.error("Ошибка при загрузке данных материалов");
@@ -20,7 +20,7 @@ export const useSupplyStore = defineStore("supply", () => {
     };
     const getMaterialsDateExpired = async () => {
         try {
-            const { data } = await api.get<Material[]>(
+            const {data} = await api.get<Material[]>(
                 `/material/date-expired`
             );
             materialsDateExpired.value = data;
@@ -30,7 +30,7 @@ export const useSupplyStore = defineStore("supply", () => {
     };
     const getMaterialsAll = async () => {
         try {
-            const { data } = await api.get<Material[]>(`/material`);
+            const {data} = await api.get<Material[]>(`/material`);
             materialsAll.value = data;
         } catch (error) {
             toast.error("Ошибка при загрузке данных материалов");
@@ -66,3 +66,5 @@ export const useSupplyStore = defineStore("supply", () => {
         saveMaterial,
     };
 });
+
+export type SupplyStoreType = typeof useSupplyStore

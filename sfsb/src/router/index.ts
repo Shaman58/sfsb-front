@@ -1,6 +1,5 @@
 import {createRouter, createWebHistory} from "vue-router";
 import Commerce from "@/views/Commerce.vue";
-import Supplier from "@/views/Supplier.vue";
 import NotFound from "@/views/NotFound.vue";
 import StartPage from "@/views/StartPage.vue";
 import {useCurrentUserStore} from "@/pinia-store/currentUser";
@@ -21,6 +20,8 @@ import UserCard from "@/components/users/UserCard.vue";
 import OrderCard from "@/components/commerce/Orders/OrderCard.vue";
 import TechnologyComponent from "@/components/technology-new/TechnologyComponent.vue";
 import TechnologyCard from "@/components/technology-new/TechnologyCard.vue";
+import SupplyComponent from "@/components/supply-new/SupplyComponent.vue";
+import SupplyCard from "@/components/supply-new/SupplyCard.vue";
 
 const toast = useToast();
 
@@ -74,10 +75,36 @@ const routes = [
     },
     {
         path: "/supplier",
-        component: Supplier,
+        component: SupplyComponent,
         meta: {
             onlyFor: ["SUPPLIER", "ADMIN"],
         },
+        children: [
+            {
+                path: "all",
+                component: SupplyCard,
+                props: {type: "all"},
+                meta: {
+                    onlyFor: ["SUPPLIER", "ADMIN"],
+                },
+            },
+            {
+                path: "nocost",
+                component: SupplyCard,
+                props: {type: "nocost"},
+                meta: {
+                    onlyFor: ["SUPPLIER", "ADMIN"],
+                },
+            },
+            {
+                path: "expired",
+                component: SupplyCard,
+                props: {type: "expired"},
+                meta: {
+                    onlyFor: ["SUPPLIER", "ADMIN"],
+                },
+            },
+        ]
     },
     {
         path: "/staff",
