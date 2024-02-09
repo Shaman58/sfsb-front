@@ -25,7 +25,7 @@ const backgroundWithDefault = background.value || "#00acc120"
     height: calc(100dvh - 3rem)
     display: grid
     grid-template-rows: 80px 1fr
-    background-color: v-bind("backgroundWithDefault")
+    background: v-bind("backgroundWithDefault")
 
     &__title
         display: grid
