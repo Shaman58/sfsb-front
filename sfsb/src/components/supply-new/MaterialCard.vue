@@ -74,7 +74,7 @@ const save = (material: Material) => {
 
 const hide = () => {
     // emit("hide");
-    vi
+    visible.value = false;
     material.value = {...materialProp.value, price: {...materialProp.value.price}};
 };
 
