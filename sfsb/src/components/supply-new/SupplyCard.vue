@@ -6,12 +6,18 @@
                 v-text-field(v-model="filterText" label="Найти материал")
         .supply-card__main
             h3 {{supplyMap[type].title}}
-            v-data-table(:items="currentData")
+            v-data-table(:items="currentData" :headers)
                 //template(#item.actions="{ item }")
                 //    v-icon( size="small"  @click="console.log(item)") mdi-pencil
-                template(#item="{item}")
-                    tr(@click="console.log(item)")
-                        td {{item.materialName}}
+                template(#item="{item}" )
+                    tr(@click="showDetails(item)")
+                        td
+                            strong {{item.materialName}}
+                        td {{item.gost1}}
+                        td {{item.gost2}}
+                        td {{geometryByLabel(item.geometry)}}
+                        td {{item.density}}
+                        td {{item.price.amount}}
             //v-table(density="compact")
                 //thead
                 //    th Наимменование
@@ -33,6 +39,8 @@
     //            span {{geometryByLabel(material.geometry)}} {{ material.materialName }} {{ material.gost1 || "" }} {{ material.gost2 || "" }}
     //            .supply-card__dates
     //                span обновлен: {{ material.updated }}
+
+    MaterialCard(v-if="visible" :material="currentItem" v-model="visible" )
 </template>
 
 <script setup lang="ts">
@@ -42,12 +50,8 @@ import LayoutMain from "@/components/common/LayoutMain.vue";
 import CONST from "@/consts";
 import {useSupplyStore} from "@/pinia-store/supply";
 import {storeToRefs} from "pinia";
+import MaterialCard from "@/components/supply-new/MaterialCard.vue";
 
-interface Props {
-    title: string
-    materials: string
-    getData: () => Promise<void>
-}
 
 const props = defineProps<{ type: keyof typeof supplyMap }>()
 const {type} = toRefs(props)
@@ -67,6 +71,26 @@ const {saveMaterial, getMaterialsAll, getMaterialsNoCost, getMaterialsDateExpire
 const supplyMap = SupplyMap(useSupplyStore)
 
 const currentData = computed(() => supplyMap[type.value].data)
+const currentItem: Ref<Material | null> = ref(null)
+const visible = ref(false)
+
+const headers = [
+    {title: "Название", value: "materialName"},
+    {title: "ГОСТ на материал", value: "gost1"},
+    {title: "ГОСТ на сортамент", value: "gost2"},
+    {title: "Геометрия", value: "geometry"},
+    {title: "Плотность", value: "density"},
+    {title: "Стоимость килограмма", value: "amount"},
+]
+
+const showDetails = (item: Material) => {
+    currentItem.value = item
+    visible.value = true
+}
+const geometryByLabel = (material: string) => {
+    const geometry = CONST.GEOMETRIES.find(e => e.label === material)
+    return geometry && geometry.title
+}
 
 watchEffect(() => console.log("currentData", currentData.value))
 
