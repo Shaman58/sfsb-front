@@ -29,6 +29,11 @@
                         v-list-item(@click="logout" class="d-flex justify-center align-center navbar-exit")
                             span(color="red") ВЫХОД
                             v-icon(icon="mdi-exit-to-app" class="ml-2" color="red")
+                        v-list-item(class="d-flex justify-center align-center")
+                            .navbar__theme-switch
+                                v-icon( icon="mdi:mdi-white-balance-sunny")
+                                v-switch(v-model="theme" hide-details inset)
+                                v-icon( icon="mdi:mdi-weather-night")
             v-btn.navbar__burger(:color="'white'"  @click="showMobileMenu=true")
                 v-icon(icon="mdi-menu")
 
@@ -36,21 +41,26 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref} from "vue";
+import { onMounted, ref, watch } from "vue";
 import ImpulsHub from "@/components/ImpulsHub.vue";
 import CONSTS from "@consts/index"
 import keycloakService from '@/plugins/keycloak/service';
-import {useToast} from "vue-toast-notification";
-import {useCurrentUserStore} from "@/pinia-store/currentUser";
-import {storeToRefs} from "pinia";
+import { useToast } from "vue-toast-notification";
+import { useCurrentUserStore } from "@/pinia-store/currentUser";
+import { storeToRefs } from "pinia";
 import MobileMenu from "@/components/common/MobileMenu.vue";
+import { useTheme } from "vuetify";
 
 const toast = useToast();
 
-const {user} = storeToRefs(useCurrentUserStore())
+const { user } = storeToRefs(useCurrentUserStore())
 
 const version = import.meta.env.VITE_APP_VERSION;
 
+const themeGlobal = useTheme()
+
+const isLight = () => matchMedia("(prefers-color-scheme: light)").matches
+const theme = ref(!isLight())
 
 const showMobileMenu = ref(false)
 const logout = () => {
@@ -59,6 +69,12 @@ const logout = () => {
 
 const name = ref();
 const picture = ref()
+
+watch(theme, () => {
+    console.log(themeGlobal.global.name.value);
+    themeGlobal.global.name.value = theme.value ? "dark" : "light"
+    console.log(themeGlobal.global.name.value);
+}, { immediate: true })
 
 onMounted(async () => {
     const user = await keycloakService.keycloak.loadUserProfile()
@@ -115,6 +131,14 @@ onMounted(async () => {
         display: none
         @media (width < 1024px)
             display: block
+
+    &__theme-switch
+        display: flex
+        align-items: center
+        gap: 5px
+
+        & .v-input__details
+            display: none
 
 .navbar-exit
     display: flex
