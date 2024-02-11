@@ -34,6 +34,6 @@ page.value === "staff" && await router.push(`/staff/${firstId.value}`)
 .users-list
 
     &__link
-        color: #000
+        color: inherit
         text-decoration: none
 </style>

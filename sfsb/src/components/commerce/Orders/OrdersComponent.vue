@@ -1,17 +1,17 @@
 <template lang="pug">
-    LayoutPage.orders
-        template(#title) Заявки
-        template(#filter)
-            v-text-field(label="фильтр" v-model="filterText")
-        template(#list)
-            v-list.orders__list
-                v-list-item(@click="()=>{}" :active="id==='new'")
-                    router-link.list-link.orders__link(:to="'/commerce/orders/new'")
-                        span(:style="{color:'orange'}") Добавить новый заказ
-                v-list-item(v-for="i in orders" :key="i.id" :active="+id===i.id" @click="()=>{}")
-                    router-link.list-link.orders__link(:to="`/commerce/orders/${i.id}`") {{i.id}} {{i.customer.companyName}}
-        template(#card)
-            router-view
+  LayoutPage.orders
+    template(#title) Заявки
+    template(#filter)
+      v-text-field(label="фильтр" v-model="filterText")
+    template(#list)
+      v-list.orders__list
+        v-list-item(@click="()=>{}" :active="id==='new'")
+          router-link.list-link.orders__link(:to="'/commerce/orders/new'")
+            span(:style="{color:'orange'}") Добавить новый заказ
+        v-list-item(v-for="i in orders" :key="i.id" :active="+id===i.id" @click="()=>{}")
+          router-link.list-link.orders__link(:to="`/commerce/orders/${i.id}`") {{i.id}} {{i.customer.companyName}}
+    template(#card)
+      router-view
 
 </template>
 <script setup lang="ts">
@@ -34,19 +34,19 @@ id.value === "orders" && router.push(`/commerce/orders/${orders.value[0].id}`)
 const filterText = ref("")
 
 watch([id], () => {
-    console.log("params id", id.value)
+  console.log("params id", id.value)
 })
 
 </script>
 <style scoped lang="sass">
 .orders
 
-    &__list
-        height: 100%
-        border-radius: .5rem
-        padding: .5rem
+  &__list
+    height: 100%
+    border-radius: .5rem
+    padding: .5rem
 
-    &__link
-        text-decoration: none
-        color: #000
+  &__link
+    text-decoration: none
+    color: inherit
 </style>

@@ -1,14 +1,14 @@
 <template lang="pug">
-    LayoutPage
-        template(#title) Операции
-        template(#filter)
-            v-text-field(label="фильтр" v-model="filterText")
-        template(#list)
-            suspended-component
-                OperationsList(:filter="filterText")
-        template(#card)
-            suspended-component
-                router-view
+  LayoutPage
+    template(#title) Операции
+    template(#filter)
+      v-text-field(label="фильтр" v-model="filterText")
+    template(#list)
+      suspended-component
+        OperationsList(:filter="filterText")
+    template(#card)
+      suspended-component
+        router-view
 
 </template>
 <script setup lang="ts">
@@ -22,7 +22,7 @@ const filterText = ref("")
 </script>
 <style lang="sass">
 .list-link
-    display: block
-    color: black
-    text-decoration: none
+  display: block
+  color: inherit
+  text-decoration: none
 </style>

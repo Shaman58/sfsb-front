@@ -33,6 +33,6 @@ watch(page, () => {
 .technology-card
 
     &__link
-        color: #000
+        color: inherit
         text-decoration: none
 </style>

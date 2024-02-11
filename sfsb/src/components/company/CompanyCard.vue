@@ -36,17 +36,17 @@
 </template>
 
 <script setup lang="ts">
-import {useValidationRules} from "@/mixins/FieldValidationRules";
-import {type Ref, ref} from "vue";
-import {useRoute, useRouter} from "vue-router"
-import {useCompaniesStore} from "@/pinia-store/companies";
-import {useToast} from "vue-toast-notification";
+import { useValidationRules } from "@/mixins/FieldValidationRules";
+import { type Ref, ref } from "vue";
+import { useRoute, useRouter } from "vue-router"
+import { useCompaniesStore } from "@/pinia-store/companies";
+import { useToast } from "vue-toast-notification";
 
 const toast = useToast()
 
-const {getCompanyById, saveCompany, addCompany, changeCompanyLogo} = useCompaniesStore()
+const { getCompanyById, saveCompany, addCompany, changeCompanyLogo } = useCompaniesStore()
 
-const {rules} = useValidationRules()
+const { rules } = useValidationRules()
 
 const form: Ref<HTMLFormElement | null> = ref(null);
 const valid = ref(false);
@@ -59,24 +59,24 @@ const accept = ".png, .jpg, .jpeg, .avif, .webp"
 const initialCompany: Company = {
     companyName: "",
     id: 0,
-    bik: 0,
+    bik: "",
     bank: "",
     address: "",
-    created: null,
-    inn: 0,
-    kpp: 0,
+    created: "",
+    inn: "",
+    kpp: "",
     email: "",
-    ogrn: 0,
-    correspondentAccount: 0,
+    ogrn: "",
+    correspondentAccount: "",
     updated: null,
     phoneNumber: "",
-    paymentAccount: 0,
+    paymentAccount: "",
     logo: null
 }
 const currentCompany = ref(initialCompany)
 const result = await getCompanyById(+route.params.id)
 
-currentCompany.value = {...result} as Company || {} as Company
+currentCompany.value = { ...result } as Company || {} as Company
 const picture: Ref<string | ArrayBuffer | undefined> = ref(currentCompany.value.logo?.link)
 const changeLogo = (event: Event) => {
     const target = event.target as HTMLInputElement
@@ -108,9 +108,8 @@ const add = () => {
 
 <style scoped lang="sass">
 .company
-    --bg-color: #eee
     padding-top: 2rem
-    background-color: var(--bg-color)
+
 
     &__header
         width: 100%
@@ -152,20 +151,18 @@ const add = () => {
 
     &__cards
         padding: 1rem
-        background-color: var(--bg-color)
         display: flex
         flex-direction: column
         gap: 1rem
 
     &__card
         padding: 1rem
-        background-color: #fff
 
     &__footer
         position: fixed
         bottom: 0
         width: 100%
         padding: 1rem
-        background-color: var(--bg-color)
+        background-color: rgb(var(--v-theme-surface))
 
 </style>
