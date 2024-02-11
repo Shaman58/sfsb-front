@@ -5,7 +5,7 @@
                 v-autocomplete(label="Вид" :items="geometries" v-model="selectedType" )
                 v-text-field(v-model="search" label="Найти материал")
         .supply-card__main
-            v-data-table.supply-card__table(:items="typedCurrentData" :headers  :search )
+            v-data-table.supply-card__table(:items="typedCurrentData" :headers  :search :items-per-page-text="'Позиций на листе'" no-data-text="Данные отсутствуют")
                 //template(#item.actions="{ item }")
                 //    v-icon( size="small"  @click="console.log(item)") mdi-pencil
                 template(#item="{item}" )
@@ -25,23 +25,21 @@
 </template>
 
 <script setup lang="ts">
-import { computed, type Ref, ref, watchEffect, toRefs } from "vue"
-import SupplyMap, { type SupplyMapInterface } from "./SupplyMap"
+import {computed, type ComputedRef, ref, type Ref, toRefs} from "vue"
+import SupplyMap from "./SupplyMap"
 import LayoutMain from "@/components/common/LayoutMain.vue";
 import CONST from "@/consts";
-import { useSupplyStore } from "@/pinia-store/supply";
-import { storeToRefs } from "pinia";
-import { useRoute } from "vue-router";
-import { watch, type ComputedRef } from "vue";
+import {useSupplyStore} from "@/pinia-store/supply";
+import {storeToRefs} from "pinia";
+import {useRoute} from "vue-router";
 
 
 // const props = defineProps<{ type: keyof typeof supplyMap }>()
 // const {type} = toRefs(props)
 
-const { path } = toRefs(useRoute())
+const {path} = toRefs(useRoute())
 
 const page = computed(() => path.value.split("/").at(-1))
-
 
 
 const search = ref("")
@@ -49,8 +47,8 @@ const search = ref("")
 const geometries = CONST.GEOMETRIES
 const selectedType: Ref<string | null> = ref(null)
 
-const { materialsAll, materialsNoCost, materialsDateExpired } = storeToRefs(useSupplyStore())
-const { saveMaterial, getMaterialsAll, getMaterialsNoCost, getMaterialsDateExpired } = useSupplyStore()
+const {materialsAll, materialsNoCost, materialsDateExpired} = storeToRefs(useSupplyStore())
+const {saveMaterial, getMaterialsAll, getMaterialsNoCost, getMaterialsDateExpired} = useSupplyStore()
 
 !materialsAll.value.length && await getMaterialsAll()
 !materialsNoCost.value.length && await getMaterialsNoCost()
@@ -74,13 +72,13 @@ const editing = computed(() => !!currentItem)
 const previousPrice: Ref<number | undefined> = ref()
 
 const headers = [
-    { title: "Название", value: "materialName", key: "materialName" },
-    { title: "ГОСТ на материал", value: "gost1" },
-    { title: "ГОСТ на сортамент", value: "gost2" },
-    { title: "Геометрия", value: "geometry", key: "geometry" },
-    { title: "Плотность", value: "density" },
-    { title: "Стоимость", value: "price.amount", key: "price.amount" },
-    { title: "Сохранить", value: "editing" }
+    {title: "Название", value: "materialName", key: "materialName"},
+    {title: "ГОСТ на материал", value: "gost1"},
+    {title: "ГОСТ на сортамент", value: "gost2"},
+    {title: "Геометрия", value: "geometry", key: "geometry"},
+    {title: "Плотность", value: "density"},
+    {title: "Стоимость", value: "price.amount", key: "price.amount"},
+    {title: "Сохранить", value: "editing"}
 ]
 
 
@@ -104,7 +102,6 @@ const geometryByLabel = (material: string) => {
     return geometry && geometry.title
 }
 
-watch(page)
 </script>
 
 <style lang="sass">
