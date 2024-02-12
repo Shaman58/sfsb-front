@@ -30,10 +30,11 @@
                             span(color="red") ВЫХОД
                             v-icon(icon="mdi-exit-to-app" class="ml-2" color="red")
                         v-list-item(class="d-flex justify-center align-center")
-                            .navbar__theme-switch
-                                v-icon( icon="mdi:mdi-white-balance-sunny")
-                                v-switch(v-model="theme" hide-details inset)
-                                v-icon( icon="mdi:mdi-weather-night")
+                            //- .navbar__theme-switch
+                            //-     v-icon( icon="mdi:mdi-white-balance-sunny")
+                            //-     v-switch(v-model="theme" hide-details inset)
+                            //-     v-icon( icon="mdi:mdi-weather-night")
+                            theme-switcher
             v-btn.navbar__burger(:color="'white'"  @click="showMobileMenu=true")
                 v-icon(icon="mdi-menu")
 
@@ -50,6 +51,8 @@ import { useCurrentUserStore } from "@/pinia-store/currentUser";
 import { storeToRefs } from "pinia";
 import MobileMenu from "@/components/common/MobileMenu.vue";
 import { useTheme } from "vuetify";
+import { useThemeStore } from "@/pinia-store/themeSwitcher";
+import ThemeSwitcher from "@/components/common/ThemeSwitcher.vue";
 
 const toast = useToast();
 
@@ -57,10 +60,12 @@ const { user } = storeToRefs(useCurrentUserStore())
 
 const version = import.meta.env.VITE_APP_VERSION;
 
-const themeGlobal = useTheme()
+// const { theme: themeStore } = storeToRefs(useThemeStore())
+// const { setDark, setLight } = useThemeStore()
+// const themeGlobal = useTheme()
 
-const isLight = () => matchMedia("(prefers-color-scheme: light)").matches
-const theme = ref(!isLight())
+// const isLight = () => matchMedia("(prefers-color-scheme: light)").matches
+// const theme = ref(themeStore)
 
 const showMobileMenu = ref(false)
 const logout = () => {
@@ -70,11 +75,9 @@ const logout = () => {
 const name = ref();
 const picture = ref()
 
-watch(theme, () => {
-    console.log(themeGlobal.global.name.value);
-    themeGlobal.global.name.value = theme.value ? "dark" : "light"
-    console.log(themeGlobal.global.name.value);
-}, { immediate: true })
+// watch(theme, () => {
+//     theme.value ? setDark() : setLight()
+// }, { immediate: true })
 
 onMounted(async () => {
     const user = await keycloakService.keycloak.loadUserProfile()

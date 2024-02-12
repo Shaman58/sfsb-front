@@ -1,35 +1,35 @@
 <template lang="pug">
-    .mobile-menu(v-if="show" @keyup.esc="close")
+.mobile-menu(v-if="show" @keyup.esc="close")
 
-        .mobile-menu__nav(@keyup.esc="close" :data-active="showNav" )
-            .mobile-menu__header
-                v-icon.mobile-menu__close(@click="close" icon="mdi-close" color="red")
-                .mobile-menu__user(@click="userShow=!userShow")
-                    img.mobile-menu__avatar(:src="picture" alt="picture")
-                    span {{userName}}
-                v-card-item.mobile-menu__user-close(v-if="userShow" )
-                    .mobile-menu__user-close-inner
-                        span(@click="exit") ВЫХОД
-                        v-icon(icon="mdi-exit-to-app" class="ml-2" color="red")
-            .mobile-menu__body
-                .mobile-menu__body-wrapper
-                    .mobile-menu__link(v-for="(i, index) in CONSTS.MAINMENU" )
-                        div(v-if="'submenu' in i")
-                            label.submenu__label(:for="`submenu-switch${index}`")
-                                span {{ i.label }}
-                                v-icon(icon="mdi:mdi-chevron-down")
-                            input.submenu__switcher(:id="`submenu-switch${index}`" type="checkbox" hidden="true")
-                            .submenu
-                                .submenu__container
-                                    router-link(v-for="link in i.submenu" :key="link" :to="i.path+'/'+link.path" @click="close") {{ link.label }}
+    .mobile-menu__nav(@keyup.esc="close" :data-active="showNav" )
+        .mobile-menu__header
+            v-icon.mobile-menu__close(@click="close" icon="mdi-close" color="red")
+            .mobile-menu__user(@click="userShow=!userShow")
+                img.mobile-menu__avatar(:src="picture" alt="picture")
+                span {{userName}}
+            v-card-item.mobile-menu__user-close(v-if="userShow" )
+                .mobile-menu__user-close-inner
+                    span(@click="exit") ВЫХОД
+                    v-icon(icon="mdi-exit-to-app" class="ml-2" color="red")
+        .mobile-menu__body
+            .mobile-menu__body-wrapper
+                .mobile-menu__link(v-for="(i, index) in CONSTS.MAINMENU" )
+                    div(v-if="'submenu' in i")
+                        label.submenu__label(:for="`submenu-switch${index}`")
+                            span {{ i.label }}
+                            v-icon(icon="mdi:mdi-chevron-down")
+                        input.submenu__switcher(:id="`submenu-switch${index}`" type="checkbox" hidden="true")
+                        .submenu
+                            .submenu__container
+                                router-link(v-for="link in i.submenu" :key="link" :to="i.path+'/'+link.path" @click="close") {{ link.label }}
 
-                        router-link(:to="i.path" v-if="!('submenu' in i)" @click="close") {{i.label}}
-            .mobile-menu__footer {{ version }}
+                    router-link(:to="i.path" v-if="!('submenu' in i)" @click="close") {{i.label}}
+        .mobile-menu__footer {{ version }}
 
 </template>
 <script setup lang="ts">
 import CONSTS from "@consts/index"
-import {defineModel, ref, toRefs, watch} from "vue"
+import { defineModel, ref, toRefs, watch } from "vue"
 
 interface Props {
     userName: string
@@ -37,7 +37,7 @@ interface Props {
 }
 
 const props = defineProps<Partial<Props>>()
-const {userName, picture} = toRefs(props)
+const { userName, picture } = toRefs(props)
 const emit = defineEmits(["exit"])
 const show = defineModel<boolean>()
 const showNav = ref(false)
@@ -81,7 +81,7 @@ const exit = () => {
         right: 0
         top: 0
         width: max-content
-        background: #fff
+        background: rgb(var(--v-theme-surface))
         gap: 0.5rem
         translate: 100% 0
         transition: translate 0.5s v-bind('lagcss')
@@ -151,7 +151,7 @@ const exit = () => {
     display: grid
     grid-template-rows: 0fr
     transition: grid-template-rows 0.5s
-    background: #fff
+    background: rgb(var(--v-theme-surface))
 
     &__container
         height: 100%
