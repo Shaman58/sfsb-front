@@ -23,7 +23,13 @@ const router = useRouter()
 const {path} = toRefs(useRoute())
 const defaultRoute = "/supplier/all";
 
-path.value.split("/").at(-1) === 'supplier' && router.push(defaultRoute)
+const isNeedToRedirect =():boolean=>{
+    return  path.value.split("/").at(-1) === 'supplier'
+            || path.value.split("/").at(-2) === 'supplier'
+            &&  path.value.split("/").at(-1) === ''
+}
+
+isNeedToRedirect() && router.push(defaultRoute)
 
 </script>
 <style scoped lang="sass">

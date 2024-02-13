@@ -2,10 +2,10 @@
     LayoutMain.supply-card
         template(#header)
             .supply-card__header
-                v-autocomplete(label="Вид" :items="geometries" v-model="selectedType" )
-                v-text-field(v-model="search" label="Найти материал")
+                v-select(label="Вид" :items="geometries" v-model="selectedType")
+                v-text-field(v-model="search" label="Найти материал" clearable)
         .supply-card__main
-            v-data-table.supply-card__table(:items="typedCurrentData" :headers  :search :items-per-page-text="'Позиций на листе'" no-data-text="Данные отсутствуют")
+            v-data-table.supply-card__table(:items="typedCurrentData" :headers  :search  items-per-page-text="Позиций на листе"  no-data-text="Данные отсутствуют")
                 //template(#item.actions="{ item }")
                 //    v-icon( size="small"  @click="console.log(item)") mdi-pencil
                 template(#item="{item}" )
@@ -26,7 +26,7 @@
 
 <script setup lang="ts">
 import {computed, type ComputedRef, ref, type Ref, toRefs} from "vue"
-import SupplyMap from "./SupplyMap"
+import SupplyMap, {type SupplyMapInterface} from "./SupplyMap"
 import LayoutMain from "@/components/common/LayoutMain.vue";
 import CONST from "@/consts";
 import {useSupplyStore} from "@/pinia-store/supply";
@@ -54,8 +54,16 @@ const {saveMaterial, getMaterialsAll, getMaterialsNoCost, getMaterialsDateExpire
 !materialsNoCost.value.length && await getMaterialsNoCost()
 !materialsDateExpired.value.length && await getMaterialsDateExpired()
 
+
+
 const supplyMap = SupplyMap(useSupplyStore)
-const type: ComputedRef<keyof typeof supplyMap> = computed(() => page.value && page.value in supplyMap ? page.value : "all")
+const type: ComputedRef<keyof SupplyMapInterface> = computed(() => {
+    const isKeyOfSupplyMap = (x: any): x is keyof SupplyMapInterface =>{
+        return x in supplyMap
+    }
+    if(!page.value) return "all"
+    return isKeyOfSupplyMap(page.value) ? page.value : "all"
+})
 
 const titleToLabel = (title: string): string | undefined => {
     const found = geometries.find(e => e.title === title)

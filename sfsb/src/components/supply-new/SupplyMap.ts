@@ -43,4 +43,4 @@ const supplyMap = (store: SupplyStoreType): SupplyMapInterface => {
 };
 
 export default supplyMap;
-export type SupplyMapType = ReturnType<supplyMap>;
+
