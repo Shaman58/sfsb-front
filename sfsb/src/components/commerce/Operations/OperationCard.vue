@@ -4,7 +4,7 @@
             v-form#operation-form(ref="form" v-model="valid" @submit.prevent="save")
                 v-card-text(v-if="operationLocal")
                     v-text-field( label="Название операции:" v-model="operationLocal.operationName" :rules="[rules.required, rules.nameValidation]" counter :disabled="operationLocal.id<3")
-                    v-select(label="Описание:" :items="CONST.OPERATIONS" item-title="title" item-value="label" v-model="operationLocal.operationTimeManagement" :disabled="operationLocal.id<3" )
+                    v-select(label="Тип:" :items="CONST.OPERATIONS" item-title="title" item-value="label" v-model="operationLocal.operationTimeManagement" :disabled="operationLocal.id<3" :rules="[rules.required]")
                     v-text-field( label="Стоимость за час:" v-model="operationLocal.paymentPerHour.amount" :rules="[rules.required,rules.numeric]" type="number")
                     v-container(v-if="!operationLocal?.id||operationLocal?.id>=3")
                         OperationDescriptions
