@@ -25,7 +25,7 @@
                                 router-link(v-for="link in i.submenu" :key="link" :to="i.path+'/'+link.path" @click="close") {{ link.label }}
 
                     router-link(:to="i.path" v-if="!('submenu' in i)" @click="close") {{i.label}}
-        router-link.mobile-menu__link(:to="'/support'") ТЕХПОДДЕРЖКА
+        router-link.mobile-menu__link(:to="'/support'" @click="close") ТЕХПОДДЕРЖКА
         .mobile-menu__footer {{ version }}
 
 </template>

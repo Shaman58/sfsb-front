@@ -11,7 +11,7 @@
         p.support__signature Разработчики
 
     .support__container
-        .support__support
+        a.support__support(href="https://t.me/+nw6VUwj3oHA3NjRi")
             img(src="/images/photo_2024-02-13_18-48-23.webp" alt="support image")
 </template>
 <script setup lang="ts">
@@ -28,6 +28,7 @@
         place-items: center
 
     &__support
+        display: block
         width: min(320px, 100%)
         aspect-ratio: 1
 
