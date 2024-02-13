@@ -38,9 +38,6 @@ import {storeToRefs} from "pinia";
 import {useRoute} from "vue-router";
 
 
-// const props = defineProps<{ type: keyof typeof supplyMap }>()
-// const {type} = toRefs(props)
-
 const {path} = toRefs(useRoute())
 
 const page = computed(() => path.value.split("/").at(-1))
