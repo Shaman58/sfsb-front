@@ -21,8 +21,8 @@ const backgroundWithDefault = background.value || "#00acc120"
 <style scoped lang="sass">
 .layout-page
     --scroll-color: rgba(47, 71, 126, 0.5)
-    padding: 0 1rem 1rem
-    height: calc(100dvh - 3rem)
+    padding: 0 1rem 0
+    height: calc(100dvh - 2rem)
     display: grid
     grid-template-rows: 80px 1fr
     background: v-bind("backgroundWithDefault")

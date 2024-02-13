@@ -62,7 +62,7 @@ export const useTechnologyStore = defineStore("technology", () => {
         try {
             const resp = await api.get(url);
             checkStatus(resp)
-            await getTechnologyById(currentItem.value.id);
+            currentItem.value.id && await getTechnologyById(currentItem.value.id);
             isBlockedByCurrentUser.value = compareBlockedAndCurrentUser();
             setTimeout( async () => await getOrders())
             setTimeout( async () => await fetchItems())
