@@ -7,14 +7,12 @@ import {storeToRefs} from "pinia";
 import CompanyPage from "@/views/CompanyPage.vue";
 import Company1 from "@/components/company/Company1.vue";
 import {useCurrentTool} from "@/pinia-store/tools";
-import UsersComponent from "@/components/users/UsersComponent.vue";
-import UserCard from "@/components/users/UserCard.vue";
-import TechnologyComponent from "@/components/technology-new/TechnologyComponent.vue";
-import TechnologyCard from "@/components/technology-new/TechnologyCard.vue";
 import Support from "@/views/Support.vue";
 import data from "@/router/data";
 import supplier from "@/router/supplier";
 import commerce from "@/router/commerce";
+import technology from "@/router/technology";
+import staff from "@/router/staff";
 
 const toast = useToast();
 
@@ -43,39 +41,9 @@ const routes = [
     },
     data,
     supplier,
-    {
-        path: "/staff",
-        component: UsersComponent,
-        meta: {
-            onlyFor: ["HR", "ADMIN"],
-        },
-        children: [
-            {
-                path: ":id",
-                component: UserCard,
-                meta: {
-                    onlyFor: ["HR", "ADMIN"],
-                },
-            },
-        ]
-    },
+    staff,
     commerce,
-    {
-        path: "/technology",
-        component: TechnologyComponent,
-        meta: {
-            onlyFor: ["TECHNOLOGIST", "ADMIN"],
-        },
-        children: [
-            {
-                path: ":id",
-                component: TechnologyCard,
-                meta: {
-                    onlyFor: ["TECHNOLOGIST", "ADMIN"],
-                },
-            }
-        ]
-    },
+    technology,
     {
         path: "/not-found",
         component: NotFound
