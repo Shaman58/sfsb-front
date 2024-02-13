@@ -46,7 +46,7 @@ watch([orderId], async () => {
 
     &__new
         flex: 0 0 70px
-        background-color: #fff
+        background-color: rgb(var(--v-theme-surface-light))
         display: grid
         place-items: center
         cursor: pointer

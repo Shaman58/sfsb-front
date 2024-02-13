@@ -7,6 +7,8 @@
 
             span.navbar__version(:style="{color:'white'}") {{ version }}
             v-toolbar-items.ml-5.navbar__menu(style="overflow-x: auto;")
+                .navbar__item
+                    router-link.navbar__link(:to="'/support'") ТЕХПОДДЕЖКА
                 .navbar__item(v-for="navitem in CONSTS.MAINMENU" :key="navitem.path" :hidden="navitem.role && navitem.role.length && !user?.roles.some(e => navitem.role?.includes(e))")
                     div(v-if="'submenu' in navitem" )
                         div
@@ -30,10 +32,6 @@
                             span(color="red") ВЫХОД
                             v-icon(icon="mdi-exit-to-app" class="ml-2" color="red")
                         v-list-item(class="d-flex justify-center align-center")
-                            //- .navbar__theme-switch
-                            //-     v-icon( icon="mdi:mdi-white-balance-sunny")
-                            //-     v-switch(v-model="theme" hide-details inset)
-                            //-     v-icon( icon="mdi:mdi-weather-night")
                             theme-switcher
             v-btn.navbar__burger(:color="'white'"  @click="showMobileMenu=true")
                 v-icon(icon="mdi-menu")
@@ -60,13 +58,6 @@ const { user } = storeToRefs(useCurrentUserStore())
 
 const version = import.meta.env.VITE_APP_VERSION;
 
-// const { theme: themeStore } = storeToRefs(useThemeStore())
-// const { setDark, setLight } = useThemeStore()
-// const themeGlobal = useTheme()
-
-// const isLight = () => matchMedia("(prefers-color-scheme: light)").matches
-// const theme = ref(themeStore)
-
 const showMobileMenu = ref(false)
 const logout = () => {
     keycloakService.logout()
@@ -75,9 +66,6 @@ const logout = () => {
 const name = ref();
 const picture = ref()
 
-// watch(theme, () => {
-//     theme.value ? setDark() : setLight()
-// }, { immediate: true })
 
 onMounted(async () => {
     const user = await keycloakService.keycloak.loadUserProfile()
@@ -120,11 +108,14 @@ onMounted(async () => {
         @media (width < 1160px)
             display: none
 
-    &__item > *
-        color: white
-        text-decoration: none
-        text-transform: uppercase
-        cursor: pointer
+    &__item
+        font-size: clamp(12px, 18 / 1920 * 100vw, 18px)
+
+        & > *
+            color: white
+            text-decoration: none
+            text-transform: uppercase
+            cursor: pointer
 
     &__name
         @media (width < 1116px)

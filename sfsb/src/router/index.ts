@@ -22,6 +22,7 @@ import TechnologyComponent from "@/components/technology-new/TechnologyComponent
 import TechnologyCard from "@/components/technology-new/TechnologyCard.vue";
 import SupplyComponent from "@/components/supply-new/SupplyComponent.vue";
 import SupplyCard from "@/components/supply-new/SupplyCard.vue";
+import Support from "@/views/Support.vue";
 
 const toast = useToast();
 
@@ -29,6 +30,10 @@ const routes = [
     {
         path: "/",
         component: StartPage,
+    },
+    {
+        path: "/support",
+        component: Support
     },
     {
         path: "/company/:id",
