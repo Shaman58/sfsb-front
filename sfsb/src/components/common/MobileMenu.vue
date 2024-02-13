@@ -11,6 +11,7 @@
                 .mobile-menu__user-close-inner
                     span(@click="exit") ВЫХОД
                     v-icon(icon="mdi-exit-to-app" class="ml-2" color="red")
+            ThemeSwitcher
         .mobile-menu__body
             .mobile-menu__body-wrapper
                 .mobile-menu__link(v-for="(i, index) in CONSTS.MAINMENU" )
@@ -30,6 +31,7 @@
 <script setup lang="ts">
 import CONSTS from "@consts/index"
 import { defineModel, ref, toRefs, watch } from "vue"
+import ThemeSwitcher from "@/components/common/ThemeSwitcher.vue";
 
 interface Props {
     userName: string
