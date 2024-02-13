@@ -1,5 +1,6 @@
 <template lang="pug">
     v-card.table
+        v-progress-linear(v-if="loading" indeterminate color="#2F477E")
         v-table
             thead
                 tr
@@ -23,7 +24,7 @@ import {toRefs} from "vue";
 import {storeToRefs} from "pinia";
 import {useStaffStore} from "@/pinia-store/staff";
 
-const props = defineProps<{ items: Item[] }>()
+const props = defineProps<{ items: Item[], loading: boolean }>()
 const {items} = toRefs(props)
 
 const emit = defineEmits(["select"])

@@ -2,7 +2,7 @@
     layout-main
         .technology-card
             .technology-card__overall
-                technology-table(:items="order.items" @select="$event=>setCurrentItem($event)")
+                technology-table(:items="order.items" @select="$event=>setCurrentItem($event)" :loading="loadingOrders")
             .technology-card__self
                 technology-self(@select="$event=>setCurrentItem($event)")
         suspended-component
@@ -24,7 +24,7 @@ import {useTechnologyStore} from "@/pinia-store/technology";
 const router = useRouter()
 const {params, path} = toRefs(useRoute())
 
-const {orders} = storeToRefs(useOrdersStore())
+const {orders, loading: loadingOrders} = storeToRefs(useOrdersStore())
 const {getOrders} = useOrdersStore()
 !orders.value.length && await getOrders()
 

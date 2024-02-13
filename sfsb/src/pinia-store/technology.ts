@@ -4,10 +4,17 @@ import {useToast} from "vue-toast-notification";
 import {type Ref, ref} from "vue";
 import {useCurrentUserStore} from "./currentUser";
 import checkStatus from "@/mixins/CheckStatus";
+import {useOrdersStore} from "@/pinia-store/orders";
+import {useItemStore} from "@/pinia-store/item";
 
 const toast = useToast();
 
+
 export const useTechnologyStore = defineStore("technology", () => {
+
+    const {getOrders} = useOrdersStore()
+    const {fetchItems} = useItemStore()
+
     const dialogVisible: Ref<boolean> = ref(false);
     const currentItem = ref<Item>({} as Item);
     const isBlockedByCurrentUser: Ref<boolean> = ref(false);
@@ -57,6 +64,8 @@ export const useTechnologyStore = defineStore("technology", () => {
             checkStatus(resp)
             await getTechnologyById(currentItem.value.id);
             isBlockedByCurrentUser.value = compareBlockedAndCurrentUser();
+            setTimeout( async () => await getOrders())
+            setTimeout( async () => await fetchItems())
         } catch (error) {
             toast.error("Ошибка при изменении блокировки " + error);
         }
