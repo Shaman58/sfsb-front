@@ -32,6 +32,10 @@ export function useValidationRules() {
             const pattern = /^[0-9]{13}$/
             return pattern.test(value) || 'Неверный формат, введите 13 цифр'
         },
+        okpoValidation: (value: string) => {
+            const pattern = /^[0-9]{13}$/
+            return pattern.test(value) || 'Неверный формат, введите 13 цифр'
+        },
         innValidation: (value: string) => {
             const pattern = /^[0-9]{10}$/
             return pattern.test(value) || 'Неверный формат, введите 10 цифр'

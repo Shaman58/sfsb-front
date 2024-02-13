@@ -23,7 +23,7 @@
                             v-col(cols="12" sm="6" md="4")
                                 v-text-field(label="КПП*" v-model="companyLocal.kpp" :rules="[rules.bikkppValidation]" counter)
                             v-col(cols="12" sm="6" md="4")
-                                v-text-field(label="ОГРН*" v-model="companyLocal.ogrn" :rules="[rules.ogrnValidation]" counter)
+                                v-text-field(label="ОКПО*" v-model="companyLocal.ogrn" :rules="[rules.okpoValidation]" counter)
                         v-row
                             v-col( cols="12" sm="6" md="4")
                                 v-text-field(label="Банк" v-model="companyLocal.bank" :rules="[ rules.counter]" placeholder="ОАО ВТБ" counter maxlength="200")
