@@ -25,6 +25,7 @@
                                 router-link(v-for="link in i.submenu" :key="link" :to="i.path+'/'+link.path" @click="close") {{ link.label }}
 
                     router-link(:to="i.path" v-if="!('submenu' in i)" @click="close") {{i.label}}
+        router-link.mobile-menu__link(:to="'/support'") ТЕХПОДДЕРЖКА
         .mobile-menu__footer {{ version }}
 
 </template>
@@ -113,6 +114,9 @@ const exit = () => {
     &__link
         text-decoration: none
         text-transform: uppercase
+        &  a
+            text-decoration: inherit
+            text-transform: inherit
 
     &__footer
         display: grid
