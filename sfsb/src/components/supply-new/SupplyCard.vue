@@ -5,9 +5,13 @@
                 v-select(label="Вид" :items="geometries" v-model="selectedType")
                 v-text-field(v-model="search" label="Найти материал" clearable)
         .supply-card__main
-            v-data-table.supply-card__table(:items="typedCurrentData" :headers  :search  items-per-page-text="Позиций на листе"  no-data-text="Данные отсутствуют")
-                //template(#item.actions="{ item }")
-                //    v-icon( size="small"  @click="console.log(item)") mdi-pencil
+            v-data-table.supply-card__table(:items="typedCurrentData" :headers  :search
+                items-per-page-text="Позиций на листе"
+                no-data-text="Данные отсутствуют"
+                page-text=""
+                :show-current-page="true"
+                )
+
                 template(#item="{item}" )
                     tr(@click="currentItem=item")
                         td
@@ -133,10 +137,12 @@ const geometryByLabel = (material: string) => {
 
             &::-webkit-scrollbar
                 width: 4px
+                height: 4px
                 background-color: transparent
 
             &::-webkit-scrollbar-thumb
                 width: 4px
+                height: 4px
                 background-color: var(--scroll-color)
                 border-radius: 8px
 
