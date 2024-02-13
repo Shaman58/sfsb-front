@@ -85,7 +85,7 @@ const insert = () => {
     &__title-description
         font-size: 0.95rem
         font-weight: 200
-        color: #0009
+        opacity: 0.5
 
     &__controls
         display: grid

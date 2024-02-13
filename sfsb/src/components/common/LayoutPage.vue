@@ -1,7 +1,7 @@
 <template lang="pug">
     .layout-page
         h1.layout-page__title
-            slot(name="title")
+            slot(name="'title'")
         .layout-page__container
             .layout-page__list-filter
                 slot(name="filter")
