@@ -2,7 +2,7 @@
     LayoutPage.users(:background="'#BB00C120'")
         template(#title) Управление пользователями
         template(#filter)
-            v-text-field(label="фильтр" v-model="filterText" )
+            v-text-field(label="фильтр" v-model="filterText" clearable)
         template(#list)
             suspended-component
                 users-list(:filter="filterText")

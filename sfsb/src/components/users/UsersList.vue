@@ -4,7 +4,7 @@
             v-list-item-title
                 router-link.users-list__link(:to="`/staff/new`")
                     div(:style="{color: 'orange'}") Добавить нового пользователя
-        v-list-item(v-for='user in staff', :key='user.id' :active="user.id===page")
+        v-list-item(v-for='user in filteredStaff', :key='user.id' :active="user.id===page")
             router-link.users-list__link(:to='`/staff/${user.id}`')
                 span {{user.firstName}} {{user.lastName}}
 </template>
@@ -14,6 +14,9 @@ import {useStaffStore} from "@/pinia-store/staff";
 import {computed, toRefs} from "vue";
 import {useRoute, useRouter} from "vue-router";
 
+const props = defineProps<{filter?:string}>()
+const {filter} = toRefs(props)
+
 const {staff} = storeToRefs(useStaffStore())
 const {getAllStaff} = useStaffStore()
 !staff.value.length && await getAllStaff()
@@ -21,6 +24,8 @@ const {getAllStaff} = useStaffStore()
 const router = useRouter();
 const {path} = toRefs(useRoute())
 const page = computed(() => path.value.split("/").at(-1))
+
+const filteredStaff = computed<Person[]>(()=>staff.value.filter(e=>(e.firstName+" "+e.lastName).toLowerCase().includes(filter.value?.toLowerCase() || "")))
 
 
 const firstId = computed(() => staff.value.length && staff.value[0].id)
