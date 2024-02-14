@@ -2,14 +2,14 @@
     LayoutPage
         template(#title) Клиенты
         template(#filter)
-            v-text-field(label="фильтр" v-model="filterText")
+            v-text-field(label="фильтр" v-model="filterText" clearable)
         template(#list)
             v-list
                 v-list-item
                     v-list-item-title
                         router-link.list-link(:to="`/commerce/clients/new`")
                             div(:style="{color: 'orange'}") Добавить новую компанию
-                v-list-item(v-for="i in customers" @click="currentCompany=i"
+                v-list-item(v-for="i in filteredCustomers" @click="currentCompany=i"
                     :key="i.id" :active="+page===i.id")
                     v-list-item-title
                         router-link.list-link(:to="`/commerce/clients/${i.id}`") {{i.companyName}}
@@ -39,6 +39,7 @@ const firstId = computed(() => customers.value[0].id)
 page.value === "clients" && router.push(`/commerce/clients/${firstId.value}`)
 
 const filterText = ref("")
+const filteredCustomers = computed<Customer[]>(()=>customers.value.filter(e=>e.companyName.toLowerCase().includes(filterText.value?.toLowerCase()||"")))
 const currentCompany = ref<Customer>(customers.value[0])
 
 watchEffect(() => {
