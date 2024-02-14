@@ -1,6 +1,6 @@
 <template lang="pug">
     v-list.technology-card
-        v-list-item(v-for='order in orders', :key='order.id' :active="order.id===+page")
+        v-list-item(v-for='order in filteredOrders', :key='order.id' :active="order.id===+page")
             router-link.list-link.technology-card__link(:to='`/technology/${order.id}`')
                 span {{order.applicationNumber}} {{order.customer.companyName}}
 </template>
@@ -10,6 +10,9 @@ import {computed, toRefs, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {useOrdersStore} from "@/pinia-store/orders";
 
+const props = defineProps<{filter: string}>()
+const {filter: filterText} = toRefs(props)
+
 const {orders} = storeToRefs(useOrdersStore())
 const {getOrders} = useOrdersStore()
 !orders.value.length && await getOrders()
@@ -17,6 +20,14 @@ const {getOrders} = useOrdersStore()
 const router = useRouter();
 const {path} = toRefs(useRoute())
 const page = computed(() => path.value.split("/").at(-1))
+
+const filteredOrders = computed<Order[]>(() => orders.value.filter(e => e.customer
+            .companyName
+            .toLowerCase()
+            .includes(filterText.value?.toLowerCase()||"")
+        || e.applicationNumber.toString().includes(filterText.value?.toLowerCase()||"")
+    )
+)
 
 
 const firstId = computed(() => orders.value.length && orders.value[0].id)

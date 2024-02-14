@@ -2,7 +2,7 @@
     LayoutPage.users(:background="'#00bfa520'")
         template(#title) Технологии
         template(#filter)
-            v-text-field(label="фильтр" v-model="filterText" )
+            v-text-field(label="фильтр" v-model="filterText" clearable)
         template(#list)
             suspended-component
                 technology-list(:filter="filterText")
