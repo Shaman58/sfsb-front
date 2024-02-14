@@ -15,6 +15,8 @@
                                 span Автор:&nbsp;
                                 strong {{ orderLocal.user.lastName }}&nbsp;
                                 strong {{ orderLocal.user.firstName }}
+                                v-spacer
+                                span Дата создания: {{ new Date(orderLocal.created).toLocaleDateString()}} {{new Date(orderLocal.created).toLocaleTimeString() }}
                             v-row(v-if="orderLocal")
                                 v-col(cols="3")
                                     v-text-field(label="Номер заявки:" v-model="orderLocal.applicationNumber" :rules="[rules.required]" maxlength="5")
