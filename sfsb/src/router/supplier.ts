@@ -1,7 +1,8 @@
 import SupplyComponent from "@/components/supply-new/SupplyComponent.vue";
 import SupplyCard from "@/components/supply-new/SupplyCard.vue";
+import {type RouteMeta, type RouteRecordRaw} from "vue-router";
 
-const supplier =  {
+const supplier: RouteRecordRaw & RouteMeta =  {
     path: "/supplier",
     component: SupplyComponent,
     meta: {

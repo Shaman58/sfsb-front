@@ -1,4 +1,4 @@
-import {createRouter, createWebHistory} from "vue-router";
+import {createRouter, createWebHistory, type RouteMeta, type RouteRecordRaw} from "vue-router";
 import NotFound from "@/views/NotFound.vue";
 import StartPage from "@/views/StartPage.vue";
 import {useCurrentUserStore} from "@/pinia-store/currentUser";
@@ -16,7 +16,7 @@ import staff from "@/router/staff";
 
 const toast = useToast();
 
-const routes = [
+const routes: (RouteRecordRaw & RouteMeta)[]  = [
     {
         path: "/",
         component: StartPage,

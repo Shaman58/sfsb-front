@@ -1,7 +1,8 @@
 import DataPage1 from "@/views/DataPage1.vue";
 import DataPageMain from "@/components/data-page/DataPageMain.vue";
+import {type RouteMeta, type RouteRecordRaw} from "vue-router";
 
-const data = {
+const data: RouteRecordRaw & RouteMeta = {
     path: "/data",
     component: DataPage1,
     meta: {

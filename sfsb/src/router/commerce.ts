@@ -5,8 +5,9 @@ import OrdersComponent from "@/components/commerce/Orders/OrdersComponent.vue";
 import OrderCard from "@/components/commerce/Orders/OrderCard.vue";
 import OperationsComponent from "@/components/commerce/Operations/OperationsComponent.vue";
 import OperationCard from "@/components/commerce/Operations/OperationCard.vue";
+import {type RouteMeta, type RouteRecordRaw} from "vue-router";
 
-const commerce = {
+const commerce: RouteRecordRaw & RouteMeta = {
     path: "/commerce",
     component: Commerce,
     meta: {

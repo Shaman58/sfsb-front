@@ -1,7 +1,8 @@
 import UsersComponent from "@/components/users/UsersComponent.vue";
 import UserCard from "@/components/users/UserCard.vue";
+import {type RouteMeta, type RouteRecordRaw} from "vue-router";
 
-const staff = {
+const staff: RouteRecordRaw & RouteMeta = {
     path: "/staff",
     component: UsersComponent,
     meta: {

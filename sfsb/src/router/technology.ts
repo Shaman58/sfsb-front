@@ -1,7 +1,8 @@
 import TechnologyComponent from "@/components/technology-new/TechnologyComponent.vue";
 import TechnologyCard from "@/components/technology-new/TechnologyCard.vue";
+import {type RouteMeta, type RouteRecordRaw} from "vue-router";
 
-const technology = {
+const technology: RouteRecordRaw & RouteMeta = {
     path: "/technology",
     component: TechnologyComponent,
     meta: {
