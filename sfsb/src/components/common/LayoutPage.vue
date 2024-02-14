@@ -39,7 +39,7 @@ const backgroundWithDefault = background.value || "#00acc120"
         grid-template-rows: 56px 1fr
         grid-template-areas: "filter card" "list card"
         gap: 0.5rem
-        height: 100%
+        height: calc(100% - 1rem)
         overflow-y: hidden
 
     &__filter
