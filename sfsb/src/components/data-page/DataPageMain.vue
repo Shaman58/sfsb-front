@@ -2,7 +2,7 @@
 	layout-page
 		template(#title) {{ currentTab?.name }}
 		template(#filter)
-			v-text-field.datapage-main__list-filter(label="фильтр" v-model="filterText")
+			v-text-field.datapage-main__list-filter(label="фильтр" v-model="filterText" clearable)
 		template(#list)
 			data-page-list(:list="selectedList" @select="setCurrentTool" @intersected="onIntersect")
 		template(#card)
