@@ -7,7 +7,7 @@
             router-link.list-link(:to="`/commerce/operations/setup`") Наладочная
         v-list-item(@click="()=>{}" :active="page==='tech'")
             router-link.list-link(:to="`/commerce/operations/tech`") Технолог
-        v-list-item(v-for="i in operations" @click="currentOperation=i"
+        v-list-item(v-for="i in filteredOperation" @click="currentOperation=i"
             :key="i.id" :active="+page===i.id")
             router-link.list-link(:to="`/commerce/operations/${i.id}`") {{i.operationName}}
 </template>
@@ -16,6 +16,9 @@ import {storeToRefs} from "pinia";
 import {useOperationsStore} from "@/pinia-store/operations";
 import {computed, ref, toRefs} from "vue";
 import {useRoute, useRouter} from "vue-router";
+
+const props = defineProps<{filter?: string}>()
+const {filter} = toRefs(props)
 
 const router = useRouter()
 
@@ -27,6 +30,7 @@ const {operations, loading, techPrice, setupPrice} = storeToRefs(useOperationsSt
 const {fetchOperation, fetchSetupPrice, fetchTechPrice} = useOperationsStore()
 
 const currentOperation = ref<Operation>(operations.value[0])
+const filteredOperation = computed<Operation[]>(()=>operations.value.filter(e=>e.operationName.toLowerCase().includes(filter.value?.toLowerCase() || "")))
 
 !operations.value.length && await fetchOperation()
 !Object.keys(techPrice.value).length && await fetchTechPrice()
