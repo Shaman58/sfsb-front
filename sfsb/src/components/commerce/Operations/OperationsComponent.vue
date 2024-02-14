@@ -2,7 +2,7 @@
   LayoutPage
     template(#title) Операции
     template(#filter)
-      v-text-field(label="фильтр" v-model="filterText")
+      v-text-field(label="фильтр" v-model="filterText" clearable)
     template(#list)
       suspended-component
         OperationsList(:filter="filterText")
