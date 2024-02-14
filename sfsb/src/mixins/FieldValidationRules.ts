@@ -33,8 +33,8 @@ export function useValidationRules() {
             return pattern.test(value) || 'Неверный формат, введите 13 цифр'
         },
         okpoValidation: (value: string) => {
-            const pattern = /^[0-9]{13}$/
-            return pattern.test(value) || 'Неверный формат, введите 13 цифр'
+            const pattern = /^[0-9]{8}$/
+            return pattern.test(value) || 'Неверный формат, введите 8 цифр'
         },
         innValidation: (value: string) => {
             const pattern = /^[0-9]{10}$/
