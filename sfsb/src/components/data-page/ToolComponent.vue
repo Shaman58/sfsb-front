@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, type Ref, ref, toRefs, watchEffect} from "vue";
+import {onMounted, onUnmounted, type Ref, ref, toRefs, watchEffect} from "vue";
 import {useValidationRules} from "@/mixins/FieldValidationRules";
 import {useToolingStore} from "@/pinia-store/tools";
 import {storeToRefs} from "pinia";
@@ -49,7 +49,7 @@ onMounted(() => {
     currentTool.value = item.value
 })
 
-watchEffect(() => {
+const unwatch = watchEffect(() => {
     console.log("item props", item)
     currentTool.value = item.value
     newFlag.value = false
@@ -62,6 +62,8 @@ const insert = () => {
     }
     newFlag.value = true
 }
+
+onUnmounted(unwatch)
 </script>
 
 

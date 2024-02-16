@@ -31,7 +31,7 @@
 </template>
 <script setup lang="ts">
 import CONSTS from "@consts/index"
-import { defineModel, ref, toRefs, watch } from "vue"
+import {defineModel, onUnmounted, ref, toRefs, watch} from "vue"
 import ThemeSwitcher from "@/components/common/ThemeSwitcher.vue";
 
 interface Props {
@@ -49,10 +49,9 @@ const version = import.meta.env.VITE_APP_VERSION;
 
 const lag = 500
 const lagcss = lag + 'ms'
-watch([show], ([newVal]) => {
+const unwatch = watch([show], ([newVal]) => {
     newVal && setTimeout(() => showNav.value = true, lag)
 })
-watch([showNav], console.info)
 const close = () => {
     userShow.value = false
     showNav.value = false
@@ -64,6 +63,7 @@ const exit = () => {
     emit("exit")
 }
 
+onUnmounted(unwatch)
 </script>
 <style scoped lang="sass">
 .mobile-menu

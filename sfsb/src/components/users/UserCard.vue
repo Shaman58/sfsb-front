@@ -42,7 +42,7 @@
 <script setup lang="ts">
 import LayoutMain from "@/components/common/LayoutMain.vue"
 import {useRoute} from "vue-router";
-import {computed, type Ref, ref, toRefs, watch, watchEffect} from "vue";
+import {computed, onUnmounted, type Ref, ref, toRefs, watch, watchEffect} from "vue";
 import {storeToRefs} from "pinia";
 import {useStaffStore} from "@/pinia-store/staff"
 import emptyUser from "./EmptyUser"
@@ -110,14 +110,19 @@ const deletePerson = async (event: Event) => {
     await deleteStaff(personLocal.value)
 }
 
-watch([personLocal], () => {
+const unwatchPersonLocal =watch([personLocal], () => {
     console.log("personLocal", personLocal.value, isValidForm.value)
 }, {deep: true})
 
-watchEffect(() => {
+const unwatchParams = watchEffect(() => {
     console.log("params", params.value)
     personLocal.value = params.value.id === "new" ? emptyUser() as Person : (staff.value.find(e => e.id === params.value.id) || staff.value[0])
 
+})
+
+onUnmounted(()=>{
+    unwatchPersonLocal()
+    unwatchParams()
 })
 </script>
 

@@ -45,7 +45,7 @@
 </template>
 <script setup lang="ts">
 
-import {computed, type Ref, ref, toRefs, watch, watchEffect} from "vue";
+import {computed, onUnmounted, type Ref, ref, toRefs, watch, watchEffect} from "vue";
 import SuspendedComponent from "@/components/common/SuspendedComponent.vue";
 import OrderFiles from "@/components/commerce/Orders/OrderFiles.vue";
 import {useValidationRules} from "@/mixins/FieldValidationRules";
@@ -114,14 +114,18 @@ const save = async () => {
         refreshedOrder?.id && await router.push(`/commerce/orders/${refreshedOrder.id}`)
     }, 500)
 }
-watchEffect(() => {
+const unwatchEffect = watchEffect(() => {
     orderLocal.value = order.value as Order
 })
 
-watch([params], () => {
+const unwatch = watch([params], () => {
     panel.value = params.value.id === "new" ? ["common", "items"] : panel.value
 })
 
+onUnmounted(()=>{
+    unwatch()
+    unwatchEffect()
+})
 
 </script>
 <style scoped lang="sass">

@@ -40,9 +40,6 @@ const filteredOrders = computed<Order[]>(() => orders.value.filter(e => e.custom
     )
 )
 
-watch([id], () => {
-    console.log("params id", id.value)
-})
 
 </script>
 <style scoped lang="sass">

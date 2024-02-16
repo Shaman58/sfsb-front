@@ -17,7 +17,7 @@
 import {useRoute} from "vue-router";
 import {storeToRefs} from "pinia";
 import {useOperationsStore} from "@/pinia-store/operations";
-import {ref, type Ref, toRefs, watch} from "vue";
+import {onUnmounted, ref, type Ref, toRefs, watch} from "vue";
 import {useValidationRules} from "@/mixins/FieldValidationRules";
 import emptyOperation from "@/components/commerce/Operations/EmptyOperation";
 import CONST from "@/consts";
@@ -61,12 +61,13 @@ const save = async () => {
     await saveOperation(operationLocal.value)
 }
 
-watch(params, () => {
+const unwatch =watch(params, () => {
     refetchData()
     operationLocal.value = params.value.id in operationMap ? operationMap[params.value.id]() : operationMap["default"]()
 
 }, {immediate: true})
 
+onUnmounted(unwatch)
 </script>
 <style scoped lang="sass">
 .operation-card

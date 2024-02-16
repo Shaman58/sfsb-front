@@ -42,7 +42,7 @@
 </template>
 
 <script setup lang="ts">
-import type {Ref} from "vue"
+import {onUnmounted, Ref} from "vue"
 import {computed, reactive, ref, watch} from 'vue';
 import {useToast} from 'vue-toast-notification';
 import {useStaffStore} from '@/pinia-store/staff'
@@ -130,11 +130,12 @@ const deletePerson = async () => {
     emit("exit")
 }
 
-watch(personLocal, (personValue: Person) => {
+const unwatch = watch(personLocal, (personValue: Person) => {
     wasPersonChanged.value = true
     console.log(personValue);
 })
 
+onUnmounted(unwatch)
 </script>
 
 <style lang="sass" scoped>

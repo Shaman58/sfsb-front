@@ -49,8 +49,6 @@ import {useCustomersStore} from "@/pinia-store/customers";
 import emptyCompany from "./EmptyCompany"
 import LayoutMain from "@/components/common/LayoutMain.vue";
 
-// const props = defineProps<{ company: PartialCustomer, loading: boolean }>();
-// const {company, loading} = toRefs(props)
 const {params} = toRefs(useRoute())
 
 const {customers, loading} = storeToRefs(useCustomersStore())
@@ -69,6 +67,9 @@ const save = async () => {
     if (!valid.valid) return
     await saveCustomer(companyLocal.value)
 }
+
+
+
 
 </script>
 <style scoped lang="sass">

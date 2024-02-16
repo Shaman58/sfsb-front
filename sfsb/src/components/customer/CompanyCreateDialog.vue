@@ -42,7 +42,7 @@
 
 <script setup lang="ts">
 import {useValidationRules} from "@/mixins/FieldValidationRules";
-import {type Ref, ref, toRefs, watch, watchEffect} from "vue";
+import {onUnmounted, type Ref, ref, toRefs, watch, watchEffect} from "vue";
 import {useCustomersStore} from "@/pinia-store/customers";
 
 const props = defineProps<{ company: PartialCustomer }>();
@@ -60,21 +60,8 @@ const valid = ref(false);
 
 const {saveCustomer} = useCustomersStore()
 
-watchEffect(() => companyLocal.value = company.value)
-// onUpdated(() => {
-//     companyLocal.value = company.value
-// })
+const unwatch =watchEffect(() => companyLocal.value = company.value)
 
-watch([orgName], () => {
-    console.log("orgName", orgName.value)
-})
-
-// watch(
-//     () => props.company,
-//     () => {
-//         company.value = {...props.company};
-//     }
-// );
 
 const hide = () => {
     emit("hide");
@@ -91,5 +78,5 @@ const save = async () => {
     }
 };
 
-
+onUnmounted(unwatch)
 </script>

@@ -13,7 +13,7 @@
 </template>
 <script setup lang="ts">
 
-import {toRefs, watch} from "vue";
+import {onUnmounted, toRefs, watch} from "vue";
 import {storeToRefs} from "pinia";
 import useOrderFiles from "@/pinia-store/orderFiles";
 
@@ -27,9 +27,11 @@ const {getAllFilesByOrder} = useOrderFiles()
 const removeFile = (file: any) => {
 }
 
-watch([orderId], async () => {
+const unwatch =watch([orderId], async () => {
     await getAllFilesByOrder(orderId.value)
 })
+
+onUnmounted(unwatch)
 </script>
 
 

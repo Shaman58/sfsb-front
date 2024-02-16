@@ -9,7 +9,7 @@
 <script setup lang="ts">
 import { useThemeStore } from '@/pinia-store/themeSwitcher';
 import { storeToRefs } from 'pinia';
-import { ref, watch } from 'vue';
+import {onUnmounted, ref, watch} from 'vue';
 import { useTheme } from 'vuetify';
 
 const { theme: themeStore } = storeToRefs(useThemeStore())
@@ -18,9 +18,12 @@ const themeGlobal = useTheme()
 
 const theme = ref(themeStore)
 
-watch(theme, () => {
+const unwatchTheme = watch(theme, () => {
     theme.value ? setDark() : setLight()
 }, { immediate: true })
+
+onUnmounted(unwatchTheme)
+
 </script>
 
 <style lang="sass" scoped>

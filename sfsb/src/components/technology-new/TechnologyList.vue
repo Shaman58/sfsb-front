@@ -6,7 +6,7 @@
 </template>
 <script setup lang="ts">
 import {storeToRefs} from "pinia";
-import {computed, toRefs, watch} from "vue";
+import {computed, onUnmounted, toRefs, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {useOrdersStore} from "@/pinia-store/orders";
 
@@ -32,11 +32,11 @@ const filteredOrders = computed<Order[]>(() => orders.value.filter(e => e.custom
 
 const firstId = computed(() => orders.value.length && orders.value[0].id)
 
-watch(page, () => {
+const unwatch = watch(page, () => {
     page.value === "technology" && router.push(`/technology/${firstId.value}`)
 }, {immediate: true})
 
-
+onUnmounted(unwatch)
 </script>
 
 

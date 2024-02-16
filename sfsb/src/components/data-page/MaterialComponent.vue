@@ -33,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, type Ref, ref, toValue, watchEffect} from "vue";
+import {onMounted, onUnmounted, type Ref, ref, toValue, watchEffect} from "vue";
 import {useValidationRules} from "@/mixins/FieldValidationRules";
 import {useRoute} from "vue-router";
 import CONST from "@/consts";
@@ -89,11 +89,12 @@ onMounted(async () => {
 
 })
 
-watchEffect(() => {
+const unwatch = watchEffect(() => {
     materialLocal.value = props.item
     flagNew.value = false
 })
 
+onUnmounted(unwatch)
 
 </script>
 

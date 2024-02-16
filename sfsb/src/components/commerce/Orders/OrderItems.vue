@@ -30,7 +30,7 @@
 
 import OrderItem from "@/components/commerce/Orders/OrderItem.vue";
 import {useValidationRules} from "@/mixins/FieldValidationRules";
-import {ref, toRefs, watch} from "vue";
+import {onUnmounted, ref, toRefs, watch} from "vue";
 import emptyItem from "@/components/commerce/Orders/EmptyItem";
 
 const props = defineProps<{ items: Item[] }>()
@@ -60,15 +60,20 @@ const removeItem = (item: Item) => {
     index >= 0 && items.value.splice(index, 1)
 }
 
-watch([newItem], () => {
+const unwatchNewItem = watch([newItem], () => {
     if (!newItem.value) return
     if (newItem.value.technology.drawingNumber && newItem.value.technology.drawingNumber && newItem.value.quantity) {
         canAddNewItem.value = true
     }
 }, {deep: true})
 
-watch(items, () => {
+const unwatchItems=watch(items, () => {
     currentItem.value = items.value[0]
+})
+
+onUnmounted(() => {
+    unwatchNewItem()
+    unwatchItems()
 })
 </script>
 

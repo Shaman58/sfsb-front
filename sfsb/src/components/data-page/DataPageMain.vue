@@ -11,7 +11,7 @@
 </template>
 <script setup lang="ts">
 import {useRoute} from "vue-router";
-import {computed, ref, watch} from "vue";
+import {computed, onUnmounted, ref, watch} from "vue";
 import DataPageList from "@/components/data-page/DataPageList.vue";
 import MaterialComponent from "@/components/data-page/MaterialComponent.vue";
 import ToolComponent from "@/components/data-page/ToolComponent.vue";
@@ -42,7 +42,7 @@ const setCurrentTool = (item: Material | Tool) => {
 	const found = currentTab.value?.list.find(e => e.id === item.id)
 	found && (currentTool.value = found)
 }
-const save = async (ev: Material | Tool) => {
+const save = async (ev: Material & Tool) => {
 	await currentTab.value?.save(ev)
 	const last = document.querySelector(".v-list > .v-list-item[data-last='true']")
 	last?.scrollIntoView()
@@ -62,18 +62,25 @@ const backgroundLoadingLists = () => {
 }
 backgroundLoadingLists()
 
-watch([route], async () => {
+const unwatchRoute = watch([route], async () => {
 	filterText.value = ""
 	!currentTab.value?.list.length && await currentTab.value?.fetch()
 })
-watch([currentTab], async () => {
+const unwatchCurrentTab = watch([currentTab], async () => {
 	currentTool.value = currentTab.value?.list[0]
 	console.log("currentTab", currentTab.value)
 })
 
-watch([filterText], debounce(async () =>
+const unwatchFileterText =watch([filterText], debounce(async () =>
 		await currentTab.value?.setFilter(filterText.value)
 	, 250))
+
+onUnmounted(()=>{
+    unwatchRoute()
+    unwatchCurrentTab()
+    unwatchFileterText()
+})
+
 </script>
 
 
