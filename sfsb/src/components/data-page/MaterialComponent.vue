@@ -41,6 +41,7 @@ import {storeToRefs} from "pinia";
 import {useMaterialTemplatesStore} from "@/pinia-store/materialTemplates";
 import {useMaterialsStore} from "@/pinia-store/tools";
 import Material from "@/components/data-page/MaterialComponent.vue";
+import emptyMaterial from "@/components/data-page/EmptyMaterial";
 
 const {materialTemplates: templates} = storeToRefs(useMaterialTemplatesStore())
 const {fetchMaterialTemplates} = useMaterialTemplatesStore()
@@ -57,7 +58,7 @@ const route = useRoute()
 
 const {rules} = useValidationRules();
 const geometries = CONST.GEOMETRIES
-const materialLocal = ref<Partial<Material>>(props.item)
+const materialLocal = ref({...emptyMaterial(), ...props.item})
 const flagNew = ref(false)
 
 
@@ -72,7 +73,7 @@ const save = async () => {
 const insert = () => {
     materialLocal.value = {
         materialName: "",
-        geometry: geometries.at(-1)?.label,
+        geometry: geometries.at(-1)?.label||"",
         gost1: "",
         gost2: "",
         density: 0,
