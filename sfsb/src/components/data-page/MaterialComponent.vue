@@ -4,7 +4,7 @@
             v-card-title.material-form__title {{ materialLocal.materialName}}
             v-card-text.material-form__controls
                 .material-form__controls-content
-                    v-row
+                    v-row.material-form__row
                         v-col(cols="4")
                             v-text-field(label="Название:" v-model="materialLocal.materialName" :rules="[rules.required, rules.nameValidation]" counter)
                         v-col(cols="4")
@@ -12,7 +12,7 @@
                                 v-model="materialLocal.geometry" :rules="[rules.required]" )
                         v-col(cols="4")
                             v-text-field(label="Гост на метериал:"  :rules="[rules.required]" v-model="materialLocal.gost1")
-                    v-row
+                    v-row.material-form__row
                         v-col(cols="4")
                             v-select(label="Выберите плотность:" :items="templates" item-title="materialTypeName"
                                 item-value="density" v-model="materialLocal.density" )
@@ -108,8 +108,27 @@ onUnmounted(unwatch)
         height: 100%
         display: grid
         grid-template-rows: 50px 1fr 50px
+        overflow-y: auto
 
     &__controls
         display: grid
         place-items: center stretch
+
+    &__row
+
+        @media (width < 768px)
+            display: grid
+            grid-template-columns: 1fr 1fr
+
+            & > *
+                width: 100%
+                max-width: 100%
+                padding: 2px
+
+        @media (width < 530px)
+            grid-template-columns: 1fr
+
+
+
+
 </style>
