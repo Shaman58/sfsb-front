@@ -31,7 +31,7 @@
                                 )
         template(#footer)
             v-card.user-card__footer
-                v-btn(variant="text" @click="showChangePass=true") Изменить пароль
+                v-btn(variant="text" @click="showChangePass=true" hide-details="true") Изменить пароль
 
                 v-dialog(v-model="showChangePass")
                     v-card

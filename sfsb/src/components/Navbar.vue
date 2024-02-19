@@ -2,7 +2,7 @@
     v-container
         v-app-bar.navbar(color="#2F477E")
             template(#prepend)
-                v-btn(:to="'/'")
+                v-btn.navbar__logo(:to="'/'")
                     impuls-hub
             v-spacer
             span.navbar__route {{ $route.meta?.name?.toUpperCase() }}
@@ -106,6 +106,10 @@ onMounted(async () => {
         @media (width < 1024px)
             display: none
 
+    &__logo
+        @media (width < 1024px)
+            padding: 0
+
     &__version
         @media (width < 1160px)
             display: none
@@ -140,6 +144,7 @@ onMounted(async () => {
         display: none
         @media (width < 1024px)
             display: block
+            font-size: clamp(12px, 16 / 1024  * 100vw, 16px)
 
 .navbar-exit
     display: flex

@@ -55,6 +55,7 @@ const backgroundWithDefault = background.value || "#00acc120"
             grid-template-rows: 56px 20vh 1fr
             grid-template-areas: "filter" "list" "card"
             margin-top: 1rem
+            padding-bottom: .3rem
 
     &__filter
         grid-area: filter
