@@ -12,21 +12,25 @@ const data: RouteRecordRaw & RouteMeta = {
         {
             path: "materials", component: DataPageMain, meta: {
                 onlyFor: ["TECHNOLOGIST", "ADMIN"],
+                name: "Материалы",
             },
         },
         {
             path: "cutters", component: DataPageMain, meta: {
                 onlyFor: ["TECHNOLOGIST", "ADMIN"],
+                name: "Инструменты",
             },
         },
         {
             path: "specials", component: DataPageMain, meta: {
                 onlyFor: ["TECHNOLOGIST", "ADMIN"],
+                name: "Специнструмент"
             },
         },
         {
             path: "toolings", component: DataPageMain, meta: {
                 onlyFor: ["TECHNOLOGIST", "ADMIN"],
+                name: "Оснастка"
             },
         },
     ]

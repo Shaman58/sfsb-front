@@ -4,7 +4,9 @@
             template(#prepend)
                 v-btn(:to="'/'")
                     impuls-hub
-
+            v-spacer
+            span.navbar__route {{ $route.meta?.name?.toUpperCase() }}
+            v-spacer
             span.navbar__version(:style="{color:'white'}") {{ version }}
             v-toolbar-items.ml-5.navbar__menu(style="overflow-x: auto;")
                 .navbar__item
@@ -133,6 +135,11 @@ onMounted(async () => {
 
         & .v-input__details
             display: none
+
+    &__route
+        display: none
+        @media (width < 1024px)
+            display: block
 
 .navbar-exit
     display: flex

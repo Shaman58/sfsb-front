@@ -7,6 +7,7 @@ const supplier: RouteRecordRaw & RouteMeta =  {
     component: SupplyComponent,
     meta: {
         onlyFor: ["SUPPLIER", "ADMIN"],
+        name: "Снабжение"
     },
     children: [
         {
@@ -15,6 +16,7 @@ const supplier: RouteRecordRaw & RouteMeta =  {
             props: {type: "all"},
             meta: {
                 onlyFor: ["SUPPLIER", "ADMIN"],
+                name: "снабжение | все"
             },
         },
         {
@@ -23,6 +25,7 @@ const supplier: RouteRecordRaw & RouteMeta =  {
             props: {type: "nocost"},
             meta: {
                 onlyFor: ["SUPPLIER", "ADMIN"],
+                name: "снабжение | без стоимости"
             },
         },
         {
@@ -31,6 +34,7 @@ const supplier: RouteRecordRaw & RouteMeta =  {
             props: {type: "expired"},
             meta: {
                 onlyFor: ["SUPPLIER", "ADMIN"],
+                name: "снабжение | истекшие"
             },
         },
     ]

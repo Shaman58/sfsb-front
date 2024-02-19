@@ -1,6 +1,7 @@
 <template lang="pug">
 	layout-page
-		template(#title) {{ currentTab?.name }}
+		//template(#title) {{ currentTab?.name }}
+		template(#title) {{ $route.meta.name }}
 		template(#filter)
 			v-text-field.datapage-main__list-filter(label="фильтр" v-model="filterText" clearable)
 		template(#list)

@@ -7,6 +7,7 @@ const technology: RouteRecordRaw & RouteMeta = {
     component: TechnologyComponent,
     meta: {
         onlyFor: ["TECHNOLOGIST", "ADMIN"],
+        name: "Технология"
     },
     children: [
         {
@@ -14,6 +15,7 @@ const technology: RouteRecordRaw & RouteMeta = {
             component: TechnologyCard,
             meta: {
                 onlyFor: ["TECHNOLOGIST", "ADMIN"],
+                name: "Технология"
             },
         }
     ]

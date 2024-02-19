@@ -1,7 +1,7 @@
 <template lang="pug">
     .layout-page
         h1.layout-page__title
-            slot(name="title")
+            slot(name="title") {{$route.meta.name}}
         .layout-page__container
             .layout-page__list-filter
                 slot(name="filter")
@@ -27,11 +27,17 @@ const backgroundWithDefault = background.value || "#00acc120"
     grid-template-rows: 80px 1fr
     background: v-bind("backgroundWithDefault")
 
+    @media (width < 1024px)
+        grid-template-rows: 1fr
+
     &__title
         display: grid
         place-items: center start
         color: #333
         text-shadow: 2px 2px 1px #fff
+
+        @media (width < 1024px)
+            display: none
 
     &__container
         display: grid
@@ -41,6 +47,11 @@ const backgroundWithDefault = background.value || "#00acc120"
         gap: 0.5rem
         height: calc(100% - 1rem)
         overflow-y: hidden
+
+        @media (width < 1024px)
+            grid-template-columns: 1fr
+            grid-template-rows: 56px 20vh 1fr
+            grid-template-areas: "filter" "list" "card"
 
     &__filter
         grid-area: filter

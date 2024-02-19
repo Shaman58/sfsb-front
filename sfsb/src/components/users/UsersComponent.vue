@@ -1,6 +1,6 @@
 <template lang="pug">
     LayoutPage.users(:background="'#BB00C120'")
-        template(#title) Управление пользователями
+        template(#title) {{ $route.meta.name }}
         template(#filter)
             v-text-field(label="фильтр" v-model="filterText" clearable)
         template(#list)

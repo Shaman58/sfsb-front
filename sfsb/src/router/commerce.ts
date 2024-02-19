@@ -12,6 +12,7 @@ const commerce: RouteRecordRaw & RouteMeta = {
     component: Commerce,
     meta: {
         onlyFor: ["COMMERCE", "ADMIN"],
+        name: "Коммерция"
     },
     children: [
 
@@ -20,6 +21,7 @@ const commerce: RouteRecordRaw & RouteMeta = {
             component: ClientsComponent,
             meta: {
                 onlyFor: ["COMMERCE", "ADMIN"],
+                name: "Контрагенты"
             },
             children: [
                 {
@@ -27,6 +29,7 @@ const commerce: RouteRecordRaw & RouteMeta = {
                     component: ClientCard,
                     meta: {
                         onlyFor: ["COMMERCE", "ADMIN"],
+                        name: "Контрагенты"
                     },
                 },
             ]
@@ -36,6 +39,7 @@ const commerce: RouteRecordRaw & RouteMeta = {
             component: OrdersComponent,
             meta: {
                 onlyFor: ["COMMERCE", "ADMIN"],
+                name: "Заявки"
             },
             children: [
                 {
@@ -43,6 +47,7 @@ const commerce: RouteRecordRaw & RouteMeta = {
                     component: OrderCard,
                     meta: {
                         onlyFor: ["COMMERCE", "ADMIN"],
+                        name: "Заявки"
                     },
                 }
             ]
@@ -52,6 +57,7 @@ const commerce: RouteRecordRaw & RouteMeta = {
             component: OperationsComponent,
             meta: {
                 onlyFor: ["COMMERCE", "ADMIN"],
+                name: "Операции"
             },
             children: [
                 {
@@ -59,6 +65,7 @@ const commerce: RouteRecordRaw & RouteMeta = {
                     component: OperationCard,
                     meta: {
                         onlyFor: ["COMMERCE", "ADMIN"],
+                        name: "Операции"
                     },
                 },
             ]

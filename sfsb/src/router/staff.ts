@@ -7,6 +7,7 @@ const staff: RouteRecordRaw & RouteMeta = {
     component: UsersComponent,
     meta: {
         onlyFor: ["HR", "ADMIN"],
+        name: "Пользователи"
     },
     children: [
         {
@@ -14,6 +15,7 @@ const staff: RouteRecordRaw & RouteMeta = {
             component: UserCard,
             meta: {
                 onlyFor: ["HR", "ADMIN"],
+                name: "Пользователи"
             },
         },
     ]
