@@ -29,6 +29,8 @@ const backgroundWithDefault = background.value || "#00acc120"
 
     @media (width < 1024px)
         grid-template-rows: 1fr
+        padding: 0 clamp(0.3rem, 16 / 1024 * 100vw ,1rem) 0
+
 
     &__title
         display: grid
@@ -52,6 +54,7 @@ const backgroundWithDefault = background.value || "#00acc120"
             grid-template-columns: 1fr
             grid-template-rows: 56px 20vh 1fr
             grid-template-areas: "filter" "list" "card"
+            margin-top: 1rem
 
     &__filter
         grid-area: filter
@@ -74,6 +77,7 @@ const backgroundWithDefault = background.value || "#00acc120"
     &__card
         grid-area: card
         height: 100%
+        overflow-y: auto
 
     &__card-content
         height: 100%

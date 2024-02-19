@@ -2,10 +2,10 @@
     v-list.users-list
         v-list-item
             v-list-item-title
-                router-link.users-list__link(:to="`/staff/new`")
+                router-link.list-link(:to="`/staff/new`")
                     div(:style="{color: 'orange'}") Добавить нового пользователя
         v-list-item(v-for='user in filteredStaff', :key='user.id' :active="user.id===page")
-            router-link.users-list__link(:to='`/staff/${user.id}`')
+            router-link.list-link(:to='`/staff/${user.id}`')
                 span {{user.firstName}} {{user.lastName}}
 </template>
 <script setup lang="ts">
@@ -38,6 +38,9 @@ page.value === "staff" && await router.push(`/staff/${firstId.value}`)
 <style scoped lang="sass">
 .users-list
 
+    .v-list-item--density-default.v-list-item--one-line
+        @media (width < 1024px)
+            min-height: 36px
     &__link
         color: inherit
         text-decoration: none

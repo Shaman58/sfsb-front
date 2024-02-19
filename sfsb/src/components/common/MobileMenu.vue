@@ -47,7 +47,7 @@ const showNav = ref(false)
 const userShow = ref(false)
 const version = import.meta.env.VITE_APP_VERSION;
 
-const lag = 500
+const lag = 100
 const lagcss = lag + 'ms'
 const unwatch = watch([show], ([newVal]) => {
     newVal && setTimeout(() => showNav.value = true, lag)

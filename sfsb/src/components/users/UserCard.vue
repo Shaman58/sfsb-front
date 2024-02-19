@@ -6,8 +6,7 @@
                 ControlButton(@click="reset"  tooltip="Отменить изменения" icon-name="mdi-refresh")
                 ControlButton(@click="save" color="orange-darken-1" variant="text" type="submit" :disabled=" !isValidForm" tooltip="Сохранить" icon-name="mdi-floppy")
         v-card.user-card__main
-            v-form(id="person-form" ref="personForm")
-
+            v-form.user-card__form(id="person-form" ref="personForm")
                 .user-card__header
                     UserAvatar.user-card__picture(:picture="personLocal.picture" :user-id="personLocal.id")
                     h2.user-card__title
@@ -15,7 +14,7 @@
                         span {{ personLocal.lastName }}
                         span.user-card__username [ {{ personLocal.username }} ]
                 v-card.user-card__main
-                    form.user-card__form
+                    .user-card__form-data
                         .user-card__form-name
                             v-text-field(label="username" v-model="personLocal.username" :rules="[required]" v-if="!personLocal.id")
                             v-text-field(label="Имя" v-model="personLocal.firstName" :rules="[required]")
@@ -23,7 +22,13 @@
                         .user-card__form-contacts
                             v-text-field(label="Email" v-model="personLocal.email" :rules="[emailValidation]")
                         .user-card__form-roles
-                            v-checkbox(v-for="(role, index) in roles" :label="role" :value="role" v-model="personLocal.roles" :key="role")
+                            v-checkbox.user-card__form-role(v-for="(role, index) in roles"
+                                :label="role"
+                                :value="role"
+                                v-model="personLocal.roles"
+                                :key="role"
+                                hide-details="true"
+                                )
         template(#footer)
             v-card.user-card__footer
                 v-btn(variant="text" @click="showChangePass=true") Изменить пароль
@@ -101,7 +106,7 @@ const changePass = () => {
 
 const save = async () => {
     if (!isValidForm.value) return toast.error("Поля не заполнены")
-    if (!personLocal.value.password) return toast.error("Вы забыли задать пароль")
+    if (params.value.id === "new" && !personLocal.value.password) return toast.error("Вы забыли задать пароль")
     await saveStaff(personLocal.value)
 }
 const reset = async (event: Event) => {
@@ -127,7 +132,7 @@ onUnmounted(()=>{
 })
 </script>
 
-<style scoped lang="sass">
+<style  lang="sass">
 .user-card
 
     &__toolbar
@@ -151,10 +156,14 @@ onUnmounted(()=>{
             background-color: var(--scroll-color)
             border-radius: 8px
 
+    &__form
+        container: user-form / inline-size
+
     &__header
         display: grid
         grid-template-columns: 120px 1fr
         place-items: center
+
 
     &__picture
         flex: 0 0 40%
@@ -163,6 +172,12 @@ onUnmounted(()=>{
     &__title
         display: flex
         gap: 1rem
+
+        @container user-form (width < 500px)
+            flex-direction: column
+            justify-content: center
+            align-items: center
+            gap: 0
 
     &__username
         font-size: 0.9em
@@ -182,11 +197,30 @@ onUnmounted(()=>{
         justify-content: space-between
         gap: 1rem
 
+        @container user-form (width < 500px)
+            flex-direction: column
+            gap: 0
+
+            & > *
+                width: 100%
+
+
     &__form-roles
         display: flex
         align-items: center
         gap: 1rem
         flex-wrap: wrap
+
+        @container user-form (width < 500px)
+            gap: 0
+
+        & > .v-input
+            @container user-form (width < 500px)
+                flex-basis: 50%
+
+    &__form-role .v-label
+        @container user-form (width < 500px)
+            font-size: clamp(10px,16 / 500 * 100vw,1rem)
 
 
 </style>
