@@ -94,11 +94,12 @@ const changePass = () => {
     if (newPass.value !== newPassRepeat.value) return toast.error("Пароли не совпадают")
     personLocal.value.password = newPass.value
     showChangePass.value = false
+    if (params.value.id === "new") return
+    save()
 }
 
 
 const save = async () => {
-    console.log("personLocal from component", personLocal.value);
     if (!isValidForm.value) return toast.error("Поля не заполнены")
     if (!personLocal.value.password) return toast.error("Вы забыли задать пароль")
     await saveStaff(personLocal.value)
