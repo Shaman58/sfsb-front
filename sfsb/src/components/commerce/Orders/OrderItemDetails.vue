@@ -1,32 +1,49 @@
 <template lang="pug">
     .order-item-details(v-if="currentItem")
         v-text-field.order-item-details__schema-number(label="Децимальный номер:"
-            v-model="currentItem.technology.drawingNumber"
+            v-model="drawingNumber"
             placeholder="42"
             :rules="[rules.required]"
         )
         v-text-field.order-item-details__schema-name(label="Название чертежа:"
-            v-model="currentItem.technology.drawingName"
+            v-model="drawingName"
             placeholder="Гайка M10"
             :rules="[rules.required]"
         )
         v-text-field.order-item-details__schema-amount(label="Количество:"
-            v-model="currentItem.quantity"
+            v-model="quantity"
             type="number"
             placeholder="100"
             :rules="[rules.required]"
         )
-        v-switch.order-item-details__outsource-material(v-model="currentItem.customerMaterial",
-            :label="currentItem.customerMaterial ? 'Материал заказчика' : 'Наш материал'")
+        v-switch.order-item-details__outsource-material(v-model="customerMaterial",
+            :label="customerMaterial ? 'Материал заказчика' : 'Наш материал'")
 </template>
 <script setup lang="ts">
 import {useValidationRules} from "@/mixins/FieldValidationRules";
-import {watch} from "vue";
+import {onUnmounted, ref, toRefs, watch} from "vue";
 
 const currentItem = defineModel<Item>("item")
+const props = defineProps<{save: boolean}>()
+const {save} = toRefs(props)
+
 const {rules} = useValidationRules()
 
-watch(currentItem,console.log)
+const drawingNumber = ref(currentItem.value?.technology.drawingNumber)
+const drawingName = ref(currentItem.value?.technology.drawingName)
+const quantity = ref(currentItem.value?.quantity)
+const customerMaterial = ref(currentItem.value?.customerMaterial)
+
+const unwatch = watch([save],()=>{
+    currentItem.value && (currentItem.value.technology.drawingNumber = drawingNumber.value||"")
+    currentItem.value && (currentItem.value.technology.drawingName = drawingName.value||"")
+    currentItem.value && (currentItem.value.quantity = quantity.value||0)
+    currentItem.value && (currentItem.value.customerMaterial = customerMaterial.value||false)
+})
+
+onUnmounted(() => {
+    unwatch()
+})
 </script>
 
 

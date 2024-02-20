@@ -11,9 +11,10 @@
         v-container
             v-card.order-items__mobile-card
                 v-card-title {{ number }} {{customer}}
-                OrderItemDetails(v-model:item="currentItem")
+                OrderItemDetails(v-model:item="currentItem" :save="canSave")
                 v-card-actions
                     v-btn(color="primary" @click="showDialog=false" :disabled="!canAddNewItem") Закрыть
+                    v-btn(color="primary" @click="toSave" :disabled="!canAddNewItem") Сохранить
 </template>
 <script setup lang="ts">
 
@@ -30,6 +31,7 @@ const newItem = ref<Item | null>(null)
 const canAddNewItem = ref(true)
 const showDialog = ref(false)
 const wasItemsChange = ref(false)
+const canSave = ref(false)
 
 const isActive = (item: Item): boolean => {
     const currentIndex = `${currentItem.value.id}${currentItem.value.uid}`
@@ -52,6 +54,14 @@ const removeItem = (item: Item) => {
 const changeItem= (item: Item)=>{
     currentItem.value = item
     showDialog.value =  true
+}
+
+const toSave = () => {
+    canSave.value = true
+    setTimeout(()=>{
+        canSave.value = false
+    }, 200)
+    showDialog.value = false
 }
 
 const unwatchNewItem = watch([newItem], () => {
