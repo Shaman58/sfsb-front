@@ -30,5 +30,6 @@ onUnmounted(unwatchTheme)
 .theme-switch
     display: flex
     align-items: center
+    justify-content: center
     gap: 5px
 </style>

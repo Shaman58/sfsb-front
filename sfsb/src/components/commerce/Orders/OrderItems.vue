@@ -99,4 +99,7 @@ onUnmounted(() => {
     &__mobile-card
         padding: 1em
 
+    &__mobile-title
+        text-align: center
+
 </style>
