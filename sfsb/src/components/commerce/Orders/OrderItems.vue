@@ -5,25 +5,7 @@
             v-list-item(v-for="(i,index) in items" @click="currentItem = i" :key="index"
                 :active="isActive(i)")
                 OrderItem(:item="i" @remove="removeItem(i)")
-        .order-card__details-item(v-if="currentItem" ref="itemForm")
-            v-text-field.item-card__schema-number(label="Децимальный номер:"
-                v-model="currentItem.technology.drawingNumber"
-                placeholder="42"
-                :rules="[rules.required]"
-            )
-            v-text-field.item-card__schema-name(label="Название чертежа:"
-                v-model="currentItem.technology.drawingName"
-                placeholder="Гайка M10"
-                :rules="[rules.required]"
-            )
-            v-text-field.item-card__schema-amount(label="Количество:"
-                v-model="currentItem.quantity"
-                type="number"
-                placeholder="100"
-                :rules="[rules.required]"
-            )
-            v-switch.item-card__outsource-material(v-model="currentItem.customerMaterial",
-                :label="currentItem.customerMaterial ? 'Материал заказчика' : 'Наш материал'")
+        OrderItemDetails(v-model:item="currentItem")
 
 </template>
 <script setup lang="ts">
@@ -32,13 +14,12 @@ import OrderItem from "@/components/commerce/Orders/OrderItem.vue";
 import {useValidationRules} from "@/mixins/FieldValidationRules";
 import {onUnmounted, ref, toRefs, watch} from "vue";
 import emptyItem from "@/components/commerce/Orders/EmptyItem";
+import OrderItemDetails from "@/components/commerce/Orders/OrderItemDetails.vue";
 
 const props = defineProps<{ items: Item[] }>()
 const {items} = toRefs(props)
 
-const {rules} = useValidationRules()
-
-const currentItem = ref(items.value[0])
+const currentItem = ref<Item>(items.value[0])
 const newItem = ref<Item | null>(null)
 const canAddNewItem = ref(true)
 
