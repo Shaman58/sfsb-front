@@ -1,13 +1,14 @@
 <template lang="pug">
     LayoutMain.operation-card
-        v-card(:style="{height:'100%'}")
-            v-form#operation-form(ref="form" v-model="valid" @submit.prevent="save")
-                v-card-text(v-if="operationLocal")
-                    v-text-field( label="Название операции:" v-model="operationLocal.operationName" :rules="[rules.required, rules.nameValidation]" counter :disabled="operationLocal.id<3")
-                    v-select(label="Тип:" :items="CONST.OPERATIONS" item-title="title" item-value="label" v-model="operationLocal.operationTimeManagement" :disabled="operationLocal.id<3" :rules="[rules.required]")
-                    v-text-field( label="Стоимость за час:" v-model="operationLocal.paymentPerHour.amount" :rules="[rules.required,rules.numeric]" type="number")
-                    v-container(v-if="!operationLocal?.id||operationLocal?.id>=3")
-                        OperationDescriptions
+        template(#default)
+            v-card.operation-card__card
+                v-form#operation-form(ref="form" v-model="valid" @submit.prevent="save")
+                    v-card-text(v-if="operationLocal")
+                        v-text-field( label="Название операции:" v-model="operationLocal.operationName" :rules="[rules.required, rules.nameValidation]" counter :disabled="operationLocal.id<3")
+                        v-select(label="Тип:" :items="CONST.OPERATIONS" item-title="title" item-value="label" v-model="operationLocal.operationTimeManagement" :disabled="operationLocal.id<3" :rules="[rules.required]")
+                        v-text-field( label="Стоимость за час:" v-model="operationLocal.paymentPerHour.amount" :rules="[rules.required,rules.numeric]" type="number")
+                        v-container(v-if="!operationLocal?.id||operationLocal?.id>=3")
+                            OperationDescriptions
         template(#footer)
             v-card.operation-card__footer
                 v-btn(color="orange-darken-1" variant="text" type="submit" :disabled="!valid" form="operation-form") Сохранить
@@ -71,6 +72,10 @@ onUnmounted(unwatch)
 </script>
 <style scoped lang="sass">
 .operation-card
+
+    &__card
+        height: 100%
+        overflow-y: auto
 
     &__footer
         width: 100%
