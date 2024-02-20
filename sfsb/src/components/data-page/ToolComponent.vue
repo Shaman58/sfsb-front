@@ -73,19 +73,24 @@ onUnmounted(unwatch)
 
     &__card
         height: 100%
+        overflow-y: auto
         display: grid
-        grid-template-rows: 50px 1fr 50px
+        grid-template-rows: 90px 1fr 50px
 
     &__title
         display: flex
         gap: 1rem
+        @media (width < 768px)
+            flex-wrap: wrap
+            row-gap: 0
+            font-size: clamp(12px, 16 / 768 * 100vw,16px)
 
     &__title-name
-        font-size: 1.1rem
+        font-size: 1.1em
         font-weight: 700
 
     &__title-description
-        font-size: 0.95rem
+        font-size: 0.95em
         font-weight: 200
         opacity: 0.5
 

@@ -12,11 +12,14 @@
                     slot(name="card")
 </template>
 <script setup lang="ts">
-import {toRefs} from "vue";
+import {toRefs, useSlots} from "vue";
 
 const props = defineProps<{ background?: string }>()
 const {background} = toRefs(props)
 const backgroundWithDefault = background.value || "#00acc120"
+
+const slots = useSlots()
+const filterHeight = slots.filter ? "56px": "0px"
 </script>
 <style scoped lang="sass">
 .layout-page
@@ -52,7 +55,7 @@ const backgroundWithDefault = background.value || "#00acc120"
 
         @media (width < 1024px)
             grid-template-columns: 1fr
-            grid-template-rows: 56px 20vh 1fr
+            grid-template-rows: v-bind("filterHeight") 20vh 1fr
             grid-template-areas: "filter" "list" "card"
             margin-top: 1rem
             padding-bottom: .3rem
