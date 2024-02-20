@@ -13,7 +13,7 @@
                 v-card-title {{ number }} {{customer}}
                 OrderItemDetails(v-model:item="currentItem")
                 v-card-actions
-                    v-btn(color="primary" @click="showDialog=false") Закрыть
+                    v-btn(color="primary" @click="showDialog=false" :disabled="!canAddNewItem") Закрыть
 </template>
 <script setup lang="ts">
 
@@ -61,7 +61,10 @@ const unwatchNewItem = watch([newItem], () => {
     }
 }, {deep: true})
 
-
+const unwatchShowDialog = watch([showDialog], (value, oldValue) => {
+    if (showDialog.value) return
+    !canAddNewItem.value && (showDialog.value = true)
+})
 
 const unwatchCurrentItem = watch([currentItem], () => {
     if (!currentItem.value) return
@@ -69,6 +72,7 @@ const unwatchCurrentItem = watch([currentItem], () => {
 })
 onUnmounted(() => {
     unwatchNewItem()
+    unwatchShowDialog()
     unwatchCurrentItem()
 })
 </script>
