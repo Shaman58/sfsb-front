@@ -25,8 +25,8 @@
 
                     v-expansion-panel.order-card__group-items(value="items")
                         v-expansion-panel-title ПОЗИЦИИ ЗАКАЗА
-                        v-expansion-panel-text
-                            OrderItems(:items="orderLocal.items")
+                        v-expansion-panel-text.order-card__group-text
+                            OrderItems(:items="orderLocal.items" :customer="orderLocal.customer.companyName" :number="orderLocal.applicationNumber")
 
                     v-expansion-panel.order-card__files(value="files")
                         v-expansion-panel-title ФАЙЛЫ
@@ -128,7 +128,7 @@ onUnmounted(()=>{
 })
 
 </script>
-<style scoped lang="sass">
+<style lang="sass">
 .order-card
     display: grid
     gap: 0.5rem
@@ -178,5 +178,10 @@ onUnmounted(()=>{
             width: 4px
             background-color: var(--scroll-color)
             border-radius: 8px
+
+    &__group-text > .v-expansion-panel-text__wrapper
+
+        @media (width < 1024px)
+            padding-inline: 0
 
 </style>

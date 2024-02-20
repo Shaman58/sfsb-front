@@ -4,7 +4,7 @@
             template(#activator="{ props }")
                 v-btn(color="primary" v-bind="props" :disabled="!isOrderComputed || !order.customer?.companyName")
                     ControlButton(tooltip="Коммерческое предложение" icon-name="mdi-offer")
-            v-list(@click:select="selectCompany")
+            v-list(@click:select="void selectCompany")
                 v-list-item(v-for="company in companiesList" :key="company.id" :value="company.companyName")
                     v-list-item-title {{ company.companyName }}
         ControlButton(@click="void previewToolOrder(order, 1, 2)" :disabled="!isAllComputed || !order.id" tooltip="Заявка на инструмент" icon-name="mdi-tools")
