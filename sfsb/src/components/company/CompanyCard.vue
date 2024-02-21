@@ -1,7 +1,7 @@
 <template lang="pug">
     .company
         .company__header
-            h1 {{currentCompany.companyName||"НОВАЯ КОМПАНИЯ"}}
+            h1.company__title {{currentCompany.companyName||"НОВАЯ КОМПАНИЯ"}}
             .company__logo-component
                 img.company__logo(v-if="currentCompany?.logo?.link" alt="logo" :src="picture")
                 input.company__file-logo(type="file" hidden @change="changeLogo" :accept="accept")
@@ -15,18 +15,18 @@
                 v-card.company__card(title="Общие данные" prepend-icon="mdi-home"  )
                     v-text-field(label="Название организации" variant="underlined" v-model="currentCompany.companyName")
                     v-text-field(label="Адрес" variant="underlined" v-model="currentCompany.address")
-                    .d-flex
+                    .d-flex.company__row
                         v-text-field(label="ИНН" variant="underlined" v-model="currentCompany.inn" :rules="[rules.innValidation]")
                         v-text-field(label="КПП" variant="underlined" v-model="currentCompany.kpp" :rules="[rules.bikkppValidation]")
                         v-text-field(label="ОГРН" variant="underlined" v-model="currentCompany.ogrn" :rules="[rules.ogrnValidation]")
                 v-card.company__card(title="Банковские реквизиты" prepend-icon="mdi-bank" )
                     v-text-field(label="Банк" variant="underlined" v-model="currentCompany.bank" :rules="[rules.required, rules.counter]")
-                    .d-flex
+                    .d-flex.company__row
                         v-text-field(label="Расчетный счет" variant="underlined" v-model="currentCompany.paymentAccount" :rules="[rules.accountValidation]")
                         v-text-field(label="БИК" variant="underlined" v-model="currentCompany.bik" :rules="[rules.bikkppValidation]")
                         v-text-field(label="Корреспонденский счет" variant="underlined" v-model="currentCompany.correspondentAccount" :rules="[rules.accountValidation]")
                 v-card.company__card(title="Контактные данные" prepend-icon="mdi-mail" )
-                    .d-flex
+                    .d-flex.company__row
                         v-text-field(label="email" variant="underlined" v-model="currentCompany.email" :rules="[rules.required, rules.emailValidation]")
                         v-text-field(label="телефон" variant="underlined" v-model="currentCompany.phoneNumber" :rules="[rules.required, rules.phoneValidation]")
         .company__footer
@@ -119,6 +119,13 @@ const add = () => {
         justify-content: center
         gap: 1rem
 
+        @media (width < 1024px)
+            flex-wrap: wrap
+            height: min-content
+
+    &__title
+        font-size: clamp(14px, 32 / 1024 * 100vw, 32px)
+
     &__logo-component
         min-height: 100px
         height: 100%
@@ -146,6 +153,9 @@ const add = () => {
         flex: 0 1 30%
         font-size: 0.9rem
 
+        @media (width < 1024px)
+            flex-basis: 75%
+
     &__form
         width: 100%
 
@@ -157,6 +167,11 @@ const add = () => {
 
     &__card
         padding: 1rem
+
+    &__row
+
+        @media (width < 768px)
+            flex-direction: column
 
     &__footer
         position: fixed
