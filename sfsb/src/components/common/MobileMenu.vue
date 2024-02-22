@@ -1,7 +1,7 @@
 <template lang="pug">
-.mobile-menu(v-if="show" @keyup.esc="close")
+.mobile-menu(v-if="show" @keyup.esc="close" @click="close")
 
-    .mobile-menu__nav(@keyup.esc="close" :data-active="showNav" )
+    .mobile-menu__nav(@keyup.esc="close" :data-active="showNav" @click.stop)
         .mobile-menu__header
             v-icon.mobile-menu__close(@click="close" icon="mdi-close" color="red")
             .mobile-menu__user(@click="userShow=!userShow")
