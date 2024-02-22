@@ -1,6 +1,6 @@
 <template lang="pug">
     .order-files
-        v-progress-linear(v-if="loading" :indeterminate="true" color="#2F477E")
+        v-progress-linear(v-if="loading" :indeterminate="true" :color="$defaultColor")
         .order-files__container
             label.order-files__new(for="new-file" title="Добавить файл")
                 v-icon(color="orange-lighten-1") mdi-plus

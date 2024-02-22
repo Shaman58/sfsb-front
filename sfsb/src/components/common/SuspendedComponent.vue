@@ -2,7 +2,7 @@
     Suspense.suspended-component
         template(#fallback)
             div.suspended-component__loader-container
-                v-progress-circular(indeterminate :size="62" :width="6" color="#2F477E")
+                v-progress-circular(indeterminate :size="62" :width="6" :color="$defaultColor")
         template(#default)
             slot
 </template>

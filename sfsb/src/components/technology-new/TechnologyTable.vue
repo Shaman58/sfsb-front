@@ -1,6 +1,6 @@
 <template lang="pug">
     v-card.table
-        v-progress-linear(v-if="loading" indeterminate color="#2F477E")
+        v-progress-linear(v-if="loading" indeterminate :color="$defaultColor")
         v-table
             thead
                 tr

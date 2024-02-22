@@ -29,4 +29,5 @@ keycloakService
     });
 
 app.config.globalProperties.$keycloakService = keycloakService;
+app.config.globalProperties.$defaultColor = "#2F477E";
 console.log(import.meta.env.BASE_URL);

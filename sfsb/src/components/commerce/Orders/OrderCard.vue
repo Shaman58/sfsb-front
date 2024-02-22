@@ -2,7 +2,7 @@
     LayoutMain
         template(#header)
             div(style="height: 8px; width: 100%;")
-                v-progress-linear(v-show="loading" :indeterminate="true" color="#2F477E")
+                v-progress-linear(v-show="loading" indeterminate :color="$defaultColor")
             OrderToolbar(:order="orderLocal" :valid="valid"  @save="save" @refresh="refresh")
         .order-card
             v-form.order-card__form(ref="form" v-model="valid")

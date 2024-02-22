@@ -9,7 +9,8 @@
                                 span.text-h4 {{ currentItem && currentItem.technology.drawingNumber + " " + currentItem && currentItem.technology.drawingName }}
                                 | {{ currentItem.quantity + "шт." }}
                             Suspense
-                                template(#fallback) Loading ...
+                                template(#fallback)
+                                    v-progress-linear(indeterminate :color="$defaultColor")
                                 template(#default)
                                     technology-card-owner(@change="changeOwner")
 

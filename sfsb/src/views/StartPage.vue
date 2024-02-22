@@ -2,7 +2,7 @@
     .start-page
         Suspense
             template(#fallback)
-                v-progress-circular(indeterminate :size="62" :width="6" color="#2F477E")
+                v-progress-circular(indeterminate :size="62" :width="6" :color="$defaultColor")
             template(#default)
                 Companies
 

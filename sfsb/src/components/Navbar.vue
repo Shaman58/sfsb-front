@@ -1,6 +1,6 @@
 <template lang="pug">
     v-container
-        v-app-bar.navbar(color="#2F477E")
+        v-app-bar.navbar(:color="$defaultColor")
             template(#prepend)
                 v-btn.navbar__logo(:to="'/'")
                     impuls-hub
