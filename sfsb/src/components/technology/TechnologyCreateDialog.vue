@@ -30,13 +30,13 @@
                             v-col(cols="12" v-for="(setup, index) in sortedSetups" :key="index")
                                 v-card(v-if="activeSetupIndex !== index" @click="showSetupCard(index)")
                                     v-row
-                                        v-col(cols="3" v-if="!setup.cooperate")
+                                        v-col(cols="12" lg="3" md="6" v-if="!setup.cooperate")
                                             TechnologyCreateDialogCardPart1(:setup="setup")
-                                        v-col(cols="3" v-if="!setup.cooperate && setup.operation.operationTimeManagement !== 'COMPUTED' && setup.operation.operationTimeManagement !== 'NONE'")
+                                        v-col(cols="12" lg="3" md="6" v-if="!setup.cooperate && setup.operation.operationTimeManagement !== 'COMPUTED' && setup.operation.operationTimeManagement !== 'NONE'")
                                             TechnologyCreateDialogCardPart2(:setup="setup")
-                                        v-col(cols="3" v-if="!setup.cooperate  && setup.operation.operationTimeManagement !== 'COMPUTED' && setup.operation.operationTimeManagement !== 'NONE'")
+                                        v-col(cols="12" lg="3" md="6" v-if="!setup.cooperate  && setup.operation.operationTimeManagement !== 'COMPUTED' && setup.operation.operationTimeManagement !== 'NONE'")
                                             TechnologyCreateDialogCardPart3(:setup="setup")
-                                        v-col(cols="3" fill-height v-if="!setup.cooperate  && setup.operation.operationTimeManagement !== 'COMPUTED'  && setup.operation.operationTimeManagement !== 'NONE'")
+                                        v-col(cols="12" lg="3" md="6" fill-height v-if="!setup.cooperate  && setup.operation.operationTimeManagement !== 'COMPUTED'  && setup.operation.operationTimeManagement !== 'NONE'")
                                             TechnologyCreateDialogCardPart4(:setup="setup")
 
                                         // 1234 часть карточки кооперация
