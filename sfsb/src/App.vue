@@ -29,8 +29,20 @@ watch(theme, () => {
     height: 32px !important
 
 [untouchable="true"]
-    pointer-events: none
-    // filter: contrast(0)
     opacity: 0.5
-    user-select: none
+    & *
+        pointer-events: none
+        user-select: none
+
+.v-container
+    @media (width < 1024px)
+        padding: 1em
+
+.v-card-text
+    @media (width < 1024px)
+        padding: 6px
+
+[class*="v-col-"]
+    @media (width < 1024px)
+        padding: 2px
 </style>
