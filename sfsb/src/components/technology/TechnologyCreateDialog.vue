@@ -62,6 +62,7 @@
                             v-btn.technology-card__save(color="orange-darken-1" variant="text" type="submit" :disabled="isSaveActive" :untouchable="!isBlockedByCurrentUser") Сохранить
                         .technology-card__close
                             v-btn(color="orange-darken-1" variant="text" @click="hideDialog") Закрыть
+
     AlertDialog(ref="alertDialog")
 </template>
 
@@ -228,7 +229,7 @@ const createNewSetup = () => ({
         operationName: ''
     },
     cooperatePrice: {amount: 0, currency: 'RUB'}
-});
+} as Partial<Setup>);
 
 const newSetup = ref(createNewSetup())
 
