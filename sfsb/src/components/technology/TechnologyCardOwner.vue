@@ -1,7 +1,9 @@
 <template lang="pug">
 .technology-card__owner
     .technology-card__owner-title
-        span(v-if="technologyUser") Последние изменения внесены: {{ technologyUser.firstName }} {{technologyUser.lastName }}
+        .technology-card__owner-changes(v-if="technologyUser")
+            span Последние изменения внесены:
+            span {{ technologyUser.firstName }} {{technologyUser.lastName }}
         span(v-else="technologyUser" ) Данные не были внесены
     .technology-card__owner-switcher(:untouchable="untouchable")
         v-switch(v-model="model" :label="model?'В работе':'Взять в работу'" color="red" )
@@ -34,5 +36,11 @@ watch(() => model.value, async (newVal: boolean) => {
 </script>
 
 <style lang="sass" scoped>
+.technology-card
+    &__owner-changes
+        display: flex
+        column-gap: .5em
+        flex-wrap: wrap
+        font-size: clamp(14px, 20 / 1024 * 100vw, 20px)
 
 </style>
