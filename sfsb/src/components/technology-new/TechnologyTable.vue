@@ -86,7 +86,6 @@ const refresh = () => {
 
     &__item
         padding: 1em
-        background: #fff
         border-radius: .5em
         box-shadow: 0 0 .4em #7774
 
