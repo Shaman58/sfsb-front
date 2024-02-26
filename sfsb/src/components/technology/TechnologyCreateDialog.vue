@@ -1,24 +1,21 @@
 <template lang="pug">
     v-container.pa-0(fluid v-if="currentItem")
-        v-dialog(v-model="dialogVisible" :fullscreen="true")
+        v-dialog(v-model="dialogVisible" :fullscreen="true" scrollable)
             v-form(ref="form" v-model="valid" @submit.prevent="save" style="overflow-y: auto;")
                 v-card.dialog-content
                     v-card-title
                         .technology-card__title
                             .technology-card__title-main
                                 span.text-h4 {{ currentItem && currentItem.technology.drawingNumber + " " + currentItem && currentItem.technology.drawingName }}
-                                | {{ currentItem.quantity + "шт." }}
-                            Suspense
-                                template(#fallback)
-                                    v-progress-linear(indeterminate :color="$defaultColor")
-                                template(#default)
+                                span {{ currentItem.quantity + "шт." }}
+                            suspended-component
                                     technology-card-owner(@change="changeOwner")
 
                     v-card-text(:untouchable="!isBlockedByCurrentUser")
                         v-row
                             v-col
-                                v-switch(v-model="currentItem.technology.assembly" :true-value="true" :false-value="false" :label="currentItem.technology.assembly ? 'Сборка' : 'Деталь'")
-                                v-card(v-if="!workpieceCardVisible && !currentItem.technology.assembly" width="200" title="Заготовка:" @click="showWorkpieceCard")
+                                v-switch(cols="12" md="6" v-model="currentItem.technology.assembly" :true-value="true" :false-value="false" :label="currentItem.technology.assembly ? 'Сборка' : 'Деталь'")
+                                v-card(cols="12" md="6" v-if="!workpieceCardVisible && !currentItem.technology.assembly" width="200" title="Заготовка:" @click="showWorkpieceCard")
                                     v-card-item {{ !!currentItem.technology.workpiece ? formatWorkpieceData(currentItem.technology.workpiece) : "Задать заготовку"}}
                                 tech-workpiece-card(v-else-if="!currentItem.technology.assembly" :workpiece="{ ...currentItem.technology.workpiece }" :materials="materials" @validatedWorkpiece="saveWorkpiece" @hide="hideWorkpieceCard")
 
@@ -58,13 +55,13 @@
                                 suspended-component(v-else)
                                     setup-create-card( :setup="newSetup" :quantity-of-parts-from-workpiece="Number(currentItem.technology.quantityOfPartsFromWorkpiece)" :additionalTexts="additionalTexts" @hideSetup="hideSetup()" @save="pushSetup" )
 
-                    v-card-actions
-                        v-col(cols="2" class="technology-card__calculate")
+                    v-card-actions.technology-card__actions
+                        .technology-card__calculate
                             span {{ currentItem.technology.computed ? 'Рассчитан' : 'Не рассчитан' }}
                             v-switch.technology-card__switch(v-model="calculate" :disabled="!isBlockedByCurrentUser")
-                        v-btn(color="orange-darken-1" variant="text" type="submit" :disabled="isSaveActive" :untouchable="!isBlockedByCurrentUser") Сохранить
-                        v-spacer
-                        v-btn(color="orange-darken-1" variant="text" @click="hideDialog") Закрыть
+                            v-btn.technology-card__save(color="orange-darken-1" variant="text" type="submit" :disabled="isSaveActive" :untouchable="!isBlockedByCurrentUser") Сохранить
+                        .technology-card__close
+                            v-btn(color="orange-darken-1" variant="text" @click="hideDialog") Закрыть
     AlertDialog(ref="alertDialog")
 </template>
 
@@ -296,16 +293,7 @@ const save = async () => {
     calculate.value = currentItem.value.technology && currentItem.value.technology.computed
 };
 
-// const calculateItem = async () => {
-//     if (!saveActive.value) return;
-//     saveActive.value = false;
-//     currentItem.value.technology.computed = false;
-//     await store.dispatch("saveTechnology", currentItem.value.technology);
-//     await store.dispatch("calculateItem", currentItem.value.id);
-//     await store.dispatch("fetchItem", currentItem.value.id);
-//     await store.dispatch("fetchItems");
-//     saveActive.value = true;
-// };
+
 
 const saveWorkpiece = (validWorkpiece: any) => {
     currentItem.value.technology.workpiece = validWorkpiece;
@@ -346,14 +334,32 @@ const showWorkpieceCard = () => {
         display: flex
         align-items: center
         justify-content: space-between
+        flex-wrap: wrap
+
+    &__title-main
+
+        & > * + *
+            margin-left: .5rem
+
+    &__actions
+        display: flex
+        align-items: center
+        justify-content: space-between
+        gap: .5rem
+        flex-wrap: wrap
 
     &__calculate
         display: flex
         align-items: center
         gap: .5rem
 
+    &__save
+        flex: 1
 
-    &__switch .v-input__details
-        display: none
+
+    &__switch.v-input
+        flex-shrink: 0
+        .v-input__details
+            display: none
 
 </style>
