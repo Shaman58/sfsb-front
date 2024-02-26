@@ -18,13 +18,11 @@
                         v-row
                             v-col
                                 v-switch(v-model="currentItem.technology.assembly" :true-value="true" :false-value="false" :label="currentItem.technology.assembly ? 'Сборка' : 'Деталь'")
-
                                 v-card(v-if="!workpieceCardVisible && !currentItem.technology.assembly" width="200" title="Заготовка:" @click="showWorkpieceCard")
                                     v-card-item {{ !!currentItem.technology.workpiece ? formatWorkpieceData(currentItem.technology.workpiece) : "Задать заготовку"}}
-
                                 tech-workpiece-card(v-else-if="!currentItem.technology.assembly" :workpiece="{ ...currentItem.technology.workpiece }" :materials="materials" @validatedWorkpiece="saveWorkpiece" @hide="hideWorkpieceCard")
 
-                            v-col(cols="9" v-if="!workpieceCardVisible")
+                            v-col(cols="12" md="9" v-if="!workpieceCardVisible")
                                 TechnologyCardMainOptions
 
                         br
