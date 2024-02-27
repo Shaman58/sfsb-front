@@ -41,8 +41,15 @@ const unwatch = watch([save],()=>{
     currentItem.value && (currentItem.value.customerMaterial = customerMaterial.value||false)
 })
 
+const unwatchCurrentItem = watch([currentItem],()=>{
+     drawingNumber.value = currentItem.value?.technology.drawingNumber
+     drawingName.value = currentItem.value?.technology.drawingName
+     quantity.value = currentItem.value?.quantity
+     customerMaterial.value = currentItem.value?.customerMaterial
+})
 onUnmounted(() => {
     unwatch()
+    unwatchCurrentItem()
 })
 </script>
 
