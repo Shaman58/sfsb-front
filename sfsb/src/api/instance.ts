@@ -1,5 +1,6 @@
 import axios, {Axios, AxiosResponse} from "axios";
-import Service from "@/plugins/keycloak/service"
+// import Service from "@/plugins/keycloak/service"
+import {getToken} from "@josempgon/vue-keycloak";
 import checkStatus from "@/mixins/CheckStatus";
 import toErrorMessage from "@/mixins/ToErrorMessage";
 import {useToast} from "vue-toast-notification";
@@ -27,13 +28,13 @@ api.interceptors.response.use(
     }
 );
 
-api.interceptors.request.use((config) => {
-    const token = Service.getTocken()
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`
-    }
+api.interceptors.request.use(async (config) => {
+    const token = await getToken()
+    config.headers['Authorization'] = `Bearer ${token}`
     return config
-}, error => Promise.reject(error))
+}, error => {
+    return Promise.reject(error)
+})
 
 
 export default api;

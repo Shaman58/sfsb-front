@@ -42,10 +42,10 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue";
+import {onMounted, onUnmounted, ref, watch} from "vue";
 import ImpulsHub from "@/components/ImpulsHub.vue";
 import CONSTS from "@consts/index"
-import keycloakService from '@/plugins/keycloak/service';
+// import keycloakService from '@/plugins/keycloak/service';
 import { useToast } from "vue-toast-notification";
 import { useCurrentUserStore } from "@/pinia-store/currentUser";
 import { storeToRefs } from "pinia";
@@ -53,26 +53,34 @@ import MobileMenu from "@/components/common/MobileMenu.vue";
 import { useTheme } from "vuetify";
 import { useThemeStore } from "@/pinia-store/themeSwitcher";
 import ThemeSwitcher from "@/components/common/ThemeSwitcher.vue";
+import {useKeycloak} from "@josempgon/vue-keycloak";
 
+const {keycloak} = useKeycloak()
+const {user} = storeToRefs(useCurrentUserStore())
 const toast = useToast();
 
-const { user } = storeToRefs(useCurrentUserStore())
 
 const version = import.meta.env.VITE_APP_VERSION;
 
 const showMobileMenu = ref(false)
 const logout = () => {
-    keycloakService.logout()
+    // keycloakService.logout()
+    keycloak.logout()
 }
 
 const name = ref();
 const picture = ref()
 
-
-onMounted(async () => {
-    const user = await keycloakService.keycloak.loadUserProfile()
-    picture.value = user.attributes.picture && user.attributes.picture.length > 0 && import.meta.env.VITE_APP_BASE_FS_URL + user.attributes.picture[0]
-    name.value = user.firstName + " " + user.lastName
+const unwatchUser = watch([user], ()=>{
+    picture.value = user.value?.picture && user.value.picture
+    name.value = (user.value?.firstName || "") + " " + (user.value?.lastName || "")
+})
+// onMounted(async () => {
+//     picture.value = user.value?.picture && user.value.picture
+//     name.value = user.value?.firstName + " " + user.value?.lastName
+// })
+onUnmounted(()=>{
+    unwatchUser()
 })
 </script>
 

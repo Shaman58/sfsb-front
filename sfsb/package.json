@@ -2,6 +2,7 @@
   "name": "sfsb",
   "version": "0.2.1",
   "type": "module",
+  "types": "./srcglobal.d.ts",
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
@@ -9,6 +10,7 @@
     "docker": "docker build -t voskanvl/sfsb-front:0.2.1 . && docker push voskanvl/sfsb-front:0.2.1"
   },
   "dependencies": {
+    "@josempgon/vue-keycloak": "^2.5.0",
     "@mdi/font": "7.0.96",
     "@types/node": "^20.10.4",
     "file-saver": "^2.0.5",
