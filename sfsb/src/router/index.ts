@@ -55,7 +55,7 @@ const routes: (RouteRecordRaw & RouteMeta)[]  = [
 ];
 
 const router = createRouter({
-    history: createWebHistory(process.env.BASE_URL),
+    history: createWebHistory(),
     routes,
 });
 
@@ -63,7 +63,7 @@ router.beforeEach(async (to, _, next) => {
     const {fetchUser} = useCurrentUserStore();
     const {user} = storeToRefs(useCurrentUserStore());
     const {setCurrentRoute} = useCurrentTool()
-    setCurrentRoute(to.path)
+    setCurrentRoute(to)
 
     !user.value && await fetchUser();
 

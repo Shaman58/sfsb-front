@@ -64,6 +64,10 @@ const toSave = () => {
     showDialog.value = false
 }
 
+const unwatchItems = watch([items], () => {
+    currentItem.value = items.value[0]
+}, )
+
 const unwatchNewItem = watch([newItem], () => {
     if (!newItem.value) return
     if (newItem.value.technology.drawingNumber && newItem.value.technology.drawingNumber && newItem.value.quantity) {
@@ -81,6 +85,7 @@ const unwatchCurrentItem = watch([currentItem], () => {
     !wasItemsChange.value  && (showDialog.value = true)
 })
 onUnmounted(() => {
+    unwatchItems()
     unwatchNewItem()
     unwatchShowDialog()
     unwatchCurrentItem()
