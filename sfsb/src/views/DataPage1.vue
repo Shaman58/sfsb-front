@@ -1,6 +1,7 @@
 <template lang="pug">
     suspended-component
-        DataPageTabs
+        //DataPageTabs
+        router-view
 </template>
 <script setup lang="ts">
 

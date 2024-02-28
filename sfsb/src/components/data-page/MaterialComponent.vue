@@ -1,102 +1,91 @@
 <template lang="pug">
-    v-form.material-form(ref="form" v-if="materialLocal" )
+    v-form.material-form(ref="form")
         v-card.material-form__card(:loading="loading")
-            v-card-title.material-form__title {{ materialLocal.materialName}}
+            v-card-title.material-form__title {{ materialName}}
             v-card-text.material-form__controls
                 .material-form__controls-content
                     v-row.material-form__row
                         v-col(cols="4")
-                            v-text-field(label="Название:" v-model="materialLocal.materialName" :rules="[rules.required, rules.nameValidation]" counter)
+                            v-text-field(label="Название:" v-model="materialName" :rules="[rules.required, rules.nameValidation]" counter)
                         v-col(cols="4")
-                            v-select(label="Выберите вид:" :items="geometries" item-title="title" item-value="label"
-                                v-model="materialLocal.geometry" :rules="[rules.required]" )
+                            v-select(label="Выберите вид:" :items="$geometries" item-title="title" item-value="label"
+                                v-model="geometry" :rules="[rules.required]" )
                         v-col(cols="4")
-                            v-text-field(label="Гост на метериал:"  :rules="[rules.required]" v-model="materialLocal.gost1")
+                            v-text-field(label="Гост на метериал:"  :rules="[rules.required]" v-model="gost1")
                     v-row.material-form__row
                         v-col(cols="4")
                             v-select(label="Выберите плотность:" :items="templates" item-title="materialTypeName"
-                                item-value="density" v-model="materialLocal.density" )
+                                item-value="density" v-model="density" )
                         v-col(cols="2")
-                            v-text-field(label="Плотность:" v-model="materialLocal.density"
+                            v-text-field(label="Плотность:" v-model="density"
                                 :rules="[rules.required, rules.numeric]" )
                         v-col(cols="2")
-                            v-text-field(label="Стоимость килограмма:" v-model="materialLocal.price.amount"
+                            v-text-field(label="Стоимость килограмма:" v-model="price.amount"
                                 :rules="[rules.required]" type="number")
                         v-col(cols="4")
-                            v-text-field(label="Гост на сортамент:" v-model="materialLocal.gost2")
+                            v-text-field(label="Гост на сортамент:" v-model="gost2")
 
             v-card-actions.material-form__actions
-                v-btn.material-form__btn(@click="save") {{ flagNew ? "Сохранить" : "Изменить" }}
-                v-spacer
-                v-btn.material-form__btn(@click="insert" :disabled="flagNew" color="orange") Добавить новый
+                v-btn.material-form__btn(@click="save") {{ route.params.id==="new" ? "Сохранить" : "Изменить" }}
+
 
 </template>
 
 <script setup lang="ts">
-import {onMounted, onUnmounted, type Ref, ref, toValue, watchEffect} from "vue";
-import {useValidationRules} from "@/mixins/FieldValidationRules";
 import {useRoute} from "vue-router";
-import CONST from "@/consts";
 import {storeToRefs} from "pinia";
+import {useCurrentTool, useToolingStore} from "@/pinia-store/tools";
+import {useValidationRules} from "@/mixins/FieldValidationRules";
+import {computed, onUnmounted, ref, toRefs, watch} from "vue";
 import {useMaterialTemplatesStore} from "@/pinia-store/materialTemplates";
-import {useMaterialsStore} from "@/pinia-store/tools";
-import Material from "@/components/data-page/MaterialComponent.vue";
-import emptyMaterial from "@/components/data-page/EmptyMaterial";
-
-const {materialTemplates: templates} = storeToRefs(useMaterialTemplatesStore())
-const {fetchMaterialTemplates} = useMaterialTemplatesStore()
-const {loading} = storeToRefs(useMaterialsStore())
-const {saveTool: saveMaterial} = useMaterialsStore()
-
-const props = defineProps<{ item: Material }>()
-// const {item} = toRefs(props)
-
-const emit = defineEmits(["save"])
-
-const form = ref<HTMLFormElement>()
-const route = useRoute()
+import {de} from "vuetify/locale";
 
 const {rules} = useValidationRules();
-const geometries = CONST.GEOMETRIES
-const materialLocal = ref({...emptyMaterial(), ...props.item})
-const flagNew = ref(false)
+const route = useRoute()
+
+const {currentTool: currentType} = storeToRefs(useCurrentTool())
+const loading = false
 
 
-const save = async () => {
-    if (!materialLocal.value || !form.value) return
-    const valid: { valid: boolean, errors: Ref<string[]> } = await form.value?.validate()
-    if (valid.valid) {
-        emit("save", materialLocal.value)
-        flagNew.value = false
-    }
+const currentMaterial = computed<Material>(() => (currentType.value?.list.find(e => e.id.toString() === route.params.id.toString()) || currentType.value?.list[0]) as Material)
+const {geometry, gost1, gost2, materialName, density, price} = toRefs(currentMaterial.value)
+const {materialTemplates: templates} = storeToRefs(useMaterialTemplatesStore())
+
+const save = async ()=>{
+    await currentType.value?.save({
+        materialName: materialName.value,
+        geometry: geometry.value,
+        density: density.value,
+        gost2: gost2.value,
+        gost1: gost1.value,
+        price: price.value
+    } as Material & Tool)
 }
-const insert = () => {
-    materialLocal.value = {
-        materialName: "",
-        geometry: geometries.at(-1)?.label||"",
-        gost1: "",
-        gost2: "",
-        density: 0,
-        price: {
+
+const unwatchRoute = watch([route], () => {
+    if(route.params.id==="new"){
+        geometry.value = ""
+        gost2.value = ""
+        gost1.value = ""
+        materialName.value = ""
+        density.value = 0
+        price.value = {
             amount: 0,
-            currency: "RUB"
+            currency: "RUB",
         }
+        return
     }
-    flagNew.value = true
-}
-onMounted(async () => {
-    !templates.value.length && await fetchMaterialTemplates()
-    materialLocal.value = toValue(props.item) as Material
+     geometry.value = currentMaterial.value.geometry
+     gost2.value = currentMaterial.value.gost2
+     gost1.value = currentMaterial.value.gost1
+     materialName.value = currentMaterial.value.materialName
+     density.value = currentMaterial.value.density
+     price.value = currentMaterial.value.price
 
+}, {immediate: true})
+onUnmounted(() => {
+    unwatchRoute()
 })
-
-const unwatch = watchEffect(() => {
-    materialLocal.value = props.item
-    flagNew.value = false
-})
-
-onUnmounted(unwatch)
-
 </script>
 
 
@@ -127,8 +116,6 @@ onUnmounted(unwatch)
 
         @media (width < 530px)
             grid-template-columns: 1fr
-
-
 
 
 </style>

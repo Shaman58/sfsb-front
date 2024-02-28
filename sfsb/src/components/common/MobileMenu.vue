@@ -14,7 +14,7 @@
             ThemeSwitcher
         .mobile-menu__body
             .mobile-menu__body-wrapper
-                .mobile-menu__link(v-for="(i, index) in CONSTS.MAINMENU" )
+                .mobile-menu__link(v-for="(i, index) in $navItems" )
                     div(v-if="'submenu' in i")
                         label.submenu__label(:for="`submenu-switch${index}`")
                             span {{ i.label }}
@@ -30,7 +30,6 @@
 
 </template>
 <script setup lang="ts">
-import CONSTS from "@consts/index"
 import {defineModel, onUnmounted, ref, toRefs, watch} from "vue"
 import ThemeSwitcher from "@/components/common/ThemeSwitcher.vue";
 

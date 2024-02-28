@@ -6,7 +6,7 @@
                 v-text-field(v-model="search" label="Найти материал" clearable)
         .supply-card__main
             v-data-table.supply-card__table(:items="typedCurrentData" :headers  :search
-            :items-per-page-text="'Позиций на листе'"
+                :items-per-page-text="'Позиций на листе'"
                 no-data-text="Данные отсутствуют"
                 page-text=""
                 :show-current-page="true"

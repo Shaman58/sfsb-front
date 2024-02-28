@@ -54,7 +54,7 @@ const toolItem = ref({} as AdditionalTool);
 const {formatWorkpieceData} = materialDataFormatting();
 const workpieceCardVisible = ref(false);
 const {additionals, visible} = toRefs(props);
-const {materials} = storeToRefs(useMaterialsStore())
+const {tools: materials} = storeToRefs(useMaterialsStore())
 const showWorkpieceCard = () => {
     workpieceCardVisible.value = true;
 };
@@ -63,7 +63,7 @@ const hideWorkpieceCard = () => {
     workpieceCardVisible.value = false;
 };
 
-const saveWorkpiece = (validWorkpiece) => {
+const saveWorkpiece = (validWorkpiece: Workpiece) => {
     toolItem.value.workpiece = validWorkpiece;
 };
 
@@ -71,8 +71,8 @@ const hide = () => {
     emit('hide');
 };
 
-const save = (savedTool) => {
-    additionals.push({...savedTool});
+const save = (savedTool: AdditionalTool) => {
+    additionals.value.push({...savedTool});
     toolItem.value = {workpiece: undefined, toolName: ''};
 };
 

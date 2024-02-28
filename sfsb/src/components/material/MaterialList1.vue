@@ -36,8 +36,8 @@ import {useMaterialTemplatesStore} from "@/pinia-store/materialTemplates";
 const props = defineProps<{ visible: boolean }>()
 const emit = defineEmits(["update:visible"])
 
-const {materials} = storeToRefs(useMaterialsStore())
-const {fetchMaterials, saveMaterial, deleteMaterial} = useMaterialsStore()
+const {tools: materials} = storeToRefs(useMaterialsStore())
+const {fetchTool: fetchMaterials, saveTool: saveMaterial, deleteTool: deleteMaterial} = useMaterialsStore()
 
 const {materialTemplates} = storeToRefs(useMaterialTemplatesStore())
 const {fetchMaterialTemplates} = useMaterialTemplatesStore()

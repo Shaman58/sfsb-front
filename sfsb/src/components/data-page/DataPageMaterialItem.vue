@@ -1,5 +1,5 @@
 <template lang="pug">
-	.datapage-main__list-name {{ geom.title }} {{ item.materialName }}
+	.datapage-main__list-name {{ geom?.title }} {{ item.materialName }}
 	.datapage-main__list-options
 		.datapage-main__list-option(v-if="item.gost1") {{ item.gost1}}
 		.datapage-main__list-option(v-if="item.gost2") {{ item.gost2}}

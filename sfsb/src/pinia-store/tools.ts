@@ -1,6 +1,7 @@
 import {defineStore} from "pinia";
 import ToolStore from "@/pinia-store/ToolStore";
-import {computed, ref} from "vue";
+import {computed, type Ref, ref} from "vue";
+import {RouteLocationNormalized} from "vue-router";
 
 export const useToolingStore
     = defineStore("tooling", () => new ToolStore<Tool>("/tooling"));
@@ -63,7 +64,7 @@ export const useSwitches = () => computed(() => [
     {
         id: 4,
         path: "/data/toolings",
-        name: "Остастка",
+        name: "Оснастка",
         list: useToolingStore().tools,
         type: "Tool",
         save: useToolingStore().saveTool,
@@ -76,18 +77,18 @@ export const useSwitches = () => computed(() => [
 ])
 
 export const useCurrentTool = defineStore("currentTool", () => {
-    const currentRoute = ref("/")
+    const currentRoute: Ref<RouteLocationNormalized | null> = ref(null)
     const switchTool = useSwitches()
     const currentTool = computed({
         get: () => {
-            const res = switchTool.value.find(e => e.path === currentRoute.value)
+            const res = switchTool.value.find(e => e.name === currentRoute.value?.meta.name)
             return res
         },
         set: () => {
         }
     })
 
-    const setCurrentRoute = (route: string) => {
+    const setCurrentRoute = (route: RouteLocationNormalized) => {
         currentRoute.value = route
     }
 

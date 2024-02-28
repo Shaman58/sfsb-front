@@ -28,7 +28,7 @@
                         v-col(cols="12" md="6" lg="4" v-if="setup?.operation?.operationTimeManagement === 'FULL' && !setup.cooperate")
                             v-text-field(label="Наладочное время(чч:мм)" v-model="setup.setupTime" type="time" :rules="[rules.durationNotZeroValidation]")
                         v-col(cols="12" md="6" lg="4" v-if="setup?.operation?.operationTimeManagement === 'FULL' && !setup.cooperate || setup?.operation?.operationTimeManagement === 'PROCESS_TIME_ONLY' && !setup.cooperate")
-                            v-combobox(v-if="!!toolings" :items="toolings" item-title='toolName' return-object v-model="setup.toolings" label="Выбрать оснастку" :multiple="true")
+                            v-combobox(v-if="!!toolings" :items="toolings" item-title='toolName' return-object v-model="setup.toolings" label="Выбрать оснастку" multiple)
                         v-col(cols="12" md="6" lg="4" v-if="setup?.operation?.operationTimeManagement === 'FULL' && !setup.cooperate || setup?.operation?.operationTimeManagement === 'PROCESS_TIME_ONLY' && !setup.cooperate")
                             v-btn(size="small" variant="text" v-if="setup.measureToolItems?.length === 0" @click="measureVisible = true") Меритель
                             v-list(v-else @click="measureVisible = true")
