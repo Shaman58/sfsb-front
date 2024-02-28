@@ -19,6 +19,9 @@ declare module "*.vue" {
 
 declare interface ImportMeta {
     env: {
+        VITE_APP_KEYCLOAK_CLIENT: string;
+        VITE_APP_KEYCLOAK_REALM: string;
+        VITE_APP_KEYCLOAK_URL: string;
         BASE_URL: string;
         VITE_APP_VERSION: any;
         VITE_APP_BASE_API_URL: string;
