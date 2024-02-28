@@ -1,4 +1,3 @@
-// import keycloakService from "@/plugins/keycloak/service.mjs";
 import { Ref, ref } from "vue";
 import { useKeycloak } from '@josempgon/vue-keycloak'
 

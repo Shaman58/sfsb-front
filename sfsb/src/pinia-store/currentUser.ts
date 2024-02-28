@@ -2,7 +2,6 @@ import { defineStore } from "pinia";
 import api from "@/api/instance";
 import { useToast } from "vue-toast-notification";
 import { Ref, ref } from "vue";
-// import keycloakService from "@/plugins/keycloak/service.mjs";
 import { useKeycloak } from '@josempgon/vue-keycloak'
 const toast = useToast();
 
@@ -20,9 +19,8 @@ export const useCurrentUserStore = defineStore("current-user", () => {
     const user = ref<Person | null>(null);
 
     const fetchUser = async () => {
-        const {keycloak, isPending, hasFailed, token} = useKeycloak()
+        const {keycloak, } = useKeycloak()
         try {
-            console.log(hasFailed.value, isPending.value, token.value, keycloak.authenticated)
             await keycloakLoaded()
             const { data } = await api.get<Person[]>("/user");
             const userKeycloak =
