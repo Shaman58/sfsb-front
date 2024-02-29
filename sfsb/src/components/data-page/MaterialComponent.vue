@@ -5,24 +5,24 @@
             v-card-text.material-form__controls
                 .material-form__controls-content
                     v-row.material-form__row
-                        v-col(cols="4")
+                        v-col(cols="12" sm="6" md="4")
                             v-text-field(label="Название:" v-model="local.materialName" :rules="[rules.required, rules.nameValidation]" counter)
-                        v-col(cols="4")
+                        v-col(cols="12" sm="6" md="4")
                             v-select(label="Выберите вид:" :items="$geometries" item-title="title" item-value="label"
                                 v-model="local.geometry" :rules="[rules.required]" )
-                        v-col(cols="4")
+                        v-col(cols="12" sm="12" md="4")
                             v-text-field(label="Гост на метериал:"  :rules="[rules.required]" v-model="local.gost1")
                     v-row.material-form__row
-                        v-col(cols="4")
+                        v-col(cols="12"   sm="6" md="4")
                             v-select(label="Выберите плотность:" :items="templates" item-title="materialTypeName"
                                 item-value="local.density" v-model="local.density" )
-                        v-col(cols="2")
+                        v-col(cols="12"   sm="6" md="2")
                             v-text-field(label="Плотность:" v-model="local.density"
                                 :rules="[rules.required, rules.numeric]" )
-                        v-col(cols="2")
+                        v-col(cols="12"   sm="6" md="2")
                             v-text-field(label="Стоимость килограмма:" v-model="local.price.amount"
                                 :rules="[rules.required]" type="number")
-                        v-col(cols="4")
+                        v-col(cols="12"   sm="6" md="4")
                             v-text-field(label="Гост на сортамент:" v-model="local.gost2")
 
             v-card-actions.material-form__actions
@@ -45,7 +45,7 @@ const selectedTool = ref((currentTool.value!.list.find(e => +e.id === +route.par
 
 const {rules} = useValidationRules();
 
-const local = ref({...emptyMaterial()})
+const local = ref(emptyMaterial())
 
 const {gost1, gost2, density, geometry, materialName, price: {value: {amount}}} = toRefs(selectedTool.value)
 
