@@ -47,7 +47,7 @@ const unwatchRouter = watchEffect(() => {
     if (route.params.id === 'new') {
         currentTool.value = emptyTool() as Tool
     } else {
-        currentTool.value = (currentType.value?.list.find(e => e.id + "" === route.params.id) || emptyTool() )as Tool
+        currentTool.value = (currentType.value?.list.find(e => e.id + "" === route.params.id) || currentType.value?.list[0] )as Tool
     }
     if (!currentTool.value) return
     toolName.value = currentTool.value.toolName
