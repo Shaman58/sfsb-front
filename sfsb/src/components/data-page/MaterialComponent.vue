@@ -63,6 +63,7 @@ const save = async ()=>{
 }
 
 const unwatchRoute = watch([currentMaterial], () => {
+    if(!route.path.includes("materials")) return
     if(route.params.id==="new"){
         geometry.value = ""
         gost2.value = ""

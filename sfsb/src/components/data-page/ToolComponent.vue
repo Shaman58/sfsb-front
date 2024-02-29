@@ -29,7 +29,7 @@ const {rules} = useValidationRules();
 
 const {currentTool: currentType} = storeToRefs(useCurrentTool())
 
-const currentTool = ref((currentType.value?.list.find(e => e.id + "" === route.params.id) || emptyTool() )as Tool)
+const currentTool = ref((currentType.value?.list.find(e => e.id + "" === route.params.id) || currentType.value?.list[0] )as Tool)
 const newFlag = ref(route.params.id === "new")
 
 const toolName = ref(currentTool.value?.toolName || "")
