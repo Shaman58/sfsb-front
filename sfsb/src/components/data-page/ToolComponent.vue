@@ -63,7 +63,7 @@ onUnmounted(() => {
 </script>
 
 
-<style scoped lang="sass">
+<style lang="sass">
 .material-form
     height: 100%
 

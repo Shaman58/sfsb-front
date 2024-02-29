@@ -2,8 +2,8 @@ import DataPage1 from "@/views/DataPage1.vue";
 import DataPageMain from "@/components/data-page/DataPageMain.vue";
 import {type RouteMeta, type RouteRecordRaw} from "vue-router";
 import ClientCard from "@/components/commerce/Clients/ClientCard.vue";
-import MaterialComponent from "@/components/data-page/MaterialComponent.vue";
 import ToolComponent from "@/components/data-page/ToolComponent.vue";
+import MaterialComponent from "@/components/data-page/MaterialComponent.vue";
 
 const data: RouteRecordRaw & RouteMeta = {
     path: "/data",
