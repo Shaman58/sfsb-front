@@ -2,9 +2,10 @@
     v-list.datapage-main__list
         v-list-item
             router-link(:to="href+'/new'") Добавить новый
-        v-list-item(v-for="item in list" :key="item.id" :active="item.id+''===route.path.split('/').at(-1)")
+        v-list-item(v-for="item in list" :key="item.id" :active="item.id+''===route.path.split('/').at(-1)" )
             router-link(:to="href+'/'+item.id")
                 slot(:item="item")
+        v-list-item(v-intersect="onInter")
 
 </template>
 <script setup lang="ts">
@@ -13,6 +14,8 @@ import {useRoute, useRouter} from "vue-router";
 
 const props = defineProps<{ list: Material[] | Tool[] }>()
 const {list} = toRefs(props)
+const emit = defineEmits(["intersect"])
+
 const route = useRoute()
 const router = useRouter()
 
@@ -23,7 +26,9 @@ const href = computed(() => {
     return route.path //иначе возвращаем path без изменений
 })
 
-//TODO: lazy loading
+const onInter=(ev: Event)=>{
+    emit("intersect", ev)
+}
 </script>
 
 

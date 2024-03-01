@@ -1,6 +1,6 @@
 <template lang="pug">
     v-form.material-form(ref="form")
-        v-card.material-form__card
+        v-card.material-form__card(:loading="currentTool.loading")
             v-card-title.material-form__title {{ local.materialName}}
             v-card-text.material-form__controls
                 .material-form__controls-content
@@ -59,7 +59,7 @@ const save = async () => {
     currentTool.value && await currentTool.value.save(res)
 }
 
-watch([local],() => console.log("local", local.value))
+watch([local],() => console.log("local", local.value),{deep: true})
 
 watch([route], () => {
         if (route.params.id === "new") {
@@ -68,9 +68,10 @@ watch([route], () => {
             selectedTool.value = (currentTool.value!.list.find(e => +e.id === +route.params.id) || currentTool.value!.list[0]) as Material
         }
 
+
         for (const key in local.value) {
             if (local.value.hasOwnProperty(key)) {
-                local.value[key as keyof Partial<Material>] = selectedTool.value[key as keyof Partial<Material>]
+                local.value[key] = selectedTool.value[key as keyof Partial<Material>]
             }
         }
         local.value.price && (local.value.price = {

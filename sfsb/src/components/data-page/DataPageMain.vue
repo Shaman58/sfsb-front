@@ -4,7 +4,7 @@
         template(#filter)
             v-text-field.datapage-main__list-filter(label="фильтр" v-model="filterText" clearable)
         template(#list)
-            data-page-list1(:list="selectedList")
+            data-page-list1(:list="selectedList" @intersect="onIntersect")
                 template(#default="{item}")
                     data-page-material-item(v-if="$route.meta.name==='Материалы'" :item="item")
                     data-page-tool-item(v-else :item="item")
@@ -47,6 +47,12 @@ const backgroundLoadingLists = () => {
     })
 }
 backgroundLoadingLists()
+
+const onIntersect = async(ev: boolean)=>{
+    console.log("intersect", ev)
+    if(!ev) return
+    currentTab.value && await currentTab.value.newData()
+}
 
 watchEffect(()=>console.log("selectedList", selectedList.value))
 
