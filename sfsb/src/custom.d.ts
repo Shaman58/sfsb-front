@@ -132,7 +132,7 @@ declare interface Operation {
 }
 
 declare interface AdditionalTool extends Tool {
-    workpiece: Workpiece,
+    workpiece?: Workpiece,
     amount: number,
     processTime: string
 }

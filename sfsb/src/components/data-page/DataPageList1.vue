@@ -12,7 +12,7 @@
 import {computed, toRefs} from "vue";
 import {useRoute, useRouter} from "vue-router";
 
-const props = defineProps<{ list: Material[] | Tool[] }>()
+const props = defineProps<{ list: { id: number }[] }>()
 const {list} = toRefs(props)
 const emit = defineEmits(["intersect"])
 
