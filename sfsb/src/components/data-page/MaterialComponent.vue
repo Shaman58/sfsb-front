@@ -32,7 +32,7 @@
 import {useRoute} from "vue-router";
 import {storeToRefs} from "pinia";
 import {useCurrentTool} from "@/pinia-store/tools";
-import {reactive, ref, toRefs, watch, watchEffect} from "vue";
+import {onUnmounted, reactive, ref, toRefs, watch, watchEffect} from "vue";
 import {useValidationRules} from "@/mixins/FieldValidationRules";
 import {useMaterialTemplatesStore} from "@/pinia-store/materialTemplates";
 import emptyMaterial from "@/components/data-page/EmptyMaterial";
@@ -59,9 +59,9 @@ const save = async () => {
     currentTool.value && await currentTool.value.save(res)
 }
 
-watch([local],() => console.log("local", local.value),{deep: true})
+const unwatchLocal = watch([local],() => console.log("local", local.value),{deep: true})
 
-watch([route], () => {
+const unwatchRoute = watch([route], () => {
         if (route.params.id === "new") {
             selectedTool.value = emptyMaterial() as Material
         } else {
@@ -71,8 +71,7 @@ watch([route], () => {
 
         for (const key in local.value) {
             if (local.value.hasOwnProperty(key)) {
-                local.value[key] = selectedTool.value[key as keyof Partial<Material>]
-            }
+                (local.value as { [K in keyof Material]: any } )[key as keyof Material] = selectedTool.value[key as keyof Partial<Material>]}
         }
         local.value.price && (local.value.price = {
             ...local.value.price,
@@ -80,6 +79,11 @@ watch([route], () => {
         })
     }, {immediate: true}
 )
+
+onUnmounted(()=>{
+    unwatchLocal()
+    unwatchRoute()
+})
 
 </script>
 
