@@ -73,11 +73,11 @@ const hide = () => {
 
 const save = (savedTool: AdditionalTool) => {
     additionals.value.push({...savedTool});
-    toolItem.value = {workpiece: undefined, toolName: ''};
+    toolItem.value = { toolName: ''};
 };
 
-const remove = (index) => {
-    additionals.splice(index, 1);
+const remove = (index: number) => {
+    additionals.value.splice(index, 1);
 };
 
 </script>
