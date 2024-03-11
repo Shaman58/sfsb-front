@@ -257,3 +257,52 @@ declare interface FileOrder {
     "link": string,
     "user": unknown | null
 }
+
+declare interface KPItem{
+    id?: string,
+    created: string|null,
+    updated: string|null,
+    name: string,
+    decimal: string,
+    amount: number,
+    itemPrice: number,
+    totalPrice: string
+}
+declare interface KP{
+    id?: number,
+    created: string,
+    updated: null,
+    businessProposal: string,
+    applicationNumber: number,
+    companyId: number,
+    managerUuid: string,
+    items: KPItem[]
+}
+declare interface KPResponse{
+    content: KP[],
+    pageable: {
+        pageNumber: number,
+        pageSize: number,
+        sort: {
+            empty: boolean,
+            sorted: boolean,
+            unsorted: boolean
+        },
+        offset: number,
+        paged: boolean,
+        unpaged: boolean
+    },
+    totalPages: number,
+    totalElements: number,
+    last: boolean,
+    size: number,
+    number: number,
+    sort: {
+        empty: boolean,
+        sorted: boolean,
+        unsorted: boolean
+    },
+    numberOfElements: number,
+    first: boolean,
+    empty: boolean
+}
