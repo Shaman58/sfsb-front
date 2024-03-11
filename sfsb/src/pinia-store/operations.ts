@@ -19,6 +19,7 @@ export const useOperationsStore = defineStore("operations", () => {
         loading.value = false
     }
 
+
     //--- OPERATIONS ---
     const fetchOperation = async () => await withLoading(async () => operations.value = await crudOperations.fetch() as unknown as Operation[])
 

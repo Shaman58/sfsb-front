@@ -14,6 +14,7 @@ const navItems: NavItem[] = [
             {path: "clients", label: "Контрагенты", role: ["COMMERCE", "ADMIN"]},
             {path: "orders", label: "Заявки", role: ["COMMERCE", "ADMIN"]},
             {path: "operations", label: "Операции", role: ["COMMERCE", "ADMIN"]},
+            {path: "kp", label: "КП", role: ["COMMERCE", "ADMIN"]},
         ]
     },
     {

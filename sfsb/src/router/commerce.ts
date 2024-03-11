@@ -6,6 +6,8 @@ import OrderCard from "@/components/commerce/Orders/OrderCard.vue";
 import OperationsComponent from "@/components/commerce/Operations/OperationsComponent.vue";
 import OperationCard from "@/components/commerce/Operations/OperationCard.vue";
 import {type RouteMeta, type RouteRecordRaw} from "vue-router";
+import KP from "@/components/commerce/KP/KP.vue";
+import KPCard from "@/components/commerce/KP/KPCard.vue";
 
 const commerce: RouteRecordRaw & RouteMeta = {
     path: "/commerce",
@@ -70,6 +72,24 @@ const commerce: RouteRecordRaw & RouteMeta = {
                 },
             ]
         },
+        {
+            path: "kp",
+            component: KP,
+            meta: {
+                onlyFor: ["COMMERCE", "ADMIN"],
+                name: "КП"
+            },
+            children: [
+                {
+                    path: ":id",
+                    component: KPCard,
+                    meta: {
+                        onlyFor: ["COMMERCE", "ADMIN"],
+                        name: "КП карт"
+                    },
+                },
+            ]
+        }
     ]
 }
 
