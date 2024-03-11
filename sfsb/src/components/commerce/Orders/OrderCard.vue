@@ -56,9 +56,9 @@ import OrderToolbar from "@/components/commerce/Orders/OrderToolbar.vue";
 import OrderItems from "@/components/commerce/Orders/OrderItems.vue";
 import {useRoute, useRouter} from "vue-router";
 import {useOrdersStore} from "@/pinia-store/orders";
-import emptyOrder from "@/components/commerce/Orders/EmptyOrder";
 import AlertDialog from "@/components/common/AlertDialog.vue";
 import {useCurrentUserStore} from "@/pinia-store/currentUser";
+import {Empty} from "@/mixins/Empty";
 
 const router = useRouter()
 const {params} = toRefs(useRoute())
@@ -69,7 +69,7 @@ const {saveOrder, getOrders} = useOrdersStore()
 const hasCurrentOrder = orders.value.find(e => e.id + "" === params.value.id)
 if (!hasCurrentOrder && params.value.id !== "new") router.push("/not-found")
 
-const order = computed(() => params.value.id === 'new' ? emptyOrder() : orders.value.find(e => e.id + "" === params.value.id) || orders.value[0])
+const order = computed(() => params.value.id === 'new' ? Empty.Order() : orders.value.find(e => e.id + "" === params.value.id) || orders.value[0])
 
 const orderLocal = ref<Order>(order.value as Order)
 

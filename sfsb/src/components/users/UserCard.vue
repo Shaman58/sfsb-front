@@ -50,11 +50,11 @@ import {useRoute} from "vue-router";
 import {computed, onUnmounted, type Ref, ref, toRefs, watch, watchEffect} from "vue";
 import {storeToRefs} from "pinia";
 import {useStaffStore} from "@/pinia-store/staff"
-import emptyUser from "./EmptyUser"
 import {useRolesStore} from "@/pinia-store/roles";
 import ControlButton from "@/components/commerce/Orders/ControlButton.vue";
 import {useToast} from "vue-toast-notification";
 import UserAvatar from "@/components/users/UserAvatar.vue";
+import {Empty} from "@/mixins/Empty";
 
 const toast = useToast();
 
@@ -69,7 +69,7 @@ const {getAllRoles} = useRolesStore()
 !roles.value.length && await getAllRoles()
 
 const emptyUserWithRoles = () => {
-    const user = emptyUser()
+    const user = Empty.User()
     user.roles = roles.value
     return user
 }
@@ -122,7 +122,7 @@ const unwatchPersonLocal =watch([personLocal], () => {
 
 const unwatchParams = watchEffect(() => {
     console.log("params", params.value)
-    personLocal.value = params.value.id === "new" ? emptyUser() as Person : (staff.value.find(e => e.id === params.value.id) || staff.value[0])
+    personLocal.value = params.value.id === "new" ? Empty.User() as Person : (staff.value.find(e => e.id === params.value.id) || staff.value[0])
 
 })
 

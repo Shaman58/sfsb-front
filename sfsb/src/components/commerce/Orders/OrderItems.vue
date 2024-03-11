@@ -20,8 +20,8 @@
 
 import OrderItem from "@/components/commerce/Orders/OrderItem.vue";
 import {onUnmounted, ref, toRefs, watch} from "vue";
-import emptyItem from "@/components/commerce/Orders/EmptyItem";
 import OrderItemDetails from "@/components/commerce/Orders/OrderItemDetails.vue";
+import {Empty} from "@/mixins/Empty";
 
 const props = defineProps<{ items: Item[], customer: string, number: number }>()
 const {items, customer, number} = toRefs(props)
@@ -40,7 +40,7 @@ const isActive = (item: Item): boolean => {
 }
 
 const addNewItem = () => {
-    newItem.value = emptyItem()
+    newItem.value = Empty.Item()
     newItem.value.uid = Date.now().toString(36)
     items.value.push(newItem.value)
     currentItem.value = newItem.value

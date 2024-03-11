@@ -270,8 +270,8 @@ declare interface KPItem{
 }
 declare interface KP{
     id?: number,
-    created: string,
-    updated: null,
+    created: string | null,
+    updated: string | null,
     businessProposal: string,
     applicationNumber: number,
     companyId: number,

@@ -20,10 +20,10 @@ import {storeToRefs} from "pinia";
 import {useOperationsStore} from "@/pinia-store/operations";
 import {onUnmounted, ref, type Ref, toRefs, watch} from "vue";
 import {useValidationRules} from "@/mixins/FieldValidationRules";
-import emptyOperation from "@/components/commerce/Operations/EmptyOperation";
 import CONST from "@/consts";
 import OperationDescriptions from "@/components/commerce/Operations/OperationDescriptions.vue";
 import LayoutMain from "@/components/common/LayoutMain.vue";
+import {Empty} from "@/mixins/Empty";
 
 const {params} = toRefs(useRoute())
 
@@ -46,7 +46,7 @@ const refetchData = async () => {
 await refetchData()
 
 const operationMap = {
-    new: () => emptyOperation() satisfies Operation,
+    new: () => Empty.Operation() satisfies Operation,
     setup: () => setupPrice.value,
     tech: () => techPrice.value,
     default: () => operations.value.find(e => e.id === +params.value.id) || operations.value[0]

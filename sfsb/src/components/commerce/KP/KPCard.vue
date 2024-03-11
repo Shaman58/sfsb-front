@@ -60,6 +60,7 @@ import {storeToRefs} from "pinia";
 import {useStaffStore} from "@/pinia-store/staff";
 import {useCompaniesStore} from "@/pinia-store/companies";
 import {useCustomersStore} from "@/pinia-store/customers";
+import {Empty} from "@/mixins/Empty";
 
 const route = useRoute()
 const {loading} = storeToRefs(useKPStore())
@@ -108,8 +109,11 @@ const {fetchCustomers} = useCustomersStore()
 const unwatchRoute = watch([route], async () => {
     if (!Number.isNaN(Number(+route.params.id))) {
         currentKP.value = (await get<KP>(+route.params.id)) || null
-        items.value = currentKP.value?.items || [] as KPItem[]
     }
+    if(route.params.id==="new"){
+        currentKP.value = Empty.KP()
+    }
+    items.value = currentKP.value?.items || [] as KPItem[]
 }, {immediate: true})
 
 onBeforeUnmount(() => {

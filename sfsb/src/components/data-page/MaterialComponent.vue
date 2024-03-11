@@ -35,7 +35,7 @@ import {useCurrentTool} from "@/pinia-store/tools";
 import {onUnmounted, reactive, ref, toRefs, watch, watchEffect} from "vue";
 import {useValidationRules} from "@/mixins/FieldValidationRules";
 import {useMaterialTemplatesStore} from "@/pinia-store/materialTemplates";
-import emptyMaterial from "@/components/data-page/EmptyMaterial";
+import {Empty} from "@/mixins/Empty";
 
 const route = useRoute()
 
@@ -45,7 +45,7 @@ const selectedTool = ref((currentTool.value!.list.find(e => +e.id === +route.par
 
 const {rules} = useValidationRules();
 
-const local = ref(emptyMaterial())
+const local = ref(Empty.Material())
 
 const {gost1, gost2, density, geometry, materialName, price: {value: {amount}}} = toRefs(selectedTool.value)
 
@@ -63,7 +63,7 @@ const unwatchLocal = watch([local],() => console.log("local", local.value),{deep
 
 const unwatchRoute = watch([route], () => {
         if (route.params.id === "new") {
-            selectedTool.value = emptyMaterial() as Material
+            selectedTool.value = Empty.Material() as Material
         } else {
             selectedTool.value = (currentTool.value!.list.find(e => +e.id === +route.params.id) || currentTool.value!.list[0]) as Material
         }

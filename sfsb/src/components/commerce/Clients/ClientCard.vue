@@ -46,15 +46,15 @@ import {useValidationRules} from "@/mixins/FieldValidationRules";
 import {useRoute} from "vue-router";
 import {storeToRefs} from "pinia";
 import {useCustomersStore} from "@/pinia-store/customers";
-import emptyCompany from "./EmptyCompany"
 import LayoutMain from "@/components/common/LayoutMain.vue";
+import {Empty} from "@/mixins/Empty";
 
 const {params} = toRefs(useRoute())
 
 const {customers, loading} = storeToRefs(useCustomersStore())
 const {saveCustomer} = useCustomersStore()
 const companyLocal: ComputedRef<Customer> = computed(() => params.value.id === "new"
-    ? emptyCompany()
+    ? Empty.Company()
     : customers.value.find(e => e.id === +params.value.id) || customers.value[0]
 )
 

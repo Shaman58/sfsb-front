@@ -20,7 +20,7 @@ import {storeToRefs} from "pinia";
 import {useCurrentTool, useToolingStore} from "@/pinia-store/tools";
 import {onUnmounted, ref, watchEffect} from "vue";
 import {useValidationRules} from "@/mixins/FieldValidationRules";
-import emptyTool from "@/components/data-page/EmptyTool";
+import {Empty} from "@/mixins/Empty";
 
 const route = useRoute()
 
@@ -45,7 +45,7 @@ const save = async () => {
 
 const unwatchRouter = watchEffect(() => {
     if (route.params.id === 'new') {
-        currentTool.value = emptyTool() as Tool
+        currentTool.value = Empty.Tool()
     } else {
         currentTool.value = (currentType.value?.list.find(e => e.id + "" === route.params.id) || currentType.value?.list[0] )as Tool
     }
