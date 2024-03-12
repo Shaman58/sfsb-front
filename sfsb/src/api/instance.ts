@@ -30,8 +30,8 @@ api.interceptors.response.use(
 
 api.interceptors.request.use(async (config) => {
     const token = await getToken()
-    config.headers['Authorization'] = `Bearer ${token}`
     console.log(token)
+    config.headers['Authorization'] = `Bearer ${token}`
     return config
 }, error => {
     return Promise.reject(error)

@@ -1,0 +1,48 @@
+<template lang="pug">
+    v-data-table(:items :headers :search)
+        template(#item="{item}" )
+            KPItem(:item="item" @append="append")
+</template>
+<script setup lang="ts">
+import {Empty} from "@/mixins/Empty";
+import {storeToRefs} from "pinia";
+import {useItemStore} from "@/pinia-store/item";
+import {useTechnologyStore} from "@/pinia-store/technology";
+import useTechnologies from "@/pinia-store/technologies";
+import {ref, watch} from "vue";
+import KPItem from "@/components/commerce/KP/KPItem.vue";
+
+const items = defineModel<KPItem[]>("items")
+const props = defineProps<{search: string}>()
+const headers = [
+    {key: "controls", title: "Управление"},
+    {key: "decimal", title: "Децимальный номер"},
+    {key: "name", title: "Наименование"},
+    {key: "created", title: "Создан"},
+    {key: "updated", title: "Обновлен"},
+    {key: "price", title: "Прайс"},
+    {key: "amount", title: "Количество"},
+    {key: "total", title: "Итого"}
+]
+
+const {technologies} = storeToRefs(useTechnologies())
+const {fetch} = useTechnologies()
+!technologies.value.length && await fetch()
+
+const append = (item: KPItem) => {
+    if(!items.value) return
+    const index = items.value.indexOf(item)
+    console.log(index);
+    const newItem = Empty.KPItem()
+    newItem.created = new Date(Date.now()).toDateString()
+    items.value= [...items.value.toSpliced(index+1,0,newItem)]
+}
+
+const select = ref("")
+watch([select],console.log)
+</script>
+
+
+<style scoped lang="sass">
+
+</style>

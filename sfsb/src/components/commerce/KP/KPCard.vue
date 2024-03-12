@@ -2,6 +2,12 @@
     LayoutMain
         template(#header)
             v-progress-linear(indeterminate v-if="loading")
+            v-card(width="100%")
+                v-card-actions
+                    .bar
+                        v-icon(icon="mdi:mdi-content-copy")
+                        v-icon(icon="mdi:mdi-floppy" @click="saveKP")
+                        v-icon(icon="mdi:mdi-delete")
         template(#default v-if="currentKP" )
             div(v-if="manager") Автор: {{manager && (manager.firstName + " " + manager.lastName)}}
             v-row
@@ -15,13 +21,13 @@
                     span Обновлен:
                     span {{new Date(currentKP.updated).toLocaleDateString() + " " + new Date(currentKP.updated).toLocaleTimeString()}}
             v-row
-                v-col(v-if="company")
-                    v-select(:items="companies.map(e=>e.companyName)" :model-value="company.companyName" label="От: " )
+                v-col
+                    v-select(:items="companies.map(e=>e.companyName)" :model-value="company.companyName || companies[0].companyName" label="От: " @update:modelValue="changeCompany")
                 v-col()
                     v-select(:items="customers.map(e=>e.companyName)" label="Для: ")
             v-row
                 v-col(col="12")
-                    v-textarea(:model-value="currentKP.businessProposal" auto-grow label="Оферта")
+                    v-textarea(v-model="currentKP.businessProposal" label="Оферта" )
             v-text-field(
                 v-model="search"
                 label="Фильтр"
@@ -30,20 +36,8 @@
                 hide-details
                 single-line
             )
-            v-data-table(:items :headers :search)
-                template(#item="{item}" )
-                    tr
-                        td
-                            .controls
-                                v-icon(icon="mdi:mdi-close" :color="'red'")
-                                v-icon(icon="mdi:mdi-pen" )
-                        td {{item.decimal}}
-                        td {{item.name}}
-                        td {{new Date(item.created).toLocaleDateString()}}
-                        td {{item.updated}}
-                        td {{item.itemPrice}}
-                        td {{item.amount}}
-                        td {{item.totalPrice}}
+            suspended-component
+                KPItemsList(v-model:items="items" :search)
 
                 //template(v-slot:item.name="{ item }") {{item.name}}
 
@@ -61,23 +55,16 @@ import {useStaffStore} from "@/pinia-store/staff";
 import {useCompaniesStore} from "@/pinia-store/companies";
 import {useCustomersStore} from "@/pinia-store/customers";
 import {Empty} from "@/mixins/Empty";
+import KPItemsList from "@/components/commerce/KP/KPItemsList.vue";
+import SuspendedComponent from "@/components/common/SuspendedComponent.vue";
 
 const route = useRoute()
 const {loading} = storeToRefs(useKPStore())
-const {get} = useKPStore()
+const {get, save} = useKPStore()
 
 const currentKP: Ref<KP | null> = ref(null)
 const items = ref<KPItem[]>([])
-const headers = [
-    {key: "controls", title: "Управление"},
-    {key: "decimal", title: "Децимальный номер"},
-    {key: "name", title: "Наименование"},
-    {key: "created", title: "Создан"},
-    {key: "updated", title: "Обновлен"},
-    {key: "price", title: "Прайс"},
-    {key: "amount", title: "Количество"},
-    {key: "total", title: "Итого"}
-]
+
 
 const search = ref("")
 
@@ -86,8 +73,8 @@ const {staff} = storeToRefs(useStaffStore())
 const {getAllStaff} = useStaffStore()
 !staff.value.length && await getAllStaff()
 
-const manager = computed<Person|undefined>(()=> {
-    const res  = staff.value.find(e => e.id === currentKP.value?.managerUuid)
+const manager = computed<Person | undefined>(() => {
+    const res = staff.value.find(e => e.id === currentKP.value?.managerUuid)
     return res
 })
 
@@ -96,7 +83,7 @@ const {companies} = storeToRefs(useCompaniesStore())
 const {fetchCompaniesData} = useCompaniesStore()
 !companies.value.length && await fetchCompaniesData()
 
-const company = computed<Company|undefined>(()=>companies.value.find(e=>e.id===currentKP.value?.companyId))
+const company = computed<Company | undefined>(()=>companies.value.find(e => e.id === currentKP.value?.companyId))
 
 //--- CUSTOMERS ---
 const {customers} = storeToRefs(useCustomersStore())
@@ -105,13 +92,35 @@ const {fetchCustomers} = useCustomersStore()
 
 // const customer = computed<Company|undefined>(()=>customers.value.find(e=>e.id===currentKP.value?.customerId))
 
+const saveKP=async()=> {
+    const updated = currentKP.value?.updated || ""
+    const created = currentKP.value?.created || ""
+    const businessProposal = currentKP.value?.businessProposal || ""
+    const applicationNumber = currentKP.value?.applicationNumber || 0
+    const companyId = currentKP.value?.companyId || 0
+    const managerUuid = currentKP.value?.managerUuid || ""
+    await save({...currentKP.value,
+        updated,
+        created,
+        businessProposal,
+        applicationNumber,
+        companyId,
+        managerUuid,
+        items: items.value})
+}
+
+const changeCompany=(ev: string)=>{
+    const foundCompany = companies.value.find(e=>e.companyName===ev)
+    currentKP.value && (currentKP.value.companyId = foundCompany ? +foundCompany.id : 0)
+}
 //--- WATCH ---
 const unwatchRoute = watch([route], async () => {
     if (!Number.isNaN(Number(+route.params.id))) {
         currentKP.value = (await get<KP>(+route.params.id)) || null
     }
-    if(route.params.id==="new"){
+    if (route.params.id === "new") {
         currentKP.value = Empty.KP()
+        currentKP.value.items = [Empty.KPItem()]
     }
     items.value = currentKP.value?.items || [] as KPItem[]
 }, {immediate: true})
@@ -123,5 +132,9 @@ onBeforeUnmount(() => {
 
 
 <style scoped lang="sass">
-
+.bar
+    margin-left: auto
+    display: flex
+    justify-content: flex-end
+    gap: 1rem
 </style>

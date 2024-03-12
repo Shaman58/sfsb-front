@@ -33,13 +33,24 @@ export const useKPStore
         loading.value = false
         return res
     }
+    const save = async <T>(kp: KP) => {
+        loading.value = true
+        const method = "id" in kp ? "put" : "post"
+        const res = await query<T>(
+            async () => await api[method]("http://5.35.84.165:9000/api/order/" + kp.id || "", kp),
+            {success:""}
+        )
+        loading.value = false
+        return res
+    }
 
 
     return {
         loading,
         kp,
         fetch,
-        get
+        get,
+        save
     }
 });
 

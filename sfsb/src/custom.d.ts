@@ -265,7 +265,7 @@ declare interface KPItem{
     name: string,
     decimal: string,
     amount: number,
-    itemPrice: number,
+    itemPrice: string,
     totalPrice: string
 }
 declare interface KP{
