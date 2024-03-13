@@ -5,7 +5,7 @@ export class Empty{
             name:"",
             created: null,
             updated: null,
-            itemPrice: 0,
+            itemPrice: "0",
             amount: 0,
             totalPrice: "0"
         }) as KPItem

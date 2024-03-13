@@ -1,8 +1,8 @@
 <template lang="pug">
     .bar
-            v-btn(v-for="i in menuItems" :key="i.emit" :title="i.label" )
+            v-btn(v-for="i in menuItems" :key="i.emit" :title="i.label" @click="emit(i.emit)")
                 span {{i.label}}
-                v-icon(:icon="i.icon" @click="emit(i.emit)")
+                v-icon(:icon="i.icon" )
 
 </template>
 

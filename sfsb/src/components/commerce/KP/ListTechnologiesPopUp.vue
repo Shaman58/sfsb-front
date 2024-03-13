@@ -43,7 +43,7 @@ onBeforeMount(async () => {
     top: 0
     left: 100%
     width: 200px
-    height: 60px
+    height: 52px
     border-radius: 8px
     box-shadow: 0 0 12px rgba(var(--v-theme-on-surface), 50%)
     border: 3px solid rgb(var(--v-theme-on-surface))
@@ -70,11 +70,11 @@ onBeforeMount(async () => {
         overflow-y: auto
 
         &::-webkit-scrollbar
-            width: 4px
+            width: 8px
             background-color: transparent
 
         &::-webkit-scrollbar-thumb
-            width: 4px
+            width: 8px
             background-color: var(--scroll-color)
             border-radius: 8px
 

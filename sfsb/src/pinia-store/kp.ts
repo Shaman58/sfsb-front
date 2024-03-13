@@ -40,6 +40,7 @@ export const useKPStore
             async () => await api[method]("http://5.35.84.165:9000/api/order" + (kp.id?"/"+kp.id:""), kp),
         )
         loading.value = false
+        await fetch()
         return res
     }
 

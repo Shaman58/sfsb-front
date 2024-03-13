@@ -7,7 +7,7 @@ const useTechnologies = defineStore("techlogies",()=>{
     const technologies = ref<Technology[]>([])
 
     const fetch = async () =>{
-        technologies.value = (await query<Technology[]>(async()=>await api.get("/technology"))) || []
+        technologies.value = (await query<Technology[]>(async()=>await api.get("/technology"),{success:""})) || []
     }
     return {
         technologies,

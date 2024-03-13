@@ -22,18 +22,27 @@
 import LayoutPage from "@/components/common/LayoutPage.vue";
 import {storeToRefs} from "pinia";
 import {useKPStore} from "@/pinia-store/kp";
-import {computed, ref, toRefs} from "vue";
-import {useRoute} from "vue-router";
+import {computed, onUnmounted, ref, toRefs, watch} from "vue";
+import {useRoute, useRouter} from "vue-router";
 
 const filterText = ref("")
 const {loading, kp} = storeToRefs(useKPStore())
 const {fetch} = useKPStore()
 !kp.value.length && await fetch()
 
+const router = useRouter()
 const route = useRoute();
 const {path} = toRefs(route);
 const page = computed(() => path.value.split("/").at(-1))
 
+const unwatchRoute = watch([route],()=>{
+    if(route.params.id) return
+    router.push("/commerce/kp/"+kp.value[0].id)
+},{immediate: true})
+
+onUnmounted(()=>{
+    unwatchRoute()
+})
 </script>
 
 
