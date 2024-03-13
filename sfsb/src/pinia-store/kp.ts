@@ -1,6 +1,6 @@
 import {defineStore} from "pinia";
 import {ref} from "vue";
-import api, {CRUD, query} from "@/api/instance";
+import api, { query} from "@/api/instance";
 
 export const useKPStore
     = defineStore("kp", () => {
@@ -37,8 +37,7 @@ export const useKPStore
         loading.value = true
         const method = "id" in kp ? "put" : "post"
         const res = await query<T>(
-            async () => await api[method]("http://5.35.84.165:9000/api/order/" + kp.id || "", kp),
-            {success:""}
+            async () => await api[method]("http://5.35.84.165:9000/api/order" + (kp.id?"/"+kp.id:""), kp),
         )
         loading.value = false
         return res

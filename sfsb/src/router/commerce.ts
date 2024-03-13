@@ -81,6 +81,14 @@ const commerce: RouteRecordRaw & RouteMeta = {
             },
             children: [
                 {
+                    path: ":id/:clone",
+                    component: KPCard,
+                    meta: {
+                        onlyFor: ["COMMERCE", "ADMIN"],
+                        name: "КП карт"
+                    },
+                },
+                {
                     path: ":id",
                     component: KPCard,
                     meta: {

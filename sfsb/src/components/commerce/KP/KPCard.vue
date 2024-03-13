@@ -1,19 +1,16 @@
 <template lang="pug">
     LayoutMain
         template(#header)
-            v-progress-linear(indeterminate v-if="loading")
+            div(:style="{height:'10px', width:'100%'}")
+                v-progress-linear(indeterminate v-if="loading")
             v-card(width="100%")
                 v-card-actions
-                    .bar
-                        v-icon(icon="mdi:mdi-content-copy")
-                        v-icon(icon="mdi:mdi-floppy" @click="saveKP")
-                        v-icon(icon="mdi:mdi-delete")
+                    KPBar(@save="saveKP")
         template(#default v-if="currentKP" )
             div(v-if="manager") Автор: {{manager && (manager.firstName + " " + manager.lastName)}}
             v-row
                 v-col(lg="4")
-                    span Номер:
-                    span {{currentKP.applicationNumber}}
+                    v-text-field(v-model="currentKP.applicationNumber" label="Номер:" )
                 v-col(lg="4")
                     span Создан:
                     span {{new Date(currentKP.created).toLocaleDateString() + " " + new Date(currentKP.created).toLocaleTimeString()}}
@@ -22,7 +19,7 @@
                     span {{new Date(currentKP.updated).toLocaleDateString() + " " + new Date(currentKP.updated).toLocaleTimeString()}}
             v-row
                 v-col
-                    v-select(:items="companies.map(e=>e.companyName)" :model-value="company.companyName || companies[0].companyName" label="От: " @update:modelValue="changeCompany")
+                    v-select(:items="companies.map(e=>e.companyName)" :model-value="company?.companyName || companies[0].companyName" label="От: " @update:modelValue="changeCompany")
                 v-col()
                     v-select(:items="customers.map(e=>e.companyName)" label="Для: ")
             v-row
@@ -57,6 +54,7 @@ import {useCustomersStore} from "@/pinia-store/customers";
 import {Empty} from "@/mixins/Empty";
 import KPItemsList from "@/components/commerce/KP/KPItemsList.vue";
 import SuspendedComponent from "@/components/common/SuspendedComponent.vue";
+import KPBar from "@/components/commerce/KP/KPBar.vue";
 
 const route = useRoute()
 const {loading} = storeToRefs(useKPStore())
@@ -73,10 +71,7 @@ const {staff} = storeToRefs(useStaffStore())
 const {getAllStaff} = useStaffStore()
 !staff.value.length && await getAllStaff()
 
-const manager = computed<Person | undefined>(() => {
-    const res = staff.value.find(e => e.id === currentKP.value?.managerUuid)
-    return res
-})
+const manager = computed<Person | undefined>(() => staff.value.find(e => e.id === currentKP.value?.managerUuid))
 
 //--- COMPANY ---
 const {companies} = storeToRefs(useCompaniesStore())
@@ -115,6 +110,7 @@ const changeCompany=(ev: string)=>{
 }
 //--- WATCH ---
 const unwatchRoute = watch([route], async () => {
+    console.log(route.params)
     if (!Number.isNaN(Number(+route.params.id))) {
         currentKP.value = (await get<KP>(+route.params.id)) || null
     }

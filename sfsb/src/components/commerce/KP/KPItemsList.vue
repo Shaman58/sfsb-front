@@ -1,13 +1,11 @@
 <template lang="pug">
     v-data-table(:items :headers :search)
         template(#item="{item}" )
-            KPItem(:item="item" @append="append")
+            KPItem(:item @append="append")
 </template>
 <script setup lang="ts">
 import {Empty} from "@/mixins/Empty";
 import {storeToRefs} from "pinia";
-import {useItemStore} from "@/pinia-store/item";
-import {useTechnologyStore} from "@/pinia-store/technology";
 import useTechnologies from "@/pinia-store/technologies";
 import {ref, watch} from "vue";
 import KPItem from "@/components/commerce/KP/KPItem.vue";
