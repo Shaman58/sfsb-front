@@ -6,27 +6,16 @@
             v-card(width="100%")
                 v-card-actions
                     KPBar(@save="saveKP" @copy="copyKP")
-        template(#default v-if="currentKP" )
-            v-card
+        template(#default)
+            v-card(v-if="currentKP")
                 v-card-title
-                    div(v-if="manager") Автор: {{manager && (manager.firstName + " " + manager.lastName)}}
-                    v-row
-                        v-col.py-0(lg="4")
-                            v-text-field(v-model="currentKP.applicationNumber" label="Номер:" )
-                        v-col.py-0(lg="4")
-                            span Создан:
-                            span {{new Date(currentKP.created).toLocaleDateString() + " " + new Date(currentKP.created).toLocaleTimeString()}}
-                        v-col.py-0(lg="4" v-if="currentKP.updated" )
-                            span Обновлен:
-                            span {{new Date(currentKP.updated).toLocaleDateString() + " " + new Date(currentKP.updated).toLocaleTimeString()}}
-                    v-row
-                        v-col.py-0
-                            v-select(:items="companies.map(e=>e.companyName)" :model-value="company?.companyName || companies[0].companyName" label="От: " @update:modelValue="changeCompany")
-                        v-col.py-0
-                            v-select(:items="customers.map(e=>e.companyName)" label="Для: ")
-                    v-row
-                        v-col.py-0(col="12")
-                            v-text-field(v-model="currentKP.businessProposal" label="Оферта" )
+                    suspended-component
+                        KPCardHeader(
+                            v-bind="currentKP"
+                            v-model:businessProposal="businessProposal"
+                            v-model:applicationNumber="applicationNumber"
+                            v-model:companyId="companyId"
+                            )
                 v-card-text
                     v-text-field.py-0(
                         v-model="search"
@@ -39,15 +28,13 @@
                     suspended-component
                         KPItemsList(v-model:items="items" :search)
 
-
-
 </template>
 
 <script setup lang="ts">
 
 import {useRoute, useRouter} from "vue-router";
 import {useKPStore} from "@/pinia-store/kp";
-import {computed, onBeforeUnmount, type Ref, ref, watch} from "vue";
+import {computed, onBeforeUnmount, type Ref, ref, toRefs, watch, watchEffect} from "vue";
 import LayoutMain from "@/components/common/LayoutMain.vue";
 import {storeToRefs} from "pinia";
 import {useStaffStore} from "@/pinia-store/staff";
@@ -58,6 +45,7 @@ import KPItemsList from "@/components/commerce/KP/KPItemsList.vue";
 import SuspendedComponent from "@/components/common/SuspendedComponent.vue";
 import KPBar from "@/components/commerce/KP/KPBar.vue";
 import {useCurrentUserStore} from "@/pinia-store/currentUser";
+import KPCardHeader from "@/components/commerce/KP/KPCardHeader.vue";
 
 const router = useRouter()
 const route = useRoute()
@@ -67,32 +55,18 @@ const {get, save} = useKPStore()
 const currentKP: Ref<KP | null> = ref(null)
 const items = ref<KPItem[]>([])
 
+const companyId = ref(currentKP.value?.companyId)
+const businessProposal = ref(currentKP.value?.businessProposal)
+const applicationNumber = ref(currentKP.value?.applicationNumber)
+
+const unwatchCompanyId=watchEffect(()=>currentKP.value && (currentKP.value.companyId = companyId?.value||0))
+const unwatchBusinessProposal=watchEffect(()=>currentKP.value && (currentKP.value.businessProposal = businessProposal?.value||""))
+const unwatchApplicationNumber=watchEffect(()=>currentKP.value && (currentKP.value.applicationNumber = applicationNumber?.value||0))
 
 const search = ref("")
 
 //--- CURRENT USER ---
 const {user} = storeToRefs(useCurrentUserStore())
-
-//--- MANAGER ---
-const {staff} = storeToRefs(useStaffStore())
-const {getAllStaff} = useStaffStore()
-!staff.value.length && await getAllStaff()
-
-const manager = computed<Person | undefined>(() => staff.value.find(e => e.id === currentKP.value?.managerUuid))
-
-//--- COMPANY ---
-const {companies} = storeToRefs(useCompaniesStore())
-const {fetchCompaniesData} = useCompaniesStore()
-!companies.value.length && await fetchCompaniesData()
-
-const company = computed<Company | undefined>(() => companies.value.find(e => e.id === currentKP.value?.companyId))
-
-//--- CUSTOMERS ---
-const {customers} = storeToRefs(useCustomersStore())
-const {fetchCustomers} = useCustomersStore()
-!customers.value.length && await fetchCustomers()
-
-// const customer = computed<Company|undefined>(()=>customers.value.find(e=>e.id===currentKP.value?.customerId))
 
 const saveKP = async () => {
     const updated = currentKP.value?.updated || null
@@ -117,10 +91,7 @@ const copyKP = () => {
     console.log("copy")
     router.push("/commerce/kp/new/" + currentKP.value?.id)
 }
-const changeCompany = (ev: string) => {
-    const foundCompany = companies.value.find(e => e.companyName === ev)
-    currentKP.value && (currentKP.value.companyId = foundCompany ? +foundCompany.id : 0)
-}
+
 //--- WATCH ---
 const unwatchRoute = watch([route], async () => {
     console.log(route.params)
@@ -143,10 +114,19 @@ const unwatchRoute = watch([route], async () => {
         currentKP.value && (currentKP.value.applicationNumber = -1)
     }
     items.value = currentKP.value?.items || [] as KPItem[]
+    companyId.value = currentKP.value?.companyId
+    businessProposal.value = currentKP.value?.businessProposal
+    applicationNumber.value = currentKP.value?.applicationNumber
+
 }, {immediate: true})
+
+
 
 onBeforeUnmount(() => {
     unwatchRoute()
+    unwatchApplicationNumber()
+    unwatchCompanyId()
+    unwatchBusinessProposal()
 })
 </script>
 
