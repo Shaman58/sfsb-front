@@ -1,34 +1,49 @@
 <template lang="pug">
-.list-technologies
-    .list-technologies__content
-        v-list
-            v-list-item.list-technologies__item(v-for="i in filteredTechnologies" :key="i.id" height="20" @mousedown="emit('select',i)") {{i.drawingNumber}} {{i.drawingName}}
+    .list-technologies
+        ul.list-technologies__content
+            li.list-technologies__item(
+                v-for="(i, index) in technologies"
+                :key="i.id"
+                @mousedown="emit('select',i)"
+                :class="i.drawingNumber.includes( props.currentTechnology)?'active':'passive'"
+                :ref="el => el && (elements[index] = el)"
+            ) {{i.drawingNumber}} {{i.drawingName}}
 </template>
 <script setup lang="ts">
 import {storeToRefs} from "pinia";
 import useTechnologies from "@/pinia-store/technologies";
-import {computed, onBeforeMount, watch} from "vue";
+import { onBeforeMount, onBeforeUpdate, ref, watch} from "vue";
 
-const props = defineProps<{currentTechology: string}>()
+const props = defineProps<{ currentTechnology: string }>()
 const emit = defineEmits<{
     (e: 'select', technology: Technology): void
 }>()
 
+const elements = ref<HTMLInputElement[]>([])
 
 const {technologies} = storeToRefs(useTechnologies())
 const {fetch} = useTechnologies()
 
-const filteredTechnologies = computed<Technology[]>(()=> {
-    const res = technologies.value.filter(e => e.drawingNumber.includes( props.currentTechology))
-    if(!res.length) return technologies.value
-    return res
+// const filteredTechnologies = computed<Technology[]>(()=> {
+//     const res = technologies.value.filter(e => e.drawingNumber.includes( props.currentTechology))
+//     if(!res.length) return technologies.value
+//     return res
+// })
+
+
+watch([props], () => {
+    if (!technologies.value || !technologies.value.length) return
+    const indexElement = technologies.value.find(e => e.drawingNumber.includes(props.currentTechnology))
+    const index = !!indexElement ? technologies.value.indexOf(indexElement) : 0
+    const matchedElement = elements.value[index]
+    matchedElement && matchedElement.scrollIntoView({behavior:"smooth",block:"center"})
+    console.log(index, matchedElement);
+
+}, {immediate: true, deep: true})
+
+onBeforeUpdate(() => {
+    elements.value = []
 })
-
-
-watch([props],()=>{
-
-},{immediate:true,deep: true})
-
 onBeforeMount(async () => {
     !technologies.value.length && await fetch()
 })
@@ -56,7 +71,7 @@ onBeforeMount(async () => {
         border-left: 3px solid rgb(var(--v-theme-on-surface))
         background-color: rgba(var(--v-theme-surface))
         position: absolute
-        z-index: 0
+        z-index: -1
         top: 50%
         left: -2px
         translate: -50% -50%
@@ -64,10 +79,14 @@ onBeforeMount(async () => {
 
 
     &__content
+        padding: 4px
         width: 98%
         height: 98%
         margin: auto
         overflow-y: auto
+        background-color: rgba(var(--v-theme-background))
+
+
 
         &::-webkit-scrollbar
             width: 8px
@@ -81,5 +100,11 @@ onBeforeMount(async () => {
     &__item
         cursor: pointer
         font-size: 12px
+        min-height: 30px
+        display: grid
+        place-items: center start
+
+        &.active
+            background-color:   rgba(var(--v-theme-surface))
 
 </style>
