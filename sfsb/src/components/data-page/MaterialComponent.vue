@@ -15,7 +15,7 @@
                     v-row.material-form__row
                         v-col(cols="12"   sm="6" md="4")
                             v-select(label="Выберите плотность:" :items="templates" item-title="materialTypeName"
-                                item-value="local.density" v-model="local.density" )
+                                item-value="density" v-model="local.density" )
                         v-col(cols="12"   sm="6" md="2")
                             v-text-field(label="Плотность:" v-model="local.density"
                                 :rules="[rules.required, rules.numeric]" )
