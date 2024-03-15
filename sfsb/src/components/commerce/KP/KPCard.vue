@@ -5,13 +5,15 @@
                 v-progress-linear(indeterminate v-if="loading")
             v-card(width="100%")
                 v-card-actions
-                    KPBar(@save="saveKP" @copy="copyKP")
+                    KPBar(@save="saveKP" @copy="copyKP" @refresh="refresh")
         template(#default)
             v-card(v-if="currentKP")
                 v-card-title
                     suspended-component
                         KPCardHeader(
-                            v-bind="currentKP"
+                            :created="currentKP && currentKP.created"
+                            :updated="currentKP && currentKP.updated"
+                            :manager-uuid="currentKP && currentKP.managerUuid"
                             v-model:businessProposal="businessProposal"
                             v-model:applicationNumber="applicationNumber"
                             v-model:companyId="companyId"
@@ -34,12 +36,9 @@
 
 import {useRoute, useRouter} from "vue-router";
 import {useKPStore} from "@/pinia-store/kp";
-import {computed, onBeforeUnmount, type Ref, ref, toRefs, watch, watchEffect} from "vue";
+import { onBeforeUnmount, type Ref, ref, watch, watchEffect} from "vue";
 import LayoutMain from "@/components/common/LayoutMain.vue";
 import {storeToRefs} from "pinia";
-import {useStaffStore} from "@/pinia-store/staff";
-import {useCompaniesStore} from "@/pinia-store/companies";
-import {useCustomersStore} from "@/pinia-store/customers";
 import {Empty} from "@/mixins/Empty";
 import KPItemsList from "@/components/commerce/KP/KPItemsList.vue";
 import SuspendedComponent from "@/components/common/SuspendedComponent.vue";
@@ -68,32 +67,7 @@ const search = ref("")
 //--- CURRENT USER ---
 const {user} = storeToRefs(useCurrentUserStore())
 
-const saveKP = async () => {
-    const updated = currentKP.value?.updated || null
-    const created = currentKP.value?.created || null
-    const businessProposal = currentKP.value?.businessProposal || ""
-    const applicationNumber = currentKP.value?.applicationNumber || 0
-    const companyId = currentKP.value?.companyId || 0
-    const managerUuid = currentKP.value?.managerUuid || user.value?.id || ""
-    await save({
-        ...currentKP.value,
-        updated,
-        created,
-        businessProposal,
-        applicationNumber,
-        companyId,
-        managerUuid,
-        items: items.value
-    })
-}
-
-const copyKP = () => {
-    console.log("copy")
-    router.push("/commerce/kp/new/" + currentKP.value?.id)
-}
-
-//--- WATCH ---
-const unwatchRoute = watch([route], async () => {
+const init = async () => {
     console.log(route.params)
     if (!Number.isNaN(Number(+route.params.id))) {
         currentKP.value = (await get<KP>(+route.params.id)) || null
@@ -118,7 +92,38 @@ const unwatchRoute = watch([route], async () => {
     businessProposal.value = currentKP.value?.businessProposal
     applicationNumber.value = currentKP.value?.applicationNumber
 
-}, {immediate: true})
+}
+
+const saveKP = async () => {
+    const updated = currentKP.value?.updated || null
+    const created = currentKP.value?.created || null
+    const businessProposal = currentKP.value?.businessProposal || ""
+    const applicationNumber = currentKP.value?.applicationNumber || 0
+    const companyId = currentKP.value?.companyId || 0
+    const managerUuid = currentKP.value?.managerUuid || user.value?.id || ""
+    await save({
+        ...currentKP.value,
+        updated,
+        created,
+        businessProposal,
+        applicationNumber,
+        companyId,
+        managerUuid,
+        items: items.value
+    })
+}
+
+const copyKP = () => {
+    console.log("copy")
+    router.push("/commerce/kp/new/" + currentKP.value?.id)
+}
+
+const refresh =async()=>{
+    await init()
+}
+
+//--- WATCH ---
+const unwatchRoute = watch([route], init, {immediate: true})
 
 
 

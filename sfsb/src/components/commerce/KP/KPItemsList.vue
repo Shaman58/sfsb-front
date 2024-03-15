@@ -1,7 +1,7 @@
 <template lang="pug">
     v-data-table(:items :headers :search)
         template(#item="{item}" )
-            KPItem(:item @append="append")
+            KPItem(:item @append="append" @remove="remove")
 </template>
 <script setup lang="ts">
 import {Empty} from "@/mixins/Empty";
@@ -34,6 +34,13 @@ const append = (item: KPItem) => {
     const newItem = Empty.KPItem()
     newItem.created = new Date(Date.now()).toDateString()
     items.value= [...items.value.toSpliced(index+1,0,newItem)]
+}
+
+const remove=(item: KPItem)=>{
+    if(!items.value) return
+    const index = items.value.indexOf(item)
+    console.log(index);
+    items.value = items.value.toSpliced(index,1)
 }
 
 const select = ref("")

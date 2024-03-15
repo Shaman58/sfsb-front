@@ -1,5 +1,5 @@
 <template lang="pug">
-    div(v-if="manager") Автор: {{manager && (manager.firstName + " " + manager.lastName)}}
+    div.pb-4 Автор: {{manager ? manager.firstName + " " + manager.lastName : "Не указан"}}
     v-row
         v-col.py-0(lg="4")
             v-text-field(v-model="applicationNumber" label="Номер:" )
@@ -22,21 +22,14 @@
 <script setup lang="ts">
 import {storeToRefs} from "pinia";
 import {useCompaniesStore} from "@/pinia-store/companies";
-import {computed, ref, toRefs, watchEffect} from "vue";
+import {computed, toRefs, watchEffect} from "vue";
 import {useStaffStore} from "@/pinia-store/staff";
 import {useCustomersStore} from "@/pinia-store/customers";
 
-interface Props {
-    companyId: number,
-    businessProposal: string,
-    applicationNumber: number,
-    managerUuid: string,
-    created?: string | null,
-    updated?: string | null
-}
 
-const props = defineProps<Props>()
-const { managerUuid} = toRefs(props)
+
+const props = defineProps<{ managerUuid: string, created: string|null, updated: string|null }>()
+const { managerUuid, updated, created} = toRefs(props)
 const emit = defineEmits(["changeBusinessProposal"])
 
 const applicationNumber = defineModel("applicationNumber")

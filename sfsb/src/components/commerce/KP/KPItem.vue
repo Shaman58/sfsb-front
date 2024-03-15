@@ -2,12 +2,11 @@
     tr.item(v-if="item")
         td
             .controls
-                v-icon(icon="mdi:mdi-close" :color="'red'")
-                v-icon(icon="mdi:mdi-pen" )
+                v-icon(icon="mdi:mdi-close" :color="'red'" @click="emit('remove',item)")
                 v-icon(icon="mdi:mdi-plus" @click="emit('append',item)")
         td.item__decimal
             input.item__decimal-input(v-model="item.decimal" ref="refDecimal")
-            ListTechnologiesPopUp(:currentTechology="item.decimal" @select="onSelect")
+            ListTechnologiesPopUp(:current-technology="item.decimal" @select="onSelect")
         td.item__name
             input.item__name-input(v-model="item.name" ref="refName")
         td {{new Date(item.created).toLocaleDateString()}}
@@ -25,7 +24,7 @@ import KPItem from "@/components/commerce/KP/KPItem.vue";
 import ListTechnologiesPopUp from "@/components/commerce/KP/ListTechnologiesPopUp.vue";
 
 const item = defineModel<KPItem>("item", {required: true,})
-const emit = defineEmits(["append"])
+const emit = defineEmits(["append","remove"])
 
 const onSelect=(e: Technology)=> {
     console.log(e)

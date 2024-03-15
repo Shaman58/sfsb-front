@@ -11,6 +11,7 @@ const menuItems=[
     {emit: "save", icon: "mdi:mdi-floppy", label: "Сохранить"},
     {emit: "delete", icon: "mdi:mdi-delete", label: "Удалить"},
     {emit: "copy", icon: "mdi:mdi-content-copy", label: "Скопировать"},
+    {emit: "refresh", icon: "mdi:mdi-refresh", label: "Обновить"},
     {emit: "download", icon: "mdi:mdi-download", label: "Скачать"},
     {emit: "print", icon: "mdi:mdi-printer", label: "Распечатать"},
 ]
