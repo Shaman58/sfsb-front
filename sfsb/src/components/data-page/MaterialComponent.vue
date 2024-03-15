@@ -16,12 +16,12 @@
                         v-col(cols="12"   sm="6" md="4")
                             v-select(label="Выберите плотность:" :items="templates" item-title="materialTypeName"
                                 item-value="density" v-model="local.density" )
-                        v-col(cols="12"   sm="6" md="2")
+                        v-col(cols="12"   sm="6" md="4")
                             v-text-field(label="Плотность:" v-model="local.density"
                                 :rules="[rules.required, rules.numeric]" )
-                        v-col(cols="12"   sm="6" md="2")
-                            v-text-field(label="Стоимость килограмма:" v-model="local.price.amount"
-                                :rules="[rules.required]" type="number")
+                        //v-col(cols="12"   sm="6" md="2")
+                        //    v-text-field(label="Стоимость килограмма:" v-model="local.price.amount"
+                        //        :rules="[rules.required]" type="number")
                         v-col(cols="12"   sm="6" md="4")
                             v-text-field(label="Гост на сортамент:" v-model="local.gost2")
 
@@ -32,7 +32,7 @@
 import {useRoute} from "vue-router";
 import {storeToRefs} from "pinia";
 import {useCurrentTool} from "@/pinia-store/tools";
-import {onUnmounted, reactive, ref, toRefs, watch, watchEffect} from "vue";
+import {onUnmounted, ref, toRefs, watch} from "vue";
 import {useValidationRules} from "@/mixins/FieldValidationRules";
 import {useMaterialTemplatesStore} from "@/pinia-store/materialTemplates";
 import emptyMaterial from "@/components/data-page/EmptyMaterial";
@@ -47,7 +47,7 @@ const {rules} = useValidationRules();
 
 const local = ref(emptyMaterial())
 
-const {gost1, gost2, density, geometry, materialName, price: {value: {amount}}} = toRefs(selectedTool.value)
+const {density, price: {value: {amount}}} = toRefs(selectedTool.value)
 
 
 const {materialTemplates: templates} = storeToRefs(useMaterialTemplatesStore())
