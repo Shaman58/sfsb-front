@@ -4,11 +4,11 @@
         .order-files__container
             label.order-files__new(for="new-file" title="Добавить файл")
                 v-icon(color="orange-lighten-1") mdi-plus
-                input#new-file(type="file" hidden)
+                input#new-file(type="file" hidden @change="saveOrderFile" accept="image/*,.pdf,.xls,.xlsx,.doc,.docx" )
             v-list.order-files__list
                 v-list-item.order-files__list-item(v-for='(file, index) in files', :key='index')
                     a.order-files__list-link(:href="file.link" target="_blank") {{file.filename}}
-                    v-icon(color="orange" @click.stop="removeFile(file)") mdi-close
+                    v-icon(color="orange" @click.stop="removeFile(file.id)") mdi-close
 
 </template>
 <script setup lang="ts">
@@ -21,10 +21,19 @@ const props = defineProps<{ orderId: number }>()
 const {orderId} = toRefs(props)
 
 const {files, loading} = storeToRefs(useOrderFiles())
-const {getAllFilesByOrder} = useOrderFiles()
+const {getAllFilesByOrder,saveFile, deleteFile} = useOrderFiles()
 !files.value.length && await getAllFilesByOrder(orderId.value)
 
-const removeFile = (file: any) => {
+const removeFile = async (file: number) => {
+    await deleteFile(orderId.value, file)
+}
+
+const saveOrderFile = async(ev: Event)=>{
+    const {files} = ev.target as HTMLInputElement
+    if(!files || !files.length) return
+    const fd = new FormData()
+    fd.append("file",files[0])
+    await saveFile(orderId.value, fd)
 }
 
 const unwatch =watch([orderId], async () => {
