@@ -55,7 +55,7 @@ const {fetchMaterialTemplates} = useMaterialTemplatesStore()
 !templates.value.length && await fetchMaterialTemplates()
 
 const save = async () => {
-    const res = {...selectedTool.value, ...local.value} as Material & Tool
+    const res = {...selectedTool.value, ...local.value, updated:""} as Material & Tool
     currentTool.value && await currentTool.value.save(res)
 }
 
