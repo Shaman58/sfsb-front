@@ -34,7 +34,8 @@
                             span(color="red") ВЫХОД
                             v-icon(icon="mdi-exit-to-app" class="ml-2" color="red")
                         v-list-item(class="d-flex justify-center align-center")
-                            theme-switcher
+                            //theme-switcher
+                            three-position-switch
             v-btn.navbar__burger(:color="'white'"  @click="showMobileMenu=true")
                 v-icon(icon="mdi-menu")
 
@@ -54,6 +55,7 @@ import { useTheme } from "vuetify";
 import { useThemeStore } from "@/pinia-store/themeSwitcher";
 import ThemeSwitcher from "@/components/common/ThemeSwitcher.vue";
 import {useKeycloak} from "@josempgon/vue-keycloak";
+import ThreePositionSwitch from "@/components/common/ThreePositionSwitch.vue";
 
 const {keycloak} = useKeycloak()
 const {user} = storeToRefs(useCurrentUserStore())

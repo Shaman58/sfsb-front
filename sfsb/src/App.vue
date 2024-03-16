@@ -18,7 +18,8 @@ const { theme } = storeToRefs(useThemeStore())
 const { setDark, setLight } = useThemeStore()
 const themeGlobal = useTheme()
 const isLight = () => matchMedia("(prefers-color-scheme: light)").matches
-isLight() ? setLight() : setDark()
+const storagedTheme = window.localStorage.getItem("theme")
+if(storagedTheme === "auto" || !storagedTheme) isLight() ? setLight() : setDark()
 
 const {user} = storeToRefs(useCurrentUserStore())
 

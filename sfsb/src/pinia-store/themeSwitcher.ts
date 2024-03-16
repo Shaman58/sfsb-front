@@ -1,9 +1,6 @@
-import { defineStore, storeToRefs } from "pinia";
-import api from "@/api/instance";
-import { useToast } from "vue-toast-notification";
-import { Ref, ref } from "vue";
+import { defineStore } from "pinia";
+import {  ref } from "vue";
 
-const toast = useToast();
 
 export const useThemeStore = defineStore("theme", () => {
     const theme = ref<boolean>(false);
@@ -14,6 +11,7 @@ export const useThemeStore = defineStore("theme", () => {
     const setDark = () => {
         theme.value = true;
     };
+
     const toggleTheme = () => {
         theme.value = !theme.value;
     };
