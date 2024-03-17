@@ -11,7 +11,7 @@
                 .mobile-menu__user-close-inner
                     span(@click="exit") ВЫХОД
                     v-icon(icon="mdi-exit-to-app" class="ml-2" color="red")
-            ThemeSwitcher
+            ThreePositionSwitch.mx-auto.my-2
         .mobile-menu__body
             .mobile-menu__body-wrapper
                 .mobile-menu__link(v-for="(i, index) in $navItems" )
@@ -31,7 +31,7 @@
 </template>
 <script setup lang="ts">
 import {defineModel, onUnmounted, ref, toRefs, watch} from "vue"
-import ThemeSwitcher from "@/components/common/ThemeSwitcher.vue";
+import ThreePositionSwitch from "@/components/common/ThreePositionSwitch.vue";
 
 interface Props {
     userName: string
