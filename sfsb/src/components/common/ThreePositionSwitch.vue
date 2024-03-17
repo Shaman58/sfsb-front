@@ -1,9 +1,9 @@
 <template lang="pug">
     .container
         .track
-            .position(@click="()=>position=0")
-            .position(@click="()=>position=1")
-            .position(@click="()=>position=2")
+            .position(@click.stop="()=>position=0")
+            .position(@click.stop="()=>position=1")
+            .position(@click.stop="()=>position=2")
             .thumb(:data-set="position")
                 v-icon( v-if="position===0" icon="mdi:mdi-white-balance-sunny" color="black")
                 v-icon( v-if="position===1" icon="mdi:mdi-brightness-auto" color="#333")
@@ -20,8 +20,10 @@ const {setDark, setLight} = useThemeStore()
 const position = ref(0)
 
 const {lightOn,darkOn,autoOn} = useStorageTheme()
-const colorMap = ["#eee", "#aaa", "#333"]
-const bgcolor = computed(() => colorMap[position.value])
+const colorMap = ["#fff", "#aaa", "#333"]
+const trackColorMap = ["#eee", "#bbb", "#444"]
+const thumbBgColor = computed(() => colorMap[position.value])
+const trackBgColor = computed(() => trackColorMap[position.value])
 
 
 
@@ -38,6 +40,7 @@ onBeforeMount(() => {
 
 
 <style scoped lang="sass">
+@use 'sass:color'
 .container
     --height: 2rem
     width: 100px
@@ -53,12 +56,12 @@ onBeforeMount(() => {
 
 
 .position
-    background: #777
+    background: v-bind("trackBgColor")
 
 .thumb
     position: absolute
     z-index: 1
-    background: v-bind("bgcolor")
+    background: v-bind("thumbBgColor")
     height: calc(var(--height) * 0.8)
     top: 50%
     left: 1rem
