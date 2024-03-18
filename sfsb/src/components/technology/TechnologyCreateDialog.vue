@@ -48,12 +48,24 @@
                                             v-card(height="100%" :title="setup.aggregate ? 'Групповая по ' + setup.perTime + 'шт.' : ''") {{ setup.text }}
 
                                 suspended-component(v-else)
-                                    setup-create-card( :setup="setup" :quantity-of-parts-from-workpiece="Number(currentItem.technology.quantityOfPartsFromWorkpiece)" :additionalTexts="additionalTexts" @hideSetup="hideSetup()" @deleteSetup="deleteSetup(index)" @save="replaceSetup($event, index)")
+                                    setup-create-card(
+                                        :setup="setup"
+                                        :quantity-of-parts-from-workpiece="Number(currentItem.technology.quantityOfPartsFromWorkpiece)"
+                                        :additionalTexts="additionalTexts"
+                                        @hideSetup="hideSetup()"
+                                        @deleteSetup="deleteSetup(index)"
+                                        @save="replaceSetup($event, index)"
+                                    )
 
                             v-col(cols="12")
                                 v-card(v-if="activeSetupIndex !== 'new'" title="Новый установ" @click="activeSetupIndex = 'new'")
                                 suspended-component(v-else)
-                                    setup-create-card( :setup="newSetup" :quantity-of-parts-from-workpiece="Number(currentItem.technology.quantityOfPartsFromWorkpiece)" :additionalTexts="additionalTexts" @hideSetup="hideSetup()" @save="pushSetup" )
+                                    setup-create-card(
+                                        :setup="newSetup"
+                                        :quantity-of-parts-from-workpiece="Number(currentItem.technology.quantityOfPartsFromWorkpiece)"
+                                        :additionalTexts="additionalTexts"
+                                        @hideSetup="hideSetup()"
+                                        @save="pushSetup" )
 
                     v-card-actions.technology-card__actions
                         .technology-card__calculate
@@ -198,19 +210,20 @@ const additionalTextGenerator = (setup: Setup) => {
     return [];
 }
 
-
 const calculateSetupNumber = computed(() => {
-    if (!currentItem.value.technology?.setups) {
-        return -1
+    if (!("technology" in currentItem.value) || !currentItem.value.technology?.setups.length) {
+        return 10
     }
-    const setupNumbers = currentItem.value.technology.setups.map((setup: { setupNumber: any; }) => setup.setupNumber);
-    for (let i = 10; i <= Number.MAX_SAFE_INTEGER; i = i + 10) {
-        if (!setupNumbers.includes(i)) {
-            return i;
-        }
-    }
-    return -1;
-});
+    // const setupNumbers = currentItem.value.technology.setups.map((setup: { setupNumber: any; }) => setup.setupNumber);
+    // for (let i = 10; i <= Number.MAX_SAFE_INTEGER; i = i + 10) {
+    //     if (!setupNumbers.includes(i)) {
+    //         return i;
+    //     }
+    // }
+    // return -1;
+    const lastSetupNumber = Number(currentItem.value.technology.setups.at(-1)!.setupNumber)
+    return lastSetupNumber % 10 ? (lastSetupNumber - lastSetupNumber % 10)+10: lastSetupNumber + 10
+})
 
 const isSaveActive = computed(() => !valid.value || !saveActive.value || (!currentItem.value.technology.workpiece && !currentItem.value.technology.assembly)
 );
@@ -226,7 +239,8 @@ const createNewSetup = () => ({
     additionalTools: [],
     setupNumber: calculateSetupNumber.value,
     operation: {
-        operationName: ''
+        operationName: '',
+        operationTimeManagement: "FULL"
     },
     cooperatePrice: {amount: 0, currency: 'RUB'}
 } as Partial<Setup>);
@@ -308,6 +322,10 @@ const showWorkpieceCard = () => {
     workpieceCardVisible.value = true;
 };
 
+watch([currentItem],()=>{
+    newSetup.value = createNewSetup()
+
+},{immediate: true})
 </script>
 
 <style lang="sass">
