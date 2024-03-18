@@ -7,28 +7,94 @@
                 v-container
                     v-row
                         v-col(cols="12" md="6" lg="4")
-                            v-switch(v-model="setup.cooperate" :true-value="true" :false-value="false" :label="setup.cooperate ? 'Кооперация' : 'Не кооперация'")
-                        v-col(cols="12" md="6" lg="4" v-if="setup?.operation?.operationTimeManagement === 'COMPUTED' && !setup.cooperate")
-                            v-switch(v-model="setup.aggregate" :true-value="true" :false-value="false" :label="setup.aggregate ? 'Несколько заготовок' : 'Одна заготовка'")
-                        v-col(cols="12" md="6" lg="4" v-if="setup?.operation?.operationTimeManagement === 'FULL'  && !setup.cooperate  && quantityOfPartsFromWorkpiece !== 1  && setup.groupAble")
-                            v-switch(v-model="setup.group" :true-value="true" :false-value="false" :label="setup.group ? 'С заготовкой' : 'С деталью'")
+                            v-switch(
+                                v-model="setup.cooperate"
+                                :true-value="true"
+                                :false-value="false"
+                                :label="setup.cooperate ? 'Кооперация' : 'Не кооперация'")
+                        v-col(
+                            cols="12"
+                            md="6"
+                            lg="4"
+                            v-if="setup?.operation?.operationTimeManagement === 'COMPUTED' && !setup.cooperate"
+                            )
+                            v-switch(
+                                v-model="setup.aggregate"
+                                :true-value="true"
+                                :false-value="false"
+                                :label="setup.aggregate ? 'Несколько заготовок' : 'Одна заготовка'")
+                        v-col(cols="12" md="6" lg="4" v-if="isWorkpiece")
+                            v-switch(
+                                v-model="setup.group"
+                                :true-value="true"
+                                :false-value="false"
+                                :label="setup.group ? 'С заготовкой' : 'С деталью'")
                         v-col(cols="12" md="6" lg="4" v-if="setup?.operation?.operationTimeManagement === 'COMPUTED' && setup.aggregate && !setup.cooperate")
-                            v-text-field(label="Количество заготовок за раз" v-model="setup.perTime" type="number" :rules="[rules.numberGreaterThanZero]")
+                            v-text-field(
+                                label="Количество заготовок за раз"
+                                v-model="setup.perTime"
+                                type="number"
+                                :rules="[rules.numberGreaterThanZero]"
+                                autocomplete="false"
+                                )
                     v-row
                         v-col(cols="12" md="6" lg="4")
-                            v-text-field(label="Номер установки" v-model="setup.setupNumber" :rules="[unitNumberValidationRule, rules.required]")
+                            v-text-field(
+                                label="Номер установки"
+                                v-model="setup.setupNumber"
+                                :rules="[unitNumberValidationRule, rules.required]"
+                                autocomplete="false"
+                                )
                         v-col(cols="12" md="6" lg="4")
-                            v-combobox(label="Название установки" :items="operations" item-title="operationName" return-object v-model="setup.operation" :rules="[rules.required]")
+                            v-combobox(
+                                label="Название установки"
+                                :items="operations"
+                                item-title="operationName"
+                                return-object
+                                v-model="setup.operation"
+                                :rules="[rules.required]")
                         v-col(cols="12" md="6" lg="4" v-if="setup.cooperate")
-                            v-text-field(label="Кооперационная цена на деталь" v-model="setup.cooperatePrice.amount" type="number" :rules="[rules.required, rules.numeric, rules.min0Validation]")
+                            v-text-field(
+                                label="Кооперационная цена на деталь"
+                                v-model="setup.cooperatePrice.amount"
+                                type="number"
+                                :rules="[rules.required, rules.numeric, rules.min0Validation]"
+                                autocomplete="false"
+                                )
                         v-col(cols="12" md="6" lg="4" v-if="setup?.operation?.operationTimeManagement === 'FULL' && !setup.cooperate  || setup?.operation?.operationTimeManagement === 'COMPUTED' && !setup.cooperate  || setup?.operation?.operationTimeManagement === 'PROCESS_TIME_ONLY' && !setup.cooperate")
-                            v-text-field(label="Время цикла(чч:мм)" v-model="setup.processTime" type="time" :rules="[rules.durationNotZeroValidation]")
+                            v-text-field(
+                                label="Время цикла(чч:мм)"
+                                v-model="setup.processTime"
+                                type="time"
+                                :rules="[rules.durationNotZeroValidation]"
+                                autocomplete="false"
+                                )
                         v-col(cols="12" md="6" lg="4" v-if="setup?.operation?.operationTimeManagement === 'FULL' && !setup.cooperate")
-                            v-text-field(label="Межоперационное время(чч:мм)" v-model="setup.interoperativeTime" type="time" :rules="[rules.durationNotZeroValidation]")
+                            v-text-field(
+                                label="Межоперационное время(чч:мм)"
+                                v-model="setup.interoperativeTime"
+                                type="time"
+                                :rules="[rules.durationNotZeroValidation]"
+                                autocomplete="false"
+                                )
                         v-col(cols="12" md="6" lg="4" v-if="setup?.operation?.operationTimeManagement === 'FULL' && !setup.cooperate")
-                            v-text-field(label="Наладочное время(чч:мм)" v-model="setup.setupTime" type="time" :rules="[rules.durationNotZeroValidation]")
+                            v-text-field(
+                                label="Наладочное время(чч:мм)"
+                                v-model="setup.setupTime"
+                                type="time"
+                                :rules="[rules.durationNotZeroValidation]"
+                                autocomplete="false"
+                                )
                         v-col(cols="12" md="6" lg="4" v-if="setup?.operation?.operationTimeManagement === 'FULL' && !setup.cooperate || setup?.operation?.operationTimeManagement === 'PROCESS_TIME_ONLY' && !setup.cooperate")
-                            v-combobox(v-if="!!toolings" :items="toolings" item-title='toolName' return-object v-model="setup.toolings" label="Выбрать оснастку" multiple)
+                            v-combobox(
+                                v-if="!!toolings"
+                                :items="toolings"
+                                item-title='toolName'
+                                return-object
+                                v-model="setup.toolings"
+                                label="Выбрать оснастку"
+                                multiple
+                            )
                         v-col(cols="12" md="6" lg="4" v-if="setup?.operation?.operationTimeManagement === 'FULL' && !setup.cooperate || setup?.operation?.operationTimeManagement === 'PROCESS_TIME_ONLY' && !setup.cooperate")
                             v-btn(size="small" variant="text" v-if="setup.measureToolItems?.length === 0" @click="measureVisible = true") Меритель
                             v-list(v-else @click="measureVisible = true")
@@ -61,7 +127,7 @@
 </template>
 
 <script setup lang="ts">
-import {computed, ref, toRefs} from 'vue';
+import {computed, ref, toRefs, watchEffect} from 'vue';
 import {useValidationRules} from "@/mixins/FieldValidationRules";
 import ToolCreate from "@/components/technology/ToolItemCreate.vue";
 import AdditionalCreate from "@/components/technology/AdditionalCreate.vue";
@@ -102,6 +168,7 @@ const props = defineProps<Props>();
 const emit = defineEmits(["hideSetup", "save", "deleteSetup"]);
 
 const {setup, additionalTexts, quantityOfPartsFromWorkpiece} = toRefs(props);
+console.log(setup);
 
 // const setup = reactive(setupProps.value)
 
@@ -138,6 +205,10 @@ const {fetchOperation} = useOperationsStore()
 const setupNumbers = computed(() => currentItem.value.technology.setups.filter(item => item.setupNumber !== setup.value.setupNumber).map(obj => obj.setupNumber));
 const unitNumberValidationRule = rules.unitNumberValidation(setupNumbers);
 
+const isWorkpiece = computed(()=>{
+    return setup.value.operation?.operationTimeManagement === 'FULL'  && !setup.value.cooperate  && quantityOfPartsFromWorkpiece.value !== 1  && setup.value.groupAble
+})
+
 const save = (setup: Partial<Setup>) => emit("save", setup);
 
 const deleteSetup = () => {
@@ -146,5 +217,10 @@ const deleteSetup = () => {
 };
 
 const hideSetup = () => emit("hideSetup");
+
+watchEffect(()=>console.log("valid", valid.value))
+watchEffect(()=>{
+    console.log("setup",setup.value, setup.value.operation?.operationTimeManagement, setup.value.cooperate)
+})
 
 </script>

@@ -11,7 +11,7 @@
         v-col(cols="12"  xs="12" sm="3" xl="2")
             v-text-field(label="Сумма"  v-model="currentTechnology.outsourcedCosts.amount" type="number" :rules="[rules.required, rules.numeric, rules.min0Validation]" )
         v-col(cols="12"  xs="12" sm="3" xl="3")
-            DurationPicker(v-model="currentTechnology.technologistTime" label="Продолжительность" :rules="[rules.durationNotZeroValidation]" )
+            DurationPicker(v-model="currentTechnology.technologistTime" label="Время технолога" :rules="[rules.durationNotZeroValidation]" )
 
 </template>
 

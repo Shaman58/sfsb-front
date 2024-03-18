@@ -222,6 +222,7 @@ const calculateSetupNumber = computed(() => {
     // }
     // return -1;
     const lastSetupNumber = Number(currentItem.value.technology.setups.at(-1)!.setupNumber)
+    console.log(currentItem.value.technology.setups.sort((a,b)=>b.setupNumber - a.setupNumber))
     return lastSetupNumber % 10 ? (lastSetupNumber - lastSetupNumber % 10)+10: lastSetupNumber + 10
 })
 

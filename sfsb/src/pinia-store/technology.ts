@@ -41,6 +41,7 @@ export const useTechnologyStore = defineStore("technology", () => {
             await api.put(url, technology);
             toast.info("Успешно сохранено!", {position: "top-right"});
             await getTechnologyById(technology.id);
+            await fetchItems()
         } catch (error) {
             toast.error("Ошибка при сохранении данных " + error);
         }

@@ -128,7 +128,7 @@ declare interface Operation {
     updated: string;
     operationName: string;
     paymentPerHour: ItemPrice | null;
-    operationTimeManagement: string;
+    operationTimeManagement: OperationTimeManagement;
 }
 
 declare interface AdditionalTool extends Tool {

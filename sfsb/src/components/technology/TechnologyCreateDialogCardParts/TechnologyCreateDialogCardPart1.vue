@@ -4,7 +4,11 @@
             span {{ "№" + setup.setupNumber + " " + setup.operation.operationName }}
             p(v-if="setup.group && Number(currentItem.technology.quantityOfPartsFromWorkpiece) !== 1") Групповая
         v-card-item {{ compactInfo(setup) }}
-        v-list(density="compact" style="padding: 0;" :lines="false" v-if="!!setup.toolings && setup.operation.operationTimeManagement !== 'COMPUTED' && setup.operation.operationTimeManagement !== 'NONE'")
+        v-list(
+            density="compact"
+            style="padding: 0;"
+            :lines="false"
+            v-if="!!setup.toolings && setup.operation.operationTimeManagement !== 'COMPUTED' && setup.operation.operationTimeManagement !== 'NONE'")
             v-list-item(v-for="tooling in setup.toolings" :title="tooling.toolName")
 </template>
 <script setup lang="ts">
