@@ -30,8 +30,8 @@ const currentItem = ref<Item>(items.value[0])
 const newItem = ref<Item | null>(null)
 const canAddNewItem = ref(true)
 const showDialog = ref(false)
-const wasItemsChange = ref(false)
 const canSave = ref(false)
+// const wasItemsChange = ref(false)
 
 const validForm = ref<HTMLFormElement|null>(null)
 
@@ -47,6 +47,7 @@ const addNewItem = () => {
     items.value.push(newItem.value)
     currentItem.value = newItem.value
     canAddNewItem.value = false
+    showDialog.value=true
 }
 const removeItem = (item: Item) => {
     const index = items.value.indexOf(item)
@@ -84,16 +85,16 @@ const unwatchShowDialog = watch([showDialog], (value, oldValue) => {
     // !canAddNewItem.value && (showDialog.value = true)
 })
 
-const unwatchCurrentItem = watch([currentItem], () => {
-    if (!currentItem.value) return
-    !wasItemsChange.value && (showDialog.value = true)
-})
+// const unwatchCurrentItem = watch([currentItem], () => {
+//     if (!currentItem.value) return
+//     !wasItemsChange.value && (showDialog.value = true)
+// })
 
 onUnmounted(() => {
     unwatchItems()
     unwatchNewItem()
     unwatchShowDialog()
-    unwatchCurrentItem()
+    // unwatchCurrentItem()
 })
 </script>
 

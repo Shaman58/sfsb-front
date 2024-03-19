@@ -37,8 +37,8 @@
                     v-expansion-panel.order-card__descriptions(value="descriptions")
                         v-expansion-panel-title ДОПОЛНИТЕЛЬНЫЕ ДАННЫЕ
                         v-expansion-panel-text
-                            v-textarea(v-model="orderLocal.description")
-                            v-textarea(v-model="orderLocal.businessProposal")
+                            v-textarea(v-model="orderLocal.description" label="Описание" )
+                            v-textarea(v-model="orderLocal.businessProposal" label="Бизнес предложение" )
         AlertDialog(ref="alertDialog")
 
 
@@ -77,7 +77,7 @@ const alertDialog = ref<typeof AlertDialog | undefined>()
 
 const form = ref<HTMLFormElement>()
 const valid = ref(false)
-const panel = ref<string[]>(params.value.id === "new" ? ["common", "items"] : ["items"])
+const panel = ref<string[]>(["common", "items"])
 
 const {rules} = useValidationRules()
 
