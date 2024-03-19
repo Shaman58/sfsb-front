@@ -84,7 +84,6 @@
 
 <script setup>
 import {computed, getCurrentInstance, reactive, ref} from "vue";
-import {useStore} from "vuex";
 import {useValidationRules} from "@/mixins/FieldValidationRules";
 
 // ---- ПРОПСЫ ----
@@ -113,7 +112,6 @@ const props = defineProps({
 
 const {rules} = useValidationRules();
 const {emit} = getCurrentInstance();
-const store = useStore();
 const form = ref(null);
 const valid = ref(false);
 const filter = ref('');
