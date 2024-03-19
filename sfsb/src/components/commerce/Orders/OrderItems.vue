@@ -11,17 +11,17 @@
         v-container
             v-card.order-items__mobile-card
                 v-card-title {{ number }} {{customer}}
-                OrderItemDetails(v-model:item="currentItem" :save="canSave")
+                OrderItemDetails(v-model:item="currentItem" :save="canSave" ref="validForm")
                 v-card-actions
-                    v-btn(color="primary" @click="showDialog=false" :disabled="!canAddNewItem") Закрыть
-                    v-btn(color="primary" @click="toSave" :disabled="!canAddNewItem") Сохранить
+                    v-btn(color="primary" @click="showDialog=false") Закрыть
+                    v-btn(color="primary" @click="toSave" :disabled="!canAddNewItem || !validForm?.valid") Сохранить
 </template>
 <script setup lang="ts">
 
 import OrderItem from "@/components/commerce/Orders/OrderItem.vue";
-import {onUnmounted, ref, toRefs, watch} from "vue";
-import emptyItem from "@/components/commerce/Orders/EmptyItem";
+import {onUnmounted, ref, toRefs, watch, watchEffect} from "vue";
 import OrderItemDetails from "@/components/commerce/Orders/OrderItemDetails.vue";
+import {Empty} from "@/mixins/Empty";
 
 const props = defineProps<{ items: Item[], customer: string, number: number }>()
 const {items, customer, number} = toRefs(props)
@@ -33,6 +33,8 @@ const showDialog = ref(false)
 const wasItemsChange = ref(false)
 const canSave = ref(false)
 
+const validForm = ref<HTMLFormElement|null>(null)
+
 const isActive = (item: Item): boolean => {
     const currentIndex = `${currentItem.value.id}${currentItem.value.uid}`
     const itemIndex = `${item.id}${item.uid}`
@@ -40,7 +42,7 @@ const isActive = (item: Item): boolean => {
 }
 
 const addNewItem = () => {
-    newItem.value = emptyItem()
+    newItem.value = Empty.Item()
     newItem.value.uid = Date.now().toString(36)
     items.value.push(newItem.value)
     currentItem.value = newItem.value
@@ -51,14 +53,14 @@ const removeItem = (item: Item) => {
     index >= 0 && items.value.splice(index, 1)
 }
 
-const changeItem= (item: Item)=>{
+const changeItem = (item: Item) => {
     currentItem.value = item
-    showDialog.value =  true
+    showDialog.value = true
 }
 
 const toSave = () => {
     canSave.value = true
-    setTimeout(()=>{
+    setTimeout(() => {
         canSave.value = false
     }, 200)
     showDialog.value = false
@@ -66,7 +68,7 @@ const toSave = () => {
 
 const unwatchItems = watch([items], () => {
     currentItem.value = items.value[0]
-}, )
+},)
 
 const unwatchNewItem = watch([newItem], () => {
     if (!newItem.value) return
@@ -76,14 +78,17 @@ const unwatchNewItem = watch([newItem], () => {
 }, {deep: true})
 
 const unwatchShowDialog = watch([showDialog], (value, oldValue) => {
-    if (showDialog.value) return
-    !canAddNewItem.value && (showDialog.value = true)
+    if (showDialog.value || canAddNewItem.value) return
+    items.value.pop()
+    canAddNewItem.value = true
+    // !canAddNewItem.value && (showDialog.value = true)
 })
 
 const unwatchCurrentItem = watch([currentItem], () => {
     if (!currentItem.value) return
-    !wasItemsChange.value  && (showDialog.value = true)
+    !wasItemsChange.value && (showDialog.value = true)
 })
+
 onUnmounted(() => {
     unwatchItems()
     unwatchNewItem()
