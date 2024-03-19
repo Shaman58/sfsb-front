@@ -121,7 +121,7 @@
                             v-textarea(clearable v-model="setup.text" label="Коментарии")
             v-card-actions
                 v-btn(color="orange-darken-1" variant="text" @click="deleteSetup" v-if="isExist") Удалить
-                v-btn(color="orange-darken-1" variant="text" @click="hideSetup") Закрыть
+                v-btn(color="orange-darken-1" variant="text" @click="isExist ? hideSetup(): emit('incorrectSetup', setup.setupNumber)") Закрыть
                 v-spacer
                 v-btn(color="orange-darken-1" variant="text" type="submit" :disabled="!valid") {{ isExist ? 'Изменить' : 'Добавить' }}
 </template>
@@ -165,7 +165,7 @@ const initSetup = {
 }
  */
 const props = defineProps<Props>();
-const emit = defineEmits(["hideSetup", "save", "deleteSetup"]);
+const emit = defineEmits(["hideSetup", "save", "deleteSetup", "incorrectSetup"]);
 
 const {setup, additionalTexts, quantityOfPartsFromWorkpiece} = toRefs(props);
 console.log(setup);
@@ -182,7 +182,7 @@ const specialVisible = ref(false);
 const additionalVisible = ref(false);
 const {formatWorkpieceData} = materialDataFormatting();
 
-const isExist = (!!(setup.value.operation?.operationName));
+const isExist = !!setup.value.operation?.operationName;
 
 const {tools: specials} = storeToRefs(useSpecialStore())
 const {fetchTool: fetchSpecials} = useSpecialStore()
@@ -218,9 +218,6 @@ const deleteSetup = () => {
 
 const hideSetup = () => emit("hideSetup");
 
-watchEffect(()=>console.log("valid", valid.value))
-watchEffect(()=>{
-    console.log("setup",setup.value, setup.value.operation?.operationTimeManagement, setup.value.cooperate)
-})
+
 
 </script>

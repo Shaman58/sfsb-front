@@ -119,4 +119,23 @@ export class Empty{
             updated: null
         }) as Tool
     }
+
+    static Setup():Partial<Setup>{
+        return ({
+            setupTime: "00:00",
+            processTime: "00:00",
+            interoperativeTime: "00:00",
+            measureToolItems: [],
+            specialToolItems: [],
+            cutterToolItems: [],
+            toolings: [],
+            additionalTools: [],
+            setupNumber: 10,
+            operation: {
+            operationName: '',
+                operationTimeManagement: "FULL"
+        },
+            cooperatePrice: {amount: 0, currency: 'RUB'}
+        } as Partial<Setup>)
+    }
 }

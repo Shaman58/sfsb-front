@@ -9,7 +9,7 @@
                                 span.text-h4 {{ currentItem && currentItem.technology.drawingNumber + " " + currentItem && currentItem.technology.drawingName }}
                                 span {{ currentItem.quantity + "шт." }}
                             suspended-component
-                                    technology-card-owner(@change="changeOwner")
+                                technology-card-owner(@change="changeOwner")
 
                     v-card-text(:untouchable="!isBlockedByCurrentUser")
                         v-row
@@ -53,19 +53,20 @@
                                         :quantity-of-parts-from-workpiece="Number(currentItem.technology.quantityOfPartsFromWorkpiece)"
                                         :additionalTexts="additionalTexts"
                                         @hideSetup="hideSetup()"
-                                        @deleteSetup="deleteSetup(index)"
-                                        @save="replaceSetup($event, index)"
+                                        @deleteSetup="void deleteSetup(index)"
+                                        @save="void replaceSetup($event, index)"
+                                        @incorrect-setup="void deleteSetup(index)"
                                     )
 
                             v-col(cols="12")
-                                v-card(v-if="activeSetupIndex !== 'new'" title="Новый установ" @click="activeSetupIndex = 'new'")
-                                suspended-component(v-else)
-                                    setup-create-card(
-                                        :setup="newSetup"
-                                        :quantity-of-parts-from-workpiece="Number(currentItem.technology.quantityOfPartsFromWorkpiece)"
-                                        :additionalTexts="additionalTexts"
-                                        @hideSetup="hideSetup()"
-                                        @save="pushSetup" )
+                                v-card(v-if="activeSetupIndex !== 'new'" title="Новый установ" @click="addSetup")
+                                //suspended-component(v-else)
+                                //    setup-create-card(
+                                //        :setup="currentItem.technology.setups.at(-1)"
+                                //        :quantity-of-parts-from-workpiece="Number(currentItem.technology.quantityOfPartsFromWorkpiece)"
+                                //        :additionalTexts="additionalTexts"
+                                //        @hideSetup="hideSetup()"
+                                //    )
 
                     v-card-actions.technology-card__actions
                         .technology-card__calculate
@@ -104,6 +105,7 @@ import SuspendedComponent from "@/components/common/SuspendedComponent.vue";
 import {useCuttersStore, useMaterialsStore, useSpecialStore, useToolingStore} from "@/pinia-store/tools";
 import {useOperationsStore} from "@/pinia-store/operations";
 import {useItemStore} from "@/pinia-store/item";
+import {Empty} from "@/mixins/Empty";
 
 const {dialogVisible, currentItem, isBlockedByCurrentUser} = storeToRefs(useTechnologyStore());
 const {saveTechnology, changeBlocked, calculateTechnology, setTechnologyDialogVisible} = useTechnologyStore();
@@ -178,10 +180,10 @@ const sortedSetups = computed<Setup[]>(() => {
             setupNumber: number;
         }) => a.setupNumber - b.setupNumber);
 
-        setups[0].groupAble = true;
+        // setups[0].groupAble = true;
 
         for (let i = 1; i < setups.length; i++) {
-            setups[i].groupAble = setups[i - 1].groupAble && setups[i - 1].group; // Добавляем поле groupAble
+            // setups[i].groupAble = setups[i - 1].groupAble && setups[i - 1].group; // Добавляем поле groupAble
             if (!setups[i].groupAble) {
                 setups[i].group = false;
             }
@@ -222,36 +224,36 @@ const calculateSetupNumber = computed(() => {
     // }
     // return -1;
     const lastSetupNumber = Number(currentItem.value.technology.setups.at(-1)!.setupNumber)
-    console.log(currentItem.value.technology.setups.sort((a,b)=>b.setupNumber - a.setupNumber))
-    return lastSetupNumber % 10 ? (lastSetupNumber - lastSetupNumber % 10)+10: lastSetupNumber + 10
+    console.log(currentItem.value.technology.setups.sort((a, b) => b.setupNumber - a.setupNumber))
+    return lastSetupNumber % 10 ? (lastSetupNumber - lastSetupNumber % 10) + 10 : lastSetupNumber + 10
 })
 
 const isSaveActive = computed(() => !valid.value || !saveActive.value || (!currentItem.value.technology.workpiece && !currentItem.value.technology.assembly)
 );
 
-const createNewSetup = () => ({
-    setupTime: "00:00",
-    processTime: "00:00",
-    interoperativeTime: "00:00",
-    measureToolItems: [],
-    specialToolItems: [],
-    cutterToolItems: [],
-    toolings: [],
-    additionalTools: [],
-    setupNumber: calculateSetupNumber.value,
-    operation: {
-        operationName: '',
-        operationTimeManagement: "FULL"
-    },
-    cooperatePrice: {amount: 0, currency: 'RUB'}
-} as Partial<Setup>);
+// const createNewSetup = () => ({
+//     setupTime: "00:00",
+//     processTime: "00:00",
+//     interoperativeTime: "00:00",
+//     measureToolItems: [],
+//     specialToolItems: [],
+//     cutterToolItems: [],
+//     toolings: [],
+//     additionalTools: [],
+//     setupNumber: calculateSetupNumber.value,
+//     operation: {
+//         operationName: '',
+//         operationTimeManagement: "FULL"
+//     },
+//     cooperatePrice: {amount: 0, currency: 'RUB'}
+// } as Partial<Setup>);
 
-const newSetup = ref(createNewSetup())
+const newSetup = ref({...Empty.Setup(), setupNumber: calculateSetupNumber.value})
 
 const pushSetup = (setup: Setup) => {
     hideSetup();
     currentItem.value.technology.setups.push(setup);
-    newSetup.value = createNewSetup();
+    newSetup.value = {...Empty.Setup(), setupNumber: calculateSetupNumber.value};
 };
 
 const replaceSetup = async (setup: Setup, index: any) => {
@@ -262,6 +264,20 @@ const replaceSetup = async (setup: Setup, index: any) => {
 const hideSetup = () => {
     isBlockedByCurrentUser.value && (activeSetupIndex.value = null);
 };
+
+const addSetup = () => {
+    const lastSetup = currentItem.value.technology.setups.sort((a, b) => a.setupNumber - b.setupNumber).at(-1)
+    const isGroupable = lastSetup && lastSetup.groupAble ? lastSetup.groupAble : true
+    const newSetup = {
+        ...Empty.Setup(),
+        setupNumber: lastSetup ? (Math.floor(lastSetup.setupNumber / 10) + 1) * 10 : 10,
+        groupAble: isGroupable,
+        group: isGroupable || lastSetup?.group
+    } as Setup
+    currentItem.value.technology.setups.push(newSetup)
+
+    activeSetupIndex.value = currentItem.value.technology.setups.length - 1
+}
 
 const deleteSetup = async (index: string | number) => {
     const setupNumberToDelete = sortedSetups.value[+index].setupNumber;
@@ -310,7 +326,6 @@ const save = async () => {
 };
 
 
-
 const saveWorkpiece = (validWorkpiece: any) => {
     currentItem.value.technology.workpiece = validWorkpiece;
 };
@@ -323,10 +338,13 @@ const showWorkpieceCard = () => {
     workpieceCardVisible.value = true;
 };
 
-watch([currentItem],()=>{
-    newSetup.value = createNewSetup()
+watch([currentItem], () => {
+    newSetup.value = {...Empty.Setup(), setupNumber: calculateSetupNumber.value}
 
-},{immediate: true})
+}, {immediate: true})
+watch([currentItem.value.technology], () => {
+    console.log("currentItem.value.technology.setups", currentItem.value.technology?.setups)
+}, {immediate: true, deep: true})
 </script>
 
 <style lang="sass">
@@ -379,6 +397,7 @@ watch([currentItem],()=>{
 
     &__switch.v-input
         flex-shrink: 0
+
         .v-input__details
             display: none
 
