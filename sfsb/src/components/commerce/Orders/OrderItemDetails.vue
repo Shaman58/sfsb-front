@@ -21,7 +21,7 @@
 </template>
 <script setup lang="ts">
 import {useValidationRules} from "@/mixins/FieldValidationRules";
-import {onUnmounted, ref, toRefs, watch} from "vue";
+import {onUnmounted, ref, toRefs, watch, watchEffect} from "vue";
 
 const currentItem = defineModel<Item>("item")
 const props = defineProps<{save: boolean}>()
@@ -46,7 +46,25 @@ const unwatchCurrentItem = watch([currentItem],()=>{
      drawingName.value = currentItem.value?.technology.drawingName
      quantity.value = currentItem.value?.quantity
      customerMaterial.value = currentItem.value?.customerMaterial
+},{deep: true})
+
+watchEffect(()=> {
+    if(!currentItem.value || !currentItem.value.technology) return
+    currentItem.value.technology.drawingNumber = drawingNumber.value||""
 })
+watchEffect(()=> {
+    if(!currentItem.value || !currentItem.value.technology) return
+    currentItem.value.technology.drawingName = drawingName.value||""
+})
+watchEffect(()=> {
+    if(!currentItem.value ) return
+    currentItem.value.quantity = quantity.value||0
+})
+watchEffect(()=> {
+    if(!currentItem.value ) return
+    currentItem.value.customerMaterial = customerMaterial.value||false
+})
+
 onUnmounted(() => {
     unwatch()
     unwatchCurrentItem()

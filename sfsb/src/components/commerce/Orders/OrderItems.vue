@@ -5,7 +5,7 @@
             v-list-item(v-for="(i,index) in items"  :key="index"
                 :active="isActive(i)")
                 OrderItem(:item="i" @remove="removeItem(i)" @select="$event=>changeItem($event)")
-        OrderItemDetails(class="order-items__desktop-details" v-model:item="currentItem" :save="canSave")
+        OrderItemDetails.order-items__desktop-details(v-model:item="currentItem" :save="canSave")
 
     v-dialog.order-items__mobile-details(v-model="showDialog")
         v-container
