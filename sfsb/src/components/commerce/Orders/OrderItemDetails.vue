@@ -1,5 +1,5 @@
 <template lang="pug">
-    .order-item-details(v-if="currentItem")
+    v-form.order-item-details(v-if="currentItem" v-model="valid" )
         v-text-field.order-item-details__schema-number(label="Децимальный номер:"
             v-model="drawingNumber"
             placeholder="42"
@@ -18,6 +18,7 @@
         )
         v-switch.order-item-details__outsource-material(v-model="customerMaterial",
             :label="customerMaterial ? 'Материал заказчика' : 'Наш материал'")
+
 </template>
 <script setup lang="ts">
 import {useValidationRules} from "@/mixins/FieldValidationRules";
@@ -28,6 +29,9 @@ const props = defineProps<{save: boolean}>()
 const {save} = toRefs(props)
 
 const {rules} = useValidationRules()
+const valid = ref()
+
+defineExpose({valid})
 
 const drawingNumber = ref(currentItem.value?.technology.drawingNumber)
 const drawingName = ref(currentItem.value?.technology.drawingName)
