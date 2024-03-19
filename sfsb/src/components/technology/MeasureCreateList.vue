@@ -14,26 +14,26 @@
 
                     v-container
                         v-row
-                            v-col(cols="4")
+                            v-col(cols="12" sm="6" md="4")
                                 v-text-field(
                                     label="Название:"
                                     v-model="toolItem.tool.toolName"
                                     :rules="[rules.required, rules.nameValidation]"
                                     counter)
-                            v-col(cols="4")
+                            v-col(cols="12" sm="6" md="4")
                                 v-text-field(
                                     label="Описание:"
                                     v-model="toolItem.tool.description"
                                     :rules="[rules.required, rules.nameValidation]"
                                     counter)
 
-                            v-col(cols="4")
+                            v-col(cols="12" sm="6" md="4")
                                 v-text-field(
                                     label="Количество:"
                                     v-model="toolItem.amount"
                                     :rules="[rules.required, rules.minValidation]"
                                     counter)
-                            v-col(cols="4")
+                            v-col(cols="12" sm="6" md="4")
                                 v-text-field(
                                     label="Ориентировочная стоимость:"
                                     v-model="toolItem.price.amount"

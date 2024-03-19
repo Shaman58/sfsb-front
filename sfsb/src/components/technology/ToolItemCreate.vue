@@ -28,13 +28,13 @@
 
           <v-container>
             <v-row>
-              <v-col cols="4">
+              <v-col cols="12" sm="6" md="4">
                 <v-text-field
                   label="Фильтр"
                   v-model="filter">
                 </v-text-field>
               </v-col>
-              <v-col cols="4">
+              <v-col cols="12" sm="6" md="4">
                 <v-select
                   :items="filteredTools"
                   item-title='toolName'
@@ -44,7 +44,7 @@
                   :rules="[rules.required]">
                 </v-select>
               </v-col>
-              <v-col cols="4">
+              <v-col cols="12" sm="6" md="4">
                 <v-text-field
                   label="Количество:"
                   v-model="toolItem.amount"
@@ -54,7 +54,7 @@
                   maxlength="20">
                 </v-text-field>
               </v-col>
-              <v-col cols="4">
+              <v-col cols="12" sm="6" md="4">
                 <v-text-field
                   label="Ориентировочная стоимость:"
                   v-model="toolItem.price.amount"

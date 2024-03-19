@@ -342,9 +342,7 @@ watch([currentItem], () => {
     newSetup.value = {...Empty.Setup(), setupNumber: calculateSetupNumber.value}
 
 }, {immediate: true})
-watch([currentItem.value.technology], () => {
-    console.log("currentItem.value.technology.setups", currentItem.value.technology?.setups)
-}, {immediate: true, deep: true})
+
 </script>
 
 <style lang="sass">
