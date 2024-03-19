@@ -3,7 +3,12 @@
         template(#header)
             div(style="height: 8px; width: 100%;")
                 v-progress-linear(v-show="loading" indeterminate :color="$defaultColor")
-            OrderToolbar(:order="orderLocal" :valid="valid"  @save="save" @refresh="refresh")
+            OrderToolbar(
+                :order="orderLocal"
+                :valid="valid"
+                @save="save"
+                @refresh="refresh"
+            )
         .order-card
             v-form.order-card__form(ref="form" v-model="valid")
                 v-expansion-panels.order-card__container(:multiple="true" v-model="panel" )

@@ -106,6 +106,7 @@ import {useCuttersStore, useMaterialsStore, useSpecialStore, useToolingStore} fr
 import {useOperationsStore} from "@/pinia-store/operations";
 import {useItemStore} from "@/pinia-store/item";
 import {Empty} from "@/mixins/Empty";
+import {useOrdersStore} from "@/pinia-store/orders";
 
 const {dialogVisible, currentItem, isBlockedByCurrentUser} = storeToRefs(useTechnologyStore());
 const {saveTechnology, changeBlocked, calculateTechnology, setTechnologyDialogVisible} = useTechnologyStore();
@@ -136,6 +137,8 @@ const {items} = storeToRefs(useItemStore())
 const {fetchItems, fetchItem} = useItemStore()
 !items.value.length && await fetchItems()
 
+const {getOrders} = useOrdersStore()
+
 
 const {user} = storeToRefs(useCurrentUserStore())
 
@@ -150,9 +153,9 @@ const activeSetupIndex: Ref<number | string | null> = ref(null);
 const saveActive = ref(true);
 
 const calculate = ref(currentItem.value.technology && currentItem.value.technology.computed)
-watch([calculate], () => {
-    dialogVisible.value && calculate.value !== currentItem.value.technology.computed && calculateTechnology(currentItem.value.technology.id, calculate.value)
-    setTimeout(() => calculate.value = currentItem.value.technology.computed, 500)
+watch([calculate], async () => {
+    dialogVisible.value && calculate.value !== currentItem.value.technology.computed && await calculateTechnology(currentItem.value.technology.id, calculate.value)
+    calculate.value = currentItem.value.technology.computed
 })
 watch([dialogVisible], () => {
     dialogVisible.value && (calculate.value = currentItem.value.technology.computed)
@@ -317,9 +320,10 @@ const save = async () => {
     }
     if (!saveActive.value) return;
     saveActive.value = false;
-    currentItem.value.technology.computed = false;
+    // currentItem.value.technology.computed = false;
     currentItem.value.id && await fetchItem(currentItem.value.id);
     await fetchItems();
+    await getOrders()
     saveActive.value = true;
     await saveTechnology(currentItem.value.technology);
     calculate.value = currentItem.value.technology && currentItem.value.technology.computed
