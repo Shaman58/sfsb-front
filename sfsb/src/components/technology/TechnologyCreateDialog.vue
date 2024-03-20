@@ -72,7 +72,13 @@
                         .technology-card__calculate
                             span {{ currentItem.technology.computed ? 'Рассчитан' : 'Не рассчитан' }}
                             v-switch.technology-card__switch(v-model="calculate" :disabled="!isBlockedByCurrentUser")
-                            v-btn.technology-card__save(color="orange-darken-1" variant="text" type="submit" :disabled="isSaveActive" :untouchable="!isBlockedByCurrentUser") Сохранить
+                            v-btn.technology-card__save(
+                                color="orange-darken-1"
+                                variant="text"
+                                type="submit"
+                                :disabled="isSaveActive"
+                                :untouchable="!isBlockedByCurrentUser"
+                            ) Сохранить
                         .technology-card__close
                             v-btn(color="orange-darken-1" variant="text" @click="hideDialog") Закрыть
 
@@ -231,7 +237,9 @@ const calculateSetupNumber = computed(() => {
     return lastSetupNumber % 10 ? (lastSetupNumber - lastSetupNumber % 10) + 10 : lastSetupNumber + 10
 })
 
-const isSaveActive = computed(() => !valid.value || !saveActive.value || (!currentItem.value.technology.workpiece && !currentItem.value.technology.assembly)
+const isSaveActive = computed(() => {
+        return !valid.value || !saveActive.value || (!currentItem.value.technology.workpiece && !currentItem.value.technology.assembly)
+    }
 );
 
 // const createNewSetup = () => ({

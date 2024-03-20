@@ -17,7 +17,7 @@
                             md="6"
                             lg="4"
                             v-if="setup?.operation?.operationTimeManagement === 'COMPUTED' && !setup.cooperate"
-                            )
+                        )
                             v-switch(
                                 v-model="setup.aggregate"
                                 :true-value="true"
@@ -36,7 +36,7 @@
                                 type="number"
                                 :rules="[rules.numberGreaterThanZero]"
                                 autocomplete="false"
-                                )
+                            )
                     v-row
                         v-col(cols="12" md="6" lg="4")
                             v-text-field(
@@ -44,7 +44,7 @@
                                 v-model="setup.setupNumber"
                                 :rules="[unitNumberValidationRule, rules.required]"
                                 autocomplete="false"
-                                )
+                            )
                         v-col(cols="12" md="6" lg="4")
                             v-combobox(
                                 label="Название установки"
@@ -53,39 +53,39 @@
                                 return-object
                                 v-model="setup.operation"
                                 :rules="[rules.required]")
-                        v-col(cols="12" md="6" lg="4" v-if="setup.cooperate")
+                        v-col(cols="12" md="6" lg="4" v-if="setup.operation?.operationName && setup.cooperate")
                             v-text-field(
                                 label="Кооперационная цена на деталь"
                                 v-model="setup.cooperatePrice.amount"
                                 type="number"
                                 :rules="[rules.required, rules.numeric, rules.min0Validation]"
                                 autocomplete="false"
-                                )
-                        v-col(cols="12" md="6" lg="4" v-if="setup?.operation?.operationTimeManagement === 'FULL' && !setup.cooperate  || setup?.operation?.operationTimeManagement === 'COMPUTED' && !setup.cooperate  || setup?.operation?.operationTimeManagement === 'PROCESS_TIME_ONLY' && !setup.cooperate")
+                            )
+                        v-col(cols="12" md="6" lg="4" v-if="setup.operation?.operationName && setup?.operation?.operationTimeManagement === 'FULL' && !setup.cooperate  || setup?.operation?.operationTimeManagement === 'COMPUTED' && !setup.cooperate  || setup?.operation?.operationTimeManagement === 'PROCESS_TIME_ONLY' && !setup.cooperate")
                             v-text-field(
                                 label="Время цикла(чч:мм)"
                                 v-model="setup.processTime"
                                 type="time"
                                 :rules="[rules.durationNotZeroValidation]"
                                 autocomplete="false"
-                                )
-                        v-col(cols="12" md="6" lg="4" v-if="setup?.operation?.operationTimeManagement === 'FULL' && !setup.cooperate")
+                            )
+                        v-col(cols="12" md="6" lg="4" v-if="setup.operation?.operationName && setup?.operation?.operationTimeManagement === 'FULL' && !setup.cooperate")
                             v-text-field(
                                 label="Межоперационное время(чч:мм)"
                                 v-model="setup.interoperativeTime"
                                 type="time"
                                 :rules="[rules.durationNotZeroValidation]"
                                 autocomplete="false"
-                                )
-                        v-col(cols="12" md="6" lg="4" v-if="setup?.operation?.operationTimeManagement === 'FULL' && !setup.cooperate")
+                            )
+                        v-col(cols="12" md="6" lg="4" v-if="setup.operation?.operationName && setup?.operation?.operationTimeManagement === 'FULL' && !setup.cooperate")
                             v-text-field(
                                 label="Наладочное время(чч:мм)"
                                 v-model="setup.setupTime"
                                 type="time"
                                 :rules="[rules.durationNotZeroValidation]"
                                 autocomplete="false"
-                                )
-                        v-col(cols="12" md="6" lg="4" v-if="setup?.operation?.operationTimeManagement === 'FULL' && !setup.cooperate || setup?.operation?.operationTimeManagement === 'PROCESS_TIME_ONLY' && !setup.cooperate")
+                            )
+                        v-col(cols="12" md="6" lg="4" v-if="setup.operation?.operationName && setup?.operation?.operationTimeManagement === 'FULL' && !setup.cooperate || setup?.operation?.operationTimeManagement === 'PROCESS_TIME_ONLY' && !setup.cooperate")
                             v-combobox(
                                 v-if="!!toolings"
                                 :items="toolings"
@@ -95,29 +95,29 @@
                                 label="Выбрать оснастку"
                                 multiple
                             )
-                        v-col(cols="12" md="6" lg="4" v-if="setup?.operation?.operationTimeManagement === 'FULL' && !setup.cooperate || setup?.operation?.operationTimeManagement === 'PROCESS_TIME_ONLY' && !setup.cooperate")
+                        v-col(cols="12" md="6" lg="4" v-if="setup.operation?.operationName && setup?.operation?.operationTimeManagement === 'FULL' && !setup.cooperate || setup?.operation?.operationTimeManagement === 'PROCESS_TIME_ONLY' && !setup.cooperate")
                             v-btn(size="small" variant="text" v-if="setup.measureToolItems?.length === 0" @click="measureVisible = true") Меритель
                             v-list(v-else @click="measureVisible = true")
                                 v-list-item(v-for="tool in setup.measureToolItems" :title="tool.tool.toolName + ' ' + tool.tool.description" :subtitle="tool.amount + 'шт.'")
                             MeasureCreateList(title="Меритель" :visible="measureVisible" :tools="setup.measureToolItems" @hide="measureVisible = false")
-                        v-col(cols="12" md="6" lg="4" v-if="setup?.operation?.operationTimeManagement === 'FULL' && !setup.cooperate || setup?.operation?.operationTimeManagement === 'PROCESS_TIME_ONLY' && !setup.cooperate")
+                        v-col(cols="12" md="6" lg="4" v-if="setup.operation?.operationName && setup?.operation?.operationTimeManagement === 'FULL' && !setup.cooperate || setup?.operation?.operationTimeManagement === 'PROCESS_TIME_ONLY' && !setup.cooperate")
                             v-btn(size="small" variant="text" v-if="setup.cutterToolItems?.length === 0" @click="cutterVisible = true") Инструмент
                             v-list(v-else @click="cutterVisible = true")
                                 v-list-item(v-for="tool in setup.cutterToolItems" :title="tool.tool.toolName" :subtitle="tool.amount + 'шт.'")
                             tool-create(title="Инструмент" :visible="cutterVisible" :toolItems="setup.cutterToolItems" :tools="cutters" @hide="cutterVisible = false")
-                        v-col(cols="12" md="6" lg="4" v-if="setup?.operation?.operationTimeManagement === 'FULL' && !setup.cooperate || setup?.operation?.operationTimeManagement === 'PROCESS_TIME_ONLY' && !setup.cooperate")
+                        v-col(cols="12" md="6" lg="4" v-if="setup.operation?.operationName && setup?.operation?.operationTimeManagement === 'FULL' && !setup.cooperate || setup?.operation?.operationTimeManagement === 'PROCESS_TIME_ONLY' && !setup.cooperate")
                             v-btn(size="small" variant="text" v-if="setup.specialToolItems?.length === 0" @click="specialVisible = true") Специнструмент
                             v-list(v-else @click="specialVisible = true")
                                 v-list-item(v-for="tool in setup.specialToolItems" :title="tool.tool.toolName" :subtitle="tool.amount + 'шт.'")
                             tool-create(title="Специнструмент" :visible="specialVisible" :toolItems="setup.specialToolItems" :tools="specials" @hide="specialVisible = false")
-                        v-col(cols="6" md="6" lg="6" v-if="setup?.operation?.operationTimeManagement === 'FULL' && !setup.cooperate || setup?.operation?.operationTimeManagement === 'PROCESS_TIME_ONLY' && !setup.cooperate")
+                        v-col(cols="6" md="6" lg="6" v-if="setup.operation?.operationName && setup?.operation?.operationTimeManagement === 'FULL' && !setup.cooperate || setup?.operation?.operationTimeManagement === 'PROCESS_TIME_ONLY' && !setup.cooperate")
                             v-btn(size="small" variant="text" v-if="setup.additionalTools?.length === 0" @click="additionalVisible = true") Приспособление
                             v-list(v-else @click="additionalVisible = true")
                                 v-list-item(v-for="tool in setup.additionalTools" :title="tool.toolName + ' ' + formatWorkpieceData(tool.workpiece)" :subtitle="tool.amount + 'шт.'")
                             additional-create(:visible="additionalVisible" :additionals="setup.additionalTools" @hide="additionalVisible = false")
-                        v-col(cols="12" v-if="setup?.operation?.operationTimeManagement === 'FULL' && !setup.cooperate || setup?.operation?.operationTimeManagement === 'PROCESS_TIME_ONLY' && !setup.cooperate")
+                        v-col(cols="12" v-if="setup.operation?.operationName && setup?.operation?.operationTimeManagement === 'FULL' && !setup.cooperate || setup?.operation?.operationTimeManagement === 'PROCESS_TIME_ONLY' && !setup.cooperate")
                             v-combobox.flex-full-width(label="Приспособление" v-model="setup.additionalComments" :items="additionalTexts" density="comfortable" menu-icon="" placeholder="Выберите из списка или введите свой коментарий" prepend-inner-icon="mdi-magnify" hide-details)
-                        v-col(cols="12" v-if="setup?.operation?.operationTimeManagement === 'COMPUTED' && !setup.cooperate")
+                        v-col(cols="12" v-if="setup.operation?.operationName && setup?.operation?.operationTimeManagement === 'COMPUTED' && !setup.cooperate")
                             v-textarea(clearable v-model="setup.text" label="Коментарии")
             v-card-actions
                 v-btn(color="orange-darken-1" variant="text" @click="deleteSetup" v-if="isExist") Удалить
@@ -205,8 +205,8 @@ const {fetchOperation} = useOperationsStore()
 const setupNumbers = computed(() => currentItem.value.technology.setups.filter(item => item.setupNumber !== setup.value.setupNumber).map(obj => obj.setupNumber));
 const unitNumberValidationRule = rules.unitNumberValidation(setupNumbers);
 
-const isWorkpiece = computed(()=>{
-    return setup.value.operation?.operationTimeManagement === 'FULL'  && !setup.value.cooperate  && quantityOfPartsFromWorkpiece.value !== 1  && setup.value.groupAble
+const isWorkpiece = computed(() => {
+    return setup.value.operation?.operationName && setup.value.operation?.operationTimeManagement === 'FULL' && !setup.value.cooperate && quantityOfPartsFromWorkpiece.value !== 1 && setup.value.groupAble
 })
 
 const save = (setup: Partial<Setup>) => emit("save", setup);
@@ -218,6 +218,7 @@ const deleteSetup = () => {
 
 const hideSetup = () => emit("hideSetup");
 
-
-
+watchEffect(() => {
+    console.log("setup.value.operation", setup.value.operation)
+})
 </script>

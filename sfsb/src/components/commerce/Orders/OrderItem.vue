@@ -17,7 +17,7 @@ import {computed, toRefs} from "vue"
 
 const props = defineProps<{ item: Item }>()
 const {item} = toRefs(props)
-const emit = defineEmits(["remove","select"])
+const emit = defineEmits(["remove", "select"])
 
 const isComputed = computed(() => !!item.value?.technology?.computed)
 const isMaterial = computed(() => !!item.value?.customerMaterial || !!item.value?.technology?.assembly || !!item.value.technology?.workpiece?.material?.price?.amount)
@@ -40,12 +40,12 @@ const isMaterial = computed(() => !!item.value?.customerMaterial || !!item.value
         gap: .5rem
 
         @media (width < 500px)
-            font-size: clamp(11px,16 / 500 * 100vw,1rem)
+            font-size: clamp(11px, 16 / 500 * 100vw, 1rem)
 
     &__controls
         margin-left: auto
 
     &__amount
         @media (width < 500px)
-            font-size: clamp(11px,16 / 500 * 100vw,1rem)
+            font-size: clamp(11px, 16 / 500 * 100vw, 1rem)
 </style>
