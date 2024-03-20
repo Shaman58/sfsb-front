@@ -7,7 +7,7 @@
                 OrderItem(:item="i" @remove="removeItem(i)" @select="$event=>changeItem($event)")
         OrderItemDetails.order-items__desktop-details(v-model:item="currentItem" :save="canSave")
 
-    v-dialog.order-items__mobile-details(v-model="showDialog")
+    v-dialog.order-items__mobile-details(v-model="showDialog" v-if="screenWidth < 1024")
         v-container
             v-card.order-items__mobile-card
                 v-card-title {{ number }} {{customer}}
@@ -19,10 +19,12 @@
 <script setup lang="ts">
 
 import OrderItem from "@/components/commerce/Orders/OrderItem.vue";
-import {onUnmounted, ref, toRefs, watch, watchEffect} from "vue";
+import {onUnmounted, ref, toRefs, watch} from "vue";
 import OrderItemDetails from "@/components/commerce/Orders/OrderItemDetails.vue";
 import {Empty} from "@/mixins/Empty";
+import {useDisplay} from "vuetify";
 
+const {width: screenWidth} = useDisplay()
 const props = defineProps<{ items: Item[], customer: string, number: number }>()
 const {items, customer, number} = toRefs(props)
 
@@ -52,6 +54,7 @@ const addNewItem = () => {
 const removeItem = (item: Item) => {
     const index = items.value.indexOf(item)
     index >= 0 && items.value.splice(index, 1)
+    currentItem.value = items.value.at(-1) || items.value[0]
 }
 
 const changeItem = (item: Item) => {
@@ -78,17 +81,13 @@ const unwatchNewItem = watch([newItem], () => {
     }
 }, {deep: true})
 
-const unwatchShowDialog = watch([showDialog], (value, oldValue) => {
+const unwatchShowDialog = watch([showDialog], () => {
     if (showDialog.value || canAddNewItem.value) return
     items.value.pop()
     canAddNewItem.value = true
+
     // !canAddNewItem.value && (showDialog.value = true)
 })
-
-// const unwatchCurrentItem = watch([currentItem], () => {
-//     if (!currentItem.value) return
-//     !wasItemsChange.value && (showDialog.value = true)
-// })
 
 onUnmounted(() => {
     unwatchItems()

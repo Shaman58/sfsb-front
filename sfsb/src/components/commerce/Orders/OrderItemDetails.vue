@@ -22,10 +22,10 @@
 </template>
 <script setup lang="ts">
 import {useValidationRules} from "@/mixins/FieldValidationRules";
-import {onUnmounted, ref, toRefs, watch, watchEffect} from "vue";
+import {computed, onUnmounted, ref, toRefs, watch} from "vue";
 
 const currentItem = defineModel<Item>("item")
-const props = defineProps<{save: boolean}>()
+const props = defineProps<{ save: boolean }>()
 const {save} = toRefs(props)
 
 const {rules} = useValidationRules()
@@ -33,41 +33,61 @@ const valid = ref()
 
 defineExpose({valid})
 
-const drawingNumber = ref(currentItem.value?.technology.drawingNumber)
-const drawingName = ref(currentItem.value?.technology.drawingName)
-const quantity = ref(currentItem.value?.quantity)
-const customerMaterial = ref(currentItem.value?.customerMaterial)
-
-const unwatch = watch([save],()=>{
-    currentItem.value && (currentItem.value.technology.drawingNumber = drawingNumber.value||"")
-    currentItem.value && (currentItem.value.technology.drawingName = drawingName.value||"")
-    currentItem.value && (currentItem.value.quantity = quantity.value||0)
-    currentItem.value && (currentItem.value.customerMaterial = customerMaterial.value||false)
+// const drawingNumber = ref(currentItem.value?.technology.drawingNumber)
+const drawingNumber = computed({
+    get() {
+        return currentItem.value?.technology.drawingNumber
+    },
+    set(x?: string) {
+        currentItem.value &&
+        (currentItem.value.technology.drawingNumber = x || "")
+    }
+})
+// const drawingName = ref(currentItem.value?.technology.drawingName)
+const drawingName = computed({
+    get() {
+        return currentItem.value?.technology.drawingName
+    },
+    set(x?: string) {
+        currentItem.value &&
+        (currentItem.value.technology.drawingName = x || "")
+    }
+})
+// const quantity = ref(currentItem.value?.quantity)
+const quantity = computed({
+    get() {
+        return currentItem.value?.quantity || 0
+    },
+    set(x: number) {
+        currentItem.value &&
+        (currentItem.value.quantity = x )
+    }
+})
+// const customerMaterial = ref(currentItem.value?.customerMaterial)
+const customerMaterial = computed({
+    get() {
+        return currentItem.value?.customerMaterial || false
+    },
+    set(x: boolean) {
+        currentItem.value &&
+        (currentItem.value.customerMaterial = x )
+    }
 })
 
-const unwatchCurrentItem = watch([currentItem],()=>{
-     drawingNumber.value = currentItem.value?.technology.drawingNumber
-     drawingName.value = currentItem.value?.technology.drawingName
-     quantity.value = currentItem.value?.quantity
-     customerMaterial.value = currentItem.value?.customerMaterial
-},{deep: true})
+const unwatch = watch([save], () => {
+    currentItem.value && (currentItem.value.technology.drawingNumber = drawingNumber.value || "")
+    currentItem.value && (currentItem.value.technology.drawingName = drawingName.value || "")
+    currentItem.value && (currentItem.value.quantity = quantity.value || 0)
+    currentItem.value && (currentItem.value.customerMaterial = customerMaterial.value || false)
+})
 
-watchEffect(()=> {
-    if(!currentItem.value || !currentItem.value.technology) return
-    currentItem.value.technology.drawingNumber = drawingNumber.value||""
-})
-watchEffect(()=> {
-    if(!currentItem.value || !currentItem.value.technology) return
-    currentItem.value.technology.drawingName = drawingName.value||""
-})
-watchEffect(()=> {
-    if(!currentItem.value ) return
-    currentItem.value.quantity = quantity.value||0
-})
-watchEffect(()=> {
-    if(!currentItem.value ) return
-    currentItem.value.customerMaterial = customerMaterial.value||false
-})
+const unwatchCurrentItem = watch([currentItem], () => {
+    drawingNumber.value = currentItem.value?.technology.drawingNumber
+    drawingName.value = currentItem.value?.technology.drawingName
+    quantity.value = currentItem.value?.quantity || 0
+    customerMaterial.value = currentItem.value?.customerMaterial || false
+}, {deep: true})
+
 
 onUnmounted(() => {
     unwatch()
