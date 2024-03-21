@@ -13,11 +13,11 @@
 
                     v-card-text(:untouchable="!isBlockedByCurrentUser")
                         v-row
-                            v-col
-                                v-switch(cols="12" md="6" v-model="currentItem.technology.assembly" :true-value="true" :false-value="false" :label="currentItem.technology.assembly ? 'Сборка' : 'Деталь'")
-                                v-card(cols="12" md="6" v-if="!workpieceCardVisible && !currentItem.technology.assembly" width="200" title="Заготовка:" @click="showWorkpieceCard")
+                            v-col.mb-4(cols="12" md="3")
+                                v-switch(cols="12" md="2" v-model="currentItem.technology.assembly" :true-value="true" :false-value="false" :label="currentItem.technology.assembly ? 'Сборка' : 'Деталь'")
+                                v-card(cols="12" md="5" v-if="!workpieceCardVisible && !currentItem.technology.assembly" width="200" title="Заготовка:" @click="showWorkpieceCard")
                                     v-card-item {{ !!currentItem.technology.workpiece ? formatWorkpieceData(currentItem.technology.workpiece) : "Задать заготовку"}}
-                                tech-workpiece-card(v-else-if="!currentItem.technology.assembly" :workpiece="{ ...currentItem.technology.workpiece }" :materials="materials" @validatedWorkpiece="saveWorkpiece" @hide="hideWorkpieceCard")
+                                tech-workpiece-card(col="12" md="5" v-else-if="!currentItem.technology.assembly" :workpiece="{ ...currentItem.technology.workpiece }" :materials="materials" @validatedWorkpiece="saveWorkpiece" @hide="hideWorkpieceCard")
 
                             v-col(cols="12" md="9" v-if="!workpieceCardVisible")
                                 TechnologyCardMainOptions
@@ -26,17 +26,25 @@
                         v-divider
                         br
 
-                        v-row
-                            v-col(cols="12" v-for="(setup, index) in sortedSetups" :key="index")
-                                v-card(v-if="activeSetupIndex !== index" @click="showSetupCard(index)")
+                        draggable(
+                            v-model="currentItem.technology.setups"
+                            draggable=".setup-card"
+                            @start="drag=true"
+                            @end="drag=false"
+                            @change="swapSetups"
+                            item-key="id"
+                            v-bind="dragOptions"
+                        )
+                            template(#item="{element: setup, index}")
+                                v-card.setup-card(v-if="activeSetupIndex !== index" @click="showSetupCard(index)")
                                     v-row
-                                        v-col(cols="12" lg="3" md="6" v-if="!setup.cooperate")
+                                        v-col.setup-card__section(cols="12" lg="3" md="6" v-if="!setup.cooperate")
                                             TechnologyCreateDialogCardPart1(:setup="setup")
-                                        v-col(cols="12" lg="3" md="6" v-if="!setup.cooperate && setup.operation.operationTimeManagement !== 'COMPUTED' && setup.operation.operationTimeManagement !== 'NONE'")
+                                        v-col.setup-card__section(cols="12" lg="3" md="6" v-if="!setup.cooperate && setup.operation.operationTimeManagement !== 'COMPUTED' && setup.operation.operationTimeManagement !== 'NONE'")
                                             TechnologyCreateDialogCardPart2(:setup="setup")
-                                        v-col(cols="12" lg="3" md="6" v-if="!setup.cooperate  && setup.operation.operationTimeManagement !== 'COMPUTED' && setup.operation.operationTimeManagement !== 'NONE'")
+                                        v-col.setup-card__section(cols="12" lg="3" md="6" v-if="!setup.cooperate  && setup.operation.operationTimeManagement !== 'COMPUTED' && setup.operation.operationTimeManagement !== 'NONE'")
                                             TechnologyCreateDialogCardPart3(:setup="setup")
-                                        v-col(cols="12" lg="3" md="6" fill-height v-if="!setup.cooperate  && setup.operation.operationTimeManagement !== 'COMPUTED'  && setup.operation.operationTimeManagement !== 'NONE'")
+                                        v-col.setup-card__section(cols="12" lg="3" md="6" fill-height v-if="!setup.cooperate  && setup.operation.operationTimeManagement !== 'COMPUTED'  && setup.operation.operationTimeManagement !== 'NONE'")
                                             TechnologyCreateDialogCardPart4(:setup="setup")
 
                                         // 1234 часть карточки кооперация
@@ -58,29 +66,23 @@
                                         @incorrect-setup="void deleteSetup(index)"
                                     )
 
-                            v-col(cols="12")
-                                v-card(v-if="activeSetupIndex !== 'new'" title="Новый установ" @click="addSetup")
-                                //suspended-component(v-else)
-                                //    setup-create-card(
-                                //        :setup="currentItem.technology.setups.at(-1)"
-                                //        :quantity-of-parts-from-workpiece="Number(currentItem.technology.quantityOfPartsFromWorkpiece)"
-                                //        :additionalTexts="additionalTexts"
-                                //        @hideSetup="hideSetup()"
-                                //    )
+                        v-col(cols="12")
+                            v-card(v-if="activeSetupIndex !== 'new'" title="Новый установ" @click="addSetup")
 
-                    v-card-actions.technology-card__actions
-                        .technology-card__calculate
-                            span {{ currentItem.technology.computed ? 'Рассчитан' : 'Не рассчитан' }}
-                            v-switch.technology-card__switch(v-model="calculate" :disabled="!isBlockedByCurrentUser")
-                            v-btn.technology-card__save(
-                                color="orange-darken-1"
-                                variant="text"
-                                type="submit"
-                                :disabled="isSaveActive"
-                                :untouchable="!isBlockedByCurrentUser"
-                            ) Сохранить
-                        .technology-card__close
-                            v-btn(color="orange-darken-1" variant="text" @click="hideDialog") Закрыть
+
+                        v-card-actions.technology-card__actions
+                            .technology-card__calculate
+                                span {{ currentItem.technology.computed ? 'Рассчитан' : 'Не рассчитан' }}
+                                v-switch.technology-card__switch(v-model="calculate" :disabled="!isBlockedByCurrentUser")
+                                v-btn.technology-card__save(
+                                    color="orange-darken-1"
+                                    variant="text"
+                                    type="submit"
+                                    :disabled="isSaveActive"
+                                    :untouchable="!isBlockedByCurrentUser"
+                                ) Сохранить
+                            .technology-card__close
+                                v-btn(color="orange-darken-1" variant="text" @click="hideDialog") Закрыть
 
     AlertDialog(ref="alertDialog")
 </template>
@@ -113,6 +115,14 @@ import {useOperationsStore} from "@/pinia-store/operations";
 import {useItemStore} from "@/pinia-store/item";
 import {Empty} from "@/mixins/Empty";
 import {useOrdersStore} from "@/pinia-store/orders";
+import draggable from "vuedraggable";
+
+const drag = ref(false)
+const dragOptions = {
+    animation: 200,
+    disabled: false,
+    ghostClass: "ghost"
+}
 
 const {dialogVisible, currentItem, isBlockedByCurrentUser} = storeToRefs(useTechnologyStore());
 const {saveTechnology, changeBlocked, calculateTechnology, setTechnologyDialogVisible} = useTechnologyStore();
@@ -229,11 +239,11 @@ const calculateSetupNumber = computed(() => {
     // for (let i = 10; i <= Number.MAX_SAFE_INTEGER; i = i + 10) {
     //     if (!setupNumbers.includes(i)) {
     //         return i;
+    //         return i;
     //     }
     // }
     // return -1;
     const lastSetupNumber = Number(currentItem.value.technology.setups.at(-1)!.setupNumber)
-    console.log(currentItem.value.technology.setups.sort((a, b) => b.setupNumber - a.setupNumber))
     return lastSetupNumber % 10 ? (lastSetupNumber - lastSetupNumber % 10) + 10 : lastSetupNumber + 10
 })
 
@@ -242,22 +252,10 @@ const isSaveActive = computed(() => {
     }
 );
 
-// const createNewSetup = () => ({
-//     setupTime: "00:00",
-//     processTime: "00:00",
-//     interoperativeTime: "00:00",
-//     measureToolItems: [],
-//     specialToolItems: [],
-//     cutterToolItems: [],
-//     toolings: [],
-//     additionalTools: [],
-//     setupNumber: calculateSetupNumber.value,
-//     operation: {
-//         operationName: '',
-//         operationTimeManagement: "FULL"
-//     },
-//     cooperatePrice: {amount: 0, currency: 'RUB'}
-// } as Partial<Setup>);
+const swapSetups = () => {
+    if (!currentItem.value) return
+    currentItem.value.technology.setups.forEach((e, i) => e.setupNumber = (i + 1) * 10)
+}
 
 const newSetup = ref({...Empty.Setup(), setupNumber: calculateSetupNumber.value})
 
@@ -277,7 +275,7 @@ const hideSetup = () => {
 };
 
 const addSetup = () => {
-    const lastSetup = currentItem.value.technology.setups.sort((a, b) => a.setupNumber - b.setupNumber).at(-1)
+    const lastSetup = currentItem.value.technology.setups.toSorted((a, b) => a.setupNumber - b.setupNumber).at(-1)
     const isGroupable = lastSetup && lastSetup.groupAble ? lastSetup.groupAble : true
     const newSetup = {
         ...Empty.Setup(),
@@ -411,4 +409,12 @@ watch([currentItem], () => {
         .v-input__details
             display: none
 
+.setup-card
+    user-select: none
+
+    &.ghost
+        background-color: #5554
+
+        & .setup-card__section > .v-card
+            background-color: #33f4
 </style>
