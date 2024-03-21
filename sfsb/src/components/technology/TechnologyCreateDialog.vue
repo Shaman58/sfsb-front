@@ -127,6 +127,7 @@ const dragOptions = {
 const {dialogVisible, currentItem, isBlockedByCurrentUser} = storeToRefs(useTechnologyStore());
 const {saveTechnology, changeBlocked, calculateTechnology, setTechnologyDialogVisible} = useTechnologyStore();
 
+
 const alertDialog = ref<typeof AlertDialog | null>(null)
 
 const {tools: specials} = storeToRefs(useSpecialStore())
@@ -195,7 +196,7 @@ const changeOwner = (event: boolean) => {
 
 const sortedSetups = computed<Setup[]>(() => {
     if (currentItem.value.technology.setups.length !== 0) {
-        const setups = currentItem.value.technology.setups.slice().sort((a: { setupNumber: number; }, b: {
+        const setups = currentItem.value.technology.setups.toSorted((a: { setupNumber: number; }, b: {
             setupNumber: number;
         }) => a.setupNumber - b.setupNumber);
 
@@ -350,7 +351,7 @@ const showWorkpieceCard = () => {
 
 watch([currentItem], () => {
     newSetup.value = {...Empty.Setup(), setupNumber: calculateSetupNumber.value}
-
+    currentItem.value && currentItem.value.technology?.setups && currentItem.value.technology.setups.sort((a, b) => a.setupNumber - b.setupNumber)
 }, {immediate: true})
 
 </script>
