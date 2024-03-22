@@ -50,6 +50,14 @@
                                                     TechnologyCreateDialogCardPart3(:setup="setup")
                                                 v-col.setup-card__section(cols="12" lg="3" md="6" fill-height v-if="!setup.cooperate  && setup.operation.operationTimeManagement !== 'COMPUTED'  && setup.operation.operationTimeManagement !== 'NONE'")
                                                     TechnologyCreateDialogCardPart4(:setup="setup")
+                                                //1234 часть карточки кооперация
+                                                v-col(cols="12" fill-height v-if="setup.cooperate")
+                                                    v-card(height="100%" :title="'№' + setup.setupNumber + ' ' + setup.operation.operationName + ' кооперация'" color="rgba(161, 48, 13, 0.24)")
+
+                                                //234 часть карточки текст
+                                                v-col(cols="9" fill-height v-else-if="setup.operation.operationTimeManagement === 'COMPUTED'")
+                                                    v-card(height="100%" :title="setup.aggregate ? 'Групповая по ' + setup.perTime + 'шт.' : ''") {{ setup.text }}
+
                                         v-expansion-panel-text
                                             suspended-component
                                                 setup-create-card(
