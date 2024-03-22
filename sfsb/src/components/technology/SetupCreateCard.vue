@@ -141,12 +141,44 @@
                         v-col(cols="12" v-if="setup.operation?.operationName && setup?.operation?.operationTimeManagement === 'COMPUTED' && !setup.cooperate")
                             v-textarea(clearable v-model="setup.text" label="Коментарии")
             v-card-actions.flex-wrap
-                v-btn(color="orange-darken-1" variant="text" @click="deleteSetup(setup.setupNumber)" v-if="isExist") Удалить
-                v-btn(color="orange-darken-1" variant="text" @click="isExist ? hideSetup(setup.setupNumber): emit('incorrectSetup', setup.setupNumber)") Закрыть
-                v-btn(color="blue-darken-1" variant="text" @click="emit('changeOrder', {setup, order: 'up'})") Поднять
-                v-btn(color="green-accent-darken-1" variant="text" @click="emit('changeOrder', {setup, order: 'down'})") Опустить
-                v-spacer
-                v-btn(color="orange-darken-1" variant="text" type="submit" :disabled="!valid") {{ isExist ? 'Изменить' : 'Добавить' }}
+                v-btn.mx-1.px-0(
+                    color="orange-darken-1"
+                    prepend-icon="mdi-delete"
+                    variant="text"
+                    @click="deleteSetup(setup.setupNumber)"
+                    v-if="isExist"
+                    :text="windowWidth > RESOLUTION_HIDE ? 'Удалить' : ''"
+                )
+                v-btn.mx-1.px-0(
+                    color="orange-darken-1"
+                    prepend-icon="mdi-close"
+                    variant="text"
+                    @click="isExist ? hideSetup(setup.setupNumber): emit('incorrectSetup', setup.setupNumber)"
+                    :text="windowWidth > RESOLUTION_HIDE ? 'Закрыть' : ''"
+                )
+                v-btn.mx-1.px-0(
+                    color="blue-darken-1"
+                    prepend-icon="mdi-chevron-up"
+                    variant="text"
+                    @click="emit('changeOrder', {setup, order: 'up'})"
+                    :text="windowWidth > RESOLUTION_HIDE ? 'Поднять' : ''"
+                )
+                v-btn.mx-1.px-0(
+                    color="green-accent-darken-1"
+                    prepend-icon="mdi-chevron-down"
+                    variant="text"
+                    @click="emit('changeOrder', {setup, order: 'down'})"
+                    :text="windowWidth > RESOLUTION_HIDE ? 'Опустить' : ''"
+                )
+                v-spacer(v-if="windowWidth > RESOLUTION_HIDE")
+                v-btn.mx-1.px-0(
+                    color="orange-darken-1"
+                    prepend-icon="mdi-check"
+                    variant="text"
+                    type="submit"
+                    :disabled="!valid"
+                    :text ="windowWidth > RESOLUTION_HIDE ? (isExist ? 'Изменить' : 'Добавить') : ''"
+                )
 </template>
 
 <script setup lang="ts">
@@ -160,12 +192,16 @@ import {useTechnologyStore} from "@/pinia-store/technology";
 import {storeToRefs} from 'pinia';
 import {useOperationsStore} from "@/pinia-store/operations";
 import {useCuttersStore, useSpecialStore, useToolingStore} from "@/pinia-store/tools";
+import {useDisplay} from "vuetify";
 
 interface Props {
     setup: Partial<Setup>
     quantityOfPartsFromWorkpiece?: number
     additionalTexts: string[]
 }
+
+const {width: windowWidth} = useDisplay()
+const RESOLUTION_HIDE = 768
 
 const props = defineProps<Props>();
 const emit = defineEmits(["hideSetup", "save", "deleteSetup", "incorrectSetup", "changeOrder"]);
