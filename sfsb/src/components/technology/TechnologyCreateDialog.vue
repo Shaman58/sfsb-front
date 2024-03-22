@@ -26,45 +26,81 @@
                         v-divider
                         br
 
-                        draggable(
-                            v-model="currentItem.technology.setups"
-                            draggable=".setup-card"
-                            @start="drag=true"
-                            @end="drag=false"
-                            @change="swapSetups"
-                            item-key="id"
-                            v-bind="dragOptions"
+                        v-expansion-panels.setups-panels(
+                            v-model="panels"
+                            multiple
                         )
-                            template(#item="{element: setup, index}")
-                                v-card.setup-card(v-if="activeSetupIndex !== index" @click="showSetupCard(index)")
-                                    v-row
-                                        v-col.setup-card__section(cols="12" lg="3" md="6" v-if="!setup.cooperate")
-                                            TechnologyCreateDialogCardPart1(:setup="setup")
-                                        v-col.setup-card__section(cols="12" lg="3" md="6" v-if="!setup.cooperate && setup.operation.operationTimeManagement !== 'COMPUTED' && setup.operation.operationTimeManagement !== 'NONE'")
-                                            TechnologyCreateDialogCardPart2(:setup="setup")
-                                        v-col.setup-card__section(cols="12" lg="3" md="6" v-if="!setup.cooperate  && setup.operation.operationTimeManagement !== 'COMPUTED' && setup.operation.operationTimeManagement !== 'NONE'")
-                                            TechnologyCreateDialogCardPart3(:setup="setup")
-                                        v-col.setup-card__section(cols="12" lg="3" md="6" fill-height v-if="!setup.cooperate  && setup.operation.operationTimeManagement !== 'COMPUTED'  && setup.operation.operationTimeManagement !== 'NONE'")
-                                            TechnologyCreateDialogCardPart4(:setup="setup")
+                            draggable(
+                                v-model="currentItem.technology.setups"
+                                @start="drag=true"
+                                @end="drag=false"
+                                item-key="id"
+                                v-bind="dragOptions"
+                                @change="swapSetups"
+                            )
+                                template(#item="{element: setup, index}")
+                                    v-expansion-panel(:value="setup.setupNumber")
+                                        v-expansion-panel-title
+                                            v-row
+                                                v-col.setup-card__section(cols="12" lg="3" md="6" v-if="!setup.cooperate")
+                                                    TechnologyCreateDialogCardPart1(:setup="setup")
+                                                v-col.setup-card__section(cols="12" lg="3" md="6" v-if="!setup.cooperate && setup.operation.operationTimeManagement !== 'COMPUTED' && setup.operation.operationTimeManagement !== 'NONE'")
+                                                    TechnologyCreateDialogCardPart2(:setup="setup")
+                                                v-col.setup-card__section(cols="12" lg="3" md="6" v-if="!setup.cooperate  && setup.operation.operationTimeManagement !== 'COMPUTED' && setup.operation.operationTimeManagement !== 'NONE'")
+                                                    TechnologyCreateDialogCardPart3(:setup="setup")
+                                                v-col.setup-card__section(cols="12" lg="3" md="6" fill-height v-if="!setup.cooperate  && setup.operation.operationTimeManagement !== 'COMPUTED'  && setup.operation.operationTimeManagement !== 'NONE'")
+                                                    TechnologyCreateDialogCardPart4(:setup="setup")
+                                        v-expansion-panel-text
+                                            suspended-component
+                                                setup-create-card(
+                                                    :setup="setup"
+                                                    :quantity-of-parts-from-workpiece="Number(currentItem.technology.quantityOfPartsFromWorkpiece)"
+                                                    :additionalTexts="additionalTexts"
+                                                    @hideSetup="hideSetup"
+                                                    @deleteSetup="void deleteSetup(index)"
+                                                    @save="void replaceSetup($event, index)"
+                                                    @incorrect-setup="void deleteSetup(index)"
+                                                )
 
-                                        // 1234 часть карточки кооперация
-                                        v-col(cols="12" fill-height v-if="setup.cooperate")
-                                            v-card(height="100%" :title="'№' + setup.setupNumber + ' ' + setup.operation.operationName + ' кооперация'" color="rgba(161, 48, 13, 0.24)")
-
-                                        //234 часть карточки текст
-                                        v-col(cols="9" fill-height v-else-if="setup.operation.operationTimeManagement === 'COMPUTED'")
-                                            v-card(height="100%" :title="setup.aggregate ? 'Групповая по ' + setup.perTime + 'шт.' : ''") {{ setup.text }}
-
-                                suspended-component(v-else)
-                                    setup-create-card(
-                                        :setup="setup"
-                                        :quantity-of-parts-from-workpiece="Number(currentItem.technology.quantityOfPartsFromWorkpiece)"
-                                        :additionalTexts="additionalTexts"
-                                        @hideSetup="hideSetup()"
-                                        @deleteSetup="void deleteSetup(index)"
-                                        @save="void replaceSetup($event, index)"
-                                        @incorrect-setup="void deleteSetup(index)"
-                                    )
+                        //draggable(
+                        //    v-model="currentItem.technology.setups"
+                        //    draggable=".setup-card"
+                        //    @start="drag=true"
+                        //    @end="drag=false"
+                        //    @change="swapSetups"
+                        //    item-key="id"
+                        //    v-bind="dragOptions"
+                        //)
+                        //    template(#item="{element: setup, index}")
+                        //        v-card.setup-card(v-if="activeSetupIndex !== index" @click="showSetupCard(index)")
+                        //            v-row
+                        //                v-col.setup-card__section(cols="12" lg="3" md="6" v-if="!setup.cooperate")
+                        //                    TechnologyCreateDialogCardPart1(:setup="setup")
+                        //                v-col.setup-card__section(cols="12" lg="3" md="6" v-if="!setup.cooperate && setup.operation.operationTimeManagement !== 'COMPUTED' && setup.operation.operationTimeManagement !== 'NONE'")
+                        //                    TechnologyCreateDialogCardPart2(:setup="setup")
+                        //                v-col.setup-card__section(cols="12" lg="3" md="6" v-if="!setup.cooperate  && setup.operation.operationTimeManagement !== 'COMPUTED' && setup.operation.operationTimeManagement !== 'NONE'")
+                        //                    TechnologyCreateDialogCardPart3(:setup="setup")
+                        //                v-col.setup-card__section(cols="12" lg="3" md="6" fill-height v-if="!setup.cooperate  && setup.operation.operationTimeManagement !== 'COMPUTED'  && setup.operation.operationTimeManagement !== 'NONE'")
+                        //                    TechnologyCreateDialogCardPart4(:setup="setup")
+                        //
+                        //                // 1234 часть карточки кооперация
+                        //                v-col(cols="12" fill-height v-if="setup.cooperate")
+                        //                    v-card(height="100%" :title="'№' + setup.setupNumber + ' ' + setup.operation.operationName + ' кооперация'" color="rgba(161, 48, 13, 0.24)")
+                        //
+                        //                //234 часть карточки текст
+                        //                v-col(cols="9" fill-height v-else-if="setup.operation.operationTimeManagement === 'COMPUTED'")
+                        //                    v-card(height="100%" :title="setup.aggregate ? 'Групповая по ' + setup.perTime + 'шт.' : ''") {{ setup.text }}
+                        //
+                        //        suspended-component(v-else)
+                        //            setup-create-card(
+                        //                :setup="setup"
+                        //                :quantity-of-parts-from-workpiece="Number(currentItem.technology.quantityOfPartsFromWorkpiece)"
+                        //                :additionalTexts="additionalTexts"
+                        //                @hideSetup="hideSetup()"
+                        //                @deleteSetup="void deleteSetup(index)"
+                        //                @save="void replaceSetup($event, index)"
+                        //                @incorrect-setup="void deleteSetup(index)"
+                        //            )
 
                         v-col(cols="12")
                             v-card(v-if="activeSetupIndex !== 'new'" title="Новый установ" @click="addSetup")
@@ -123,6 +159,8 @@ const dragOptions = {
     disabled: false,
     ghostClass: "ghost"
 }
+const panels = ref<number[]>([])
+
 
 const {dialogVisible, currentItem, isBlockedByCurrentUser} = storeToRefs(useTechnologyStore());
 const {saveTechnology, changeBlocked, calculateTechnology, setTechnologyDialogVisible} = useTechnologyStore();
@@ -261,7 +299,7 @@ const swapSetups = () => {
 const newSetup = ref({...Empty.Setup(), setupNumber: calculateSetupNumber.value})
 
 const pushSetup = (setup: Setup) => {
-    hideSetup();
+    hideSetup(setup.setupNumber);
     currentItem.value.technology.setups.push(setup);
     newSetup.value = {...Empty.Setup(), setupNumber: calculateSetupNumber.value};
 };
@@ -269,24 +307,29 @@ const pushSetup = (setup: Setup) => {
 const replaceSetup = async (setup: Setup, index: any) => {
     await deleteSetup(index);
     pushSetup(setup);
+    panels.value = []
+    swapSetups()
 };
 
-const hideSetup = () => {
+const hideSetup = (setupNumber: number) => {
+    panels.value = panels.value.filter(e => e !== setupNumber)
     isBlockedByCurrentUser.value && (activeSetupIndex.value = null);
 };
 
+const lastSetup = computed(() => currentItem.value.technology.setups.toSorted((a, b) => a.setupNumber - b.setupNumber).at(-1))
 const addSetup = () => {
-    const lastSetup = currentItem.value.technology.setups.toSorted((a, b) => a.setupNumber - b.setupNumber).at(-1)
-    const isGroupable = lastSetup && lastSetup.groupAble ? lastSetup.groupAble : true
+    const isGroupable = lastSetup.value && lastSetup.value.groupAble ? lastSetup.value.groupAble : true
+    const nextNumber = lastSetup.value ? (Math.floor(lastSetup.value.setupNumber / 10) + 1) * 10 : 10
     const newSetup = {
         ...Empty.Setup(),
-        setupNumber: lastSetup ? (Math.floor(lastSetup.setupNumber / 10) + 1) * 10 : 10,
+        setupNumber: nextNumber,
         groupAble: isGroupable,
-        group: isGroupable || lastSetup?.group
+        group: isGroupable || lastSetup.value?.group
     } as Setup
     currentItem.value.technology.setups.push(newSetup)
 
     activeSetupIndex.value = currentItem.value.technology.setups.length - 1
+    panels.value = [nextNumber]
 }
 
 const deleteSetup = async (index: string | number) => {
@@ -298,6 +341,8 @@ const deleteSetup = async (index: string | number) => {
     if (indexInOriginalList !== -1) {
         currentItem.value.technology.setups.splice(indexInOriginalList, 1);
     }
+    panels.value = []
+    swapSetups()
 };
 
 const showSetupCard = (index: number) => {
@@ -409,6 +454,10 @@ watch([currentItem], () => {
 
         .v-input__details
             display: none
+
+.setups-panels
+    & > div
+        width: 100%
 
 .setup-card
     user-select: none

@@ -95,11 +95,32 @@
                                 label="Выбрать оснастку"
                                 multiple
                             )
-                        v-col(cols="12" md="6" lg="4" v-if="setup.operation?.operationName && setup?.operation?.operationTimeManagement === 'FULL' && !setup.cooperate || setup?.operation?.operationTimeManagement === 'PROCESS_TIME_ONLY' && !setup.cooperate")
-                            v-btn(size="small" variant="text" v-if="setup.measureToolItems?.length === 0" @click="measureVisible = true") Меритель
-                            v-list(v-else @click="measureVisible = true")
-                                v-list-item(v-for="tool in setup.measureToolItems" :title="tool.tool.toolName + ' ' + tool.tool.description" :subtitle="tool.amount + 'шт.'")
-                            MeasureCreateList(title="Меритель" :visible="measureVisible" :tools="setup.measureToolItems" @hide="measureVisible = false")
+                        v-col(
+                            cols="12"
+                            md="6"
+                            lg="4"
+                            v-if="setup.operation?.operationName && setup?.operation?.operationTimeManagement === 'FULL' && !setup.cooperate || setup?.operation?.operationTimeManagement === 'PROCESS_TIME_ONLY' && !setup.cooperate"
+                        )
+                            v-btn(
+                                size="small"
+                                variant="text"
+                                v-if="setup.measureToolItems?.length === 0"
+                                @click="measureVisible = true"
+                            ) Меритель
+                            v-list(
+                                v-else
+                                @click="measureVisible = true"
+                            )
+                                v-list-item(
+                                    v-for="tool in setup.measureToolItems"
+                                    :title="tool.tool.toolName + ' ' + tool.tool.description" :subtitle="tool.amount + 'шт.'"
+                                )
+                            MeasureCreateList(
+                                title="Меритель"
+                                :visible="measureVisible"
+                                :tools="setup.measureToolItems"
+                                @hide="measureVisible = false"
+                            )
                         v-col(cols="12" md="6" lg="4" v-if="setup.operation?.operationName && setup?.operation?.operationTimeManagement === 'FULL' && !setup.cooperate || setup?.operation?.operationTimeManagement === 'PROCESS_TIME_ONLY' && !setup.cooperate")
                             v-btn(size="small" variant="text" v-if="setup.cutterToolItems?.length === 0" @click="cutterVisible = true") Инструмент
                             v-list(v-else @click="cutterVisible = true")
@@ -120,8 +141,8 @@
                         v-col(cols="12" v-if="setup.operation?.operationName && setup?.operation?.operationTimeManagement === 'COMPUTED' && !setup.cooperate")
                             v-textarea(clearable v-model="setup.text" label="Коментарии")
             v-card-actions
-                v-btn(color="orange-darken-1" variant="text" @click="deleteSetup" v-if="isExist") Удалить
-                v-btn(color="orange-darken-1" variant="text" @click="isExist ? hideSetup(): emit('incorrectSetup', setup.setupNumber)") Закрыть
+                v-btn(color="orange-darken-1" variant="text" @click="deleteSetup(setup.setupNumber)" v-if="isExist") Удалить
+                v-btn(color="orange-darken-1" variant="text" @click="isExist ? hideSetup(setup.setupNumber): emit('incorrectSetup', setup.setupNumber)") Закрыть
                 v-spacer
                 v-btn(color="orange-darken-1" variant="text" type="submit" :disabled="!valid") {{ isExist ? 'Изменить' : 'Добавить' }}
 </template>
@@ -144,34 +165,11 @@ interface Props {
     additionalTexts: string[]
 }
 
-/*
-const initSetup = {
-    id: 0,
-    setupNumber: Number,
-    perTime: 0,
-    measureToolItems: [],
-    specialToolItems: [],
-    cutterToolItems: [],
-    toolings: [],
-    additionalTools: [],
-    cooperate: false,
-    aggregate: false,
-    operation: {
-        operationName: '',
-        paymentPerHour: {},
-        operationTimeManagement: ''
-    },
-    additionalComments: ''
-}
- */
 const props = defineProps<Props>();
 const emit = defineEmits(["hideSetup", "save", "deleteSetup", "incorrectSetup"]);
 
 const {setup, additionalTexts, quantityOfPartsFromWorkpiece} = toRefs(props);
 console.log(setup);
-
-// const setup = reactive(setupProps.value)
-
 
 const {rules} = useValidationRules();
 const valid = ref(true);
@@ -211,12 +209,12 @@ const isWorkpiece = computed(() => {
 
 const save = (setup: Partial<Setup>) => emit("save", setup);
 
-const deleteSetup = () => {
-    hideSetup();
+const deleteSetup = (setupNumber: number) => {
+    hideSetup(setupNumber);
     emit("deleteSetup");
 };
 
-const hideSetup = () => emit("hideSetup");
+const hideSetup = (setupNumber: number) => emit("hideSetup", setupNumber);
 
 watchEffect(() => {
     console.log("setup.value.operation", setup.value.operation)
