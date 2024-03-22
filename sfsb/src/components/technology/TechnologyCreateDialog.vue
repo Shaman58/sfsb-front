@@ -37,9 +37,11 @@
                                 item-key="id"
                                 v-bind="dragOptions"
                                 @change="swapSetups"
+                                :draggable=" windowWidth < 1024 ? '.ghjj91i' : '.draggable-item'"
+
                             )
                                 template(#item="{element: setup, index}")
-                                    v-expansion-panel(:value="setup.setupNumber")
+                                    v-expansion-panel.draggable-item(:value="setup.setupNumber")
                                         v-expansion-panel-title
                                             v-row.pr-2
                                                 v-col.setup-card__section(cols="12" lg="3" md="6" v-if="!setup.cooperate")
@@ -121,6 +123,7 @@ import {useItemStore} from "@/pinia-store/item";
 import {Empty} from "@/mixins/Empty";
 import {useOrdersStore} from "@/pinia-store/orders";
 import draggable from "vuedraggable";
+import {useDisplay} from "vuetify";
 
 const drag = ref(false)
 const dragOptions = {
@@ -129,6 +132,8 @@ const dragOptions = {
     ghostClass: "ghost"
 }
 const panels = ref<number[]>([])
+
+const {width: windowWidth} = useDisplay()
 
 
 const {dialogVisible, currentItem, isBlockedByCurrentUser} = storeToRefs(useTechnologyStore());
