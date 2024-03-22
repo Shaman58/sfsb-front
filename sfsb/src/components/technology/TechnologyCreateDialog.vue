@@ -68,6 +68,7 @@
                                                     @deleteSetup="void deleteSetup(index)"
                                                     @save="void replaceSetup($event, index)"
                                                     @incorrect-setup="void deleteSetup(index)"
+                                                    @changeOrder="changeOrder"
                                                 )
 
                         v-col(cols="12")
@@ -256,6 +257,20 @@ const swapSetups = () => {
     currentItem.value.technology.setups.forEach((e, i) => e.setupNumber = (i + 1) * 10)
 }
 
+const changeOrder = ({setup, order}: { setup: Setup, order: 'up' | 'down' }) => {
+    const from = currentItem.value.technology.setups.indexOf(setup)
+    const {length} = currentItem.value.technology.setups
+    if (from === -1 || (from === 0 && order === "up") || (from === length - 1 && order === "down")) return
+
+    panels.value = [] //закрываем все панели
+    const to = order === "up" ? from - 1 : from + 1
+
+    const temp = currentItem.value.technology.setups[to]
+    currentItem.value.technology.setups[to] = currentItem.value.technology.setups[from]
+    currentItem.value.technology.setups[from] = temp
+    swapSetups()
+    panels.value = [setup.setupNumber]
+}
 const newSetup = ref({...Empty.Setup(), setupNumber: calculateSetupNumber.value})
 
 const pushSetup = (setup: Setup) => {

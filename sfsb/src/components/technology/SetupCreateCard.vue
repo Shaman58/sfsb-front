@@ -140,9 +140,11 @@
                             v-combobox.flex-full-width(label="Приспособление" v-model="setup.additionalComments" :items="additionalTexts" density="comfortable" menu-icon="" placeholder="Выберите из списка или введите свой коментарий" prepend-inner-icon="mdi-magnify" hide-details)
                         v-col(cols="12" v-if="setup.operation?.operationName && setup?.operation?.operationTimeManagement === 'COMPUTED' && !setup.cooperate")
                             v-textarea(clearable v-model="setup.text" label="Коментарии")
-            v-card-actions
+            v-card-actions.flex-wrap
                 v-btn(color="orange-darken-1" variant="text" @click="deleteSetup(setup.setupNumber)" v-if="isExist") Удалить
                 v-btn(color="orange-darken-1" variant="text" @click="isExist ? hideSetup(setup.setupNumber): emit('incorrectSetup', setup.setupNumber)") Закрыть
+                v-btn(color="blue-darken-1" variant="text" @click="emit('changeOrder', {setup, order: 'up'})") Поднять
+                v-btn(color="green-accent-darken-1" variant="text" @click="emit('changeOrder', {setup, order: 'down'})") Опустить
                 v-spacer
                 v-btn(color="orange-darken-1" variant="text" type="submit" :disabled="!valid") {{ isExist ? 'Изменить' : 'Добавить' }}
 </template>
@@ -166,7 +168,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits(["hideSetup", "save", "deleteSetup", "incorrectSetup"]);
+const emit = defineEmits(["hideSetup", "save", "deleteSetup", "incorrectSetup", "changeOrder"]);
 
 const {setup, additionalTexts, quantityOfPartsFromWorkpiece} = toRefs(props);
 console.log(setup);
