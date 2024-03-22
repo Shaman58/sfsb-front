@@ -41,7 +41,7 @@
                                 template(#item="{element: setup, index}")
                                     v-expansion-panel(:value="setup.setupNumber")
                                         v-expansion-panel-title
-                                            v-row
+                                            v-row.pr-2
                                                 v-col.setup-card__section(cols="12" lg="3" md="6" v-if="!setup.cooperate")
                                                     TechnologyCreateDialogCardPart1(:setup="setup")
                                                 v-col.setup-card__section(cols="12" lg="3" md="6" v-if="!setup.cooperate && setup.operation.operationTimeManagement !== 'COMPUTED' && setup.operation.operationTimeManagement !== 'NONE'")
@@ -70,63 +70,23 @@
                                                     @incorrect-setup="void deleteSetup(index)"
                                                 )
 
-                        //draggable(
-                        //    v-model="currentItem.technology.setups"
-                        //    draggable=".setup-card"
-                        //    @start="drag=true"
-                        //    @end="drag=false"
-                        //    @change="swapSetups"
-                        //    item-key="id"
-                        //    v-bind="dragOptions"
-                        //)
-                        //    template(#item="{element: setup, index}")
-                        //        v-card.setup-card(v-if="activeSetupIndex !== index" @click="showSetupCard(index)")
-                        //            v-row
-                        //                v-col.setup-card__section(cols="12" lg="3" md="6" v-if="!setup.cooperate")
-                        //                    TechnologyCreateDialogCardPart1(:setup="setup")
-                        //                v-col.setup-card__section(cols="12" lg="3" md="6" v-if="!setup.cooperate && setup.operation.operationTimeManagement !== 'COMPUTED' && setup.operation.operationTimeManagement !== 'NONE'")
-                        //                    TechnologyCreateDialogCardPart2(:setup="setup")
-                        //                v-col.setup-card__section(cols="12" lg="3" md="6" v-if="!setup.cooperate  && setup.operation.operationTimeManagement !== 'COMPUTED' && setup.operation.operationTimeManagement !== 'NONE'")
-                        //                    TechnologyCreateDialogCardPart3(:setup="setup")
-                        //                v-col.setup-card__section(cols="12" lg="3" md="6" fill-height v-if="!setup.cooperate  && setup.operation.operationTimeManagement !== 'COMPUTED'  && setup.operation.operationTimeManagement !== 'NONE'")
-                        //                    TechnologyCreateDialogCardPart4(:setup="setup")
-                        //
-                        //                // 1234 часть карточки кооперация
-                        //                v-col(cols="12" fill-height v-if="setup.cooperate")
-                        //                    v-card(height="100%" :title="'№' + setup.setupNumber + ' ' + setup.operation.operationName + ' кооперация'" color="rgba(161, 48, 13, 0.24)")
-                        //
-                        //                //234 часть карточки текст
-                        //                v-col(cols="9" fill-height v-else-if="setup.operation.operationTimeManagement === 'COMPUTED'")
-                        //                    v-card(height="100%" :title="setup.aggregate ? 'Групповая по ' + setup.perTime + 'шт.' : ''") {{ setup.text }}
-                        //
-                        //        suspended-component(v-else)
-                        //            setup-create-card(
-                        //                :setup="setup"
-                        //                :quantity-of-parts-from-workpiece="Number(currentItem.technology.quantityOfPartsFromWorkpiece)"
-                        //                :additionalTexts="additionalTexts"
-                        //                @hideSetup="hideSetup()"
-                        //                @deleteSetup="void deleteSetup(index)"
-                        //                @save="void replaceSetup($event, index)"
-                        //                @incorrect-setup="void deleteSetup(index)"
-                        //            )
-
                         v-col(cols="12")
                             v-card(v-if="activeSetupIndex !== 'new'" title="Новый установ" @click="addSetup")
 
 
-                        v-card-actions.technology-card__actions
-                            .technology-card__calculate
-                                span {{ currentItem.technology.computed ? 'Рассчитан' : 'Не рассчитан' }}
-                                v-switch.technology-card__switch(v-model="calculate" :disabled="!isBlockedByCurrentUser")
-                                v-btn.technology-card__save(
-                                    color="orange-darken-1"
-                                    variant="text"
-                                    type="submit"
-                                    :disabled="isSaveActive"
-                                    :untouchable="!isBlockedByCurrentUser"
-                                ) Сохранить
-                            .technology-card__close
-                                v-btn(color="orange-darken-1" variant="text" @click="hideDialog") Закрыть
+                    v-card-actions.technology-card__actions
+                        .technology-card__calculate
+                            span {{ currentItem.technology.computed ? 'Рассчитан' : 'Не рассчитан' }}
+                            v-switch.technology-card__switch(v-model="calculate" :disabled="!isBlockedByCurrentUser")
+                            v-btn.technology-card__save(
+                                color="orange-darken-1"
+                                variant="text"
+                                type="submit"
+                                :disabled="isSaveActive"
+                                :untouchable="!isBlockedByCurrentUser"
+                            ) Сохранить
+                        .technology-card__close
+                            v-btn(color="orange-darken-1" variant="text" @click="hideDialog") Закрыть
 
     AlertDialog(ref="alertDialog")
 </template>
@@ -225,13 +185,13 @@ watch([dialogVisible], () => {
 })
 
 
-const item = computed(() => {
-    const item = currentItem;
-    if (!currentItem.value.technology.technologistTime) {
-        currentItem.value.technology.technologistTime = '00:00';
-    }
-    return item;
-});
+// const item = computed(() => {
+//     const item = currentItem;
+//     if (!currentItem.value.technology.technologistTime) {
+//         currentItem.value.technology.technologistTime = '00:00';
+//     }
+//     return item;
+// });
 
 
 const changeOwner = (event: boolean) => {
@@ -282,14 +242,6 @@ const calculateSetupNumber = computed(() => {
     if (!("technology" in currentItem.value) || !currentItem.value.technology?.setups.length) {
         return 10
     }
-    // const setupNumbers = currentItem.value.technology.setups.map((setup: { setupNumber: any; }) => setup.setupNumber);
-    // for (let i = 10; i <= Number.MAX_SAFE_INTEGER; i = i + 10) {
-    //     if (!setupNumbers.includes(i)) {
-    //         return i;
-    //         return i;
-    //     }
-    // }
-    // return -1;
     const lastSetupNumber = Number(currentItem.value.technology.setups.at(-1)!.setupNumber)
     return lastSetupNumber % 10 ? (lastSetupNumber - lastSetupNumber % 10) + 10 : lastSetupNumber + 10
 })
@@ -353,10 +305,6 @@ const deleteSetup = async (index: string | number) => {
     swapSetups()
 };
 
-const showSetupCard = (index: number) => {
-    isBlockedByCurrentUser.value && (activeSetupIndex.value = index)
-}
-
 
 const hideDialog = () => {
     setTechnologyDialogVisible(false)
@@ -380,7 +328,6 @@ const save = async () => {
     }
     if (!saveActive.value) return;
     saveActive.value = false;
-    // currentItem.value.technology.computed = false;
     currentItem.value.id && await fetchItem(currentItem.value.id);
     await fetchItems();
     await getOrders()
@@ -434,9 +381,12 @@ watch([currentItem], () => {
         display: flex
         align-items: center
         justify-content: space-between
-        flex-wrap: wrap
 
     &__title-main
+        font-size: clamp(12px, 20 / 600 * 100vw, 20px)
+
+        & > .text-h4
+            font-size: clamp(18px, 34 / 600 * 100vw, 34px) !important
 
         & > * + *
             margin-left: .5rem
@@ -463,6 +413,11 @@ watch([currentItem], () => {
         .v-input__details
             display: none
 
+    &__owner-switcher
+
+        & > div
+            grid-template-areas: none
+
 .setups-panels
     & > div
         width: 100%
@@ -473,6 +428,12 @@ watch([currentItem], () => {
     &.ghost
         background-color: #5554
 
-        & .setup-card__section > .v-card
-            background-color: #33f4
+        & .setup-card__section
+
+            & *
+                @media (width < 600px)
+                    font-size: clamp(12px, 20 / 600 * 100vw, 20px) !important
+
+            & > .v-card
+                background-color: #33f4
 </style>
