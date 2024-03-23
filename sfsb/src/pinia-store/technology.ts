@@ -15,11 +15,13 @@ export const useTechnologyStore = defineStore("technology", () => {
     const {getOrders} = useOrdersStore()
     const {fetchItems} = useItemStore()
 
+    const loading = ref(false);
     const dialogVisible: Ref<boolean> = ref(false);
     const currentItem = ref<Item>({} as Item);
     const isBlockedByCurrentUser: Ref<boolean> = ref(false);
 
     const getTechnologyById = async (id: string | number) => {
+        loading.value = true;
         try {
             const url = `/item/${id}`;
             const res = await api.get<Item>(url);
@@ -32,18 +34,23 @@ export const useTechnologyStore = defineStore("technology", () => {
                 );
         } catch (error) {
             toast.error("Ошибка при получении технологии " + error);
+        } finally {
+            loading.value = false;
         }
     };
 
     const saveTechnology = async (technology: Technology) => {
+        loading.value = true;
         try {
             const url = `/technology/${technology.id}`;
             await api.put(url, technology);
             toast.info("Успешно сохранено!", {position: "top-right"});
             await getTechnologyById(technology.id);
-            await fetchItems()
+            // await fetchItems()
         } catch (error) {
             toast.error("Ошибка при сохранении данных " + error);
+        } finally {
+            loading.value = false;
         }
     };
 
@@ -65,8 +72,8 @@ export const useTechnologyStore = defineStore("technology", () => {
             checkStatus(resp)
             currentItem.value.id && await getTechnologyById(currentItem.value.id);
             isBlockedByCurrentUser.value = compareBlockedAndCurrentUser();
-            setTimeout( async () => await getOrders())
-            setTimeout( async () => await fetchItems())
+            setTimeout(async () => await getOrders())
+            setTimeout(async () => await fetchItems())
         } catch (error) {
             toast.error("Ошибка при изменении блокировки " + error);
         }
@@ -98,6 +105,7 @@ export const useTechnologyStore = defineStore("technology", () => {
     };
 
     return {
+        loading,
         dialogVisible,
         currentItem,
         isBlockedByCurrentUser,

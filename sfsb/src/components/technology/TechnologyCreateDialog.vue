@@ -87,7 +87,9 @@
                                 type="submit"
                                 :disabled="isSaveActive"
                                 :untouchable="!isBlockedByCurrentUser"
-                            ) Сохранить
+                            )
+                                v-progress-circular(indeterminate v-if="isSaveActive")
+                                span(v-else) Сохранить
                         .technology-card__close
                             v-btn(color="orange-darken-1" variant="text" @click="hideDialog") Закрыть
 
@@ -348,11 +350,11 @@ const save = async () => {
     }
     if (!saveActive.value) return;
     saveActive.value = false;
+    await saveTechnology(currentItem.value.technology);
     currentItem.value.id && await fetchItem(currentItem.value.id);
     await fetchItems();
     await getOrders()
     saveActive.value = true;
-    await saveTechnology(currentItem.value.technology);
     calculate.value = currentItem.value.technology && currentItem.value.technology.computed
 };
 
