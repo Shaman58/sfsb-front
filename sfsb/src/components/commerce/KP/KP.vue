@@ -9,7 +9,23 @@
                     v-list-item-title
                         router-link.list-link(:to="`/commerce/kp/new`")
                             div(:style="{color: 'orange'}") Добавить новое КП
-                v-list-item(v-for="i in kp"
+                v-list-item
+                    div Сортировать:
+                    .sort-controls
+                        v-btn-toggle(v-model="asc")
+                            v-btn(:value="true" )
+                                v-icon mdi-sort-ascending
+                            v-btn(:value="false" )
+                                v-icon mdi-sort-descending
+                            v-select(
+                                v-model="criterion"
+                                item-value="parameter"
+                                item-title="title"
+                                :items="criteria"
+                                label="Критерий сортировки"
+                            )
+
+                v-list-item(v-for="i in sortedKP"
                     :key="i.id"
                     :active="+page===i.id")
                     v-list-item-title
@@ -22,7 +38,7 @@
 import LayoutPage from "@/components/common/LayoutPage.vue";
 import {storeToRefs} from "pinia";
 import {useKPStore} from "@/pinia-store/kp";
-import {computed, onUnmounted, ref, toRefs, watch} from "vue";
+import {computed, onUnmounted, ref, toRefs, watch, watchEffect} from "vue";
 import {useRoute, useRouter} from "vue-router";
 
 const filterText = ref("")
@@ -35,17 +51,65 @@ const route = useRoute();
 const {path} = toRefs(route);
 const page = computed(() => path.value.split("/").at(-1))
 
-const unwatchRoute = watch([route],()=>{
-    if(route.params.id) return
-    router.push("/commerce/kp/"+kp.value[0].id)
-},{immediate: true})
+const asc = ref<boolean>(true)
+watchEffect(() => console.log("asc", asc.value))
 
-onUnmounted(()=>{
+const criteria = [
+    {parameter: "id", title: "id"},
+    {parameter: "applicationNumber", title: "Номер предложения"},
+    {parameter: "created", title: "Дата"},
+    {parameter: "managerUuid", title: "Автор"},
+] as const
+
+type ParameterType = typeof criteria[number]["parameter"]
+const criterion = ref<ParameterType>("id")
+
+const sortedKP = computed(() => {
+    // const res = kp.value.sort((a, b) => {
+    //     if (criterion.value === "created") {
+    //         const parsedA = Date.parse(new Date(a.created || "").toLocaleString())
+    //         const parsedB = Date.parse(new Date(b.created || "").toLocaleString())
+    //         return !!asc.value
+    //             ? parsedA - parsedB
+    //             : parsedB - parsedA
+    //     }
+    //     //@ts-ignore
+    //     return !!asc.value ? a[criterion.value] - b[criterion.value] : b[criterion.value] - a[criterion.value]
+    // })
+    // return res
+    if (criterion.value === "created") {
+        const res = kp.value.sort((a, b) => {
+            const parsedA = Date.parse((a.created || "0").toLocaleString())
+            const parsedB = Date.parse((b.created || "0").toLocaleString())
+            const result = !!asc.value
+                ? parsedA - parsedB
+                : parsedB - parsedA
+            return result
+        })
+        console.log(res)
+        return res
+    }
+    const res = kp.value.sort((a, b) => {
+        //@ts-ignore
+        const res = !!asc.value ? a[criterion.value] - b[criterion.value] : b[criterion.value] - a[criterion.value]
+        return res
+    })
+    return res
+})
+
+const unwatchRoute = watch([route], () => {
+    if (route.params.id) return
+    router.push("/commerce/kp/" + kp.value[0].id)
+}, {immediate: true})
+
+onUnmounted(() => {
     unwatchRoute()
 })
 </script>
 
 
 <style scoped lang="sass">
-
+//.sort-controls
+//    display: flex
+//    align-items: center
 </style>
