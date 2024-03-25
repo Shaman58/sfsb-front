@@ -12,18 +12,13 @@
                 v-list-item
                     div Сортировать:
                     .sort-controls
-                        v-btn-toggle(v-model="asc")
-                            v-btn(:value="true" )
-                                v-icon mdi-sort-ascending
-                            v-btn(:value="false" )
-                                v-icon mdi-sort-descending
-                            v-select(
-                                v-model="criterion"
-                                item-value="parameter"
-                                item-title="title"
-                                :items="criteria"
-                            )
-
+                        SortControl(
+                            v-model:asc="asc"
+                            v-model:criterion="criterion"
+                            :items="criteria"
+                            item-title="title"
+                            item-value="parameter"
+                        )
                 v-list-item(v-for="(i, idx) in sortedKP"
                     :key="i.id"
                     :active="+page===i.id"
@@ -41,6 +36,7 @@ import {storeToRefs} from "pinia";
 import {useKPStore} from "@/pinia-store/kp";
 import {computed, onUnmounted, ref, toRefs, watch, watchEffect} from "vue";
 import {useRoute, useRouter} from "vue-router";
+import SortControl from "@/components/common/SortControl.vue";
 
 const filterText = ref("")
 const {loading, kp} = storeToRefs(useKPStore())
