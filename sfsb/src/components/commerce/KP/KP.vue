@@ -22,12 +22,13 @@
                                 item-value="parameter"
                                 item-title="title"
                                 :items="criteria"
-                                label="Критерий сортировки"
                             )
 
-                v-list-item(v-for="i in sortedKP"
+                v-list-item(v-for="(i, idx) in sortedKP"
                     :key="i.id"
-                    :active="+page===i.id")
+                    :active="+page===i.id"
+
+                )
                     v-list-item-title
                         router-link.list-link(:to="`/commerce/kp/${i.id}`") {{"#"+i.id}} №{{i.applicationNumber}} {{new Date(i.created).toLocaleDateString()}}
         template(#card)
@@ -65,36 +66,19 @@ type ParameterType = typeof criteria[number]["parameter"]
 const criterion = ref<ParameterType>("id")
 
 const sortedKP = computed(() => {
-    // const res = kp.value.sort((a, b) => {
-    //     if (criterion.value === "created") {
-    //         const parsedA = Date.parse(new Date(a.created || "").toLocaleString())
-    //         const parsedB = Date.parse(new Date(b.created || "").toLocaleString())
-    //         return !!asc.value
-    //             ? parsedA - parsedB
-    //             : parsedB - parsedA
-    //     }
-    //     //@ts-ignore
-    //     return !!asc.value ? a[criterion.value] - b[criterion.value] : b[criterion.value] - a[criterion.value]
-    // })
-    // return res
     if (criterion.value === "created") {
         const res = kp.value.sort((a, b) => {
             const parsedA = Date.parse((a.created || "0").toLocaleString())
             const parsedB = Date.parse((b.created || "0").toLocaleString())
-            const result = !!asc.value
+            return !!asc.value
                 ? parsedA - parsedB
                 : parsedB - parsedA
-            return result
         })
         console.log(res)
         return res
     }
-    const res = kp.value.sort((a, b) => {
-        //@ts-ignore
-        const res = !!asc.value ? a[criterion.value] - b[criterion.value] : b[criterion.value] - a[criterion.value]
-        return res
-    })
-    return res
+    //@ts-ignore
+    return kp.value.sort((a, b) => !!asc.value ? a[criterion.value] - b[criterion.value] : b[criterion.value] - a[criterion.value])
 })
 
 const unwatchRoute = watch([route], () => {
@@ -112,4 +96,5 @@ onUnmounted(() => {
 //.sort-controls
 //    display: flex
 //    align-items: center
+
 </style>
