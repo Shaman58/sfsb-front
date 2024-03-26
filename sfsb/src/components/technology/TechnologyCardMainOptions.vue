@@ -9,7 +9,7 @@
         v-col(cols="12"  xs="12" sm="6" md="7")
             v-textarea(clearable label="Описание доп. расходов" v-model="currentTechnology.outsourcedCostsDescription" rows="2" )
         v-col(cols="12"  xs="12" sm="3" md="2")
-            v-text-field(label="Сумма"  v-model="currentTechnology.outsourcedCosts.amount" type="number" :rules="[rules.required, rules.numeric, rules.min0Validation]" )
+            v-text-field(label="Сумма"  v-model="currentTechnology.outsourcedCosts.amount" type="number" min="0" :rules="[ rules.numeric, rules.min0Validation]" )
         v-col(cols="12"  xs="12" sm="3" md="3")
             DurationPicker(v-model="currentTechnology.technologistTime" label="Время технолога" :rules="[rules.durationNotZeroValidation]" )
 
@@ -20,11 +20,13 @@ import DurationPicker from "@/components/technology/DurationPicker.vue";
 import {useValidationRules} from '@/mixins/FieldValidationRules';
 import {useTechnologyStore} from '@/pinia-store/technology';
 import {storeToRefs} from 'pinia';
+import {watchEffect} from "vue";
 
 const {currentItem} = storeToRefs(useTechnologyStore())
 const {rules} = useValidationRules();
 
 const currentTechnology = currentItem.value.technology
+watchEffect(() => currentTechnology.outsourcedCosts.amount <= 0 && (currentTechnology.outsourcedCosts.amount = 0))
 </script>
 
 <style lang="sass" scoped>
