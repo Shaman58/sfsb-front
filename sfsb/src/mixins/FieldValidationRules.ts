@@ -2,6 +2,8 @@ import {Ref} from "vue";
 
 export function useValidationRules() {
     const rules = ({
+        alwaysValid: () => true,
+        neverValid: () => false,
         required: <T extends string | number>(value: T) => (!!value) || 'Обязательное поле',
         counter: (value: string) => value.length <= 200 || 'Не более 200 символов',
         emailValidation: (value: string) => {
