@@ -13,11 +13,32 @@
 
                     v-card-text(:untouchable="!isBlockedByCurrentUser")
                         v-row
-                            v-col.mb-4(cols="12" md="3")
-                                v-switch(cols="12" md="2" v-model="currentItem.technology.assembly" :true-value="true" :false-value="false" :label="currentItem.technology.assembly ? 'Сборка' : 'Деталь'")
-                                v-card(cols="12" md="5" v-if="!workpieceCardVisible && !currentItem.technology.assembly" width="200" title="Заготовка:" @click="showWorkpieceCard")
+                            v-col.mb-4(cols="12" :md="workpieceCardVisible? 12 : 3")
+                                v-switch(
+                                    cols="12"
+                                    md="2"
+                                    v-model="currentItem.technology.assembly"
+                                    :true-value="true"
+                                    :false-value="false"
+                                    :label="currentItem.technology.assembly ? 'Сборка' : 'Деталь'"
+                                )
+                                v-card(
+                                    cols="12"
+                                    md="5"
+                                    v-if="!workpieceCardVisible && !currentItem.technology.assembly"
+                                    width="200"
+                                    title="Заготовка:"
+                                    @click="workpieceCardVisible = true"
+                                )
                                     v-card-item {{ !!currentItem.technology.workpiece ? formatWorkpieceData(currentItem.technology.workpiece) : "Задать заготовку"}}
-                                tech-workpiece-card(col="12" md="5" v-else-if="!currentItem.technology.assembly" :workpiece="{ ...currentItem.technology.workpiece }" :materials="materials" @validatedWorkpiece="saveWorkpiece" @hide="hideWorkpieceCard")
+                                tech-workpiece-card(
+                                    col="12"
+                                    v-else-if="!currentItem.technology.assembly"
+                                    :workpiece="{ ...currentItem.technology.workpiece }"
+                                    :materials="materials"
+                                    @validatedWorkpiece="saveWorkpiece"
+                                    @hide="workpieceCardVisible = false"
+                                )
 
                             v-col(cols="12" md="9" v-if="!workpieceCardVisible")
                                 TechnologyCardMainOptions
@@ -88,7 +109,7 @@
                                 :disabled="isSaveActive"
                                 :untouchable="!isBlockedByCurrentUser"
                             )
-                                v-progress-circular(indeterminate v-if="isSaveActive")
+                                v-progress-circular(indeterminate v-if="loading")
                                 span(v-else) Сохранить
                         .technology-card__close
                             v-btn(color="orange-darken-1" variant="text" @click="hideDialog") Закрыть
@@ -138,7 +159,7 @@ const panels = ref<number[]>([])
 const {width: windowWidth} = useDisplay()
 
 
-const {dialogVisible, currentItem, isBlockedByCurrentUser} = storeToRefs(useTechnologyStore());
+const {dialogVisible, currentItem, isBlockedByCurrentUser, loading} = storeToRefs(useTechnologyStore());
 const {saveTechnology, changeBlocked, calculateTechnology, setTechnologyDialogVisible} = useTechnologyStore();
 
 
@@ -367,9 +388,9 @@ const hideWorkpieceCard = () => {
     workpieceCardVisible.value = false;
 };
 
-const showWorkpieceCard = () => {
-    workpieceCardVisible.value = true;
-};
+// const showWorkpieceCard = () => {
+//     workpieceCardVisible.value = true;
+// };
 
 watch([currentItem], () => {
     newSetup.value = {...Empty.Setup(), setupNumber: calculateSetupNumber.value}
