@@ -137,5 +137,5 @@ export const useOfferGenerator = () => {
         }
     };
 
-    return {previewCommerce, previewToolOrder, previewPlan1, previewPlan2};
+    return {generateDocument, previewCommerce, previewToolOrder, previewPlan1, previewPlan2};
 };

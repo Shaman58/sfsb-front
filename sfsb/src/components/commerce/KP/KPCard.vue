@@ -51,6 +51,7 @@ import SuspendedComponent from "@/components/common/SuspendedComponent.vue";
 import KPBar from "@/components/commerce/KP/KPBar.vue";
 import {useCurrentUserStore} from "@/pinia-store/currentUser";
 import KPCardHeader from "@/components/commerce/KP/KPCardHeader.vue";
+import {useOfferGenerator} from "@/mixins/OfferGenerator";
 
 const router = useRouter()
 const route = useRoute()
@@ -59,6 +60,10 @@ const {get, save, getDoc} = useKPStore()
 
 const currentKP: Ref<KP | null> = ref(null)
 const items = ref<KPItem[]>([])
+
+const doc = ref("")
+
+const {generateDocument} = useOfferGenerator()
 
 const companyId = ref(currentKP.value?.companyId)
 const customerId = ref(currentKP.value?.customerId)
@@ -130,12 +135,16 @@ const refresh = async () => {
     await init()
 }
 
-const download = async () => {
-    // const res = await getDoc(+route.params.id)
-    // console.log(URL.createObjectURL(res))
-}
 //--- WATCH ---
 const unwatchRoute = watch([route], init, {immediate: true})
+
+const download = async () => {
+    await generateDocument(
+        "http://5.35.84.165:9000/api/doc/kp",
+        {orderId: +route.params.id},
+        "doc"
+    )
+}
 
 onBeforeUnmount(() => {
     unwatchRoute()

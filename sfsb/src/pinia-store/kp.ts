@@ -44,23 +44,12 @@ export const useKPStore
         return res
     }
 
-    const getDoc = async (id: number) => {
-        loading.value = true
-        const res = await query(
-            async () => await api.get("http://5.35.84.165:9000/api/doc/kp?orderId=" + id),
-            {success: ""}
-        )
-        loading.value = false
-        return res
-    }
-
     return {
         loading,
         kp,
         fetch,
         get,
         save,
-        getDoc,
     }
 });
 
