@@ -9,10 +9,8 @@
             ListTechnologiesPopUp(:current-technology="item.decimal" @select="onSelect")
         td.item__name
             input.item__name-input(v-model="item.name" ref="refName")
-        td {{new Date(item.created).toLocaleDateString()}}
-        td {{new Date(item.updated).toLocaleDateString()}}
         td
-            input(ref="refItemPrice" step="0.01" v-model="item.itemPrice" @focus="focusPrice" @blur="blurPrice")
+            input(ref="refItemPrice" step="0.01" v-model="item.itemPrice")
         td
             input(v-model="item.amount" type="number")
         td {{item.totalPrice}}

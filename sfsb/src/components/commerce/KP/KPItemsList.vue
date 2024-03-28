@@ -11,13 +11,11 @@ import {ref, watch} from "vue";
 import KPItem from "@/components/commerce/KP/KPItem.vue";
 
 const items = defineModel<KPItem[]>("items")
-const props = defineProps<{search: string}>()
+const props = defineProps<{ search: string }>()
 const headers = [
     {key: "controls", title: "Управление"},
     {key: "decimal", title: "Децимальный номер"},
     {key: "name", title: "Наименование"},
-    {key: "created", title: "Создан"},
-    {key: "updated", title: "Обновлен"},
     {key: "price", title: "Прайс"},
     {key: "amount", title: "Количество"},
     {key: "total", title: "Итого"}
@@ -28,23 +26,23 @@ const {fetch} = useTechnologies()
 !technologies.value.length && await fetch()
 
 const append = (item: KPItem) => {
-    if(!items.value) return
+    if (!items.value) return
     const index = items.value.indexOf(item)
     console.log(index);
     const newItem = Empty.KPItem()
     newItem.created = new Date(Date.now()).toDateString()
-    items.value= [...items.value.toSpliced(index+1,0,newItem)]
+    items.value = [...items.value.toSpliced(index + 1, 0, newItem)]
 }
 
-const remove=(item: KPItem)=>{
-    if(!items.value) return
+const remove = (item: KPItem) => {
+    if (!items.value) return
     const index = items.value.indexOf(item)
     console.log(index);
-    items.value = items.value.toSpliced(index,1)
+    items.value = items.value.toSpliced(index, 1)
 }
 
 const select = ref("")
-watch([select],console.log)
+watch([select], console.log)
 </script>
 
 

@@ -106,15 +106,11 @@ const init = async () => {
 }
 
 const saveKP = async () => {
-    const updated = currentKP.value?.updated || null
-    const created = currentKP.value?.created || null
     const businessProposal = currentKP.value?.businessProposal || ""
     const applicationNumber = currentKP.value?.applicationNumber || 0
     const managerUuid = currentKP.value?.managerUuid || user.value?.id || ""
     const res = await save({
         ...currentKP.value,
-        updated,
-        created,
         businessProposal,
         applicationNumber,
         companyId: companyId.value || 0,
