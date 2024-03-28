@@ -1,6 +1,6 @@
 import {defineStore} from "pinia";
 import {ref} from "vue";
-import api, { query} from "@/api/instance";
+import api, {query} from "@/api/instance";
 
 export const useKPStore
     = defineStore("kp", () => {
@@ -17,7 +17,7 @@ export const useKPStore
     }
     const fetch = async () => await withLoading(async () => {
         const response = await query(async () => await api.get("http://5.35.84.165:9000/api/order"),
-            {success:""}
+            {success: ""}
         )
         if ("content" in response) {
             kp.value = response.content
@@ -28,7 +28,7 @@ export const useKPStore
         loading.value = true
         const res = await query<T>(
             async () => await api.get("http://5.35.84.165:9000/api/order/" + id),
-            {success:""}
+            {success: ""}
         )
         loading.value = false
         return res
@@ -37,20 +37,30 @@ export const useKPStore
         loading.value = true
         const method = "id" in kp ? "put" : "post"
         const res = await query<T>(
-            async () => await api[method]("http://5.35.84.165:9000/api/order" + (kp.id?"/"+kp.id:""), kp),
+            async () => await api[method]("http://5.35.84.165:9000/api/order" + (kp.id ? "/" + kp.id : ""), kp),
         )
         loading.value = false
         await fetch()
         return res
     }
 
+    const getDoc = async (id: number) => {
+        loading.value = true
+        const res = await query(
+            async () => await api.get("http://5.35.84.165:9000/api/doc/kp?orderId=" + id),
+            {success: ""}
+        )
+        loading.value = false
+        return res
+    }
 
     return {
         loading,
         kp,
         fetch,
         get,
-        save
+        save,
+        getDoc,
     }
 });
 

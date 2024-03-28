@@ -258,27 +258,30 @@ declare interface FileOrder {
     "user": unknown | null
 }
 
-declare interface KPItem{
+declare interface KPItem {
     id?: string,
-    created: string|null,
-    updated: string|null,
+    created: string | null,
+    updated: string | null,
     name: string,
     decimal: string,
     amount: number,
-    itemPrice: string,
-    totalPrice: string
+    itemPrice: number,
+    totalPrice: number
 }
-declare interface KP{
+
+declare interface KP {
     id?: number,
     created: string | null,
     updated: string | null,
     businessProposal: string,
     applicationNumber: number,
     companyId: number,
+    customerId: number,
     managerUuid: string,
     items: KPItem[]
 }
-declare interface KPResponse{
+
+declare interface KPResponse {
     content: KP[],
     pageable: {
         pageNumber: number,

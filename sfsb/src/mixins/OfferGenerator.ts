@@ -51,7 +51,7 @@ export const useOfferGenerator = () => {
         } catch (error: unknown) {
             const axiosError = error as AxiosError<{ info: string }, any>
             const {response} = axiosError
-            const {data} = response as {data: unknown}
+            const {data} = response as { data: unknown }
             const textError = data && JSON.parse(new TextDecoder().decode(data || ""))
             toast.error("Ошибка: " + textError?.info, {position: "top-right"});
             console.error(
@@ -73,7 +73,6 @@ export const useOfferGenerator = () => {
 
         await generateDocument(url, params, filename);
     };
-
     const previewToolOrder = async (
         order: Order,
         teId: number,

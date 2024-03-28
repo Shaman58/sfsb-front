@@ -5,7 +5,12 @@
                 v-progress-linear(indeterminate v-if="loading")
             v-card(width="100%")
                 v-card-actions
-                    KPBar(@save="saveKP" @copy="copyKP" @refresh="refresh")
+                    KPBar(
+                        @save="saveKP"
+                        @copy="copyKP"
+                        @refresh="refresh"
+                        @download="download"
+                    )
         template(#default)
             v-card(v-if="currentKP")
                 v-card-title
@@ -17,7 +22,8 @@
                             v-model:businessProposal="businessProposal"
                             v-model:applicationNumber="applicationNumber"
                             v-model:companyId="companyId"
-                            )
+                            v-model:customerId="customerId"
+                        )
                 v-card-text
                     v-text-field.py-0(
                         v-model="search"
@@ -36,7 +42,7 @@
 
 import {useRoute, useRouter} from "vue-router";
 import {useKPStore} from "@/pinia-store/kp";
-import { onBeforeUnmount, type Ref, ref, watch, watchEffect} from "vue";
+import {onBeforeUnmount, type Ref, ref, watch, watchEffect} from "vue";
 import LayoutMain from "@/components/common/LayoutMain.vue";
 import {storeToRefs} from "pinia";
 import {Empty} from "@/mixins/Empty";
@@ -49,18 +55,22 @@ import KPCardHeader from "@/components/commerce/KP/KPCardHeader.vue";
 const router = useRouter()
 const route = useRoute()
 const {loading} = storeToRefs(useKPStore())
-const {get, save} = useKPStore()
+const {get, save, getDoc} = useKPStore()
 
 const currentKP: Ref<KP | null> = ref(null)
 const items = ref<KPItem[]>([])
 
 const companyId = ref(currentKP.value?.companyId)
+const customerId = ref(currentKP.value?.customerId)
+watch([customerId], () => {
+    console.log("customerId", customerId)
+}, {immediate: true})
 const businessProposal = ref(currentKP.value?.businessProposal)
 const applicationNumber = ref(currentKP.value?.applicationNumber)
 
-const unwatchCompanyId=watchEffect(()=>currentKP.value && (currentKP.value.companyId = companyId?.value||0))
-const unwatchBusinessProposal=watchEffect(()=>currentKP.value && (currentKP.value.businessProposal = businessProposal?.value||""))
-const unwatchApplicationNumber=watchEffect(()=>currentKP.value && (currentKP.value.applicationNumber = applicationNumber?.value||0))
+const unwatchCompanyId = watchEffect(() => currentKP.value && (currentKP.value.companyId = companyId?.value || 0))
+const unwatchBusinessProposal = watchEffect(() => currentKP.value && (currentKP.value.businessProposal = businessProposal?.value || ""))
+const unwatchApplicationNumber = watchEffect(() => currentKP.value && (currentKP.value.applicationNumber = applicationNumber?.value || 0))
 
 const search = ref("")
 
@@ -89,6 +99,7 @@ const init = async () => {
     }
     items.value = currentKP.value?.items || [] as KPItem[]
     companyId.value = currentKP.value?.companyId
+    customerId.value = currentKP.value?.customerId
     businessProposal.value = currentKP.value?.businessProposal
     applicationNumber.value = currentKP.value?.applicationNumber
 
@@ -99,18 +110,19 @@ const saveKP = async () => {
     const created = currentKP.value?.created || null
     const businessProposal = currentKP.value?.businessProposal || ""
     const applicationNumber = currentKP.value?.applicationNumber || 0
-    const companyId = currentKP.value?.companyId || 0
     const managerUuid = currentKP.value?.managerUuid || user.value?.id || ""
-    await save({
+    const res = await save({
         ...currentKP.value,
         updated,
         created,
         businessProposal,
         applicationNumber,
-        companyId,
+        companyId: companyId.value || 0,
+        customerId: customerId.value || 0,
         managerUuid,
         items: items.value
     })
+    console.log("res after save", res)
 }
 
 const copyKP = () => {
@@ -118,14 +130,16 @@ const copyKP = () => {
     router.push("/commerce/kp/new/" + currentKP.value?.id)
 }
 
-const refresh =async()=>{
+const refresh = async () => {
     await init()
 }
 
+const download = async () => {
+    // const res = await getDoc(+route.params.id)
+    // console.log(URL.createObjectURL(res))
+}
 //--- WATCH ---
 const unwatchRoute = watch([route], init, {immediate: true})
-
-
 
 onBeforeUnmount(() => {
     unwatchRoute()

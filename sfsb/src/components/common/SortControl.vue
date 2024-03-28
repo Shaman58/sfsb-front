@@ -16,17 +16,15 @@
 import {toRefs} from "vue";
 
 
-type PropsType = Record<string, unknown>
-
-interface Props {
-    itemValue: keyof PropsType,
-    itemTitle: keyof PropsType,
-    items: PropsType[]
+interface Props<T> {
+    itemValue: keyof T,
+    itemTitle: keyof T,
+    items: T[]
 }
 
 const asc = defineModel("asc")
 const criterion = defineModel("criterion")
-const props = defineProps<Props>()
+const props = defineProps<Props<Record<string, unknown>>>()
 const {itemValue, itemTitle, items} = toRefs(props)
 </script>
 
