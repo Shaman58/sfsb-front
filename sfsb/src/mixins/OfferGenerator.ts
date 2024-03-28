@@ -28,13 +28,13 @@ export const useOfferGenerator = () => {
             const objectURL = URL.createObjectURL(blob);
 
             const downloadButtonHtml = `
-        <a href="${objectURL}" download="${filename}" style="display: block; margin: 20px;">
+        <a href="${objectURL}" download="${filename}.docx" style="display: block; margin: 20px;">
           Скачать
         </a>
       `;
 
             const newWindow = window.open("", "_blank");
-            console.log(result.value)
+            console.log(result)
             newWindow && newWindow.document.write(downloadButtonHtml);
             newWindow && newWindow.document.write(`
                 <style>
@@ -44,9 +44,39 @@ export const useOfferGenerator = () => {
                         max-height: 32px;
                         object-fit: contain;
                     }
+                    .last{
+                        border-collapse: collapse;
+                        border: 1px solid purple;
+                    }
+                    .last *{
+                        box-sizing: border-box;
+                    }
+                    .last tr{
+                        display: grid;
+                        grid-template-columns: 40px repeat(5, 1fr);
+                    }
+                    .last tr:first-child{
+                        border: 1px solid purple;
+                        text-align: center;
+                        text-transform: uppercase;
+                    }
+                    .last td{
+                        border: 1px solid #777;
+                        padding: 4px;
+                    }
                 </style>
             `)
             newWindow && newWindow.document.write(result.value);
+            newWindow && newWindow.document.write(`
+                <script>
+                const tables = [...document.querySelectorAll("table")];
+                console.log(tables);
+                if(tables && tables.length > 0) {
+                    tables.at(-1).classList.add("last");
+                }
+                </script>
+            `);
+
             newWindow && newWindow.document.close();
         } catch (error: unknown) {
             const axiosError = error as AxiosError<{ info: string }, any>
