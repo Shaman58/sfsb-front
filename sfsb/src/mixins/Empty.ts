@@ -1,29 +1,29 @@
-export class Empty{
-    static KPItem(): KPItem{
+export class Empty {
+    static KPItem(): KPItem {
         return ({
-            decimal:"",
-            name:"",
+            decimal: "",
+            name: "",
             created: null,
             updated: null,
-            itemPrice: "0",
+            itemPrice: 0,
             amount: 0,
-            totalPrice: "0"
         }) as KPItem
     }
 
-    static KP(): KP{
+    static KP(): KP {
         return ({
-            items:[],
+            items: [],
             created: null,
             updated: null,
             applicationNumber: -1,
             companyId: 1,
-            businessProposal:"",
-            managerUuid:""
+            customerId: 0,
+            businessProposal: "",
+            managerUuid: ""
         })
     }
 
-    static Company(): Customer{
+    static Company(): Customer {
         return ({
             companyName: "",
             address: "",
@@ -40,7 +40,7 @@ export class Empty{
         }) as Customer
     }
 
-    static Operation():Operation{
+    static Operation(): Operation {
         return ({
             created: null,
             operationName: "",
@@ -52,7 +52,7 @@ export class Empty{
         } as Operation)
     }
 
-    static Item():Item{
+    static Item(): Item {
         return ({
             technology: {
                 drawingName: "",
@@ -70,7 +70,7 @@ export class Empty{
         } as Item)
     }
 
-    static Order():Omit<Order, "id" | "applicationNumber" | "user" | "customer"> {
+    static Order(): Omit<Order, "id" | "applicationNumber" | "user" | "customer"> {
         return ({
             description: "",
             items: [],
@@ -82,7 +82,7 @@ export class Empty{
         })
     }
 
-    static User():Person{
+    static User(): Person {
         return ({
             email: "",
             firstName: "",
@@ -95,7 +95,7 @@ export class Empty{
         } as Person)
     }
 
-    static Material(): Material{
+    static Material(): Material {
         return ({
             updated: 0,
             created: "",
@@ -111,7 +111,7 @@ export class Empty{
         }) as Material
     }
 
-    static Tool():Tool{
+    static Tool(): Tool {
         return ({
             toolName: "",
             description: "",
@@ -120,7 +120,7 @@ export class Empty{
         }) as Tool
     }
 
-    static Setup():Partial<Setup>{
+    static Setup(): Partial<Setup> {
         return ({
             setupTime: "00:00",
             processTime: "00:00",
@@ -132,9 +132,9 @@ export class Empty{
             additionalTools: [],
             setupNumber: 10,
             operation: {
-            operationName: '',
+                operationName: '',
                 operationTimeManagement: "FULL"
-        },
+            },
             cooperatePrice: {amount: 0, currency: 'RUB'}
         } as Partial<Setup>)
     }
