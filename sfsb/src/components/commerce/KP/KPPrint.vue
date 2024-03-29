@@ -75,7 +75,7 @@
 import {useRoute} from "vue-router";
 import {storeToRefs} from "pinia";
 import {useKPStore} from "@/pinia-store/kp";
-import {computed, nextTick, onMounted, ref, watch} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import {useCompaniesStore} from "@/pinia-store/companies";
 import {useCustomersStore} from "@/pinia-store/customers";
 import router from "@/router";
@@ -116,21 +116,20 @@ const imgLoaded = () => {
     imgIsLoaded.value = true
 }
 
-watch([imageRef], () => {
+watch([imageRef], async () => {
     console.log("imageRef", imageRef.value, imageRef.value?.complete)
-    imageRef.value && setTimeout(async () => {
-        imgIsLoaded.value = true
-        canPrint.value && window.print()
-    }, 1000)
+    imageRef.value && (imgIsLoaded.value = true)
+    await wait(1000)
+    canPrint.value && print()
 }, {immediate: true})
 
-watch([canPrint], async () => {
-    console.log("canPrint", canPrint, imgIsLoaded.value, imageRef.value, imageRef.value?.complete)
-    if (!canPrint.value) return
-    await nextTick()
-    await wait(200)
-    imgIsLoaded.value && window.print()
-}, {immediate: true})
+// watch([canPrint], async () => {
+//     console.log("canPrint", canPrint, imgIsLoaded.value, imageRef.value, imageRef.value?.complete)
+//     if (!canPrint.value) return
+//     await nextTick()
+//     await wait(1000)
+//     imgIsLoaded.value && print()
+// }, {immediate: true})
 
 const print = () => {
     window.print()
