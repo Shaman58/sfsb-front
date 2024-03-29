@@ -117,19 +117,11 @@ const imgLoaded = () => {
 }
 
 watch([imageRef], async () => {
-    console.log("imageRef", imageRef.value, imageRef.value?.complete)
     imageRef.value && (imgIsLoaded.value = true)
     await wait(1000)
     canPrint.value && print()
 }, {immediate: true})
 
-// watch([canPrint], async () => {
-//     console.log("canPrint", canPrint, imgIsLoaded.value, imageRef.value, imageRef.value?.complete)
-//     if (!canPrint.value) return
-//     await nextTick()
-//     await wait(1000)
-//     imgIsLoaded.value && print()
-// }, {immediate: true})
 
 const print = () => {
     window.print()
@@ -149,11 +141,6 @@ onMounted(async () => {
     !staff.value.length && await getAllStaff()
     user.value = staff.value.find(e => e.id === data?.managerUuid) || null
 
-    imageRef.value && (imageRef.value.onload = (ev: Event) => {
-        console.log("load image", ev)
-        imgIsLoaded.value = true
-    })
-    imageRef.value && imageRef.value.complete && (imgIsLoaded.value = true)
 })
 </script>
 
