@@ -1,12 +1,13 @@
 <template lang="pug">
-    .print-form(@click="print")
-        header.print-form__header
+    .print-form(@click="print"  )
+        v-progress-circular(indeterminate :color="$defaultColor" v-if="!canPrint" size="70" )
+        header.print-form__header(v-if="canPrint")
             .print-form__close(@click.stop="close")
                 v-icon mdi-close
                 span ЗАКРЫТЬ
             .print-form__company
                 .print-form__company-logo
-                    img(:src="company && company.logo?.link" alt="logo" @load="imgIsLoaded=true")
+                    img(:src="company && company.logo?.link" alt="logo" ref="imageRef" @load="imgLoaded")
                 .print-form__company-data
                     .print-form__company-common
                         .print-form__company-name {{ company && company.companyName }}
@@ -37,7 +38,7 @@
                         .print-form__company-ks
                             span.print-form__label кор./с:
                             span.print-form__value {{ company && company.correspondentAccount }}
-        main.print-form__main
+        main.print-form__main(v-if="canPrint")
             h1.print-form__main-title КОММЕРЧЕСКОЕ ПРЕДЛОЖЕНИЕ
             h3.print-form__main-number № {{ offer && offer.applicationNumber }}
             h3.print-form__to для {{ customer && customer.companyName }}
@@ -64,7 +65,7 @@
                 .print-form__total  Итого:
                 .print-form__total  {{ 1000 }}
                 .print-form__total {{ totalPrice.toFixed(2).toLocaleString() }}
-        footer.print-form__footer
+        footer.print-form__footer(v-if="canPrint")
             .print-form__contractor
                 span.print-form__label Исполнитель:
                 span.print-form__value {{user && user.firstName}} {{user && user.lastName}}
@@ -79,42 +80,56 @@ import {useCompaniesStore} from "@/pinia-store/companies";
 import {useCustomersStore} from "@/pinia-store/customers";
 import router from "@/router";
 import {useStaffStore} from "@/pinia-store/staff";
+import wait from "@/mixins/wait";
 
-const route = useRoute()
-const {loading} = storeToRefs(useKPStore())
-const {get} = useKPStore()
+const route = useRoute(),
+    {loading} = storeToRefs(useKPStore()),
+    {get} = useKPStore()
 
-const {companies} = storeToRefs(useCompaniesStore())
-const {fetchCompaniesData} = useCompaniesStore()
+const {companies} = storeToRefs(useCompaniesStore()),
+    {fetchCompaniesData} = useCompaniesStore()
 
-const {customers} = storeToRefs(useCustomersStore())
-const {fetchCustomers} = useCustomersStore()
+const {customers} = storeToRefs(useCustomersStore()),
+    {fetchCustomers} = useCustomersStore()
 
-const {staff} = storeToRefs(useStaffStore())
-const {getAllStaff} = useStaffStore()
+const {staff} = storeToRefs(useStaffStore()),
+    {getAllStaff} = useStaffStore()
 
-const company = ref<Company | null>(null)
-const customer = ref<Customer | null>(null)
-const user = ref<Person | null>(null)
-const offer = ref<KP | null>(null)
-const imgIsLoaded = ref(false)
-
+const company = ref<Company | null>(null),
+    customer = ref<Customer | null>(null),
+    user = ref<Person | null>(null),
+    offer = ref<KP | null>(null),
+    imageRef = ref<HTMLImageElement | undefined>(),
+    imgIsLoaded = ref(false)
 const totalPrice = computed(() => {
     return offer.value?.items.map(e => e.amount * e.itemPrice).reduce((e, acc) => acc + e, 0) || 0
 })
 
 const canPrint = computed(() => {
-    return imgIsLoaded
-        && !!company.value
+    return !!company.value
         && !!customer.value
         && !!user.value
         && !!offer.value
 })
 
+const imgLoaded = () => {
+    imgIsLoaded.value = true
+}
+
+watch([imageRef], () => {
+    console.log("imageRef", imageRef.value, imageRef.value?.complete)
+    imageRef.value && setTimeout(async () => {
+        imgIsLoaded.value = true
+        canPrint.value && window.print()
+    }, 1000)
+}, {immediate: true})
+
 watch([canPrint], async () => {
+    console.log("canPrint", canPrint, imgIsLoaded.value, imageRef.value, imageRef.value?.complete)
     if (!canPrint.value) return
     await nextTick()
-    window.print()
+    await wait(200)
+    imgIsLoaded.value && window.print()
 }, {immediate: true})
 
 const print = () => {
@@ -134,6 +149,12 @@ onMounted(async () => {
     customer.value = customers.value.find(e => e.id === data?.customerId) || null
     !staff.value.length && await getAllStaff()
     user.value = staff.value.find(e => e.id === data?.managerUuid) || null
+
+    imageRef.value && (imageRef.value.onload = (ev: Event) => {
+        console.log("load image", ev)
+        imgIsLoaded.value = true
+    })
+    imageRef.value && imageRef.value.complete && (imgIsLoaded.value = true)
 })
 </script>
 
@@ -144,9 +165,15 @@ onMounted(async () => {
     top: 0
     left: 0
     width: 100vw
+    min-height: 100vh
     z-index: 1010
     background: rgb(var(--v-theme-background))
     padding: var(--pad)
+    display: grid
+    place-items: center
+
+    & > *
+        width: 100%
 
     & img
         display: block
