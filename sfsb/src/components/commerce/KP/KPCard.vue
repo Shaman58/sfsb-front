@@ -10,7 +10,9 @@
                         @copy="copyKP"
                         @refresh="refresh"
                         @download="download"
+                        @print="print"
                     )
+                    //a(:href="objectURL" download="kp.docx") Скачать
         template(#default)
             v-card(v-if="currentKP")
                 v-card-title
@@ -52,18 +54,19 @@ import KPBar from "@/components/commerce/KP/KPBar.vue";
 import {useCurrentUserStore} from "@/pinia-store/currentUser";
 import KPCardHeader from "@/components/commerce/KP/KPCardHeader.vue";
 import {useOfferGenerator} from "@/mixins/OfferGenerator";
+import {saveAs} from "file-saver";
 
 const router = useRouter()
 const route = useRoute()
 const {loading} = storeToRefs(useKPStore())
-const {get, save, getDoc} = useKPStore()
+const {get, save} = useKPStore()
 
 const currentKP: Ref<KP | null> = ref(null)
 const items = ref<KPItem[]>([])
 
-const doc = ref("")
 
-const {generateDocument} = useOfferGenerator()
+const objectURL = ref("")
+const {generateDocument, printOffer} = useOfferGenerator()
 
 const companyId = ref(currentKP.value?.companyId)
 const customerId = ref(currentKP.value?.customerId)
@@ -139,11 +142,15 @@ const refresh = async () => {
 const unwatchRoute = watch([route], init, {immediate: true})
 
 const download = async () => {
-    await generateDocument(
+    const {blob} = await generateDocument(
         "http://5.35.84.165:9000/api/doc/kp",
         {orderId: +route.params.id},
-        "doc"
-    )
+        "doc")
+    blob && saveAs(blob, "doc.docx")
+}
+
+const print = () => {
+    router.push("/commerce/print/" + route.params.id)
 }
 
 onBeforeUnmount(() => {

@@ -26,17 +26,32 @@ export const useOfferGenerator = () => {
                 type: response.headers["content-type"],
             });
             const objectURL = URL.createObjectURL(blob);
+            return {objectURL, html: result.value, blob: blob || null};
+        } catch (error: unknown) {
+            const axiosError = error as AxiosError<{ info: string }, any>
+            const {response} = axiosError
+            const {data} = response as { data: unknown }
+            const textError = data && JSON.parse(new TextDecoder().decode(data as AllowSharedBufferSource))
+            toast.error("Ошибка: " + textError?.info, {position: "top-right"});
+            console.error(
+                "There was an error previewing the DOCX file:",
+                error
+            );
+            return {objectURL: "", html: "", blob: null};
+        }
+    };
 
-            const downloadButtonHtml = `
+    const printOffer = async (url: string, params: { orderId: number }, filename: string) => {
+        const {html, objectURL} = await generateDocument(url, params, filename);
+        const downloadButtonHtml = `
         <a href="${objectURL}" download="${filename}.docx" style="display: block; margin: 20px;">
           Скачать
         </a>
       `;
 
-            const newWindow = window.open("", "_blank");
-            console.log(result)
-            newWindow && newWindow.document.write(downloadButtonHtml);
-            newWindow && newWindow.document.write(`
+        const newWindow = window.open("", "_blank");
+        newWindow && newWindow.document.write(downloadButtonHtml);
+        newWindow && newWindow.document.write(`
                 <style>
                     img{
                         display: block;
@@ -46,14 +61,13 @@ export const useOfferGenerator = () => {
                     }
                     .last{
                         border-collapse: collapse;
-                        border: 1px solid purple;
                     }
                     .last *{
                         box-sizing: border-box;
                     }
                     .last tr{
                         display: grid;
-                        grid-template-columns: 40px repeat(5, 1fr);
+                        grid-template-columns: 40px 1fr 1fr 0.25fr 0.5fr 0.5fr;
                     }
                     .last tr:first-child{
                         border: 1px solid purple;
@@ -66,8 +80,8 @@ export const useOfferGenerator = () => {
                     }
                 </style>
             `)
-            newWindow && newWindow.document.write(result.value);
-            newWindow && newWindow.document.write(`
+        newWindow && newWindow.document.write(html);
+        newWindow && newWindow.document.write(`
                 <script>
                 const tables = [...document.querySelectorAll("table")];
                 console.log(tables);
@@ -77,20 +91,8 @@ export const useOfferGenerator = () => {
                 </script>
             `);
 
-            newWindow && newWindow.document.close();
-        } catch (error: unknown) {
-            const axiosError = error as AxiosError<{ info: string }, any>
-            const {response} = axiosError
-            const {data} = response as { data: unknown }
-            const textError = data && JSON.parse(new TextDecoder().decode(data || ""))
-            toast.error("Ошибка: " + textError?.info, {position: "top-right"});
-            console.error(
-                "There was an error previewing the DOCX file:",
-                error
-            );
-        }
-    };
-
+        newWindow && newWindow.document.close();
+    }
     const previewCommerce = async (order: Order, companyId: number | undefined = 1) => {
         const url = "/doc/kp";
         const params = {orderId: order.id, companyId};
@@ -101,7 +103,7 @@ export const useOfferGenerator = () => {
             order.applicationNumber +
             ".docx";
 
-        await generateDocument(url, params, filename);
+        await printOffer(url, params, filename);
     };
     const previewToolOrder = async (
         order: Order,
@@ -120,7 +122,7 @@ export const useOfferGenerator = () => {
             order.applicationNumber +
             ".docx";
 
-        await generateDocument(url, params, filename);
+        await printOffer(url, params, filename);
     };
 
     const previewPlan1 = async (order: Order) => {
@@ -167,5 +169,5 @@ export const useOfferGenerator = () => {
         }
     };
 
-    return {generateDocument, previewCommerce, previewToolOrder, previewPlan1, previewPlan2};
+    return {generateDocument, printOffer, previewCommerce, previewToolOrder, previewPlan1, previewPlan2};
 };

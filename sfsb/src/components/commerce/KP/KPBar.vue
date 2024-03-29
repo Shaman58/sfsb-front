@@ -12,7 +12,8 @@ const menuItems = [
     {emit: "delete", icon: "mdi:mdi-delete", label: "Удалить"},
     {emit: "copy", icon: "mdi:mdi-content-copy", label: "Скопировать"},
     {emit: "refresh", icon: "mdi:mdi-refresh", label: "Обновить"},
-    {emit: "download", icon: "mdi:mdi-download", label: "Получить"},
+    {emit: "download", icon: "mdi:mdi-download", label: "Сохранить"},
+    {emit: "print", icon: "mdi:mdi-printer", label: "Печать"},
 ] as const
 const emit = defineEmits(["save", "delete", "copy", "download", "print"])
 </script>

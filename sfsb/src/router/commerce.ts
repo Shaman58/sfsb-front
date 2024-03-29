@@ -8,6 +8,7 @@ import OperationCard from "@/components/commerce/Operations/OperationCard.vue";
 import {type RouteMeta, type RouteRecordRaw} from "vue-router";
 import KP from "@/components/commerce/KP/KP.vue";
 import KPCard from "@/components/commerce/KP/KPCard.vue";
+import KPPrint from "@/components/commerce/KP/KPPrint.vue";
 
 const commerce: RouteRecordRaw & RouteMeta = {
     path: "/commerce",
@@ -97,7 +98,15 @@ const commerce: RouteRecordRaw & RouteMeta = {
                     },
                 },
             ]
-        }
+        },
+        {
+            path: "print/:id",
+            component: KPPrint,
+            meta: {
+                onlyFor: ["COMMERCE", "ADMIN"],
+                name: "КП принт"
+            }
+        },
     ]
 }
 
