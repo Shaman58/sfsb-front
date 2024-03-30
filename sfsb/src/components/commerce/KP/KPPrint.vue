@@ -127,7 +127,7 @@ watch([imageRef], async () => {
 },)
 
 
-const print = window.print
+const print = () => window.print
 
 const close = () => {
     router.push("/commerce/kp/" + route.params.id)
