@@ -1,10 +1,14 @@
 <template lang="pug">
-    .print-form(@click="print"  )
+    .print-form( )
         v-progress-circular(indeterminate :color="$defaultColor" v-if="!canPrint" size="70" )
         header.print-form__header(v-if="canPrint")
-            .print-form__close(@click.stop="close")
-                v-icon mdi-close
-                span ЗАКРЫТЬ
+            .print-form__controls
+                .print-form__close(@click.stop="close")
+                    v-icon mdi-close
+                    span ЗАКРЫТЬ
+                .print-form__close(@click.stop="print")
+                    v-icon mdi-printer
+                    span Отправить на печать
             .print-form__company
                 .print-form__company-logo
                     img(:src="company && company.logo?.link" alt="logo" ref="imageRef" @load="imgLoaded")
@@ -120,12 +124,10 @@ watch([imageRef], async () => {
     imageRef.value && (imgIsLoaded.value = true)
     await wait(1000)
     canPrint.value && print()
-}, {immediate: true})
+},)
 
 
-const print = () => {
-    window.print()
-}
+const print = window.print
 
 const close = () => {
     router.push("/commerce/kp/" + route.params.id)
@@ -161,10 +163,17 @@ onMounted(async () => {
     & > *
         width: 100%
 
+    &__controls
+        display: flex
+        align-items: center
+        justify-content: center
+        gap: 1rem
+
     & img
         display: block
         max-width: 100%
         max-height: 150px
+
 
     &__close
         cursor: pointer
