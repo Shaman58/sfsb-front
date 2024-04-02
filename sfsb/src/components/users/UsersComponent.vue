@@ -8,7 +8,10 @@
                 users-list(:filter="filterText")
         template(#card)
             suspended-component
-                router-view
+                router-view(#default="{Component, route}")
+                    transition(name="fade")
+                        div.transition-div(:key="route.params.id" :data-route="route.params.id")
+                            component(:is="Component")
 </template>
 <script setup lang="ts">
 import LayoutPage from "@/components/common/LayoutPage.vue";
@@ -19,5 +22,10 @@ import {ref} from "vue";
 const filterText = ref("")
 </script>
 <style scoped lang="sass">
+.fade-enter-active, .fade-leave-active
+    transition: all 0.5s ease
 
+.fade-enter-from, .fade-leave-to
+    opacity: 0
+    translate: 100% 0
 </style>

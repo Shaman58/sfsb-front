@@ -27,7 +27,10 @@
                     v-list-item-title
                         router-link.list-link(:to="`/commerce/kp/${i.id}`") {{"#"+i.id}} №{{i.applicationNumber}} {{new Date(i.created).toLocaleDateString()}}
         template(#card)
-            router-view
+            router-view(#default="{Component, route}")
+                transition(name="fade")
+                    div.transition-div(:key="route.params" :data-route="route.params.id")
+                        component(:is="Component")
 </template>
 <script setup lang="ts">
 
@@ -89,8 +92,11 @@ onUnmounted(() => {
 
 
 <style scoped lang="sass">
-//.sort-controls
-//    display: flex
-//    align-items: center
+.fade-enter-active, .fade-leave-active
+    transition: all 0.5s ease
+
+.fade-enter-from, .fade-leave-to
+    opacity: 0
+    translate: 50% 0
 
 </style>

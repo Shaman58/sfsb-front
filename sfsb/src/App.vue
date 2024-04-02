@@ -62,4 +62,13 @@ watch(theme, () => {
 [class*="v-col-"]
     @media (width < 1024px)
         padding: 2px
+
+//.fade-enter-active, .fade-leave-active
+//    transition: all 0.5s ease
+//
+//
+//.fade-enter-from, .fade-leave-to
+//    opacity: 0
+//    scale: 0 0
+
 </style>

@@ -48,13 +48,13 @@ const backgroundLoadingLists = () => {
 }
 backgroundLoadingLists()
 
-const onIntersect = async(ev: boolean)=>{
+const onIntersect = async (ev: boolean) => {
     console.log("intersect", ev)
-    if(!ev) return
+    if (!ev) return
     currentTab.value && await currentTab.value.newData()
 }
 
-watchEffect(()=>console.log("selectedList", selectedList.value))
+watchEffect(() => console.log("selectedList", selectedList.value))
 
 const unwatchRoute = watch([route], async () => {
     if (!currentTab.value) return
