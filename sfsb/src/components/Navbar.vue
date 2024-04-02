@@ -43,17 +43,14 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, onUnmounted, ref, watch} from "vue";
+import {onUnmounted, ref, watch} from "vue";
 import ImpulsHub from "@/components/ImpulsHub.vue";
 import CONSTS from "@consts/index"
 // import keycloakService from '@/plugins/keycloak/service';
-import { useToast } from "vue-toast-notification";
-import { useCurrentUserStore } from "@/pinia-store/currentUser";
-import { storeToRefs } from "pinia";
+import {useToast} from "vue-toast-notification";
+import {useCurrentUserStore} from "@/pinia-store/currentUser";
+import {storeToRefs} from "pinia";
 import MobileMenu from "@/components/common/MobileMenu.vue";
-import { useTheme } from "vuetify";
-import { useThemeStore } from "@/pinia-store/themeSwitcher";
-import ThemeSwitcher from "@/components/common/ThemeSwitcher.vue";
 import {useKeycloak} from "@josempgon/vue-keycloak";
 import ThreePositionSwitch from "@/components/common/ThreePositionSwitch.vue";
 
@@ -73,7 +70,7 @@ const logout = () => {
 const name = ref();
 const picture = ref()
 
-const unwatchUser = watch([user], ()=>{
+const unwatchUser = watch([user], () => {
     picture.value = user.value?.picture && user.value.picture
     name.value = (user.value?.firstName || "") + " " + (user.value?.lastName || "")
 })
@@ -81,7 +78,7 @@ const unwatchUser = watch([user], ()=>{
 //     picture.value = user.value?.picture && user.value.picture
 //     name.value = user.value?.firstName + " " + user.value?.lastName
 // })
-onUnmounted(()=>{
+onUnmounted(() => {
     unwatchUser()
 })
 </script>
@@ -89,6 +86,7 @@ onUnmounted(()=>{
 <style lang="sass">
 .navbar
     padding: 4px
+
 
     &__logout
         background: #fff
@@ -165,9 +163,18 @@ onUnmounted(()=>{
 
     &__list-item
         background-color: #2F477E
+        position: relative
 
         & a
             color: #fff
+
+        & .navbar__link::before
+            content: ""
+            position: absolute
+            top: 0
+            left: 0
+            width: 100%
+            height: 100%
 
 .v-menu > .v-overlay__content > .v-list.submenu__list
     background-color: #2F477E
