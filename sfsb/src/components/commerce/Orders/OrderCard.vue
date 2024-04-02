@@ -8,6 +8,7 @@
                 :valid="valid"
                 @save="save"
                 @refresh="refresh"
+                @save-k-p="saveKP"
             )
         .order-card
             v-form.order-card__form(ref="form" v-model="valid")
@@ -64,12 +65,15 @@ import {useOrdersStore} from "@/pinia-store/orders";
 import AlertDialog from "@/components/common/AlertDialog.vue";
 import {useCurrentUserStore} from "@/pinia-store/currentUser";
 import {Empty} from "@/mixins/Empty";
+import {useToast} from "vue-toast-notification";
+
+const toast = useToast()
 
 const router = useRouter()
 const {params} = toRefs(useRoute())
 
 const {orders, loading} = storeToRefs(useOrdersStore())
-const {saveOrder, getOrders} = useOrdersStore()
+const {saveOrder, getOrders, saveKP: storeKP} = useOrdersStore()
 
 const hasCurrentOrder = orders.value.find(e => e.id + "" === params.value.id)
 if (!hasCurrentOrder && params.value.id !== "new") router.push("/not-found")
@@ -119,6 +123,14 @@ const save = async () => {
         refreshedOrder?.id && await router.push(`/commerce/orders/${refreshedOrder.id}`)
     }, 500)
 }
+
+const saveKP = ({orderId, companyId}: { orderId: number, companyId: number }) => {
+    console.log("saveKP", orderId, companyId)
+    const ERROR_MESSAGE = "Для сохранения коммерческого предложения выберите компанию-поставщика"
+    if (!companyId) return toast.error(ERROR_MESSAGE)
+    storeKP(orderId, companyId)
+}
+
 const unwatchEffect = watchEffect(() => {
     orderLocal.value = order.value as Order
 })
@@ -127,7 +139,7 @@ const unwatch = watch([params], () => {
     panel.value = params.value.id === "new" ? ["common", "items"] : panel.value
 })
 
-onUnmounted(()=>{
+onUnmounted(() => {
     unwatch()
     unwatchEffect()
 })

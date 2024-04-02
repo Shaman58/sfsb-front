@@ -36,12 +36,19 @@ export const useOrdersStore = defineStore("orders", () => {
     const deleteOrder = async (order: Order) => {
         return await query<Order>(async () => await api.delete(`/order/${order.id}`))
     }
+    const saveKP = async (orderId: number, companyId: number) => {
+        const url = `/doc/kp/remote`;
+        return await query(async () => await api.get(url, {params: {orderId, companyId}}))
+    }
+
+
     return {
         orders,
         loading,
         getOrders,
         saveOrder,
-        deleteOrder
+        deleteOrder,
+        saveKP
     };
 
 
