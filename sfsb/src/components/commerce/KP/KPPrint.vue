@@ -11,7 +11,7 @@
                     span Отправить на печать
             .print-form__company
                 .print-form__company-logo
-                    img(:src="company && company.logo?.link" alt="logo" ref="imageRef" @load="imgLoaded")
+                    img(:src="company && company.logo?.link" alt="logo" ref="imageRef")
                 .print-form__company-data
                     .print-form__company-common
                         .print-form__company-name {{ company && company.companyName }}
@@ -116,15 +116,10 @@ const canPrint = computed(() => {
         && !!offer.value
 })
 
-const imgLoaded = () => {
-    imgIsLoaded.value = true
-}
-
-watch([imageRef], async () => {
-    imageRef.value && (imgIsLoaded.value = true)
+watch([imgIsLoaded], async () => {
     await wait(1000)
-    canPrint.value && print()
-},)
+    canPrint.value && imageRef.value?.complete && print()
+})
 
 
 const print = () => window.print()
@@ -142,6 +137,15 @@ onMounted(async () => {
     customer.value = customers.value.find(e => e.id === data?.customerId) || null
     !staff.value.length && await getAllStaff()
     user.value = staff.value.find(e => e.id === data?.managerUuid) || null
+
+    const img = new Image();
+    img.src = company.value?.logo?.link || ""
+    img.addEventListener('load', function () {
+        if (img.height > 0 && img.width > 0) {
+            console.log('Изображение загружено');
+            imgIsLoaded.value = true
+        }
+    });
 
 })
 </script>
