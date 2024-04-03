@@ -38,6 +38,7 @@ export const useKPStore
     })
 
     const next = async () => {
+        if (loading.value) return
         currentPage.value += 1
         await fetch()
     }

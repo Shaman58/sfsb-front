@@ -4,7 +4,7 @@
             .kp-header
                 div(:style="{height:'10px', width:'100%'}")
                     v-progress-linear(indeterminate v-if="loading")
-                v-card(width="100%")
+                v-card.kp-header__card(width="100%")
                     v-card-actions
                         KPBar(
                             @save="saveKP"
@@ -192,5 +192,9 @@ onBeforeUnmount(() => {
     top: 0
     width: 100%
     z-index: 1
+    background: rgb(var(--v-theme-surface))
+    border-radius: 10px
+    box-shadow: 0 3px 12px #7777
+
 
 </style>
