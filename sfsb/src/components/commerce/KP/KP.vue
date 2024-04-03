@@ -26,6 +26,7 @@
                 )
                     v-list-item-title
                         router-link.list-link(:to="`/commerce/kp/${i.id}`") {{"#"+i.id}} №{{i.applicationNumber}} {{new Date(i.created).toLocaleDateString()}}
+                v-list-item(v-intersect="next" :style="{minHeight: '4px !important'}")
         template(#card)
             router-view(#default="{Component, route}")
                 transition(name="fade")
@@ -43,7 +44,7 @@ import SortControl from "@/components/common/SortControl.vue";
 
 const filterText = ref("")
 const {loading, kp} = storeToRefs(useKPStore())
-const {fetch} = useKPStore()
+const {fetch, next: nextKP} = useKPStore()
 !kp.value.length && await fetch()
 
 const router = useRouter()
@@ -79,6 +80,11 @@ const sortedKP = computed(() => {
     //@ts-ignore
     return kp.value.sort((a, b) => !!asc.value ? a[criterion.value] - b[criterion.value] : b[criterion.value] - a[criterion.value])
 })
+
+const next = async (ev: Event) => {
+    if (!ev) return
+    await nextKP()
+}
 
 const unwatchRoute = watch([route], () => {
     if (route.params.id) return
