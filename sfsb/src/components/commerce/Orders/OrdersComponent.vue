@@ -8,7 +8,13 @@
                 v-list-item(@click="()=>{}" :active="id==='new'")
                     router-link.list-link.orders__link(:to="'/commerce/orders/new'")
                         span(:style="{color:'orange'}") Добавить новый заказ
-                v-list-item(v-for="i in filteredOrders" :key="i.id" :active="+id===i.id" @click="()=>{}")
+                v-list-item(
+                    v-for="i in filteredOrders"
+                    :key="i.id"
+                    :active="+id===i.id"
+                    @click="()=>{}"
+                    @keyup.space="router.push(`/commerce/orders/${i.id}`)"
+                )
                     router-link.list-link.orders__link(:to="`/commerce/orders/${i.id}`") {{i.applicationNumber}} {{i.customer.companyName}}
         template(#card)
             router-view
@@ -16,7 +22,7 @@
 </template>
 <script setup lang="ts">
 import {storeToRefs} from "pinia";
-import {computed, ref, toRefs, watch} from "vue";
+import {computed, ref, toRefs} from "vue";
 import LayoutPage from "@/components/common/LayoutPage.vue";
 import {useOrdersStore} from "@/pinia-store/orders";
 import {useRoute, useRouter} from "vue-router";
@@ -33,10 +39,10 @@ id.value === "orders" && router.push(`/commerce/orders/${orders.value[0].id}`)
 
 const filterText = ref("")
 const filteredOrders = computed<Order[]>(() => orders.value.filter(e => e.customer
-        .companyName
-        .toLowerCase()
-        .includes(filterText.value?.toLowerCase()||"")
-        || e.applicationNumber.toString().includes(filterText.value?.toLowerCase()||"")
+            .companyName
+            .toLowerCase()
+            .includes(filterText.value?.toLowerCase() || "")
+        || e.applicationNumber.toString().includes(filterText.value?.toLowerCase() || "")
     )
 )
 

@@ -2,7 +2,7 @@
     v-form.material-form(ref="form"  @submit.prevent="save")
         v-card.material-form__card
             v-card-title.material-form__title
-                span.material-form__title-name {{ currentTool.toolName}}
+                span.material-form__title-name {{ currentTool?.toolName}}
                 span.material-form__title-description {{ currentTool.description}}
             v-card-text.material-form__controls
                 .material-form__controls-content
@@ -17,7 +17,7 @@
 <script setup lang="ts">
 import {useRoute} from "vue-router";
 import {storeToRefs} from "pinia";
-import {useCurrentTool, useToolingStore} from "@/pinia-store/tools";
+import {useCurrentTool} from "@/pinia-store/tools";
 import {onUnmounted, ref, watchEffect} from "vue";
 import {useValidationRules} from "@/mixins/FieldValidationRules";
 import {Empty} from "@/mixins/Empty";
@@ -29,7 +29,7 @@ const {rules} = useValidationRules();
 
 const {currentTool: currentType} = storeToRefs(useCurrentTool())
 
-const currentTool = ref((currentType.value?.list.find(e => e.id + "" === route.params.id) || currentType.value?.list[0] )as Tool)
+const currentTool = ref((currentType.value?.list.find(e => e.id + "" === route.params.id) || currentType.value?.list[0]) as Tool)
 const newFlag = ref(route.params.id === "new")
 
 const toolName = ref(currentTool.value?.toolName || "")
@@ -47,7 +47,7 @@ const unwatchRouter = watchEffect(() => {
     if (route.params.id === 'new') {
         currentTool.value = Empty.Tool()
     } else {
-        currentTool.value = (currentType.value?.list.find(e => e.id + "" === route.params.id) || currentType.value?.list[0] )as Tool
+        currentTool.value = (currentType.value?.list.find(e => e.id + "" === route.params.id) || currentType.value?.list[0]) as Tool
     }
     if (!currentTool.value) return
     toolName.value = currentTool.value.toolName
