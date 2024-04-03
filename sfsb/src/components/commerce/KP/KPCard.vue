@@ -11,32 +11,34 @@
                         @refresh="refresh"
                         @download="download"
                         @print="print"
+                        :disabled="route.params.id==='new'"
                     )
                     //a(:href="objectURL" download="kp.docx") Скачать
         template(#default)
-            v-card(v-if="currentKP")
-                v-card-title
-                    suspended-component
-                        KPCardHeader(
-                            :created="currentKP && currentKP.created"
-                            :updated="currentKP && currentKP.updated"
-                            :manager-uuid="currentKP && currentKP.managerUuid"
-                            v-model:businessProposal="businessProposal"
-                            v-model:applicationNumber="applicationNumber"
-                            v-model:companyId="companyId"
-                            v-model:customerId="customerId"
+            v-form(ref="form" v-model="valid")
+                v-card(v-if="currentKP")
+                    v-card-title
+                        suspended-component
+                            KPCardHeader(
+                                :created="currentKP && currentKP.created"
+                                :updated="currentKP && currentKP.updated"
+                                :manager-uuid="currentKP && currentKP.managerUuid"
+                                v-model:businessProposal="businessProposal"
+                                v-model:applicationNumber="applicationNumber"
+                                v-model:companyId="companyId"
+                                v-model:customerId="customerId"
+                            )
+                    v-card-text
+                        v-text-field.py-0(
+                            v-model="search"
+                            label="Фильтр"
+                            prepend-inner-icon="mdi-magnify"
+                            variant="outlined"
+                            hide-details
+                            single-line
                         )
-                v-card-text
-                    v-text-field.py-0(
-                        v-model="search"
-                        label="Фильтр"
-                        prepend-inner-icon="mdi-magnify"
-                        variant="outlined"
-                        hide-details
-                        single-line
-                    )
-                    suspended-component
-                        KPItemsList(v-model:items="items" :search)
+                        suspended-component
+                            KPItemsList(v-model:items="items" :search)
 
 </template>
 
@@ -44,7 +46,7 @@
 
 import {useRoute, useRouter} from "vue-router";
 import {useKPStore} from "@/pinia-store/kp";
-import {onBeforeUnmount, type Ref, ref, watch, watchEffect} from "vue";
+import {computed, onBeforeUnmount, type Ref, ref, watch, watchEffect} from "vue";
 import LayoutMain from "@/components/common/LayoutMain.vue";
 import {storeToRefs} from "pinia";
 import {Empty} from "@/mixins/Empty";
@@ -55,15 +57,20 @@ import {useCurrentUserStore} from "@/pinia-store/currentUser";
 import KPCardHeader from "@/components/commerce/KP/KPCardHeader.vue";
 import {useOfferGenerator} from "@/mixins/OfferGenerator";
 import {saveAs} from "file-saver";
+import {useToast} from "vue-toast-notification";
 
 const router = useRouter()
 const route = useRoute()
+const toast = useToast()
 const {loading} = storeToRefs(useKPStore())
 const {get, save} = useKPStore()
 
 const currentKP: Ref<KP | null> = ref(null)
 const items = ref<KPItem[]>([])
 
+const form = ref<HTMLFormElement>()
+const valid = ref(false);
+watchEffect(() => console.log("valid", valid.value))
 
 const objectURL = ref("")
 const {generateDocument, printOffer} = useOfferGenerator()
@@ -113,7 +120,13 @@ const init = async () => {
 
 }
 
+const isEmptyItems = computed(() => items.value.every(e => e.amount && e.itemPrice && e.decimal))
 const saveKP = async () => {
+    if (!form.value) return
+    form.value.validate()
+    if (!valid.value) return
+
+    if (!isEmptyItems.value) return toast.error("Вы не указали ни одной позиции")
     const businessProposal = currentKP.value?.businessProposal || ""
     const applicationNumber = currentKP.value?.applicationNumber || 0
     const managerUuid = currentKP.value?.managerUuid || user.value?.id || ""
@@ -126,7 +139,10 @@ const saveKP = async () => {
         managerUuid,
         items: items.value
     })
-    console.log("res after save", res)
+    //переходим по id, полученный в ответе
+    if (res && typeof res === "object") {
+        ("id" in res) && await router.push(`/commerce/kp/${res.id}`)
+    }
 }
 
 const copyKP = () => {

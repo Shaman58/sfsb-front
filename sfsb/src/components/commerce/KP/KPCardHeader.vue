@@ -2,13 +2,18 @@
     div.pb-4 Автор: {{manager ? manager.firstName + " " + manager.lastName : "Не указан"}}
     v-row
         v-col.py-0(lg="4")
-            v-text-field(v-model="applicationNumber" label="Номер:" )
-        v-col.py-0(lg="4")
+            v-text-field(
+                @update:model-value="applicationNumber=$event"
+                label="Номер:"
+                :model-value="applicationNumber===-1? '':applicationNumber"
+                :rules="[rules.required]"
+            )
+        v-col.py-0(lg="4" v-if="created")
             span Создан:
-            span {{new Date(created).toLocaleDateString() + " " + new Date(created).toLocaleTimeString()}}
+            span {{dateFromString(created)}}
         v-col.py-0(lg="4" v-if="updated" )
             span Обновлен:
-            span {{new Date(updated).toLocaleDateString() + " " + new Date(updated).toLocaleTimeString()}}
+            span {{dateFromString(updated)}}
     v-row
         v-col.py-0
             v-select(
@@ -19,10 +24,11 @@
             )
         v-col.py-0
             v-select(
-                :items="customers.map(e=>e.companyName)"
-                :model-value="customer?.companyName || customers[0].companyName"
+                :items="['',...customers.map(e=>e.companyName)]"
+                :model-value="customer?.companyName || ''"
                 label="Для: "
                 @update:modelValue="changeCustomer"
+                :rules="[rules.required]"
             )
     v-row
         v-col.py-0(col="12")
@@ -35,15 +41,25 @@ import {useCompaniesStore} from "@/pinia-store/companies";
 import {computed, toRefs, watchEffect} from "vue";
 import {useStaffStore} from "@/pinia-store/staff";
 import {useCustomersStore} from "@/pinia-store/customers";
+import {useValidationRules} from "@/mixins/FieldValidationRules";
+
+const dateFromString = (str: string | null) => {
+    if (!str) return null
+    return new Date(str).toLocaleDateString() + " " + new Date(str).toLocaleTimeString()
+}
 
 const props = defineProps<{ managerUuid: string, created: string | null, updated: string | null }>()
 const {managerUuid, updated, created} = toRefs(props)
+
 const emit = defineEmits(["changeBusinessProposal"])
 
 const applicationNumber = defineModel("applicationNumber")
 const businessProposal = defineModel("businessProposal")
 const companyId = defineModel("companyId")
 const customerId = defineModel("customerId")
+
+const {rules} = useValidationRules()
+
 
 //--- MANAGER ---
 const {staff} = storeToRefs(useStaffStore())
