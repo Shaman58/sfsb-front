@@ -1,17 +1,14 @@
 import {defineStore} from "pinia";
-import {ref, watch} from "vue";
+import {computed, ref} from "vue";
 import api, {query} from "@/api/instance";
 
 export const useKPStore
     = defineStore("kp", () => {
     const loading = ref(false)
     const pages = ref<KP[][]>([[]])
-    const kp = ref<KP[]>([])
     const currentPage = ref(0)
     const LIMIT = 20
-    watch(pages, () => {
-        kp.value = pages.value.flat()
-    }, {deep: true})
+    const kp = computed(() => pages.value.flat())
 
 
     const withLoading = async (cb: () => void | Promise<any>) => {
