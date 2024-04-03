@@ -29,7 +29,7 @@
                 v-list-item(v-intersect="next" :style="{minHeight: '4px !important'}")
         template(#card)
             router-view(#default="{Component, route}")
-                transition(name="fade")
+                transition(name="fade" :style="{height:'100%'}")
                     div.transition-div(:key="route.params" :data-route="route.params.id")
                         component(:is="Component")
 </template>
@@ -65,7 +65,7 @@ const criteria = [
 type ParameterType = typeof criteria[number]["parameter"]
 const criterion = ref<ParameterType>("id")
 
-const sortedKP = computed(() => {
+const sortedKP = computed<KP[]>(() => {
     if (criterion.value === "created") {
         const res = kp.value.sort((a, b) => {
             const parsedA = Date.parse((a.created || "0").toLocaleString())

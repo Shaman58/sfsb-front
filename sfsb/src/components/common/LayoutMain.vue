@@ -28,6 +28,7 @@ const footer = slots.footer ? "60px" : "0px"
     &__main
         height: 100%
         overflow-y: auto
+        position: relative
 
         &::-webkit-scrollbar
             width: 4px

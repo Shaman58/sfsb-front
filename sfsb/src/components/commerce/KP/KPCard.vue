@@ -1,44 +1,44 @@
 <template lang="pug">
     LayoutMain
-        template(#header)
-            div(:style="{height:'10px', width:'100%'}")
-                v-progress-linear(indeterminate v-if="loading")
-            v-card(width="100%")
-                v-card-actions
-                    KPBar(
-                        @save="saveKP"
-                        @copy="copyKP"
-                        @refresh="refresh"
-                        @download="download"
-                        @print="print"
-                        :disabled="route.params.id==='new'"
-                    )
-                    //a(:href="objectURL" download="kp.docx") Скачать
         template(#default)
-            v-form(ref="form" v-model="valid")
-                v-card(v-if="currentKP")
-                    v-card-title
-                        suspended-component
-                            KPCardHeader(
-                                :created="currentKP && currentKP.created"
-                                :updated="currentKP && currentKP.updated"
-                                :manager-uuid="currentKP && currentKP.managerUuid"
-                                v-model:businessProposal="businessProposal"
-                                v-model:applicationNumber="applicationNumber"
-                                v-model:companyId="companyId"
-                                v-model:customerId="customerId"
-                            )
-                    v-card-text
-                        v-text-field.py-0(
-                            v-model="search"
-                            label="Фильтр"
-                            prepend-inner-icon="mdi-magnify"
-                            variant="outlined"
-                            hide-details
-                            single-line
+            .kp-header
+                div(:style="{height:'10px', width:'100%'}")
+                    v-progress-linear(indeterminate v-if="loading")
+                v-card(width="100%")
+                    v-card-actions
+                        KPBar(
+                            @save="saveKP"
+                            @copy="copyKP"
+                            @refresh="refresh"
+                            @download="download"
+                            @print="print"
+                            :disabled="route.params.id==='new'"
                         )
-                        suspended-component
-                            KPItemsList(v-model:items="items" :search)
+            .kp-main
+                v-form(ref="form" v-model="valid")
+                    v-card(v-if="currentKP")
+                        v-card-title
+                            suspended-component
+                                KPCardHeader(
+                                    :created="currentKP && currentKP.created"
+                                    :updated="currentKP && currentKP.updated"
+                                    :manager-uuid="currentKP && currentKP.managerUuid"
+                                    v-model:businessProposal="businessProposal"
+                                    v-model:applicationNumber="applicationNumber"
+                                    v-model:companyId="companyId"
+                                    v-model:customerId="customerId"
+                                )
+                        v-card-text
+                            v-text-field.py-0(
+                                v-model="search"
+                                label="Фильтр"
+                                prepend-inner-icon="mdi-magnify"
+                                variant="outlined"
+                                hide-details
+                                single-line
+                            )
+                            suspended-component
+                                KPItemsList(v-model:items="items" :search)
 
 </template>
 
@@ -72,8 +72,7 @@ const form = ref<HTMLFormElement>()
 const valid = ref(false);
 watchEffect(() => console.log("valid", valid.value))
 
-const objectURL = ref("")
-const {generateDocument, printOffer} = useOfferGenerator()
+const {generateDocument} = useOfferGenerator()
 
 const companyId = ref(currentKP.value?.companyId)
 const customerId = ref(currentKP.value?.customerId)
@@ -184,4 +183,14 @@ onBeforeUnmount(() => {
     display: flex
     justify-content: flex-end
     gap: 1rem
+
+.kp-main
+    margin-top: 1rem
+
+.kp-header
+    position: sticky
+    top: 0
+    width: 100%
+    z-index: 1
+
 </style>
