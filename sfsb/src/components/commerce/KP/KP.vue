@@ -45,7 +45,7 @@ import SortControl from "@/components/common/SortControl.vue";
 const filterText = ref("")
 const {loading, kp} = storeToRefs(useKPStore())
 const {fetch, next: nextKP} = useKPStore()
-!kp.value.length && await fetch()
+await fetch()
 
 const router = useRouter()
 const route = useRoute();
@@ -92,6 +92,7 @@ const unwatchRoute = watch([route], () => {
 }, {immediate: true})
 
 onUnmounted(() => {
+    console.log("KP has unmounted")
     unwatchRoute()
 })
 </script>

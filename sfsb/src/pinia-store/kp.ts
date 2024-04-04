@@ -9,6 +9,8 @@ export const useKPStore
     const currentPage = ref(0)
     const LIMIT = 20
     const kp = computed(() => pages.value.flat())
+    const total = computed(() => kp.value.length)
+    const blocked = ref(false)
 
 
     const withLoading = async (cb: () => void | Promise<any>) => {
@@ -21,25 +23,19 @@ export const useKPStore
             async () => await api.get(`http://5.35.84.165:9000/api/order?offset=${currentPage.value}&limit=${LIMIT}`),
             {success: ""}
         )
-        if ("content" in response) {
-            if (response.content.length === 0) {
-                currentPage.value = 0
-                return
-            }
+        if (response && "content" in response) {
             pages.value[currentPage.value] = response.content
         }
-        if ("totalPages" in response) {
-            console.log("response.totalPages", response.totalPages)
-        }
-        if ("totalElements" in response) {
-            console.log("response.totalElements", response.totalElements)
+        if (response && "totalElements" in response) {
+            const thatsAll = +response.totalElements <= total.value
+            blocked.value = thatsAll
+            thatsAll ? currentPage.value = 0 : currentPage.value += 1
         }
 
     })
 
     const next = async () => {
-        if (loading.value) return
-        currentPage.value += 1
+        if (loading.value || blocked.value) return
         await fetch()
     }
 
@@ -60,7 +56,11 @@ export const useKPStore
             async () => await api[method]("http://5.35.84.165:9000/api/order" + (kp.id ? "/" + kp.id : ""), kp),
         )
         loading.value = false
-        await fetch()
+        if (method === "post") {
+            blocked.value = false
+            await fetch()
+        }
+
         return res
     }
 

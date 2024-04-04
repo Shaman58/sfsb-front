@@ -62,7 +62,7 @@ import {useToast} from "vue-toast-notification";
 const router = useRouter()
 const route = useRoute()
 const toast = useToast()
-const {loading} = storeToRefs(useKPStore())
+const {loading, kp} = storeToRefs(useKPStore())
 const {get, save} = useKPStore()
 
 const currentKP: Ref<KP | null> = ref(null)
@@ -91,10 +91,9 @@ const search = ref("")
 //--- CURRENT USER ---
 const {user} = storeToRefs(useCurrentUserStore())
 
-const init = async () => {
-    console.log(route.params)
+const init = () => {
     if (!Number.isNaN(Number(+route.params.id))) {
-        currentKP.value = (await get<KP>(+route.params.id)) || null
+        currentKP.value = (kp.value.find(e => e.id === +route.params.id)) || null
     }
     if (route.params.id === "new" && !route.params?.clone) {
         currentKP.value = Empty.KP()
@@ -107,7 +106,7 @@ const init = async () => {
             user.value && (currentKP.value.managerUuid = user.value.id)
             return
         }
-        currentKP.value = (await get<KP>(+route.params.clone)) || null
+        currentKP.value = (kp.value.find(e => e.id === +route.params.clone)) || null
         user.value && currentKP.value && (currentKP.value.managerUuid = user.value.id)
         currentKP.value && (currentKP.value.applicationNumber = -1)
     }
