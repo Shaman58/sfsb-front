@@ -9,21 +9,19 @@
                         KPBar(
                             @save="saveKP"
                             @copy="copyKP"
-                            @refresh="refresh"
-                            @download="download"
                             @print="print"
                             :disabled="route.params.id==='new'"
                             :kp="currentKP"
                         )
             .kp-main
-                v-form(ref="form" v-model="valid")
+                v-form(ref="form" v-model="valid" :disabled="currentKP && currentKP.system")
                     v-card(v-if="currentKP")
                         v-card-title
                             suspended-component
                                 KPCardHeader(
                                     :created="currentKP && currentKP.created"
                                     :updated="currentKP && currentKP.updated"
-                                    :manager-uuid="currentKP && currentKP.managerUuid"
+                                    :created-by="currentKP && currentKP.createdBy"
                                     v-model:businessProposal="businessProposal"
                                     v-model:applicationNumber="applicationNumber"
                                     v-model:companyId="companyId"
@@ -39,7 +37,7 @@
                                 single-line
                             )
                             suspended-component
-                                KPItemsList(v-model:items="items" :search)
+                                KPItemsList(v-model:items="items" :search :disabled="currentKP && currentKP.system" )
 
 </template>
 
@@ -57,7 +55,6 @@ import KPBar from "@/components/commerce/KP/KPBar.vue";
 import {useCurrentUserStore} from "@/pinia-store/currentUser";
 import KPCardHeader from "@/components/commerce/KP/KPCardHeader.vue";
 import {useOfferGenerator} from "@/mixins/OfferGenerator";
-import {saveAs} from "file-saver";
 import {useToast} from "vue-toast-notification";
 
 const router = useRouter()
@@ -99,17 +96,16 @@ const init = () => {
     if (route.params.id === "new" && !route.params?.clone) {
         currentKP.value = Empty.KP()
         currentKP.value!.items = [Empty.KPItem()]
-        user.value && (currentKP.value!.managerUuid = user.value.id)
         user.value && (currentKP.value!.createdBy = user.value.id)
     }
     if (route.params.id === "new" && route.params?.clone) {
         if (Number.isNaN(+route.params?.clone)) {
             currentKP.value = Empty.KP()
-            user.value && (currentKP.value!.managerUuid = user.value.id)
+            user.value && (currentKP.value!.createdBy = user.value.id)
             return
         }
         currentKP.value = (kp.value.find(e => e.id === +route.params.clone)) || null
-        user.value && currentKP.value && (currentKP.value!.managerUuid = user.value.id)
+        user.value && currentKP.value && (currentKP.value!.createdBy = user.value.id)
         currentKP.value && (currentKP.value!.applicationNumber = -1)
     }
     items.value = currentKP.value?.items || [] as KPItem[]
@@ -129,7 +125,6 @@ const saveKP = async () => {
     if (!isEmptyItems.value) return toast.error("Вы не указали ни одной позиции")
     const businessProposal = currentKP.value?.businessProposal || ""
     const applicationNumber = currentKP.value?.applicationNumber || 0
-    const managerUuid = currentKP.value?.managerUuid || user.value?.id || ""
     const res = await save({
         ...currentKP.value,
         businessProposal,
@@ -138,7 +133,6 @@ const saveKP = async () => {
         createdBy: user.value!.id,
         companyId: companyId.value || 0,
         customerId: customerId.value || 0,
-        managerUuid,
         items: items.value
     })
     //переходим по id, полученный в ответе
@@ -152,20 +146,9 @@ const copyKP = () => {
     router.push("/commerce/kp/new/" + currentKP.value?.id)
 }
 
-const refresh = async () => {
-    await init()
-}
 
 //--- WATCH ---
 const unwatchRoute = watch([route], init, {immediate: true})
-
-const download = async () => {
-    const {blob} = await generateDocument(
-        "http://5.35.84.165:9000/api/doc/kp",
-        {orderId: +route.params.id},
-        "doc")
-    blob && saveAs(blob, "doc.docx")
-}
 
 const print = () => {
     router.push("/commerce/print/" + route.params.id)

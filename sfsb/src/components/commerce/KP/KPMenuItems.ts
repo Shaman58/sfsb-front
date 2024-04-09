@@ -33,22 +33,6 @@ export const menuItems: readonly KPMenuItem[] = [
         disabledWhenSystem: false
     },
     {
-        emit: "refresh",
-        icon: "mdi:mdi-refresh",
-        label: "Обновить",
-        canBeDisabled: true,
-        disabledWhenStranger: false,
-        disabledWhenSystem: false
-    },
-    {
-        emit: "download",
-        icon: "mdi:mdi-download",
-        label: "Скачать",
-        canBeDisabled: true,
-        disabledWhenStranger: true,
-        disabledWhenSystem: true
-    },
-    {
         emit: "print",
         icon: "mdi:mdi-printer",
         label: "Печать",

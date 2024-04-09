@@ -11,6 +11,7 @@ export const useKPStore
     const kp = computed(() => pages.value.flat())
     const total = computed(() => kp.value.length)
     const blocked = ref(false)
+    const URL = "http://cp-api.ra58.ru:9000/api/order"
 
 
     const withLoading = async (cb: () => void | Promise<any>) => {
@@ -20,7 +21,7 @@ export const useKPStore
     }
     const fetch = async () => await withLoading(async () => {
         const response = await query(
-            async () => await api.get(`http://5.35.84.165:9000/api/order?offset=${currentPage.value}&limit=${LIMIT}`),
+            async () => await api.get(`${URL}?offset=${currentPage.value}&limit=${LIMIT}`),
             {success: ""}
         )
         if (response && "content" in response) {
@@ -43,7 +44,7 @@ export const useKPStore
     const get = async <T>(id: number) => {
         loading.value = true
         const res = await query<T>(
-            async () => await api.get("http://5.35.84.165:9000/api/order/" + id),
+            async () => await api.get(`${URL}/${id}`),
             {success: ""}
         )
         loading.value = false
@@ -53,7 +54,7 @@ export const useKPStore
         loading.value = true
         const method = "id" in kp ? "put" : "post"
         const res = await query<T>(
-            async () => await api[method]("http://5.35.84.165:9000/api/order" + (kp.id ? "/" + kp.id : ""), kp),
+            async () => await api[method](URL + (kp.id ? "/" + kp.id : ""), kp),
         )
         loading.value = false
         if (method === "post") {

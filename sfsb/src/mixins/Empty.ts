@@ -19,7 +19,6 @@ export class Empty {
             companyId: 1,
             customerId: 0,
             businessProposal: "",
-            managerUuid: "",
             createdBy: "",
             system: false
         })

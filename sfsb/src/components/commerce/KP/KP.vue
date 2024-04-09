@@ -59,7 +59,7 @@ const criteria = [
     {parameter: "id", title: "id"},
     {parameter: "applicationNumber", title: "Номер предложения"},
     {parameter: "created", title: "Дата"},
-    {parameter: "managerUuid", title: "Автор"},
+    {parameter: "createdBy", title: "Автор"},
 ] as const
 
 type ParameterType = typeof criteria[number]["parameter"]

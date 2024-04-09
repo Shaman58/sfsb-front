@@ -136,7 +136,7 @@ onMounted(async () => {
     !customers.value.length && await fetchCustomers()
     customer.value = customers.value.find(e => e.id === data?.customerId) || null
     !staff.value.length && await getAllStaff()
-    user.value = staff.value.find(e => e.id === data?.managerUuid) || null
+    user.value = staff.value.find(e => e.id === data?.createdBy) || null
 
     const img = new Image();
     img.src = company.value?.logo?.link || ""

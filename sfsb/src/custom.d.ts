@@ -277,7 +277,6 @@ declare interface KP {
     applicationNumber: number,
     companyId: number,
     customerId: number,
-    managerUuid: string,
     items: KPItem[],
     createdBy: string,
     system: boolean

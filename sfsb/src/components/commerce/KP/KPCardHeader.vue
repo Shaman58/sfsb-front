@@ -1,5 +1,6 @@
 <template lang="pug">
-    div.pb-4 Автор: {{manager ? manager.firstName + " " + manager.lastName : "Не указан"}}
+    div.pb-4
+        div(v-if="createdBy!=='system'") Автор: {{manager ? manager.firstName + " " + manager.lastName : "Не указан"}}
     v-row
         v-col.py-0(lg="4")
             v-text-field(
@@ -45,11 +46,11 @@ import {useValidationRules} from "@/mixins/FieldValidationRules";
 
 const dateFromString = (str: string | null) => {
     if (!str) return null
-    return new Date(str).toLocaleDateString() + " " + new Date(str).toLocaleTimeString()
+    return new Date(str).toLocaleDateString() + " " + new Date(str).toLocaleTimeString().replace(/:\d\d$/, "")
 }
 
-const props = defineProps<{ managerUuid: string, created: string | null, updated: string | null }>()
-const {managerUuid, updated, created} = toRefs(props)
+const props = defineProps<{ createdBy: string, created: string | null, updated: string | null }>()
+const {createdBy, updated, created} = toRefs(props)
 
 const emit = defineEmits(["changeBusinessProposal"])
 
@@ -66,7 +67,7 @@ const {staff} = storeToRefs(useStaffStore())
 const {getAllStaff} = useStaffStore()
 !staff.value.length && await getAllStaff()
 
-const manager = computed<Person | undefined>(() => staff.value.find(e => e.id === managerUuid.value))
+const manager = computed<Person | undefined>(() => staff.value.find(e => e.id === createdBy.value))
 
 
 //--- COMPANY ---
