@@ -278,7 +278,9 @@ declare interface KP {
     companyId: number,
     customerId: number,
     managerUuid: string,
-    items: KPItem[]
+    items: KPItem[],
+    createdBy: string,
+    system: boolean
 }
 
 declare interface KPResponse {

@@ -30,7 +30,7 @@ const append = (item: KPItem) => {
     const index = items.value.indexOf(item)
     console.log(index);
     const newItem = Empty.KPItem()
-    newItem.created = new Date(Date.now()).toDateString()
+    newItem.created = new Date(Date.now()).toLocaleDateString() + " " + new Date(Date.now()).toLocaleTimeString()
     items.value = [...items.value.toSpliced(index + 1, 0, newItem)]
 }
 

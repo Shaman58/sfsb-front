@@ -34,28 +34,6 @@ const refItemPrice = ref<HTMLInputElement | null>(null)
 const refDecimal = ref<HTMLInputElement | null>(null)
 const refName = ref<HTMLInputElement | null>(null)
 
-// const focusPrice=()=>{
-//     const price = item.value.itemPrice.replace(/^RUB /,"")
-//     refItemPrice.value && (refItemPrice.value.type="number")
-//     item.value.itemPrice=price
-// }
-
-// const recalcTotalPrice = (price: number, amount: number)=>{
-//     const [currency, total] = item.value.totalPrice.split(" ")
-//     if(!total) return item.value.totalPrice = (price * amount).toString()
-//     return item.value.totalPrice = currency + " " + (price * amount).toFixed(2)
-// }
-// const blurPrice = () => {
-//     refItemPrice.value && (refItemPrice.value.type = "text")
-//     recalcTotalPrice(+item.value.itemPrice, item.value.amount)
-// }
-// const changeAmount = (e: Event)=>{
-//     const value =(e.target as HTMLInputElement).value
-//     const [currency,priceVal] = item.value.itemPrice.split(" ")
-//     const price = priceVal || currency
-//     recalcTotalPrice(+price, +value)
-// }
-
 watch([item], () => {
     item.value.totalPrice = item.value.itemPrice * item.value.amount
 }, {deep: true, immediate: true})

@@ -13,6 +13,7 @@
                             @download="download"
                             @print="print"
                             :disabled="route.params.id==='new'"
+                            :kp="currentKP"
                         )
             .kp-main
                 v-form(ref="form" v-model="valid")
@@ -97,18 +98,19 @@ const init = () => {
     }
     if (route.params.id === "new" && !route.params?.clone) {
         currentKP.value = Empty.KP()
-        currentKP.value.items = [Empty.KPItem()]
-        user.value && (currentKP.value.managerUuid = user.value.id)
+        currentKP.value!.items = [Empty.KPItem()]
+        user.value && (currentKP.value!.managerUuid = user.value.id)
+        user.value && (currentKP.value!.createdBy = user.value.id)
     }
     if (route.params.id === "new" && route.params?.clone) {
         if (Number.isNaN(+route.params?.clone)) {
             currentKP.value = Empty.KP()
-            user.value && (currentKP.value.managerUuid = user.value.id)
+            user.value && (currentKP.value!.managerUuid = user.value.id)
             return
         }
         currentKP.value = (kp.value.find(e => e.id === +route.params.clone)) || null
-        user.value && currentKP.value && (currentKP.value.managerUuid = user.value.id)
-        currentKP.value && (currentKP.value.applicationNumber = -1)
+        user.value && currentKP.value && (currentKP.value!.managerUuid = user.value.id)
+        currentKP.value && (currentKP.value!.applicationNumber = -1)
     }
     items.value = currentKP.value?.items || [] as KPItem[]
     companyId.value = currentKP.value?.companyId
@@ -132,6 +134,8 @@ const saveKP = async () => {
         ...currentKP.value,
         businessProposal,
         applicationNumber,
+        system: false,
+        createdBy: user.value!.id,
         companyId: companyId.value || 0,
         customerId: customerId.value || 0,
         managerUuid,
@@ -177,11 +181,6 @@ onBeforeUnmount(() => {
 
 
 <style scoped lang="sass">
-.bar
-    margin-left: auto
-    display: flex
-    justify-content: flex-end
-    gap: 1rem
 
 .kp-main
     margin-top: 1rem
