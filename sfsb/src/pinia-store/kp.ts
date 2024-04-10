@@ -44,8 +44,7 @@ export const useKPStore
     const get = async <T>(id: number) => {
         loading.value = true
         const res = await query<T>(
-            async () => await api.get(`${URL}/${id}`),
-            {success: ""}
+            async () => await api.get(`${URL}/${id}`), {success: ""}
         )
         loading.value = false
         return res

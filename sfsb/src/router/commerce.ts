@@ -107,6 +107,14 @@ const commerce: RouteRecordRaw & RouteMeta = {
                 name: "КП принт"
             }
         },
+        {
+            path: "print-order/:id/:company",
+            component: KPPrint,
+            meta: {
+                onlyFor: ["COMMERCE", "ADMIN"],
+                name: "Заказ принт"
+            }
+        }
     ]
 }
 

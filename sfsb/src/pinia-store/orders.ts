@@ -41,6 +41,11 @@ export const useOrdersStore = defineStore("orders", () => {
         return await query(async () => await api.get(url, {params: {orderId, companyId}}))
     }
 
+    const getKP = async (orderId: number, companyId: number) => {
+        const url = `/doc/cp`
+        return await query(async () => await api.get(url, {params: {orderId, companyId}}), {success: ""})
+    }
+
 
     return {
         orders,
@@ -48,7 +53,8 @@ export const useOrdersStore = defineStore("orders", () => {
         getOrders,
         saveOrder,
         deleteOrder,
-        saveKP
+        saveKP,
+        getKP
     };
 
 

@@ -2,7 +2,11 @@
     v-toolbar.order-card__controls.pa-2
         v-menu
             template(#activator="{ props }")
-                v-btn(color="primary" v-bind="props" :disabled="!isOrderComputed || !order.customer?.companyName")
+                v-btn(
+                    color="primary"
+                    v-bind="props"
+                    :disabled="!isOrderComputed || !order.customer?.companyName"
+                )
                     ControlButton(tooltip="Коммерческое предложение" icon-name="mdi-offer")
             v-list(@click:select="selectCompany($event)")
                 v-list-item(v-for="company in companiesList" :key="company.id" :value="company.companyName")
@@ -27,6 +31,7 @@ import ControlButton from "@/components/commerce/Orders/ControlButton.vue"
 import {computed, ref, toRefs} from "vue";
 import {useOfferGenerator} from "@/mixins/OfferGenerator";
 import {useCompaniesStore} from "@/pinia-store/companies";
+import router from "@/router";
 
 const props = defineProps<{ order: Order, valid: boolean | null }>()
 const {order, valid} = toRefs(props)
@@ -51,7 +56,8 @@ const getCompanyId = (name: string) => {
 const selectCompany = async ({id}: { id: string }) => {
     const selectedId = getCompanyId(id)
     selectedCompanyId.value = selectedId
-    order.value && await previewCommerce(order.value, selectedId)
+    // order.value && await previewCommerce(order.value, selectedId)
+    await router.push(`/commerce/print-order/${order.value.id}/${selectedId}`)
 }
 
 const selectCompanyForKP = ({id}: { id: string }) => {

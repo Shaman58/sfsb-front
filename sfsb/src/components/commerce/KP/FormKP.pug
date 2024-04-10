@@ -1,0 +1,74 @@
+.print-form
+    v-progress-circular(indeterminate :color="$defaultColor" v-if="!canPrint" size="70" )
+    header.print-form__header(v-if="canPrint")
+        .print-form__controls
+            .print-form__close(@click.stop="close")
+                v-icon mdi-close
+                span ЗАКРЫТЬ
+            .print-form__close(@click.stop="print")
+                v-icon mdi-printer
+                span Отправить на печать
+        .print-form__company
+            .print-form__company-logo
+                img(:src="company && company.logo?.link" alt="logo" ref="imageRef")
+            .print-form__company-data
+                .print-form__company-common
+                    .print-form__company-name {{ company && company.companyName }}
+                    .print-form__company-address
+                        span.print-form__label Адрес:
+                        span.print-form__value {{ company && company.address }}
+                    .print-form__company-contacts {{ company && company.contacts }}
+
+                    .print-form__company-inn
+                        span.print-form__label ИНН:
+                        span.print-form__value {{ company && company.inn }}
+                    .print-form__company-kpp
+                        span.print-form__label КПП:
+                        span.print-form__value {{ company && company.kpp }}
+                    .print-form__company-ogrn
+                        span.print-form__label ОГРН:
+                        span.print-form__value {{ company && company.ogrn }}
+                .print-form__company-bank
+                    .print-form__company-bank
+                        span.print-form__label БАНК:
+                        span.print-form__value {{ company && company.bank }}
+                    .print-form__company-rs
+                        span.print-form__label р/с:
+                        span.print-form__value {{ company && company.paymentAccount }}
+                    .print-form__company-bik
+                        span.print-form__label БИК:
+                        span.print-form__value {{ company && company.bik }}
+                    .print-form__company-ks
+                        span.print-form__label кор./с:
+                        span.print-form__value {{ company && company.correspondentAccount }}
+    main.print-form__main(v-if="canPrint")
+        h1.print-form__main-title КОММЕРЧЕСКОЕ ПРЕДЛОЖЕНИЕ
+        h3.print-form__main-number № {{ offer && offer.applicationNumber }}
+        h3.print-form__to для {{ customer && customer.companyName }}
+        p.print-form__proposal {{ offer && offer.businessProposal }}
+        .print-form__grid
+            .print-form__grid-row.print-form__grid-header
+                .print-form__grid-col.print-form__item-number Номер
+                .print-form__grid-col.print-form__item-decimal Децимал
+                .print-form__grid-col.print-form__item-name Название
+                .print-form__grid-col.print-form__item-price Цена (без НДС)
+                .print-form__grid-col.print-form__item-amount Кол-во
+                .print-form__grid-col.print-form__item-total Сумма (без НДС)
+            .print-form__grid-row(v-for="(i,idx) in offer && offer.items")
+                .print-form__grid-col.print-form__item-number {{ idx + 1 }}
+                .print-form__grid-col.print-form__item-decimal {{ i.decimal }}
+                .print-form__grid-col.print-form__item-name {{ i.name }}
+                .print-form__grid-col.print-form__item-price {{ i.itemPrice.toFixed(2) }}
+                .print-form__grid-col.print-form__item-amount {{ i.amount }}
+                .print-form__grid-col.print-form__item-total {{ (i.amount * i.itemPrice).toFixed(2) }}
+        .print-form__grid-row
+            div
+            div
+            div
+            .print-form__total  Итого:
+            .print-form__total.print-form__total-amount  {{ totalAmount }}
+            .print-form__total {{ totalPrice.toFixed(2).toLocaleString() }}
+    footer.print-form__footer(v-if="canPrint")
+        .print-form__contractor
+            span.print-form__label Исполнитель:
+            span.print-form__value {{user && user.firstName}} {{user && user.lastName}}

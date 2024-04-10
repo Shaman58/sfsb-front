@@ -183,28 +183,28 @@ declare interface Technology {
 }
 
 declare interface Item {
-    created?: string;
-    customerMaterial: boolean;
     id?: number;
-    uid?: number | string
+    created?: string;
+    updated?: string;
     price: ItemPrice;
+    customerMaterial: boolean;
+    uid?: number | string
     quantity: number;
     technology: Technology;
-    updated?: string;
 }
 
 declare interface Order {
+    id: number;
+    created: string;
+    updated: string | null;
     applicationNumber: number;
     businessProposal: string;
-    contact: unknown | null;
-    created: string;
-    customer: Customer;
-    description: string;
-    user: Person;
-    files: OrderFile[];
-    id: number;
     items: Item[];
-    updated: string | null;
+    customer: Customer;
+    user: Person;
+    contact: unknown | null;
+    description: string;
+    files: OrderFile[];
 }
 
 declare interface Person {
@@ -262,10 +262,10 @@ declare interface KPItem {
     id?: string,
     created: string | null,
     updated: string | null,
+    itemPrice: number,
     name: string,
     decimal: string,
     amount: number,
-    itemPrice: number,
     totalPrice: number
 }
 
@@ -273,12 +273,12 @@ declare interface KP {
     id?: number,
     created?: string | null,
     updated?: string | null,
-    businessProposal: string,
     applicationNumber: number,
-    companyId: number,
-    customerId: number,
+    businessProposal: string,
     items: KPItem[],
+    customerId: number,
     createdBy: string,
+    companyId: number,
     system: boolean
 }
 
