@@ -33,14 +33,17 @@
 
   &__main
     width: 100%
+    margin-block: 1rem
 
   &__main-title
     text-align: center
     text-transform: uppercase
     margin-bottom: 2rem
 
+  &__main-text
+    margin-bottom: 1rem
+
   &__table
-    margin-block: 1rem
     border: 3px solid
 
 
@@ -57,6 +60,13 @@
 
   &__table-total
     font-weight: 700
+
+  &__table-footer
+    &.tool-print__table-row
+      border: none
+
+      & *
+        border: none
 
   &__footer
     place-self: center left
