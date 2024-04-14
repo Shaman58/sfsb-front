@@ -67,7 +67,7 @@ declare interface Customer {
     updated: string | null;
 }
 
-declare interface PartialCustomer implements Partial<Customer> {
+declare interface PartialCustomer extends Partial<Customer> {
 }
 
 declare interface Department {
@@ -232,7 +232,7 @@ declare interface Company extends Customer {
     logo: null | Logo
 }
 
-declare interface PartialCompany implements Parial<Company> {
+declare interface PartialCompany extends Parial<Company> {
 }
 
 declare type OperationTimeManagement = "COMPUTED" | "PROCESS_TIME_ONLY" | "FULL"
@@ -252,10 +252,10 @@ declare type Roles = string[];
 declare interface FileOrder {
     id: number,
     created: string | null,
-    "updated": string | null,
-    "filename": string,
-    "link": string,
-    "user": unknown | null
+    updated: string | null,
+    filename: string,
+    link: string,
+    user: unknown | null
 }
 
 declare interface KPItem {
@@ -309,4 +309,18 @@ declare interface KPResponse {
     numberOfElements: number,
     first: boolean,
     empty: boolean
+}
+
+declare interface ToolPrintItem {
+    name: string,
+    description: string,
+    amount: number,
+    itemPrice: number
+}
+
+declare interface ToolPrint {
+    header: string,
+    body: string,
+    footer: string,
+    tools: ToolPrintItem[]
 }

@@ -11,7 +11,19 @@
             v-list(@click:select="selectCompany($event)")
                 v-list-item(v-for="company in companiesList" :key="company.id" :value="company.companyName")
                     v-list-item-title {{ company.companyName }}
-        ControlButton(@click="void previewToolOrder(order, 1, 2)" :disabled="!isAllComputed || !order.id" tooltip="Заявка на инструмент" icon-name="mdi-tools")
+
+        v-menu
+            template(#activator="{ props }")
+                v-btn(
+                    color="primary"
+                    v-bind="props"
+                    :disabled="!isOrderComputed || !order.customer?.companyName"
+                )
+                    ControlButton(tooltip="Заявка на инструмент" icon-name="mdi-tools")
+            v-list(@click:select="printToolOrder($event)")
+                v-list-item(v-for="company in companiesList" :key="company.id" :value="company.companyName")
+                    v-list-item-title {{ company.companyName }}
+
         ControlButton(@click="void previewPlan1(order)" :disabled="!isAllComputed || !order.id" tooltip="План1" icon-name="mdi-list-status")
         ControlButton(@click="void previewPlan2(order)" :disabled="!isAllComputed || !order.id"  tooltip="План2" icon-name="mdi-list-status")
         v-menu
@@ -53,12 +65,16 @@ const getCompanyId = (name: string) => {
     const selectedCompany = companiesList.find(company => company.companyName === name)
     return selectedCompany && selectedCompany.id
 }
-const selectCompany = async ({id}: { id: string }) => {
+
+const generateSelectCompany = (url: string) => async ({id}: { id: string }) => {
     const selectedId = getCompanyId(id)
     selectedCompanyId.value = selectedId
     // order.value && await previewCommerce(order.value, selectedId)
-    await router.push(`/commerce/print-order/${order.value.id}/${selectedId}`)
+    await router.push(`${url}/${order.value.id}/${selectedId}`)
 }
+const selectCompany = generateSelectCompany("/commerce/print-order")
+
+const printToolOrder = generateSelectCompany("/commerce/print-tool")
 
 const selectCompanyForKP = ({id}: { id: string }) => {
     const selectedId = getCompanyId(id)

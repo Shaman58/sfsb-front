@@ -9,6 +9,7 @@ import {type RouteMeta, type RouteRecordRaw} from "vue-router";
 import KP from "@/components/commerce/KP/KP.vue";
 import KPCard from "@/components/commerce/KP/KPCard.vue";
 import KPPrint from "@/components/commerce/KP/KPPrint.vue";
+import ToolPrint from "@/components/commerce/Orders/ToolPrint.vue";
 
 const commerce: RouteRecordRaw & RouteMeta = {
     path: "/commerce",
@@ -113,6 +114,14 @@ const commerce: RouteRecordRaw & RouteMeta = {
             meta: {
                 onlyFor: ["COMMERCE", "ADMIN"],
                 name: "Заказ принт"
+            }
+        },
+        {
+            path: "print-tool/:id/:company",
+            component: ToolPrint,
+            meta: {
+                onlyFor: ["COMMERCE", "ADMIN"],
+                name: "Заявка на иструмент"
             }
         }
     ]
