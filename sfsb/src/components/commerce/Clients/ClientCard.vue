@@ -36,27 +36,43 @@
                                 v-text-field(label="Корсчет" v-model="companyLocal.correspondentAccount" :rules="[rules.accountWithEmptyValidation]" counter)
         template(#footer)
             v-card.clients-card__footer
-                v-btn(color="orange-darken-1" variant="text" type="submit" :disabled="!valid") Сохранить
+                v-btn(color="orange-darken-1" variant="text" type="submit" :disabled="!valid" @click="save") Сохранить
 
 
 </template>
 <script setup lang="ts">
-import {computed, type ComputedRef, type Ref, ref, toRefs} from "vue";
+import {reactive, type Ref, ref, toRefs, watch} from "vue";
 import {useValidationRules} from "@/mixins/FieldValidationRules";
 import {useRoute} from "vue-router";
 import {storeToRefs} from "pinia";
 import {useCustomersStore} from "@/pinia-store/customers";
 import LayoutMain from "@/components/common/LayoutMain.vue";
 import {Empty} from "@/mixins/Empty";
+import router from "@/router";
 
 const {params} = toRefs(useRoute())
 
 const {customers, loading} = storeToRefs(useCustomersStore())
 const {saveCustomer} = useCustomersStore()
-const companyLocal: ComputedRef<Customer> = computed(() => params.value.id === "new"
-    ? Empty.Company()
-    : customers.value.find(e => e.id === +params.value.id) || customers.value[0]
-)
+// const companyLocal: ComputedRef<Customer> = computed(() => params.value.id === "new"
+//     ? Empty.Company()
+//     : customers.value.find(e => e.id === +params.value.id) || customers.value[0]
+// )
+
+const companyLocal = reactive({
+    companyName: "",
+    address: "",
+    email: "",
+    phoneNumber: "",
+    inn: "",
+    ogrn: "",
+    bank: "",
+    bik: "",
+    correspondentAccount: "",
+    paymentAccount: "",
+    kpp: "",
+
+})
 
 const form = ref<HTMLFormElement>()
 const valid = ref(false);
@@ -65,10 +81,18 @@ const {rules} = useValidationRules();
 const save = async () => {
     const valid: { valid: boolean, errors: Ref<string[]> } = form.value && await form.value.validate()
     if (!valid.valid) return
-    await saveCustomer(companyLocal.value)
+    const res = await saveCustomer(companyLocal as Customer)
+    res && await router.push(`/commerce/clients/${res.id}`)
 }
 
-
+watch([params], () => {
+    const customer = params.value.id === "new"
+        ? Empty.Company()
+        : customers.value.find(e => e.id === +params.value.id) || customers.value[0]
+    Object.keys(companyLocal as Record<string, any>).forEach((key: string) => {
+        (companyLocal as Record<string, any>)[key] = (customer as Record<string, any>)[key]
+    })
+})
 
 
 </script>

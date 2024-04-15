@@ -23,9 +23,10 @@ export const useCustomersStore = defineStore("customers", () => {
             : '/customer';
         const method: keyof Axios = customer.id ? 'put' : 'post';
         loading.value = true;
-        await query(async () => await api[method](url, customer))
+        const res = await query<Customer>(async () => await api[method](url, customer))
         await fetchCustomers()
         loading.value = false;
+        return res
     }
 
     const deleteCustomer = async (customer: Customer) => {

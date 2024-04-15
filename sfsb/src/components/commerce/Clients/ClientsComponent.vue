@@ -20,7 +20,6 @@
                         router-link.list-link(:to="`/commerce/clients/${i.id}`") {{i.companyName}}
         template(#card)
             router-view
-            //ClientCard(:company="currentCompany" :loading)
 
 </template>
 <script setup lang="ts">
@@ -50,7 +49,7 @@ const currentCompany = ref<Customer>(customers.value[0])
 const unwatch = watchEffect(() => {
     console.log(currentCompany.value)
     console.log(path.value, page.value)
-    router.push(`/commerce/clients/${currentCompany.value.id}`)
+    // router.push(`/commerce/clients/${currentCompany.value.id}`)
 })
 
 onUnmounted(unwatch)
