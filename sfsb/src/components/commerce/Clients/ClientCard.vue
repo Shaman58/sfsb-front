@@ -92,7 +92,7 @@ watch([params], () => {
     Object.keys(companyLocal as Record<string, any>).forEach((key: string) => {
         (companyLocal as Record<string, any>)[key] = (customer as Record<string, any>)[key]
     })
-})
+}, {immediate: true})
 
 
 </script>

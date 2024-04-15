@@ -25,7 +25,7 @@
 <script setup lang="ts">
 import {storeToRefs} from "pinia";
 import {useCustomersStore} from "@/pinia-store/customers";
-import {computed, onUnmounted, ref, toRefs, watchEffect} from "vue";
+import {computed, onMounted, ref, toRefs, watch} from "vue";
 import LayoutPage from "@/components/common/LayoutPage.vue";
 import {useRoute, useRouter} from "vue-router";
 
@@ -46,13 +46,17 @@ const filterText = ref("")
 const filteredCustomers = computed<Customer[]>(() => customers.value.filter(e => e.companyName.toLowerCase().includes(filterText.value?.toLowerCase() || "")))
 const currentCompany = ref<Customer>(customers.value[0])
 
-const unwatch = watchEffect(() => {
-    console.log(currentCompany.value)
-    console.log(path.value, page.value)
-    // router.push(`/commerce/clients/${currentCompany.value.id}`)
+onMounted(() => {
+    if (!route.params.id) {
+        router.push(`/commerce/clients/${firstId.value}`)
+    }
 })
+watch([route], () => {
+    if (!route.params.id) {
+        router.push(`/commerce/clients/${firstId.value}`)
+    }
+}, {immediate: true})
 
-onUnmounted(unwatch)
 </script>
 <style scoped lang="sass">
 
