@@ -1,7 +1,7 @@
 <template lang="pug">
     .order-items
         v-list.order-items__items-list
-            v-list-item(@click="addNewItem" :disabled="!canAddNewItem") Добавить новую позицию
+            v-list-item.order-items__items-first(@click="addNewItem" :disabled="!canAddNewItem") Добавить новую позицию
             v-list-item(v-for="(i,index) in items"  :key="index"
                 :active="isActive(i)")
                 OrderItem(:item="i" @remove="removeItem(i)" @select="$event=>changeItem($event)")
@@ -35,7 +35,7 @@ const showDialog = ref(false)
 const canSave = ref(false)
 // const wasItemsChange = ref(false)
 
-const validForm = ref<HTMLFormElement|null>(null)
+const validForm = ref<HTMLFormElement | null>(null)
 
 const isActive = (item: Item): boolean => {
     const currentIndex = `${currentItem.value.id}${currentItem.value.uid}`
@@ -49,7 +49,7 @@ const addNewItem = () => {
     items.value.push(newItem.value)
     currentItem.value = newItem.value
     canAddNewItem.value = false
-    showDialog.value=true
+    showDialog.value = true
 }
 const removeItem = (item: Item) => {
     const index = items.value.indexOf(item)
@@ -121,5 +121,24 @@ onUnmounted(() => {
 
     &__mobile-title
         text-align: center
+
+    &__items-list
+        max-height: 350px
+        overflow-y: auto
+
+        &::-webkit-scrollbar
+            width: 4px
+            background-color: transparent
+
+        &::-webkit-scrollbar-thumb
+            width: 4px
+            background-color: var(--scroll-color)
+            border-radius: 8px
+
+    &__items-first
+        position: sticky
+        z-index: 2
+        top: -8px
+        background-color: rgb(var(--v-theme-background))
 
 </style>
