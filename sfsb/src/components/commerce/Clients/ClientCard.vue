@@ -16,7 +16,7 @@
                             v-col( cols="12" sm="6" md="6")
                                 v-text-field(label="Email*" v-model="companyLocal.email" :rules="[rules.required, rules.emailValidation]" placeholder="example@exe.com")
                             v-col( cols="12" sm="6" md="6")
-                                v-text-field(label="Телефон*" v-model="companyLocal.phoneNumber" :rules="[rules.required, rules.phoneValidation]" placeholder="+7 (4321) 23-34-45")
+                                v-text-field(label="Телефон*" v-model="companyLocal.phoneNumber" :rules="[rules.required, rules.phoneValidation]" placeholder="+74321233445")
                         v-row
                             v-col(cols="12" sm="6" md="4")
                                 v-text-field(label="ИНН*" v-model="companyLocal.inn" :rules="[rules.innValidation]" counter)
@@ -54,25 +54,8 @@ const {params} = toRefs(useRoute())
 
 const {customers, loading} = storeToRefs(useCustomersStore())
 const {saveCustomer} = useCustomersStore()
-// const companyLocal: ComputedRef<Customer> = computed(() => params.value.id === "new"
-//     ? Empty.Company()
-//     : customers.value.find(e => e.id === +params.value.id) || customers.value[0]
-// )
 
-const companyLocal = reactive({
-    companyName: "",
-    address: "",
-    email: "",
-    phoneNumber: "",
-    inn: "",
-    ogrn: "",
-    bank: "",
-    bik: "",
-    correspondentAccount: "",
-    paymentAccount: "",
-    kpp: "",
-
-})
+const companyLocal = reactive({...Empty.Company()})
 
 const form = ref<HTMLFormElement>()
 const valid = ref(false);
@@ -93,6 +76,15 @@ watch([params], () => {
         (companyLocal as Record<string, any>)[key] = (customer as Record<string, any>)[key]
     })
 }, {immediate: true})
+
+// watch(() => companyLocal.phoneNumber, () => {
+//     companyLocal.phoneNumber = companyLocal.phoneNumber.replace(/\D/g, '')
+//         .replace(/^(\d)/, '($1')
+//         .replace(/^(\(\d{3})(\d)/, '$1) $2')
+//         .replace(/(\d{3})(\d{1,2})/, '$1-$2')
+//         .replace(/(-\d{2})(\d{1,2})$/, '$1-$2')
+//         .replace(/(-\d{2})(\d{2})(\d+)$/, '$1-$2')
+// })
 
 
 </script>
