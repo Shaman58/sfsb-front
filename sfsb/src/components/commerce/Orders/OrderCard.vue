@@ -119,7 +119,7 @@ const save = async () => {
     await saveOrder(orderLocal.value)
     await getOrders()
     setTimeout(async () => {
-        const refreshedOrder = orders.value.find(e => e.applicationNumber === +orderLocal.value.applicationNumber)
+        const refreshedOrder = orders.value.find(e => e.id === +orderLocal.value.id)
         refreshedOrder?.id && await router.push(`/commerce/orders/${refreshedOrder.id}`)
     }, 500)
 }
