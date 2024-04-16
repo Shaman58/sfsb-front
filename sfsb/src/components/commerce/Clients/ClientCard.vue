@@ -16,7 +16,7 @@
                             v-col( cols="12" sm="6" md="6")
                                 v-text-field(label="Email*" v-model="companyLocal.email" :rules="[rules.required, rules.emailValidation]" placeholder="example@exe.com")
                             v-col( cols="12" sm="6" md="6")
-                                PhoneNumber(v-model:number="companyLocal.phoneNumber")
+                                //PhoneNumber(v-model:number="companyLocal.phoneNumber")
                                 v-text-field(label="Телефон*" v-model="companyLocal.phoneNumber" :rules="[rules.required, rules.phoneValidation]" placeholder="+74321233445")
                         v-row
                             v-col(cols="12" sm="6" md="4")
@@ -50,7 +50,6 @@ import {useCustomersStore} from "@/pinia-store/customers";
 import LayoutMain from "@/components/common/LayoutMain.vue";
 import {Empty} from "@/mixins/Empty";
 import router from "@/router";
-import PhoneNumber from "@/components/common/PhoneNumber.vue";
 
 const {params} = toRefs(useRoute())
 
