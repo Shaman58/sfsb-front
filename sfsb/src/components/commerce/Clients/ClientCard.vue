@@ -16,10 +16,11 @@
                             v-col( cols="12" sm="6" md="6")
                                 v-text-field(label="Email*" v-model="companyLocal.email" :rules="[rules.required, rules.emailValidation]" placeholder="example@exe.com")
                             v-col( cols="12" sm="6" md="6")
+                                PhoneNumber(v-model:number="companyLocal.phoneNumber")
                                 v-text-field(label="Телефон*" v-model="companyLocal.phoneNumber" :rules="[rules.required, rules.phoneValidation]" placeholder="+74321233445")
                         v-row
                             v-col(cols="12" sm="6" md="4")
-                                v-text-field(label="ИНН*" v-model="companyLocal.inn" :rules="[rules.innValidation]" counter)
+                                v-text-field(label="ИНН*" v-model="companyLocal.inn" :rules="[rules.innValidation, rulesDouble]" counter)
                             v-col(cols="12" sm="6" md="4")
                                 v-text-field(label="КПП*" v-model="companyLocal.kpp" :rules="[rules.bikkppValidation]" counter)
                             v-col(cols="12" sm="6" md="4")
@@ -36,12 +37,12 @@
                                 v-text-field(label="Корсчет" v-model="companyLocal.correspondentAccount" :rules="[rules.accountWithEmptyValidation]" counter)
         template(#footer)
             v-card.clients-card__footer
-                v-btn(color="orange-darken-1" variant="text" type="submit" :disabled="!valid" @click="save") Сохранить
+                v-btn(color="orange-darken-1" variant="text" type="submit" :disabled="!valid || isDouble" @click="save") Сохранить
 
 
 </template>
 <script setup lang="ts">
-import {reactive, type Ref, ref, toRefs, watch} from "vue";
+import {computed, reactive, type Ref, ref, toRefs, watch, watchEffect} from "vue";
 import {useValidationRules} from "@/mixins/FieldValidationRules";
 import {useRoute} from "vue-router";
 import {storeToRefs} from "pinia";
@@ -49,6 +50,7 @@ import {useCustomersStore} from "@/pinia-store/customers";
 import LayoutMain from "@/components/common/LayoutMain.vue";
 import {Empty} from "@/mixins/Empty";
 import router from "@/router";
+import PhoneNumber from "@/components/common/PhoneNumber.vue";
 
 const {params} = toRefs(useRoute())
 
@@ -66,6 +68,13 @@ const save = async () => {
     if (!valid.valid) return
     const res = await saveCustomer(companyLocal as Customer)
     res && await router.push(`/commerce/clients/${res.id}`)
+}
+
+const isDouble = computed(() => !!customers.value.find(e => e.inn === companyLocal.inn))
+const rulesDouble = (value: string) => {
+    const company = customers.value.find(e => e.inn == value)
+    const companyName = company && company.companyName
+    return !company || `Такой ИНН существует у клиента ${companyName}`
 }
 
 watch([params], () => {
@@ -86,7 +95,7 @@ watch([params], () => {
 //         .replace(/(-\d{2})(\d{2})(\d+)$/, '$1-$2')
 // })
 
-
+watchEffect(() => console.log("isDouble", isDouble.value))
 </script>
 <style scoped lang="sass">
 .clients-card
