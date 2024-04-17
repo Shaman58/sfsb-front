@@ -73,7 +73,7 @@ const isDouble = computed(() => !!customers.value.find(e => e.inn === companyLoc
 const rulesDouble = (value: string) => {
     const company = customers.value.find(e => e.inn == value)
     const companyName = company && company.companyName
-    return !company || `Такой ИНН существует у клиента ${companyName}`
+    return params.value.id !== 'new' && company || `Такой ИНН существует у клиента ${companyName}`
 }
 
 watch([params], () => {
