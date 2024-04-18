@@ -16,8 +16,8 @@
                             v-col( cols="12" sm="6" md="6")
                                 v-text-field(label="Email*" v-model="companyLocal.email" :rules="[rules.required, rules.emailValidation]" placeholder="example@exe.com")
                             v-col( cols="12" sm="6" md="6")
-                                //PhoneNumber(v-model:number="companyLocal.phoneNumber")
-                                v-text-field(label="Телефон*" v-model="companyLocal.phoneNumber" :rules="[rules.required, rules.phoneValidation]" placeholder="+74321233445")
+                                PhoneNumber(v-model="companyLocal.phoneNumber")
+                                //v-text-field(label="Телефон*" v-model="companyLocal.phoneNumber" :rules="[rules.required, rules.phoneValidation]" placeholder="+74321233445")
                         v-row
                             v-col(cols="12" sm="6" md="4")
                                 v-text-field(label="ИНН*" v-model="companyLocal.inn" :rules="[rules.innValidation, rulesDouble]" counter)
@@ -37,7 +37,7 @@
                                 v-text-field(label="Корсчет" v-model="companyLocal.correspondentAccount" :rules="[rules.accountWithEmptyValidation]" counter)
         template(#footer)
             v-card.clients-card__footer
-                v-btn(color="orange-darken-1" variant="text" type="submit" :disabled="!valid || isDouble" @click="save") Сохранить
+                v-btn(color="orange-darken-1" variant="text" type="submit" :disabled="!valid" @click="save") Сохранить
 
 
 </template>
@@ -50,13 +50,14 @@ import {useCustomersStore} from "@/pinia-store/customers";
 import LayoutMain from "@/components/common/LayoutMain.vue";
 import {Empty} from "@/mixins/Empty";
 import router from "@/router";
+import PhoneNumber from "@/components/common/PhoneNumber.vue";
 
 const {params} = toRefs(useRoute())
 
 const {customers, loading} = storeToRefs(useCustomersStore())
 const {saveCustomer} = useCustomersStore()
 
-const companyLocal = reactive({...Empty.Company()})
+const companyLocal = reactive({...Empty.Company(), id: undefined})
 
 const form = ref<HTMLFormElement>()
 const valid = ref(false);
@@ -69,17 +70,17 @@ const save = async () => {
     res && await router.push(`/commerce/clients/${res.id}`)
 }
 
-const isDouble = computed(() => !!customers.value.find(e => e.inn === companyLocal.inn))
+const isDouble = computed(() => !!customers.value.find((e: Customer) => e.inn === companyLocal.inn))
 const rulesDouble = (value: string) => {
-    const company = customers.value.find(e => e.inn == value)
+    const company = customers.value.find((e: Customer) => e.inn == value)
     const companyName = company && company.companyName
-    return params.value.id !== 'new' && company || `Такой ИНН существует у клиента ${companyName}`
+    return params.value.id !== 'new' && !!company || `Такой ИНН существует у клиента ${companyName}`
 }
 
 watch([params], () => {
     const customer = params.value.id === "new"
         ? Empty.Company()
-        : customers.value.find(e => e.id === +params.value.id) || customers.value[0]
+        : customers.value.find((e: Customer) => e.id === +params.value.id) || customers.value[0]
     Object.keys(companyLocal as Record<string, any>).forEach((key: string) => {
         (companyLocal as Record<string, any>)[key] = (customer as Record<string, any>)[key]
     })
