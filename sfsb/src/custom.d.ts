@@ -58,7 +58,7 @@ declare interface Customer {
     correspondentAccount: string;
     created: string;
     email: string;
-    id: number;
+    id?: number;
     inn: string;
     kpp: string;
     ogrn: string;
