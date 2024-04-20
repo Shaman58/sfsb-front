@@ -324,3 +324,9 @@ declare interface ToolPrint {
     footer: string,
     tools: ToolPrintItem[]
 }
+
+declare interface CountryCode {
+    name: string,
+    dial_code: string,
+    code: string
+}

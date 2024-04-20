@@ -10,8 +10,8 @@
         )
 
         v-text-field(
-            v-mask="mask"
-            :rules="[rulesWidth(15)]"
+            v-mask="'(###)###-##-##'"
+
             v-model="selectedNumber"
             placeholder="(987)654-32-10"
 
@@ -21,52 +21,64 @@
 
 </template>
 <script setup lang="ts">
-import {computed, ref, watchEffect} from "vue";
+import { computed, watchEffect } from "vue";
 import useCountries from "@/pinia-store/countries";
 
-const modelValue = defineModel<string>()
-const splitedNumber = computed<{ country?: string, localNumber?: string }>(() => {
-    if (!modelValue.value) return {country: undefined, localNumber: undefined}
-    const [_, country, localNumber] = modelValue.value.replace(/\({2,}/, "(").match(/^(.*)(\(.*)$/) || [undefined, undefined, undefined]
-    return ({
-        country,
-        localNumber
-    })
-})
-const {countries, getCountryByDialCode, getCountryByCode} = useCountries()
+const modelValue = defineModel<string>();
+const digitize = (num: string) => num.replace(/\D/g, "");
+const splitter = (num: string): [string, string] => {
+    const digits = digitize(num);
+    const first = digitize(selectedCountry.value.dial_code);
+    const second =
+        digits.length <= first.length
+            ? ""
+            : digits.slice(-1 * (digits.length - first.length));
+    return [first, second];
+};
+const splitedNumber = computed<{ country?: string; localNumber?: string }>(
+    () => {
+        if (!modelValue.value)
+            return { country: undefined, localNumber: undefined };
+        const [country, localNumber] = splitter(modelValue.value);
+        return {
+            country,
+            localNumber,
+        };
+    }
+);
+const { countries, getCountryByDialCode, getCountryByCode } = useCountries();
 
 const selectedCountry = computed<CountryCode>({
     get() {
-        return getCountryByDialCode(splitedNumber.value.country || "") || getCountryByCode("RU")!
+        return (
+            getCountryByDialCode(splitedNumber.value.country || "") ||
+            getCountryByCode("RU")!
+        );
     },
     set(value: CountryCode) {
-        modelValue.value = value.dial_code + selectedNumber.value
-    }
+        modelValue.value = value.dial_code + selectedNumber.value;
+    },
 });
 const selectedNumber = computed({
     get() {
-        return "(" + splitedNumber.value.localNumber || "("
+        return splitedNumber.value.localNumber || "";
     },
     set(value: string) {
-        modelValue.value = selectedCountry.value.dial_code + value
-    }
-})
-const mask = ref("(###)###-##-##")
-const rulesWidth = (length: number) => (value: string) => value.length >= length || "Неверный номер"
+        modelValue.value = selectedCountry.value.dial_code + value;
+    },
+});
+const rulesWidth = (length: number) => (value: string) =>
+    value.length >= length || "Неверный номер";
 
-
-watchEffect(() => console.log("modelValue.value", modelValue.value))
-watchEffect(() => console.log("selectedCountry.value", selectedCountry.value))
+watchEffect(() => console.log("modelValue.value", modelValue.value));
+watchEffect(() => console.log("selectedCountry.value", selectedCountry.value));
 watchEffect(() => {
-    console.log("selectedNumber.value", selectedNumber.value.replace(/\W/g, "").match(/^9/g))
-    const match = selectedNumber.value.replace(/\W/g, "").match(/^9/g)
-    mask.value = !!match
-        ? "(###)###-##-##"
-        : "(####)##-##-##"
-
-})
+    console.log(
+        "selectedNumber.value",
+        selectedNumber.value.replace(/\W/g, "").match(/^9/g)
+    );
+});
 </script>
-
 
 <style scoped lang="sass">
 .phone-number
@@ -79,5 +91,4 @@ watchEffect(() => {
         text-align: center
         opacity: .5
         grid-column: span 2
-
 </style>

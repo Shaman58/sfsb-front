@@ -42,49 +42,76 @@
 
 </template>
 <script setup lang="ts">
-import {computed, reactive, type Ref, ref, toRefs, watch, watchEffect} from "vue";
-import {useValidationRules} from "@/mixins/FieldValidationRules";
-import {useRoute} from "vue-router";
-import {storeToRefs} from "pinia";
-import {useCustomersStore} from "@/pinia-store/customers";
+import {
+    computed,
+    reactive,
+    type Ref,
+    ref,
+    toRefs,
+    watch,
+    watchEffect,
+} from "vue";
+import { useValidationRules } from "@/mixins/FieldValidationRules";
+import { useRoute } from "vue-router";
+import { storeToRefs } from "pinia";
+import { useCustomersStore } from "@/pinia-store/customers";
 import LayoutMain from "@/components/common/LayoutMain.vue";
-import {Empty} from "@/mixins/Empty";
+import { Empty } from "@/mixins/Empty";
 import router from "@/router";
 import PhoneNumber from "@/components/common/PhoneNumber.vue";
 
-const {params} = toRefs(useRoute())
+const { params } = toRefs(useRoute());
 
-const {customers, loading} = storeToRefs(useCustomersStore())
-const {saveCustomer} = useCustomersStore()
+const { customers, loading } = storeToRefs(useCustomersStore());
+const { saveCustomer } = useCustomersStore();
 
-const companyLocal = reactive({...Empty.Company(), id: undefined})
+const companyLocal = reactive({ ...Empty.Company(), id: undefined });
 
-const form = ref<HTMLFormElement>()
+const form = ref<HTMLFormElement>();
 const valid = ref(false);
-const {rules} = useValidationRules();
+const { rules } = useValidationRules();
 
 const save = async () => {
-    const valid: { valid: boolean, errors: Ref<string[]> } = form.value && await form.value.validate()
-    if (!valid.valid) return
-    const res = await saveCustomer(companyLocal as Customer)
-    res && await router.push(`/commerce/clients/${res.id}`)
-}
+    const valid: { valid: boolean; errors: Ref<string[]> } =
+        form.value && (await form.value.validate());
+    if (!valid.valid) return;
+    const res = await saveCustomer(companyLocal as Customer);
+    res && (await router.push(`/commerce/clients/${res.id}`));
+};
 
-const isDouble = computed(() => !!customers.value.find((e: Customer) => e.inn === companyLocal.inn))
+const isDouble = computed(
+    () => !!customers.value.find((e: Customer) => e.inn === companyLocal.inn)
+);
 const rulesDouble = (value: string) => {
-    const company = customers.value.find((e: Customer) => e.inn == value)
-    const companyName = company && company.companyName
-    return params.value.id !== 'new' && !!company || `Такой ИНН существует у клиента ${companyName}`
-}
+    const company = customers.value.find((e: Customer) => {
+        return e.inn == value;
+    });
+    const companyName = company && company.companyName;
+    return (
+        (params.value.id !== "new" && !!company) ||
+        `Такой ИНН существует у клиента ${companyName}`
+    );
+};
 
-watch([params], () => {
-    const customer = params.value.id === "new"
-        ? Empty.Company()
-        : customers.value.find((e: Customer) => e.id === +params.value.id) || customers.value[0]
-    Object.keys(companyLocal as Record<string, any>).forEach((key: string) => {
-        (companyLocal as Record<string, any>)[key] = (customer as Record<string, any>)[key]
-    })
-}, {immediate: true})
+watch(
+    [params],
+    () => {
+        const customer =
+            params.value.id === "new"
+                ? Empty.Company()
+                : customers.value.find((e: Customer) => {
+                      return e.id === +params.value.id;
+                  }) || customers.value[0];
+        Object.keys(companyLocal as Record<string, any>).forEach(
+            (key: string) => {
+                (companyLocal as Record<string, any>)[key] = (
+                    customer as Record<string, any>
+                )[key];
+            }
+        );
+    },
+    { immediate: true }
+);
 
 // watch(() => companyLocal.phoneNumber, () => {
 //     companyLocal.phoneNumber = companyLocal.phoneNumber.replace(/\D/g, '')
@@ -95,7 +122,7 @@ watch([params], () => {
 //         .replace(/(-\d{2})(\d{2})(\d+)$/, '$1-$2')
 // })
 
-watchEffect(() => console.log("isDouble", isDouble.value))
+watchEffect(() => console.log("isDouble", isDouble.value));
 </script>
 <style scoped lang="sass">
 .clients-card
