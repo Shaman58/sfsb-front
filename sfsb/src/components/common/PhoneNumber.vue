@@ -17,7 +17,6 @@
 
         )
         .phone-number__total {{modelValue}}
-        .to-delete {{modelValue}}
 
 </template>
 <script setup lang="ts">
@@ -88,7 +87,8 @@ watchEffect(() => {
     grid-template-rows: auto 20px
 
     &__total
-        text-align: center
         opacity: .5
-        grid-column: span 2
+        grid-column: 2
+        margin-top: -1.5rem
+        padding-left: 1rem
 </style>
