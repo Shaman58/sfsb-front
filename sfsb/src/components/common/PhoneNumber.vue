@@ -20,19 +20,27 @@
 
 </template>
 <script setup lang="ts">
-import { computed, watchEffect } from "vue";
+import { computed } from "vue";
 import useCountries from "@/pinia-store/countries";
 
 const modelValue = defineModel<string>();
+
+const { countries, getCountryByDialCode, getCountryByCode } = useCountries();
+
 const digitize = (num: string) => num.replace(/\D/g, "");
 const splitter = (num: string): [string, string] => {
     const digits = digitize(num);
-    const first = digitize(selectedCountry.value.dial_code);
+    let first;
+    if (selectedCountry.value) {
+        first = digitize(selectedCountry.value.dial_code);
+    } else {
+        first = digits.length <= 10 ? "" : digits.slice(0, -10);
+    }
     const second =
         digits.length <= first.length
             ? ""
             : digits.slice(-1 * (digits.length - first.length));
-    return [first, second];
+    return ["+" + first, second];
 };
 const splitedNumber = computed<{ country?: string; localNumber?: string }>(
     () => {
@@ -45,7 +53,6 @@ const splitedNumber = computed<{ country?: string; localNumber?: string }>(
         };
     }
 );
-const { countries, getCountryByDialCode, getCountryByCode } = useCountries();
 
 const selectedCountry = computed<CountryCode>({
     get() {
@@ -65,17 +72,6 @@ const selectedNumber = computed({
     set(value: string) {
         modelValue.value = selectedCountry.value.dial_code + value;
     },
-});
-const rulesWidth = (length: number) => (value: string) =>
-    value.length >= length || "Неверный номер";
-
-watchEffect(() => console.log("modelValue.value", modelValue.value));
-watchEffect(() => console.log("selectedCountry.value", selectedCountry.value));
-watchEffect(() => {
-    console.log(
-        "selectedNumber.value",
-        selectedNumber.value.replace(/\W/g, "").match(/^9/g)
-    );
 });
 </script>
 
