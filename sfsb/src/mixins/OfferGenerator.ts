@@ -1,9 +1,9 @@
 import api from "@/api/instance";
 import mammoth from "mammoth";
-import {useToast} from "vue-toast-notification";
-import {saveAs} from "file-saver";
+import { useToast } from "vue-toast-notification";
+import { saveAs } from "file-saver";
 import checkStatus from "@/mixins/CheckStatus";
-import {AxiosError} from "axios";
+import { AxiosError } from "axios";
 
 const toast = useToast();
 
@@ -19,30 +19,44 @@ export const useOfferGenerator = () => {
                 params,
                 responseType: "arraybuffer",
             });
-            checkStatus(response)
+            checkStatus(response);
             const arrayBuffer = response.data;
-            const result = await mammoth.convertToHtml({arrayBuffer});
+            const result = await mammoth.convertToHtml({ arrayBuffer });
             const blob = new Blob([arrayBuffer], {
                 type: response.headers["content-type"],
             });
             const objectURL = URL.createObjectURL(blob);
-            return {objectURL, html: result.value, blob: blob || null};
+            return { objectURL, html: result.value, blob: blob || null };
         } catch (error: unknown) {
-            const axiosError = error as AxiosError<{ info: string }, any>
-            const {response} = axiosError
-            const {data} = response as { data: unknown }
-            const textError = data && JSON.parse(new TextDecoder().decode(data as AllowSharedBufferSource))
-            toast.error("Ошибка: " + textError?.info, {position: "top-right"});
+            const axiosError = error as AxiosError<{ info: string }, any>;
+            const { response } = axiosError;
+            const { data } = response as { data: unknown };
+            const textError =
+                data &&
+                JSON.parse(
+                    new TextDecoder().decode(data as AllowSharedBufferSource)
+                );
+            toast.error("Ошибка: " + textError?.info, {
+                position: "top-right",
+            });
             console.error(
                 "There was an error previewing the DOCX file:",
                 error
             );
-            return {objectURL: "", html: "", blob: null};
+            return { objectURL: "", html: "", blob: null };
         }
     };
 
-    const printOffer = async (url: string, params: { orderId: number }, filename: string) => {
-        const {html, objectURL} = await generateDocument(url, params, filename);
+    const printOffer = async (
+        url: string,
+        params: { orderId: number },
+        filename: string
+    ) => {
+        const { html, objectURL } = await generateDocument(
+            url,
+            params,
+            filename
+        );
         const downloadButtonHtml = `
         <a href="${objectURL}" download="${filename}.docx" style="display: block; margin: 20px;">
           Скачать
@@ -51,7 +65,8 @@ export const useOfferGenerator = () => {
 
         const newWindow = window.open("", "_blank");
         newWindow && newWindow.document.write(downloadButtonHtml);
-        newWindow && newWindow.document.write(`
+        newWindow &&
+            newWindow.document.write(`
                 <style>
                     img{
                         display: block;
@@ -79,9 +94,10 @@ export const useOfferGenerator = () => {
                         padding: 4px;
                     }
                 </style>
-            `)
+            `);
         newWindow && newWindow.document.write(html);
-        newWindow && newWindow.document.write(`
+        newWindow &&
+            newWindow.document.write(`
                 <script>
                 const tables = [...document.querySelectorAll("table")];
                 console.log(tables);
@@ -92,10 +108,13 @@ export const useOfferGenerator = () => {
             `);
 
         newWindow && newWindow.document.close();
-    }
-    const previewCommerce = async (order: Order, companyId: number | undefined = 1) => {
+    };
+    const previewCommerce = async (
+        order: Order,
+        companyId: number | undefined = 1
+    ) => {
         const url = "/doc/kp";
-        const params = {orderId: order.id, companyId};
+        const params = { orderId: order.id, companyId };
         const filename =
             "КП " +
             order.customer.companyName +
@@ -125,18 +144,33 @@ export const useOfferGenerator = () => {
         await printOffer(url, params, filename);
     };
 
+    const parseContentDisposition = (res: string): string => {
+        const arr = res.split(";");
+        const filenameRaw = arr.find((x) => x.trim().startsWith("filename*"));
+        const filename =
+            filenameRaw && filenameRaw.split("=")[1].split("''")[1];
+        const result = filename && decodeURI(filename);
+        return result || "";
+    };
+
     const previewPlan1 = async (order: Order) => {
         const url = "/doc/manufacturing-report";
         const params = {
             orderId: order.id,
         };
-        const filename = "План на заказ №" + order.applicationNumber + ".xlsx";
+        // const filename = "План на заказ №" + order.applicationNumber + ".xlsx";
 
         try {
             const response = await api.get(url, {
                 params,
                 responseType: "arraybuffer",
+                headers: {
+                    "Access-Control-Expose-Headers": "Content-Disposition",
+                },
             });
+            const filename = parseContentDisposition(
+                response.headers.get("Content-Disposition")
+            );
 
             const blob = new Blob([response.data], {
                 type: response.headers["content-type"],
@@ -152,14 +186,16 @@ export const useOfferGenerator = () => {
         const params = {
             orderId: order.id,
         };
-        const filename = "План на заказ №" + order.applicationNumber + ".xlsx";
+        // const filename = "План на заказ №" + order.applicationNumber + ".xlsx";
 
         try {
             const response = await api.get(url, {
                 params,
                 responseType: "arraybuffer",
             });
-
+            const filename = parseContentDisposition(
+                response.headers.get("Content-Disposition")
+            );
             const blob = new Blob([response.data], {
                 type: response.headers["content-type"],
             });
@@ -169,5 +205,12 @@ export const useOfferGenerator = () => {
         }
     };
 
-    return {generateDocument, printOffer, previewCommerce, previewToolOrder, previewPlan1, previewPlan2};
+    return {
+        generateDocument,
+        printOffer,
+        previewCommerce,
+        previewToolOrder,
+        previewPlan1,
+        previewPlan2,
+    };
 };
