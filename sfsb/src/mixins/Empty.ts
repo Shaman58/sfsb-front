@@ -1,17 +1,17 @@
 export class Empty {
     static KPItem(): KPItem {
-        return ({
+        return {
             decimal: "",
             name: "",
             created: null,
             updated: null,
             itemPrice: 0,
             amount: 0,
-        }) as KPItem
+        } as KPItem;
     }
 
     static KP(): KP {
-        return ({
+        return {
             items: [],
             created: null,
             updated: null,
@@ -20,12 +20,12 @@ export class Empty {
             customerId: 0,
             businessProposal: "",
             createdBy: "",
-            system: false
-        })
+            system: false,
+        };
     }
 
     static Company(): Customer {
-        return ({
+        return {
             companyName: "",
             address: "",
             email: "",
@@ -37,42 +37,44 @@ export class Empty {
             correspondentAccount: "",
             paymentAccount: "",
             kpp: "",
-
-        }) as Customer
+        } as Customer;
     }
 
     static Operation(): Operation {
-        return ({
+        return {
             created: null,
             operationName: "",
             updated: "",
             paymentPerHour: {
                 amount: 0,
-                currency: "RUB"
+                currency: "RUB",
             },
-        } as Operation)
+        } as Operation;
     }
 
     static Item(): Item {
-        return ({
+        return {
             technology: {
                 drawingName: "",
                 drawingNumber: "",
                 outsourcedCosts: {
                     amount: 0,
-                    currency: "RUB"
-                }
+                    currency: "RUB",
+                },
             },
             quantity: 0,
             price: {
                 amount: 0,
-                currency: "RUB"
-            }
-        } as Item)
+                currency: "RUB",
+            },
+        } as Item;
     }
 
-    static Order(): Omit<Order, "id" | "applicationNumber" | "user" | "customer"> {
-        return ({
+    static Order(): Omit<
+        Order,
+        "id" | "applicationNumber" | "user" | "customer"
+    > {
+        return {
             description: "",
             items: [],
             businessProposal: "",
@@ -80,11 +82,12 @@ export class Empty {
             updated: "",
             contact: null,
             files: [],
-        })
+            company: {},
+        };
     }
 
     static User(): Person {
-        return ({
+        return {
             email: "",
             firstName: "",
             lastName: "",
@@ -92,12 +95,12 @@ export class Empty {
             picture: "",
             username: "",
             phoneNumber: "",
-            roles: [] as string[]
-        } as Person)
+            roles: [] as string[],
+        } as Person;
     }
 
     static Material(): Material {
-        return ({
+        return {
             updated: 0,
             created: "",
             materialName: "",
@@ -107,22 +110,22 @@ export class Empty {
             density: 0,
             price: {
                 amount: 0,
-                currency: "RUB"
-            }
-        }) as Material
+                currency: "RUB",
+            },
+        } as Material;
     }
 
     static Tool(): Tool {
-        return ({
+        return {
             toolName: "",
             description: "",
             created: null,
-            updated: null
-        }) as Tool
+            updated: null,
+        } as Tool;
     }
 
     static Setup(): Partial<Setup> {
-        return ({
+        return {
             setupTime: "00:00",
             processTime: "00:00",
             interoperativeTime: "00:00",
@@ -133,10 +136,10 @@ export class Empty {
             additionalTools: [],
             setupNumber: 10,
             operation: {
-                operationName: '',
-                operationTimeManagement: "FULL"
+                operationName: "",
+                operationTimeManagement: "FULL",
             },
-            cooperatePrice: {amount: 0, currency: 'RUB'}
-        } as Partial<Setup>)
+            cooperatePrice: { amount: 0, currency: "RUB" },
+        } as Partial<Setup>;
     }
 }

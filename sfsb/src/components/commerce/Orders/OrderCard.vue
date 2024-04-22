@@ -32,7 +32,7 @@
                     v-expansion-panel.order-card__group-items(value="items")
                         v-expansion-panel-title ПОЗИЦИИ ЗАКАЗА
                         v-expansion-panel-text.order-card__group-text
-                            OrderItems(:items="orderLocal.items" :customer="orderLocal.customer.companyName" :number="orderLocal.applicationNumber")
+                            OrderItems(:items="orderLocal.items" :customer="orderLocal.customer?.companyName" :number="+orderLocal?.applicationNumber")
 
                     v-expansion-panel.order-card__files(value="files")
                         v-expansion-panel-title ФАЙЛЫ
@@ -50,100 +50,121 @@
 
 </template>
 <script setup lang="ts">
-
-import {computed, onUnmounted, type Ref, ref, toRefs, watch, watchEffect} from "vue";
+import {
+    computed,
+    onUnmounted,
+    type Ref,
+    ref,
+    toRefs,
+    watch,
+    watchEffect,
+} from "vue";
 import SuspendedComponent from "@/components/common/SuspendedComponent.vue";
 import OrderFiles from "@/components/commerce/Orders/OrderFiles.vue";
-import {useValidationRules} from "@/mixins/FieldValidationRules";
-import {storeToRefs} from "pinia";
-import {useCustomersStore} from "@/pinia-store/customers";
+import { useValidationRules } from "@/mixins/FieldValidationRules";
+import { storeToRefs } from "pinia";
+import { useCustomersStore } from "@/pinia-store/customers";
 import LayoutMain from "@/components/common/LayoutMain.vue";
 import OrderToolbar from "@/components/commerce/Orders/OrderToolbar.vue";
 import OrderItems from "@/components/commerce/Orders/OrderItems.vue";
-import {useRoute, useRouter} from "vue-router";
-import {useOrdersStore} from "@/pinia-store/orders";
+import { useRoute, useRouter } from "vue-router";
+import { useOrdersStore } from "@/pinia-store/orders";
 import AlertDialog from "@/components/common/AlertDialog.vue";
-import {useCurrentUserStore} from "@/pinia-store/currentUser";
-import {Empty} from "@/mixins/Empty";
-import {useToast} from "vue-toast-notification";
+import { useCurrentUserStore } from "@/pinia-store/currentUser";
+import { Empty } from "@/mixins/Empty";
+import { useToast } from "vue-toast-notification";
 
-const toast = useToast()
+const toast = useToast();
 
-const router = useRouter()
-const {params} = toRefs(useRoute())
+const router = useRouter();
+const { params } = toRefs(useRoute());
 
-const {orders, loading} = storeToRefs(useOrdersStore())
-const {saveOrder, getOrders, saveKP: storeKP} = useOrdersStore()
+const { orders, loading } = storeToRefs(useOrdersStore());
+const { saveOrder, getOrders, saveKP: storeKP } = useOrdersStore();
 
-const hasCurrentOrder = orders.value.find(e => e.id + "" === params.value.id)
-if (!hasCurrentOrder && params.value.id !== "new") router.push("/not-found")
+const hasCurrentOrder = orders.value.find((e) => e.id + "" === params.value.id);
+if (!hasCurrentOrder && params.value.id !== "new") router.push("/not-found");
 
-const order = computed(() => params.value.id === 'new' ? Empty.Order() : orders.value.find(e => e.id + "" === params.value.id) || orders.value[0])
+const order = computed(() =>
+    params.value.id === "new"
+        ? Empty.Order()
+        : orders.value.find((e) => e.id + "" === params.value.id) ||
+          orders.value[0]
+);
 
-const orderLocal = ref<Order>(order.value as Order)
+const orderLocal = ref<Order>(order.value as Order);
 
-const alertDialog = ref<typeof AlertDialog | undefined>()
+const alertDialog = ref<typeof AlertDialog | undefined>();
 
-const form = ref<HTMLFormElement>()
-const valid = ref(false)
-const panel = ref<string[]>(["common", "items"])
+const form = ref<HTMLFormElement>();
+const valid = ref(false);
+const panel = ref<string[]>(["common", "items"]);
 
-const {rules} = useValidationRules()
+const { rules } = useValidationRules();
 
-const {customers} = storeToRefs(useCustomersStore())
-const {fetchCustomers} = useCustomersStore()
-!customers.value.length && await fetchCustomers()
+const { customers } = storeToRefs(useCustomersStore());
+const { fetchCustomers } = useCustomersStore();
+!customers.value.length && (await fetchCustomers());
 
-
-const {user} = storeToRefs(useCurrentUserStore())
+const { user } = storeToRefs(useCurrentUserStore());
 const isSameUser = () => {
     return orderLocal.value.user && orderLocal.value.user.id === user.value?.id;
-}
+};
 const refresh = async () => {
-    await getOrders()
-}
+    await getOrders();
+};
 const save = async () => {
     if (orderLocal.value.user && !isSameUser() && alertDialog.value) {
         try {
-            alertDialog.value.show()
-            const res = await alertDialog.value.getAnswer()
+            alertDialog.value.show();
+            const res = await alertDialog.value.getAnswer();
             console.log("res", res);
         } catch (error) {
-            return
+            return;
         } finally {
-            alertDialog.value.hide()
+            alertDialog.value.hide();
         }
     }
-    const valid: { valid: boolean, errors: Ref<string[]> } | null = form.value && await form.value.validate()
-    if (!valid?.valid) return
-    await saveOrder(orderLocal.value)
-    await getOrders()
+    const valid: { valid: boolean; errors: Ref<string[]> } | null =
+        form.value && (await form.value.validate());
+    if (!valid?.valid) return;
+    await saveOrder(orderLocal.value);
+    await getOrders();
     setTimeout(async () => {
-        const refreshedOrder = orders.value.find(e => e.id === +orderLocal.value.id)
-        refreshedOrder?.id && await router.push(`/commerce/orders/${refreshedOrder.id}`)
-    }, 500)
-}
+        const refreshedOrder = orders.value.find(
+            (e) => e.id === +orderLocal.value.id
+        );
+        refreshedOrder?.id &&
+            (await router.push(`/commerce/orders/${refreshedOrder.id}`));
+    }, 500);
+};
 
-const saveKP = ({orderId, companyId}: { orderId: number, companyId: number }) => {
-    console.log("saveKP", orderId, companyId)
-    const ERROR_MESSAGE = "Для сохранения коммерческого предложения выберите компанию-поставщика"
-    if (!companyId) return toast.error(ERROR_MESSAGE)
-    storeKP(orderId, companyId)
-}
+const saveKP = ({
+    orderId,
+    companyId,
+}: {
+    orderId: number;
+    companyId: number;
+}) => {
+    console.log("saveKP", orderId, companyId);
+    const ERROR_MESSAGE =
+        "Для сохранения коммерческого предложения выберите компанию-поставщика";
+    if (!companyId) return toast.error(ERROR_MESSAGE);
+    storeKP(orderId, companyId);
+};
 
 const unwatchEffect = watchEffect(() => {
-    orderLocal.value = order.value as Order
-})
+    orderLocal.value = order.value as Order;
+});
 
 const unwatch = watch([params], () => {
-    panel.value = params.value.id === "new" ? ["common", "items"] : panel.value
-})
+    panel.value = params.value.id === "new" ? ["common", "items"] : panel.value;
+});
 
 onUnmounted(() => {
-    unwatch()
-    unwatchEffect()
-})
-
+    unwatch();
+    unwatchEffect();
+});
 </script>
 <style lang="sass">
 .order-card
@@ -200,5 +221,4 @@ onUnmounted(() => {
 
         @media (width < 1024px)
             padding-inline: 0
-
 </style>

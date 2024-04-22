@@ -16,37 +16,40 @@
                     @keyup.space="router.push(`/commerce/orders/${i.id}`)"
                 )
                     router-link.list-link.orders__link(:to="`/commerce/orders/${i.id}`") {{i.applicationNumber}} {{i.customer.companyName}}
+
         template(#card)
             router-view
 
 </template>
 <script setup lang="ts">
-import {storeToRefs} from "pinia";
-import {computed, ref, toRefs} from "vue";
+import { storeToRefs } from "pinia";
+import { computed, ref, toRefs } from "vue";
 import LayoutPage from "@/components/common/LayoutPage.vue";
-import {useOrdersStore} from "@/pinia-store/orders";
-import {useRoute, useRouter} from "vue-router";
+import { useOrdersStore } from "@/pinia-store/orders";
+import { useRoute, useRouter } from "vue-router";
 
 const router = useRouter();
 
-const {orders, loading} = storeToRefs(useOrdersStore())
-const {getOrders, saveOrder} = useOrdersStore()
-!orders.value.length && await getOrders()
+const { orders, loading } = storeToRefs(useOrdersStore());
+const { getOrders, saveOrder } = useOrdersStore();
+!orders.value.length && (await getOrders());
 
-const {path} = toRefs(useRoute())
-const id = computed(() => path.value.split("/").at(-1))
-id.value === "orders" && router.push(`/commerce/orders/${orders.value[0].id}`)
+const { path } = toRefs(useRoute());
+const id = computed(() => path.value.split("/").at(-1));
+id.value === "orders" && router.push(`/commerce/orders/${orders.value[0].id}`);
 
-const filterText = ref("")
-const filteredOrders = computed<Order[]>(() => orders.value.filter(e => e.customer
-            .companyName
-            .toLowerCase()
-            .includes(filterText.value?.toLowerCase() || "")
-        || e.applicationNumber.toString().includes(filterText.value?.toLowerCase() || "")
+const filterText = ref("");
+const filteredOrders = computed<Order[]>(() =>
+    orders.value.filter(
+        (e) =>
+            e.customer.companyName
+                .toLowerCase()
+                .includes(filterText.value?.toLowerCase() || "") ||
+            e.applicationNumber
+                .toString()
+                .includes(filterText.value?.toLowerCase() || "")
     )
-)
-
-
+);
 </script>
 <style scoped lang="sass">
 .orders
@@ -59,4 +62,10 @@ const filteredOrders = computed<Order[]>(() => orders.value.filter(e => e.custom
     &__link
         text-decoration: none
         color: inherit
+
+.fade-enter-active, .fade-leave-active
+    transition: opacity 0.5s ease
+
+.fade-enter-from, .fade-leave-to
+    opacity: 0
 </style>

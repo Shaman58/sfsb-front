@@ -17,86 +17,96 @@
                     v-btn(color="primary" @click="toSave" :disabled="!canAddNewItem || !validForm?.valid") Сохранить
 </template>
 <script setup lang="ts">
-
 import OrderItem from "@/components/commerce/Orders/OrderItem.vue";
-import {onUnmounted, ref, toRefs, watch} from "vue";
+import { onUnmounted, ref, toRefs, watch } from "vue";
 import OrderItemDetails from "@/components/commerce/Orders/OrderItemDetails.vue";
-import {Empty} from "@/mixins/Empty";
-import {useDisplay} from "vuetify";
+import { Empty } from "@/mixins/Empty";
+import { useDisplay } from "vuetify";
 
-const {width: screenWidth} = useDisplay()
-const props = defineProps<{ items: Item[], customer: string, number: number }>()
-const {items, customer, number} = toRefs(props)
+const { width: screenWidth } = useDisplay();
+const props = defineProps<{
+    items: Item[];
+    customer?: string;
+    number?: number;
+}>();
+const { items, customer, number } = toRefs(props);
 
-const currentItem = ref<Item>(items.value[0])
-const newItem = ref<Item | null>(null)
-const canAddNewItem = ref(true)
-const showDialog = ref(false)
-const canSave = ref(false)
+const currentItem = ref<Item>(items.value[0]);
+const newItem = ref<Item | null>(null);
+const canAddNewItem = ref(true);
+const showDialog = ref(false);
+const canSave = ref(false);
 // const wasItemsChange = ref(false)
 
-const validForm = ref<HTMLFormElement | null>(null)
+const validForm = ref<HTMLFormElement | null>(null);
 
 const isActive = (item: Item): boolean => {
-    const currentIndex = `${currentItem.value.id}${currentItem.value.uid}`
-    const itemIndex = `${item.id}${item.uid}`
-    return currentIndex === itemIndex
-}
+    const currentIndex = `${currentItem.value.id}${currentItem.value.uid}`;
+    const itemIndex = `${item.id}${item.uid}`;
+    return currentIndex === itemIndex;
+};
 
 const addNewItem = () => {
-    newItem.value = Empty.Item()
-    newItem.value.uid = Date.now().toString(36)
-    items.value.push(newItem.value)
-    currentItem.value = newItem.value
-    canAddNewItem.value = false
-    showDialog.value = true
-}
+    newItem.value = Empty.Item();
+    newItem.value.uid = Date.now().toString(36);
+    items.value.push(newItem.value);
+    currentItem.value = newItem.value;
+    canAddNewItem.value = false;
+    showDialog.value = true;
+};
 const removeItem = (item: Item) => {
-    const index = items.value.indexOf(item)
-    index >= 0 && items.value.splice(index, 1)
-    currentItem.value = items.value.at(-1) || items.value[0]
-}
+    const index = items.value.indexOf(item);
+    index >= 0 && items.value.splice(index, 1);
+    currentItem.value = items.value.at(-1) || items.value[0];
+};
 
 const changeItem = (item: Item) => {
-    currentItem.value = item
-    showDialog.value = true
-}
+    currentItem.value = item;
+    showDialog.value = true;
+};
 
 const toSave = () => {
-    canSave.value = true
+    canSave.value = true;
     setTimeout(() => {
-        canSave.value = false
-    }, 200)
-    showDialog.value = false
-}
+        canSave.value = false;
+    }, 200);
+    showDialog.value = false;
+};
 
 const unwatchItems = watch([items], () => {
-    currentItem.value = items.value[0]
-},)
+    currentItem.value = items.value[0];
+});
 
-const unwatchNewItem = watch([newItem], () => {
-    if (!newItem.value) return
-    if (newItem.value.technology.drawingNumber && newItem.value.technology.drawingNumber && newItem.value.quantity) {
-        canAddNewItem.value = true
-    }
-}, {deep: true})
+const unwatchNewItem = watch(
+    [newItem],
+    () => {
+        if (!newItem.value) return;
+        if (
+            newItem.value.technology.drawingNumber &&
+            newItem.value.technology.drawingNumber &&
+            newItem.value.quantity
+        ) {
+            canAddNewItem.value = true;
+        }
+    },
+    { deep: true }
+);
 
 const unwatchShowDialog = watch([showDialog], () => {
-    if (showDialog.value || canAddNewItem.value) return
-    items.value.pop()
-    canAddNewItem.value = true
+    if (showDialog.value || canAddNewItem.value) return;
+    items.value.pop();
+    canAddNewItem.value = true;
 
     // !canAddNewItem.value && (showDialog.value = true)
-})
+});
 
 onUnmounted(() => {
-    unwatchItems()
-    unwatchNewItem()
-    unwatchShowDialog()
+    unwatchItems();
+    unwatchNewItem();
+    unwatchShowDialog();
     // unwatchCurrentItem()
-})
+});
 </script>
-
 
 <style scoped lang="sass">
 .order-items
@@ -140,5 +150,4 @@ onUnmounted(() => {
         z-index: 2
         top: -8px
         background-color: rgb(var(--v-theme-background))
-
 </style>

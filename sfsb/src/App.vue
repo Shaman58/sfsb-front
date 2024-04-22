@@ -1,38 +1,44 @@
 <template>
     <v-app>
-        <navbar/>
-        <v-progress-circular v-if="!user" indeterminate :color="$defaultColor" class="is-not-user" :size="62"
-                             :width="6"/>
-        <router-view v-else v-slot="{Component}">
-            <transition name="fade">
-                <component :is="Component"/>
-            </transition>
-        </router-view>
+        <navbar />
+        <v-progress-circular
+            v-if="!user"
+            indeterminate
+            :color="$defaultColor"
+            class="is-not-user"
+            :size="62"
+            :width="6"
+        />
+        <router-view></router-view>
     </v-app>
 </template>
 
 <script setup lang="ts">
 import Navbar from "@/components/Navbar.vue";
-import {useTheme} from "vuetify";
-import {watch} from "vue";
-import {useThemeStore} from "@/pinia-store/themeSwitcher"
-import {storeToRefs} from "pinia";
-import {useCurrentUserStore} from "@/pinia-store/currentUser";
+import { useTheme } from "vuetify";
+import { watch } from "vue";
+import { useThemeStore } from "@/pinia-store/themeSwitcher";
+import { storeToRefs } from "pinia";
+import { useCurrentUserStore } from "@/pinia-store/currentUser";
 
-const {theme} = storeToRefs(useThemeStore())
-const {setDark, setLight} = useThemeStore()
-const themeGlobal = useTheme()
-const isLight = () => matchMedia("(prefers-color-scheme: light)").matches
-const storagedTheme = window.localStorage.getItem("theme")
-if (storagedTheme === "auto" || !storagedTheme) isLight() ? setLight() : setDark()
+const { theme } = storeToRefs(useThemeStore());
+const { setDark, setLight } = useThemeStore();
+const themeGlobal = useTheme();
+const isLight = () => matchMedia("(prefers-color-scheme: light)").matches;
+const storagedTheme = window.localStorage.getItem("theme");
+if (storagedTheme === "auto" || !storagedTheme)
+    isLight() ? setLight() : setDark();
 
-const {user} = storeToRefs(useCurrentUserStore())
+const { user } = storeToRefs(useCurrentUserStore());
 
-watch(theme, () => {
-    themeGlobal.global.name.value = theme.value ? "dark" : "light"
-}, {immediate: true})
+watch(
+    theme,
+    () => {
+        themeGlobal.global.name.value = theme.value ? "dark" : "light";
+    },
+    { immediate: true }
+);
 </script>
-
 
 <style lang="sass">
 .v-toolbar__content
@@ -70,5 +76,4 @@ watch(theme, () => {
 //.fade-enter-from, .fade-leave-to
 //    opacity: 0
 //    scale: 0 0
-
 </style>
