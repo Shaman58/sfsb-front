@@ -29,35 +29,37 @@
                 v-btn.material-form__btn(@click="save") {{ route.params.id==="new" ? "Сохранить" : "Изменить" }}
                 v-btn.material-form__btn.material-form__btn_delete(@click="deleteItem") Удалить
 
-    AlertDialog(ref="alertDialog" title="Вы уверены, что хотите удалить?" :text="geom.title + ' ' +  local.materialName" )
+    AlertDialog(ref="alertDialog" title="Вы уверены, что хотите удалить?" :text="geom?.title||'' + ' ' +  local.materialName" )
 
 </template>
 <script setup lang="ts">
-import {useRoute, useRouter} from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { storeToRefs } from "pinia";
 import { useCurrentTool, useMaterialsStore } from "@/pinia-store/tools";
-import {onUnmounted, ref, toRefs, toValue, watch} from "vue";
+import {onUnmounted, type Ref, ref, toRefs, toValue, watch} from "vue";
 import { useValidationRules } from "@/mixins/FieldValidationRules";
 import { useMaterialTemplatesStore } from "@/pinia-store/materialTemplates";
 import { Empty } from "@/mixins/Empty";
 import AlertDialog from "@/components/common/AlertDialog.vue";
-import CONSTS from '@/consts';
+import CONSTS from "@/consts";
 
 const route = useRoute();
-const router  = useRouter();
+const router = useRouter();
 
 const alertDialog = ref<typeof AlertDialog | undefined>();
 
-const {tools} = storeToRefs(useMaterialsStore())
-const {fetchTool} = useMaterialsStore();
-
+const { tools } = storeToRefs(useMaterialsStore());
+const { fetchTool, getTool } = useMaterialsStore();
 
 const { currentTool } = storeToRefs(useCurrentTool());
-const selectedTool = ref(
-    (currentTool.value!.list.find((e) => +e.id === +route.params.id) ||
-        currentTool.value!.list[0]) as Material
+const initialSelectedTool = async () => {
+    return await getTool(+route.params.id);
+};
+const selectedTool: Ref<Material  | null>  = ref(Empty.Material());
+
+const geom = CONSTS.GEOMETRIES.find(
+    (e) => e.label === selectedTool.value?.geometry
 );
-const geom = CONSTS.GEOMETRIES.find(e => e.label === selectedTool.value.geometry)
 
 const { rules } = useValidationRules();
 
@@ -78,13 +80,22 @@ const { fetchMaterialTemplates } = useMaterialTemplatesStore();
 
 const { deleteTool } = useMaterialsStore();
 
+const refresh = async () => {
+    await fetchTool();
+    const firstItem = toValue(tools.value[0]);
+    router.push(`/data/materials/${firstItem.id}`);
+};
+
 const save = async () => {
     const res = {
         ...selectedTool.value,
         ...local.value,
         updated: "",
     } as Material & Tool;
-    currentTool.value && (await currentTool.value.save(res));
+    const response = await currentTool.value.save(res);
+    //переходим на экран, сохраненный элемент в Материалах
+    await fetchTool();
+    response && response.id && router.push(`/data/materials/${response.id}`);
 };
 
 const deleteItem = async () => {
@@ -95,9 +106,8 @@ const deleteItem = async () => {
         const res = await alertDialog.value.getAnswer();
         console.log("res", res);
         await deleteTool(selectedTool.value);
-        //оьновляем экран, показываем пкрвый элменет в Материалах
-        const firstItem = toValue(tools.value[0]);
-        router.push(`/data/materials/${firstItem.id}`);
+        //оьновляем экран, показываем первый элменет в Материалах
+        await refresh();
     } catch (error) {
         return;
     } finally {
@@ -111,13 +121,12 @@ const unwatchLocal = watch([local], () => console.log("local", local.value), {
 
 const unwatchRoute = watch(
     [route],
-    () => {
+    async () => {
         if (route.params.id === "new") {
             selectedTool.value = Empty.Material() as Material;
         } else {
-            selectedTool.value = (currentTool.value!.list.find(
-                (e) => +e.id === +route.params.id
-            ) || currentTool.value!.list[0]) as Material;
+            const res = await initialSelectedTool();
+            selectedTool.value = await initialSelectedTool() || currentTool.value!.list[0];
         }
 
         for (const key in local.value) {

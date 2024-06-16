@@ -16,6 +16,7 @@ export default class ToolStore<T extends { id?: string | number }> {
     constructor(url: string) {
         this.url = url;
         this.fetchTool = this.fetchTool.bind(this);
+        this.getTool = this.getTool.bind(this);
         this.saveTool = this.saveTool.bind(this);
         this.deleteTool = this.deleteTool.bind(this);
         this.newData = this.newData.bind(this);
@@ -37,11 +38,22 @@ export default class ToolStore<T extends { id?: string | number }> {
         this.loading.value = false;
     }
 
+    async getTool(id: number): Promise<T | undefined> {
+        this.loading.value = true;
+        const res = await query(
+            async () => await api.get<T>(`${this.url}/${id}`),
+            { success: "" }
+        );
+        this.loading.value = false;
+        return res;
+    }
+
     async saveTool(tool: T) {
         this.loading.value = true;
-        await this.crud.save(tool);
+        const res = await this.crud.save(tool);
         await this.fetchTool();
         this.loading.value = false;
+        return res;
     }
 
     private hasId = (x: any): x is { id: any } => {
