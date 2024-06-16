@@ -27,67 +27,129 @@
 
             v-card-actions.material-form__actions
                 v-btn.material-form__btn(@click="save") {{ route.params.id==="new" ? "Сохранить" : "Изменить" }}
+                v-btn.material-form__btn.material-form__btn_delete(@click="deleteItem") Удалить
+
+    AlertDialog(ref="alertDialog" title="Вы уверены, что хотите удалить?" :text="geom.title + ' ' +  local.materialName" )
+
 </template>
 <script setup lang="ts">
-import {useRoute} from "vue-router";
-import {storeToRefs} from "pinia";
-import {useCurrentTool} from "@/pinia-store/tools";
-import {onUnmounted, ref, toRefs, watch} from "vue";
-import {useValidationRules} from "@/mixins/FieldValidationRules";
-import {useMaterialTemplatesStore} from "@/pinia-store/materialTemplates";
-import {Empty} from "@/mixins/Empty";
+import {useRoute, useRouter} from "vue-router";
+import { storeToRefs } from "pinia";
+import { useCurrentTool, useMaterialsStore } from "@/pinia-store/tools";
+import {onUnmounted, ref, toRefs, toValue, watch} from "vue";
+import { useValidationRules } from "@/mixins/FieldValidationRules";
+import { useMaterialTemplatesStore } from "@/pinia-store/materialTemplates";
+import { Empty } from "@/mixins/Empty";
+import AlertDialog from "@/components/common/AlertDialog.vue";
+import CONSTS from '@/consts';
 
-const route = useRoute()
+const route = useRoute();
+const router  = useRouter();
 
+const alertDialog = ref<typeof AlertDialog | undefined>();
 
-const {currentTool} = storeToRefs(useCurrentTool())
-const selectedTool = ref((currentTool.value!.list.find(e => +e.id === +route.params.id) || currentTool.value!.list[0]) as Material)
-
-const {rules} = useValidationRules();
-
-const local = ref(Empty.Material())
-
-const {density, price: {value: {amount}}} = toRefs(selectedTool.value)
+const {tools} = storeToRefs(useMaterialsStore())
+const {fetchTool} = useMaterialsStore();
 
 
-const {materialTemplates: templates} = storeToRefs(useMaterialTemplatesStore())
-const {fetchMaterialTemplates} = useMaterialTemplatesStore()
-!templates.value.length && await fetchMaterialTemplates()
+const { currentTool } = storeToRefs(useCurrentTool());
+const selectedTool = ref(
+    (currentTool.value!.list.find((e) => +e.id === +route.params.id) ||
+        currentTool.value!.list[0]) as Material
+);
+const geom = CONSTS.GEOMETRIES.find(e => e.label === selectedTool.value.geometry)
+
+const { rules } = useValidationRules();
+
+const local = ref(Empty.Material());
+
+const {
+    density,
+    price: {
+        value: { amount },
+    },
+} = toRefs(selectedTool.value);
+
+const { materialTemplates: templates } = storeToRefs(
+    useMaterialTemplatesStore()
+);
+const { fetchMaterialTemplates } = useMaterialTemplatesStore();
+!templates.value.length && (await fetchMaterialTemplates());
+
+const { deleteTool } = useMaterialsStore();
 
 const save = async () => {
-    const res = {...selectedTool.value, ...local.value, updated:""} as Material & Tool
-    currentTool.value && await currentTool.value.save(res)
-}
+    const res = {
+        ...selectedTool.value,
+        ...local.value,
+        updated: "",
+    } as Material & Tool;
+    currentTool.value && (await currentTool.value.save(res));
+};
 
-const unwatchLocal = watch([local],() => console.log("local", local.value),{deep: true})
+const deleteItem = async () => {
+    console.log("delete", selectedTool.value);
+    //подтверждение удаления
+    try {
+        alertDialog.value.show();
+        const res = await alertDialog.value.getAnswer();
+        console.log("res", res);
+        await deleteTool(selectedTool.value);
+        //оьновляем экран, показываем пкрвый элменет в Материалах
+        const firstItem = toValue(tools.value[0]);
+        router.push(`/data/materials/${firstItem.id}`);
+    } catch (error) {
+        return;
+    } finally {
+        alertDialog.value.hide();
+    }
+};
 
-const unwatchRoute = watch([route], () => {
+const unwatchLocal = watch([local], () => console.log("local", local.value), {
+    deep: true,
+});
+
+const unwatchRoute = watch(
+    [route],
+    () => {
         if (route.params.id === "new") {
-            selectedTool.value = Empty.Material() as Material
+            selectedTool.value = Empty.Material() as Material;
         } else {
-            selectedTool.value = (currentTool.value!.list.find(e => +e.id === +route.params.id) || currentTool.value!.list[0]) as Material
+            selectedTool.value = (currentTool.value!.list.find(
+                (e) => +e.id === +route.params.id
+            ) || currentTool.value!.list[0]) as Material;
         }
-
 
         for (const key in local.value) {
             if (local.value.hasOwnProperty(key)) {
-                (local.value as { [K in keyof Material]: any } )[key as keyof Material] = selectedTool.value[key as keyof Partial<Material>]}
+                (local.value as { [K in keyof Material]: any })[
+                    key as keyof Material
+                ] = selectedTool.value[key as keyof Partial<Material>];
+            }
         }
-        local.value.price && (local.value.price = {
-            ...local.value.price,
-            amount: selectedTool.value.price.amount
-        })
-    }, {immediate: true}
-)
+        local.value.price &&
+            (local.value.price = {
+                ...local.value.price,
+                amount: selectedTool.value.price.amount,
+            });
+    },
+    { immediate: true }
+);
 
-onUnmounted(()=>{
-    unwatchLocal()
-    unwatchRoute()
-})
-
+onUnmounted(() => {
+    unwatchLocal();
+    unwatchRoute();
+});
 </script>
 
-
 <style scoped lang="sass">
+.material-form
+    &__btn
+        &_delete
+            background-color: red
+            color: white !important
 
+    &__actions
+        display: flex
+        justify-content: space-between
 </style>
