@@ -76,4 +76,13 @@ watch(
 //.fade-enter-from, .fade-leave-to
 //    opacity: 0
 //    scale: 0 0
+
+.list-link
+    &::before
+        content: ""
+        position: absolute
+        inset: 0
+
+.v-list-item
+    position: relative
 </style>
