@@ -6,7 +6,7 @@
                 v-text-field(v-model="search" label="Найти материал" clearable)
         .supply-card__main
             v-data-table.supply-card__table(:items="typedCurrentData" :headers  :search
-                :items-per-page-text="'Позиций на листе'"
+            :items-per-page-text="'Позиций на листе'"
                 no-data-text="Данные отсутствуют"
                 page-text=""
                 :show-current-page="true"
@@ -53,114 +53,133 @@
 </template>
 
 <script setup lang="ts">
-import {computed, type ComputedRef, ref, type Ref, toRefs, watchEffect} from "vue"
-import SupplyMap, {type SupplyMapInterface} from "./SupplyMap"
+import {
+    computed,
+    type ComputedRef,
+    onMounted,
+    ref,
+    type Ref,
+    toRefs,
+} from "vue";
+import SupplyMap, { type SupplyMapInterface } from "./SupplyMap";
 import LayoutMain from "@/components/common/LayoutMain.vue";
 import CONST from "@/consts";
-import {useSupplyStore} from "@/pinia-store/supply";
-import {storeToRefs} from "pinia";
-import {useRoute} from "vue-router";
-import {useDisplay} from "vuetify";
+import { useSupplyStore } from "@/pinia-store/supply";
+import { storeToRefs } from "pinia";
+import { useRoute } from "vue-router";
+import { useDisplay } from "vuetify";
 
+const { path } = toRefs(useRoute());
 
-const {path} = toRefs(useRoute())
+const page = computed(() => path.value.split("/").at(-1));
 
-const page = computed(() => path.value.split("/").at(-1))
+const search = ref("");
 
+const geometries = CONST.GEOMETRIES;
+const selectedType: Ref<string | null> = ref(null);
 
-const search = ref("")
+const { materialsAll, materialsNoCost, materialsDateExpired } = storeToRefs(
+    useSupplyStore()
+);
+const {
+    saveMaterial,
+    getMaterialsAll,
+    getMaterialsNoCost,
+    getMaterialsDateExpired,
+} = useSupplyStore();
 
-const geometries = CONST.GEOMETRIES
-const selectedType: Ref<string | null> = ref(null)
+!materialsAll.value.length && (await getMaterialsAll());
+!materialsNoCost.value.length && (await getMaterialsNoCost());
+!materialsDateExpired.value.length && (await getMaterialsDateExpired());
 
-const {materialsAll, materialsNoCost, materialsDateExpired} = storeToRefs(useSupplyStore())
-const {saveMaterial, getMaterialsAll, getMaterialsNoCost, getMaterialsDateExpired} = useSupplyStore()
+const { width } = useDisplay();
 
-!materialsAll.value.length && await getMaterialsAll()
-!materialsNoCost.value.length && await getMaterialsNoCost()
-!materialsDateExpired.value.length && await getMaterialsDateExpired()
-
-const {width} = useDisplay()
-
-const supplyMap = SupplyMap(useSupplyStore)
+const supplyMap = SupplyMap(useSupplyStore);
 const type: ComputedRef<keyof SupplyMapInterface> = computed(() => {
     const isKeyOfSupplyMap = (x: any): x is keyof SupplyMapInterface => {
-        return x in supplyMap
-    }
-    if (!page.value) return "all"
-    return isKeyOfSupplyMap(page.value) ? page.value : "all"
-})
+        return x in supplyMap;
+    };
+    if (!page.value) return "all";
+    return isKeyOfSupplyMap(page.value) ? page.value : "all";
+});
 
 const titleToLabel = (title: string): string | undefined => {
-    const found = geometries.find(e => e.title === title)
-    if (found) return found.label
-}
+    const found = geometries.find((e) => e.title === title);
+    if (found) return found.label;
+};
 
-const currentData = computed(() => supplyMap[type.value].data)
-const typedCurrentData = computed(() => currentData.value.filter(e => selectedType.value ? e.geometry === titleToLabel(selectedType.value || "") : true))
-const currentItem: Ref<Material | null> = ref(null)
-const currentInput = ref<HTMLInputElement>()
-const currentInputMobile = ref<HTMLInputElement[]>([])
-const currentValue = ref(0)
-const breakPoint = 768
+const currentData = computed(() => supplyMap[type.value].data);
+const typedCurrentData = computed(() =>
+    currentData.value.filter((e) =>
+        selectedType.value
+            ? e.geometry === titleToLabel(selectedType.value || "")
+            : true
+    )
+);
+const currentItem: Ref<Material | null> = ref(null);
+const currentInput = ref<HTMLInputElement>();
+const currentInputMobile = ref<HTMLInputElement[]>([]);
+const currentValue = ref(0);
+const breakPoint = 768;
 
-
-const editing = computed(() => !!currentItem)
-
+const editing = computed(() => !!currentItem);
 
 const headers = [
-    {title: "Название", value: "materialName", key: "materialName"},
-    {title: "ГОСТ на материал", value: "gost1"},
-    {title: "ГОСТ на сортамент", value: "gost2"},
-    {title: "Геометрия", value: "geometry", key: "geometry"},
-    {title: "Плотность", value: "density"},
-    {title: "Стоимость", value: "price.amount", key: "price.amount"},
-    {title: "Сохранить", value: "editing"}
-]
+    { title: "Название", value: "materialName", key: "materialName" },
+    { title: "ГОСТ на материал", value: "gost1" },
+    { title: "ГОСТ на сортамент", value: "gost2" },
+    { title: "Геометрия", value: "geometry", key: "geometry" },
+    { title: "Плотность", value: "density" },
+    { title: "Стоимость", value: "price.amount", key: "price.amount" },
+    { title: "Сохранить", value: "editing" },
+];
 
 const itemsPerPageOptions = [
-    {value: 10, title: '10'},
-    {value: 20, title: '20'},
-    {value: 50, title: '50'},
-    {value: 100, title: '100'},
-    {value: -1, title: 'Все'}
-]
+    { value: 10, title: "10" },
+    { value: 20, title: "20" },
+    { value: 50, title: "50" },
+    { value: 100, title: "100" },
+    { value: -1, title: "Все" },
+];
 
-
-const i = ref(0)
+const i = ref(0);
 
 const doEdit = (item: Material) => {
-    currentValue.value = 0
-    currentItem.value = item
+    currentValue.value = 0;
+    currentItem.value = item;
     setTimeout(() => {
-        const input = currentInput.value ? currentInput.value : currentInputMobile.value["0"]
-        if (!input) return
-        input.type = "text"
-        input.focus()
-        input.setSelectionRange(input.value.length, input.value.length)
-        input.type = "number"
-
-    })
-}
+        const input = currentInput.value
+            ? currentInput.value
+            : currentInputMobile.value["0"];
+        if (!input) return;
+        input.type = "text";
+        input.focus();
+        input.setSelectionRange(input.value.length, input.value.length);
+        input.type = "number";
+    });
+};
 
 const doChange = (event: Event) => {
-    const val = (event.target as HTMLInputElement).value
-    console.log("doChange", (event.target as HTMLInputElement).value)
-    currentValue.value= +val ? +val : 0
-}
+    const val = (event.target as HTMLInputElement).value;
+    console.log("doChange", (event.target as HTMLInputElement).value);
+    currentValue.value = +val ? +val : 0;
+};
 
 const save = async () => {
     // const input = currentInput.value ? currentInput.value : currentInputMobile.value["0"]
-    currentItem.value && currentValue.value && (currentItem.value.price.amount = currentValue.value)
-    currentItem.value && await saveMaterial(currentItem.value)
-}
+    currentItem.value &&
+        currentValue.value &&
+        (currentItem.value.price.amount = currentValue.value);
+    currentItem.value && (await saveMaterial(currentItem.value));
+};
 
 const geometryByLabel = (material: string) => {
-    const geometry = CONST.GEOMETRIES.find(e => e.label === material)
-    return geometry && geometry.title
-}
-
-
+    const geometry = CONST.GEOMETRIES.find((e) => e.label === material);
+    return geometry && geometry.title;
+};
+onMounted(async () => {
+    await supplyMap[page.value].fetch();
+});
 </script>
 
 <style lang="sass">
@@ -232,5 +251,4 @@ const geometryByLabel = (material: string) => {
 
     &__mobile-key
         opacity: 0.6
-
 </style>

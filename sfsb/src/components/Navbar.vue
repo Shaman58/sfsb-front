@@ -43,44 +43,38 @@
 </template>
 
 <script setup lang="ts">
-import {onUnmounted, ref, watch} from "vue";
+import { onUnmounted, ref, watch } from "vue";
 import ImpulsHub from "@/components/ImpulsHub.vue";
-import CONSTS from "@consts/index"
-// import keycloakService from '@/plugins/keycloak/service';
-import {useToast} from "vue-toast-notification";
-import {useCurrentUserStore} from "@/pinia-store/currentUser";
-import {storeToRefs} from "pinia";
+import CONSTS from "@consts/index";
+import { useToast } from "vue-toast-notification";
+import { useCurrentUserStore } from "@/pinia-store/currentUser";
+import { storeToRefs } from "pinia";
 import MobileMenu from "@/components/common/MobileMenu.vue";
-import {useKeycloak} from "@josempgon/vue-keycloak";
+import { useKeycloak } from "@josempgon/vue-keycloak";
 import ThreePositionSwitch from "@/components/common/ThreePositionSwitch.vue";
 
-const {keycloak} = useKeycloak()
-const {user} = storeToRefs(useCurrentUserStore())
+const { keycloak } = useKeycloak();
+const { user } = storeToRefs(useCurrentUserStore());
 const toast = useToast();
-
 
 const version = import.meta.env.VITE_APP_VERSION;
 
-const showMobileMenu = ref(false)
+const showMobileMenu = ref(false);
 const logout = () => {
-    // keycloakService.logout()
-    keycloak.logout()
-}
+    keycloak.logout();
+};
 
 const name = ref();
-const picture = ref()
+const picture = ref();
 
 const unwatchUser = watch([user], () => {
-    picture.value = user.value?.picture && user.value.picture
-    name.value = (user.value?.firstName || "") + " " + (user.value?.lastName || "")
-})
-// onMounted(async () => {
-//     picture.value = user.value?.picture && user.value.picture
-//     name.value = user.value?.firstName + " " + user.value?.lastName
-// })
+    picture.value = user.value?.picture && user.value.picture;
+    name.value =
+        (user.value?.firstName || "") + " " + (user.value?.lastName || "");
+});
 onUnmounted(() => {
-    unwatchUser()
-})
+    unwatchUser();
+});
 </script>
 
 <style lang="sass">

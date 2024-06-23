@@ -67,7 +67,7 @@ import { useCustomersStore } from "@/pinia-store/customers";
 import LayoutMain from "@/components/common/LayoutMain.vue";
 import OrderToolbar from "@/components/commerce/Orders/OrderToolbar.vue";
 import OrderItems from "@/components/commerce/Orders/OrderItems.vue";
-import { useRoute, useRouter } from "vue-router";
+import { onBeforeRouteUpdate, useRoute, useRouter } from "vue-router";
 import { useOrdersStore } from "@/pinia-store/orders";
 import AlertDialog from "@/components/common/AlertDialog.vue";
 import { useCurrentUserStore } from "@/pinia-store/currentUser";
@@ -160,6 +160,8 @@ const unwatchEffect = watchEffect(() => {
 const unwatch = watch([params], () => {
     panel.value = params.value.id === "new" ? ["common", "items"] : panel.value;
 });
+
+onBeforeRouteUpdate((v) => console.log("onBeforeRouteUpdate", v));
 
 onUnmounted(() => {
     unwatch();

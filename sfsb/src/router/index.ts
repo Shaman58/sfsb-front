@@ -1,12 +1,17 @@
-import {createRouter, createWebHistory, type RouteMeta, type RouteRecordRaw} from "vue-router";
+import {
+    createRouter,
+    createWebHistory,
+    type RouteMeta,
+    type RouteRecordRaw,
+} from "vue-router";
 import NotFound from "@/views/NotFound.vue";
 import StartPage from "@/views/StartPage.vue";
-import {useCurrentUserStore} from "@/pinia-store/currentUser";
-import {useToast} from "vue-toast-notification";
-import {storeToRefs} from "pinia";
+import { useCurrentUserStore } from "@/pinia-store/currentUser";
+import { useToast } from "vue-toast-notification";
+import { storeToRefs } from "pinia";
 import CompanyPage from "@/views/CompanyPage.vue";
 import Company1 from "@/components/company/Company1.vue";
-import {useCurrentTool} from "@/pinia-store/tools";
+import { useCurrentTool } from "@/pinia-store/tools";
 import Support from "@/views/Support.vue";
 import data from "@/router/data";
 import supplier from "@/router/supplier";
@@ -16,14 +21,14 @@ import staff from "@/router/staff";
 
 const toast = useToast();
 
-const routes: (RouteRecordRaw & RouteMeta)[]  = [
+const routes: (RouteRecordRaw & RouteMeta)[] = [
     {
         path: "/",
         component: StartPage,
     },
     {
         path: "/support",
-        component: Support
+        component: Support,
     },
     {
         path: "/company/:id",
@@ -37,7 +42,7 @@ const routes: (RouteRecordRaw & RouteMeta)[]  = [
         component: CompanyPage,
         meta: {
             onlyFor: ["ADMIN"],
-        }
+        },
     },
     data,
     supplier,
@@ -46,7 +51,7 @@ const routes: (RouteRecordRaw & RouteMeta)[]  = [
     technology,
     {
         path: "/not-found",
-        component: NotFound
+        component: NotFound,
     },
     {
         path: "/:catchAll(.*)",
@@ -60,12 +65,12 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, _, next) => {
-    const {fetchUser} = useCurrentUserStore();
-    const {user} = storeToRefs(useCurrentUserStore());
-    const {setCurrentRoute} = useCurrentTool()
-    setCurrentRoute(to)
+    const { fetchUser } = useCurrentUserStore();
+    const { user } = storeToRefs(useCurrentUserStore());
+    const { setCurrentRoute } = useCurrentTool();
+    setCurrentRoute(to);
 
-    !user.value && await fetchUser();
+    !user.value && (await fetchUser());
 
     if (!user.value) {
         toast.error("Текущий пользователь не определен");
@@ -83,7 +88,6 @@ router.beforeEach(async (to, _, next) => {
         toast.error("У вас нет прав доступа к этой странице");
         return next("/");
     }
-
 });
 
 export default router;
