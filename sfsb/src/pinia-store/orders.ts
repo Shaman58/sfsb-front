@@ -25,12 +25,17 @@ export const useOrdersStore = defineStore("orders", () => {
                 },
             });
             checkStatus(response);
+            if (response.data.length === 0) return (currentOffset.value -= 1);
             orders.value = [...orders.value, ...response.data];
         } catch (error) {
             toast.error("Ошибка получения списка заказов " + error);
         } finally {
             loading.value = false;
         }
+    };
+
+    const clearCurrentOffset = () => {
+        currentOffset.value = 0;
     };
 
     const getOrders = async (search?: string) => {
@@ -85,6 +90,7 @@ export const useOrdersStore = defineStore("orders", () => {
         orders,
         loading,
         next,
+        clearCurrentOffset,
         getOrders,
         saveOrder,
         deleteOrder,
