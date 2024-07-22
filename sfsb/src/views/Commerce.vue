@@ -1,36 +1,16 @@
-<template>
-    <br>
-    <v-container>
-        <div class="d-flex justify-center">
-            <operation-component/>
-        </div>
-        <v-row>
-            <v-col cols="6">
-                <customer-component/>
-            </v-col>
-            <v-col cols="6">
-                <order-component/>
-            </v-col>
-        </v-row>
-    </v-container>
+<template lang="pug">
+    suspended-component
+        router-view
 </template>
 
 <script setup lang="ts">
+import SuspendedComponent from "@/components/common/SuspendedComponent.vue";
+import {toRefs} from "vue";
+import {useRoute, useRouter} from "vue-router";
 
-import CustomerComponent from "@/components/customer/CustomerComponent.vue";
-import OrderComponent from "@/components/order/OrderComponent.vue";
-import {onMounted} from "vue";
-import {useStore} from "vuex";
-import OperationComponent from "@/components/operation/OperationComponent.vue";
+const router = useRouter();
+const {path} = toRefs(useRoute())
+const defaultRoute = "/commerce/orders";
 
-const store = useStore();
-
-//TODO: возможно перенести в App.vue
-
-onMounted(() => {
-    store.dispatch("fetchCustomers");
-    store.dispatch("fetchOrders");
-});
-
-
+path.value.split("/").at(-1) === 'commerce' && router.push(defaultRoute)
 </script>

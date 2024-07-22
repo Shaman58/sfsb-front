@@ -1,10 +1,11 @@
 <template>
-    <v-text-field v-model="internalDuration" :label="label" outlined @input="handleInput" :rules="computedRules" type="text"
-        persistent-hint placeholder="00:00" maxlength="5" />
+    <v-text-field v-model="internalDuration" :label="label" outlined @input="handleInput" :rules="computedRules"
+                  type="text"
+                  persistent-hint placeholder="00:00" maxlength="5"/>
 </template>
 
 <script setup lang="ts">
-import { ComputedRef, computed, ref, watch } from 'vue';
+import {computed, ComputedRef, ref, watch} from 'vue';
 
 interface Props {
     modelValue: string
@@ -16,7 +17,7 @@ const emit = defineEmits();
 
 const props = defineProps<Props>();
 
-const internalDuration = ref(props.modelValue);
+const internalDuration = ref(props.modelValue || '00:00');
 
 const handleInput = () => {
 

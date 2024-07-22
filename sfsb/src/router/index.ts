@@ -1,9 +1,9 @@
-import { createRouter, createWebHistory } from "vue-router";
-import Commerce from "@/views/Commerce.vue";
-import Technology from "@/views/Technology.vue";
-import DatePage from "@/views/DatePage.vue";
-import Staff from "@/views/Staff.vue";
-import Supplier from "@/views/Supplier.vue";
+import {
+    createRouter,
+    createWebHistory,
+    type RouteMeta,
+    type RouteRecordRaw,
+} from "vue-router";
 import NotFound from "@/views/NotFound.vue";
 import StartPage from "@/views/StartPage.vue";
 import { useCurrentUserStore } from "@/pinia-store/currentUser";
@@ -11,13 +11,24 @@ import { useToast } from "vue-toast-notification";
 import { storeToRefs } from "pinia";
 import CompanyPage from "@/views/CompanyPage.vue";
 import Company1 from "@/components/company/Company1.vue";
+import { useCurrentTool } from "@/pinia-store/tools";
+import Support from "@/views/Support.vue";
+import data from "@/router/data";
+import supplier from "@/router/supplier";
+import commerce from "@/router/commerce";
+import technology from "@/router/technology";
+import staff from "@/router/staff";
 
 const toast = useToast();
 
-const routes = [
+const routes: (RouteRecordRaw & RouteMeta)[] = [
     {
         path: "/",
         component: StartPage,
+    },
+    {
+        path: "/support",
+        component: Support,
     },
     {
         path: "/company/:id",
@@ -31,42 +42,16 @@ const routes = [
         component: CompanyPage,
         meta: {
             onlyFor: ["ADMIN"],
-        }
-    },
-    {
-        path: "/date",
-        component: DatePage,
-        meta: {
-            onlyFor: ["TECHNOLOGIST", "ADMIN"],
         },
     },
+    data,
+    supplier,
+    staff,
+    commerce,
+    technology,
     {
-        path: "/supplier",
-        component: Supplier,
-        meta: {
-            onlyFor: ["SUPPLIER", "ADMIN"],
-        },
-    },
-    {
-        path: "/staff",
-        component: Staff,
-        meta: {
-            onlyFor: ["HR", "ADMIN"],
-        },
-    },
-    {
-        path: "/commerce",
-        component: Commerce,
-        meta: {
-            onlyFor: ["COMMERCE", "ADMIN"],
-        },
-    },
-    {
-        path: "/technology",
-        component: Technology,
-        meta: {
-            onlyFor: ["TECHNOLOGIST", "ADMIN"],
-        },
+        path: "/not-found",
+        component: NotFound,
     },
     {
         path: "/:catchAll(.*)",
@@ -75,15 +60,17 @@ const routes = [
 ];
 
 const router = createRouter({
-    history: createWebHistory(process.env.BASE_URL),
+    history: createWebHistory(),
     routes,
 });
 
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async (to, _, next) => {
     const { fetchUser } = useCurrentUserStore();
     const { user } = storeToRefs(useCurrentUserStore());
+    const { setCurrentRoute } = useCurrentTool();
+    setCurrentRoute(to);
 
-    await fetchUser();
+    !user.value && (await fetchUser());
 
     if (!user.value) {
         toast.error("Текущий пользователь не определен");
@@ -101,8 +88,6 @@ router.beforeEach(async (to, from, next) => {
         toast.error("У вас нет прав доступа к этой странице");
         return next("/");
     }
-
-    next();
 });
 
 export default router;

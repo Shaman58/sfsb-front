@@ -1,8 +1,8 @@
 <template>
-    <v-container class="impuls-hub">
+    <div class="impuls-hub">
         <div class="impuls">ИМПУЛЬС</div>
         <div class="hub">Атом</div>
-    </v-container>
+    </div>
 </template>
 
 <style scoped>

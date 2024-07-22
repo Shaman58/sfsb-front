@@ -1,0 +1,72 @@
+.tool-print
+  --pad: 1rem
+  position: absolute
+  top: 0
+  left: 0
+  width: 100vw
+  //min-height: 100vh
+  z-index: 1010
+  background: rgb(var(--v-theme-background))
+  padding: var(--pad)
+  display: grid
+  place-items: center
+  grid-template-columns: auto
+  gap: 1rem
+
+  &__controls
+    display: flex
+    justify-content: center
+    gap: 1rem
+    color: red
+
+    & > *
+      cursor: pointer
+
+    @media print
+      display: none
+
+
+  &__header
+    place-self: center right
+
+    font-size: clamp(12px, 18 / 1024 * 100vw, 18px)
+
+  &__main
+    width: 100%
+    margin-block: 1rem
+
+  &__main-title
+    text-align: center
+    text-transform: uppercase
+    margin-bottom: 2rem
+
+  &__main-text
+    margin-bottom: 1rem
+
+  &__table
+    border: 3px solid
+
+
+  &__table-row
+    display: grid
+    grid-template-columns: 40px 2fr 2fr 1fr 1fr
+    border-block: 1px solid
+
+  &__table-cell
+    padding: 0.5rem
+
+    &:not(:last-child)
+      border-right: 1px solid
+
+  &__table-total
+    font-weight: 700
+
+  &__table-footer
+    &.tool-print__table-row
+      border: none
+
+      & *
+        border: none
+
+  &__footer
+    place-self: center left

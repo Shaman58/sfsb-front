@@ -1,0 +1,226 @@
+<template lang="pug">
+    LayoutMain
+        template(#header)
+            div(style="height: 8px; width: 100%;")
+                v-progress-linear(v-show="loading" indeterminate :color="$defaultColor")
+            OrderToolbar(
+                :order="orderLocal"
+                :valid="valid"
+                @save="save"
+                @refresh="refresh"
+                @save-k-p="saveKP"
+            )
+        .order-card
+            v-form.order-card__form(ref="form" v-model="valid")
+                v-expansion-panels.order-card__container(:multiple="true" v-model="panel" )
+
+                    v-expansion-panel.order-card__common(value="common")
+                        v-expansion-panel-title ОБЩИЕ ДАННЫЕ
+                        v-expansion-panel-text
+                            div(style="margin-bottom: 1rem;" v-if="orderLocal && orderLocal.user")
+                                span Автор:&nbsp;
+                                strong {{ orderLocal.user.lastName }}&nbsp;
+                                strong {{ orderLocal.user.firstName }}
+                                v-spacer
+                                span Дата создания: {{ new Date(orderLocal.created).toLocaleDateString()}} {{new Date(orderLocal.created).toLocaleTimeString() }}
+                            v-row(v-if="orderLocal")
+                                v-col(cols="3")
+                                    v-text-field(label="Номер заявки:" v-model="orderLocal.applicationNumber" :rules="[rules.required]" maxlength="5")
+                                v-col(cols="9")
+                                    v-select(v-if="customers" :items="customers" :item-title="'companyName'" return-object v-model="orderLocal.customer" :rules="[rules.required]" @update:modelValue="orderLocal && (orderLocal.contact = null)" label="Заказчик")
+
+                    v-expansion-panel.order-card__group-items(value="items")
+                        v-expansion-panel-title ПОЗИЦИИ ЗАКАЗА
+                        v-expansion-panel-text.order-card__group-text
+                            OrderItems(:items="orderLocal.items" :customer="orderLocal.customer?.companyName" :number="+orderLocal?.applicationNumber")
+
+                    v-expansion-panel.order-card__files(value="files")
+                        v-expansion-panel-title ФАЙЛЫ
+                        v-expansion-panel-text
+                            suspended-component
+                                OrderFiles(:order-id="orderLocal.id")
+
+                    v-expansion-panel.order-card__descriptions(value="descriptions")
+                        v-expansion-panel-title ДОПОЛНИТЕЛЬНЫЕ ДАННЫЕ
+                        v-expansion-panel-text
+                            v-textarea(v-model="orderLocal.description" label="Описание" )
+                            v-textarea(v-model="orderLocal.businessProposal" label="Бизнес предложение" )
+        AlertDialog(ref="alertDialog")
+
+
+</template>
+<script setup lang="ts">
+import {
+    computed,
+    onUnmounted,
+    type Ref,
+    ref,
+    toRefs,
+    watch,
+    watchEffect,
+} from "vue";
+import SuspendedComponent from "@/components/common/SuspendedComponent.vue";
+import OrderFiles from "@/components/commerce/Orders/OrderFiles.vue";
+import { useValidationRules } from "@/mixins/FieldValidationRules";
+import { storeToRefs } from "pinia";
+import { useCustomersStore } from "@/pinia-store/customers";
+import LayoutMain from "@/components/common/LayoutMain.vue";
+import OrderToolbar from "@/components/commerce/Orders/OrderToolbar.vue";
+import OrderItems from "@/components/commerce/Orders/OrderItems.vue";
+import { onBeforeRouteUpdate, useRoute, useRouter } from "vue-router";
+import { useOrdersStore } from "@/pinia-store/orders";
+import AlertDialog from "@/components/common/AlertDialog.vue";
+import { useCurrentUserStore } from "@/pinia-store/currentUser";
+import { Empty } from "@/mixins/Empty";
+import { useToast } from "vue-toast-notification";
+
+const toast = useToast();
+
+const router = useRouter();
+const { params } = toRefs(useRoute());
+
+const { orders, loading } = storeToRefs(useOrdersStore());
+const { saveOrder, getOrders, saveKP: storeKP } = useOrdersStore();
+
+const hasCurrentOrder = orders.value.find((e) => e.id + "" === params.value.id);
+if (!hasCurrentOrder && params.value.id !== "new") router.push("/not-found");
+
+const order = computed(() =>
+    params.value.id === "new"
+        ? Empty.Order()
+        : orders.value.find((e) => e.id + "" === params.value.id) ||
+          orders.value[0]
+);
+
+const orderLocal = ref<Order>(order.value as Order);
+
+const alertDialog = ref<typeof AlertDialog | undefined>();
+
+const form = ref<HTMLFormElement>();
+const valid = ref(false);
+const panel = ref<string[]>(["common", "items"]);
+
+const { rules } = useValidationRules();
+
+const { customers } = storeToRefs(useCustomersStore());
+const { fetchCustomers } = useCustomersStore();
+!customers.value.length && (await fetchCustomers());
+
+const { user } = storeToRefs(useCurrentUserStore());
+const isSameUser = () => {
+    return orderLocal.value.user && orderLocal.value.user.id === user.value?.id;
+};
+const refresh = async () => {
+    await getOrders();
+};
+const save = async () => {
+    if (orderLocal.value.user && !isSameUser() && alertDialog.value) {
+        try {
+            alertDialog.value.show();
+            const res = await alertDialog.value.getAnswer();
+            console.log("res", res);
+        } catch (error) {
+            return;
+        } finally {
+            alertDialog.value.hide();
+        }
+    }
+    const valid: { valid: boolean; errors: Ref<string[]> } | null =
+        form.value && (await form.value.validate());
+    if (!valid?.valid) return;
+    await saveOrder(orderLocal.value);
+    await getOrders();
+    setTimeout(async () => {
+        const refreshedOrder = orders.value.find(
+            (e) => e.id === +orderLocal.value.id
+        );
+        refreshedOrder?.id &&
+            (await router.push(`/commerce/orders/${refreshedOrder.id}`));
+    }, 500);
+};
+
+const saveKP = ({
+    orderId,
+    companyId,
+}: {
+    orderId: number;
+    companyId: number;
+}) => {
+    console.log("saveKP", orderId, companyId);
+    const ERROR_MESSAGE =
+        "Для сохранения коммерческого предложения выберите компанию-поставщика";
+    if (!companyId) return toast.error(ERROR_MESSAGE);
+    storeKP(orderId, companyId);
+};
+
+const unwatchEffect = watchEffect(() => {
+    orderLocal.value = order.value as Order;
+});
+
+const unwatch = watch([params], () => {
+    panel.value = params.value.id === "new" ? ["common", "items"] : panel.value;
+});
+
+onBeforeRouteUpdate((v) => console.log("onBeforeRouteUpdate", v));
+
+onUnmounted(() => {
+    unwatch();
+    unwatchEffect();
+});
+</script>
+<style lang="sass">
+.order-card
+    display: grid
+    gap: 0.5rem
+    height: 100%
+
+
+    &__form
+        height: 100%
+        overflow-y: auto
+
+        &::-webkit-scrollbar
+            width: 4px
+            background-color: transparent
+
+        &::-webkit-scrollbar-thumb
+            width: 4px
+            background-color: var(--scroll-color)
+            border-radius: 8px
+
+    &__details-content
+        display: flex
+        align-items: center
+        gap: 0.5rem
+
+        & > *
+            flex: 1 1
+
+    &__controls
+        display: flex
+        align-items: center
+
+    &__items
+        display: grid
+        grid-template-columns: repeat(2, 1fr)
+        gap: 0.5rem
+        height: min(500px, 100%)
+
+    &__items-list
+        height: 100%
+        overflow-y: auto
+
+        &::-webkit-scrollbar
+            width: 4px
+            background-color: transparent
+
+        &::-webkit-scrollbar-thumb
+            width: 4px
+            background-color: var(--scroll-color)
+            border-radius: 8px
+
+    &__group-text > .v-expansion-panel-text__wrapper
+
+        @media (width < 1024px)
+            padding-inline: 0
+</style>

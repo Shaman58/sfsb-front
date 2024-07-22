@@ -1,0 +1,33 @@
+.tool-print(v-if="toolPrint")
+    .tool-print__controls
+        .tool-print__close(@click.stop="close")
+            v-icon mdi-close
+            span ЗАКРЫТЬ
+        .tool-print__close(@click.stop="print")
+            v-icon mdi-printer
+            span Отправить на печать
+    header.tool-print__header {{toolPrint.header}}
+    main.tool-print__main
+        h1.tool-print__main-title заявка на инструмент
+        .tool-print__main-text {{toolPrint.body}}
+        .tool-print__table
+            .tool-print__table-header.tool-print__table-row
+                .tool-print__table-cell.tool-print__table-th №
+                .tool-print__table-cell.tool-print__table-th Наименование
+                .tool-print__table-cell.tool-print__table-th Описание
+                .tool-print__table-cell.tool-print__table-th Кол-во, шт.
+                .tool-print__table-cell.tool-print__table-th Цена, руб. (без НДС)
+            .tool-print__table-main.tool-print__table-row(v-for="(tool, idx) of toolPrint.tools")
+                .tool-print__table-cell.tool-print__table-td {{ idx+1 }}
+                .tool-print__table-cell.tool-print__table-td {{tool.name}}
+                .tool-print__table-cell.tool-print__table-td {{tool.description}}
+                .tool-print__table-cell.tool-print__table-td {{tool.amount}}
+                .tool-print__table-cell.tool-print__table-td {{tool.itemPrice}}
+        .tool-print__table-footer.tool-print__table-row
+            .tool-print__table-cell
+            .tool-print__table-cell
+            .tool-print__table-cell Итого:
+            .tool-print__table-cell.tool-print__table-total {{totalAmount}}
+            .tool-print__table-cell.tool-print__table-total {{totalPrice}}
+
+    footer.tool-print__footer {{toolPrint.footer}}

@@ -2,7 +2,7 @@ import { Directive, DirectiveBinding } from "vue";
 import { useCurrentUserStore } from "@/pinia-store/currentUser";
 
 const effectMap: { [key: string]: (el: HTMLElement) => void } = {
-    contarst: (el: HTMLElement) => {
+    contrast: (el: HTMLElement) => {
         el.setAttribute("untouchable", "true");
     },
     hide: (el: HTMLElement) => {

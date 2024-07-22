@@ -1,0 +1,82 @@
+<template lang="pug">
+    v-dialog(v-model="show" width="1024")
+        v-form#company-create-form(ref="form" v-model="valid" v-on:submit.prevent="void save" style="overflow-y: auto;")
+            v-card.mx-auto.my-12
+                v-card-title
+                    span.text-h5 Карточка организации
+                v-card-text
+                    v-container
+                        v-row
+                            v-col(cols="12")
+                                v-text-field(label="Название организации*" ref="orgName" v-model="companyLocal.companyName" :rules="[rules.required, rules.counter]" counter maxlength="200" )
+                        v-row
+                            v-col(cols="12")
+                                v-text-field(label="Адрес*" v-model="companyLocal.address" :rules="[rules.required, rules.counter]" placeholder="г. Заречный ул. Мира 12" counter maxlength="200")
+                        v-row
+                            v-col( cols="12" sm="6" md="6")
+                                v-text-field(label="Email*" v-model="companyLocal.email" :rules="[rules.required, rules.emailValidation]" placeholder="example@exe.com")
+                            v-col( cols="12" sm="6" md="6")
+                                v-text-field(label="Телефон*" v-model="companyLocal.phoneNumber" :rules="[rules.required, rules.phoneValidation]" placeholder="+7 (4321) 23-34-45")
+                        v-row
+                            v-col(cols="12" sm="6" md="4")
+                                v-text-field(label="ИНН*" v-model="companyLocal.inn" :rules="[rules.innValidation]" counter)
+                            v-col(cols="12" sm="6" md="4")
+                                v-text-field(label="КПП*" v-model="companyLocal.kpp" :rules="[rules.bikkppValidation]" counter)
+                            v-col(cols="12" sm="6" md="4")
+                                v-text-field(label="ОКПО*" v-model="companyLocal.ogrn" :rules="[rules.ogrnValidation]" counter)
+                        v-row
+                            v-col( cols="12" sm="6" md="4")
+                                v-text-field(label="Банк" v-model="companyLocal.bank" :rules="[ rules.counter]" placeholder="ОАО ВТБ" counter maxlength="200")
+                            v-col( cols="12" sm="6" md="4")
+                                v-text-field(label="Расчетный счет" v-model="companyLocal.paymentAccount" :rules="[rules.accountWithEmptyValidation]" counter)
+                            v-col( cols="12" sm="6" md="4")
+                                v-text-field(label="БИК" v-model="companyLocal.bik" :rules="[rules.bikkppWithEmptyValidation]" counter)
+                        v-row
+                            v-col(cols="12" sm="6" md="4")
+                                v-text-field(label="Корсчет" v-model="companyLocal.correspondentAccount" :rules="[rules.accountWithEmptyValidation]" counter)
+                v-card-actions
+                    v-spacer
+                    v-btn(color="orange-darken-1" variant="text" @click="show=false") Закрыть
+                    v-btn(color="orange-darken-1" variant="text" :disabled="!valid" @click="save") Сохранить
+</template>
+
+<script setup lang="ts">
+import {useValidationRules} from "@/mixins/FieldValidationRules";
+import {onUnmounted, type Ref, ref, toRefs, watch, watchEffect} from "vue";
+import {useCustomersStore} from "@/pinia-store/customers";
+
+const props = defineProps<{ company: PartialCustomer }>();
+const show = defineModel("show")
+
+const {company} = toRefs(props)
+const companyLocal = ref(company.value)
+
+const emit = defineEmits();
+const {rules} = useValidationRules();
+
+const form: Ref<HTMLFormElement | undefined> = ref();
+const orgName = ref()
+const valid = ref(false);
+
+const {saveCustomer} = useCustomersStore()
+
+const unwatch =watchEffect(() => companyLocal.value = company.value)
+
+
+const hide = () => {
+    emit("hide");
+    // companyLocal.value = {...company};
+};
+
+const save = async () => {
+    if (!form.value) return
+    const valid: { valid: boolean, errors: Ref<string[]> } = await form.value.validate()
+    if (valid.valid) {
+        // emit("save", companyLocal.value);
+        await saveCustomer(companyLocal.value as Customer)
+        show.value = false
+    }
+};
+
+onUnmounted(unwatch)
+</script>

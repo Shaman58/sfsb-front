@@ -1,29 +1,54 @@
 <template>
     <div class="container">
-        <ul class="loader">
-            <li></li>
-            <li></li>
-            <li></li>
-            <li></li>
-            <li></li>
-            <li></li>
-        </ul>
+        <div class="wrap">
+            <impuls-hub/>
+        </div>
+        <!--        <ul class="loader">-->
+        <!--            <li></li>-->
+        <!--            <li></li>-->
+        <!--            <li></li>-->
+        <!--            <li></li>-->
+        <!--            <li></li>-->
+        <!--            <li></li>-->
+        <!--        </ul>-->
     </div>
 </template>
 
-<style scoped>
+<style>
 body {
-    background-color: #333;
+    background-color: #181818;
 }
-
+@media (prefers-color-scheme: light) {
+    body{
+        background-color: #fff;
+    }
+}
+.wrap{
+    height: 40px;
+    width: 150px;
+    animation: impuls 2s infinite ease-in-out;
+}
+@keyframes impuls {
+    0% {
+        scale: 1;
+        filter: blur(2px) contrast(20%) drop-shadow(0 0 0px #2F477E);
+    }
+    50% {
+        scale: 1.15;
+        filter: blur(0) contrast(100%) drop-shadow(0 0 4px #2F477E);
+    }
+    100%{
+        scale: 1;
+        filter: blur(2px) contrast(20%) drop-shadow(0 0 0px #2F477E);
+    }
+}
 .container {
     position: fixed;
     z-index: 4;
-    margin: 0 auto;
     left: 35px;
     right: 0;
     top: 50%;
-    margin-top: -45px;
+    margin: -45px auto 0;
     width: 120px;
     height: 80px;
     list-style: none;
@@ -33,11 +58,10 @@ body {
 .loader {
     position: fixed;
     z-index: 3;
-    margin: 0 auto;
     left: 0;
     right: 0;
     top: 50%;
-    margin-top: -30px;
+    margin: -30px auto 0;
     width: 90px;
     height: 60px;
     list-style: none;
@@ -95,3 +119,6 @@ li:nth-child(6) {
 
 
 </style>
+<script setup lang="ts">
+import ImpulsHub from "@/components/ImpulsHub.vue";
+</script>

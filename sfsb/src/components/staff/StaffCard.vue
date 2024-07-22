@@ -5,7 +5,7 @@
                 .person-card__header
                     label.person-card__picture(for="avatar")
                         img.person-card__img(:src="personLocal.picture ? personLocal.picture : '/images/user-profile.png'" alt="avatar" title="Заменить аватар")
-                        input.person-card__input(type="file" id="avatar" @change="changeAvatar($event)" hidden)
+                        input.person-card__input(type="file" id="avatar" @change="void changeAvatar($event)" hidden)
                     h2.person-card__title
                         span {{ personLocal.firstName }}
                         span {{ personLocal.lastName }}
@@ -42,15 +42,14 @@
 </template>
 
 <script setup lang="ts">
-import type {Ref} from "vue"
+import {onUnmounted, Ref} from "vue"
 import {computed, reactive, ref, watch} from 'vue';
-// import roles from "./fakeRolesData"
 import {useToast} from 'vue-toast-notification';
 import {useStaffStore} from '@/pinia-store/staff'
 import {useRolesStore} from '@/pinia-store/roles'
 import {storeToRefs} from 'pinia'
 
-const personForm = ref(null)
+const personForm = ref<HTMLFormElement>()
 const newAvatarFD: Ref<string | Blob | null> = ref(null)
 
 const toast = useToast();
@@ -73,7 +72,6 @@ const newPass = ref("")
 const newPassRepeat = ref("")
 
 const required = (v: string) => !!v.length || "Поле обязательно для заполнения"
-// const { rules:{emailValidation} } = useValidationRules()
 const emailValidation = (value: string) => {
     const pattern = /^\w+([.-]?\w+){2,}@\w+([.-]?\w+)*(\.\w{2,5})+$/
     return value === "" || pattern.test(value) || 'Неверный формат'
@@ -132,11 +130,12 @@ const deletePerson = async () => {
     emit("exit")
 }
 
-watch(personLocal, (personValue: Person) => {
+const unwatch = watch(personLocal, (personValue: Person) => {
     wasPersonChanged.value = true
     console.log(personValue);
 })
 
+onUnmounted(unwatch)
 </script>
 
 <style lang="sass" scoped>
