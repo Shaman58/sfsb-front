@@ -17,6 +17,7 @@
                 )
                     router-link.list-link.orders__link(:to="`/commerce/orders/${i.id}`") {{i.applicationNumber}} {{i.customer.companyName}}
 
+                v-list-item(v-intersect="nextPortion" :style="{minHeight: '10px !important'}")
         template(#card)
             router-view
 
@@ -31,7 +32,7 @@ import { useRoute, useRouter } from "vue-router";
 const router = useRouter();
 
 const { orders, loading } = storeToRefs(useOrdersStore());
-const { getOrders, saveOrder } = useOrdersStore();
+const { getOrders, saveOrder, next } = useOrdersStore();
 !orders.value.length && (await getOrders());
 
 const { path } = toRefs(useRoute());
@@ -50,6 +51,10 @@ const filteredOrders = computed<Order[]>(() =>
                 .includes(filterText.value?.toLowerCase() || "")
     )
 );
+const nextPortion = async (ev: Event) => {
+    if (!ev) return;
+    await next();
+};
 </script>
 <style scoped lang="sass">
 .orders
