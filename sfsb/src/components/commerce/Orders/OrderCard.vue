@@ -54,6 +54,7 @@
 <script setup lang="ts">
 import {
     computed,
+    onMounted,
     onUnmounted,
     type Ref,
     ref,
@@ -83,19 +84,25 @@ const router = useRouter();
 const { params } = toRefs(useRoute());
 
 const { orders, loading } = storeToRefs(useOrdersStore());
-const { saveOrder, getOrders, saveKP: storeKP, deleteOrder } = useOrdersStore();
+const {
+    saveOrder,
+    getOrders,
+    getOrderById,
+    saveKP: storeKP,
+    deleteOrder,
+} = useOrdersStore();
 
-const hasCurrentOrder = orders.value.find((e) => e.id + "" === params.value.id);
-if (!hasCurrentOrder && params.value.id !== "new") router.push("/not-found");
+// const hasCurrentOrder = orders.value.find((e) => e.id + "" === params.value.id);
+// if (!hasCurrentOrder && params.value.id !== "new") router.push("/not-found");
 
-const order = computed(() =>
-    params.value.id === "new"
-        ? Empty.Order()
-        : orders.value.find((e) => e.id + "" === params.value.id) ||
-          orders.value[0]
-);
+// const order = computed(() =>
+//     params.value.id === "new"
+//         ? Empty.Order()
+//         : orders.value.find((e) => e.id + "" === params.value.id) ||
+//           orders.value[0]
+// );
 
-const orderLocal = ref<Order>(order.value as Order);
+const orderLocal = ref<Order>(Empty.Order() as Order);
 
 const alertDialog = ref<typeof AlertDialog | undefined>();
 const alertDialogDelete = ref<typeof AlertDialog | undefined>();
@@ -135,14 +142,11 @@ const save = async () => {
     const valid: { valid: boolean; errors: Ref<string[]> } | null =
         form.value && (await form.value.validate());
     if (!valid?.valid) return;
-    await saveOrder(orderLocal.value);
-    await getOrders();
+    const res = await saveOrder(orderLocal.value);
+    console.log("res", res);
+
     setTimeout(async () => {
-        const refreshedOrder = orders.value.find(
-            (e) => e.id === +orderLocal.value.id
-        );
-        refreshedOrder?.id &&
-            (await router.push(`/commerce/orders/${refreshedOrder.id}`));
+        res && res.id && (await router.push(`/commerce/orders/${res.id}`));
     }, 500);
 };
 
@@ -161,11 +165,11 @@ const saveKP = ({
 };
 
 const deleteOrderHandler = async () => {
+    const deletingOrderId = orderLocal.value.id;
     try {
         alertDialogDelete.value.show();
         const res = await alertDialogDelete.value.getAnswer();
-        await deleteOrder(order.value);
-        //оьновляем экран, показываем первый элменет в Материалах
+        await deleteOrder(orderLocal.value.id);
     } catch (error) {
         return;
     } finally {
@@ -173,19 +177,29 @@ const deleteOrderHandler = async () => {
     }
 };
 
-const unwatchEffect = watchEffect(() => {
-    orderLocal.value = order.value as Order;
-});
-
 const unwatch = watch([params], () => {
     panel.value = params.value.id === "new" ? ["common", "items"] : panel.value;
 });
 
-onBeforeRouteUpdate((v) => console.log("onBeforeRouteUpdate", v));
+const init = async () => {
+    if (params.value.id === "new") {
+        orderLocal.value = Empty.Order() as Order;
+        return;
+    }
+    const res = await getOrderById(+params.value.id);
+    if (!res) await router.push("/not-found");
+    orderLocal.value = res;
+};
+const unwatchParams = watchEffect(init);
+onMounted(init);
+
+onBeforeRouteUpdate((v) => {
+    console.log("onBeforeRouteUpdate", v);
+});
 
 onUnmounted(() => {
     unwatch();
-    unwatchEffect();
+    unwatchParams();
 });
 </script>
 <style lang="sass">
