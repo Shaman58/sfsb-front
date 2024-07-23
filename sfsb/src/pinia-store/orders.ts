@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import api, { query } from "@/api/instance";
 import { useToast } from "vue-toast-notification";
-import { Ref, ref } from "vue";
+import { computed, Ref, ref } from "vue";
 import checkStatus from "@/mixins/CheckStatus";
 import { Axios } from "axios";
 
@@ -12,9 +12,11 @@ export const useOrdersStore = defineStore("orders", () => {
     const loading = ref(false);
     const limit = 20;
     const currentOffset = ref(0);
+    let previousDownloadLength = ref(0);
+    let completePortion = computed(() => previousDownloadLength.value >= limit);
 
     const next = async () => {
-        currentOffset.value += 1;
+        completePortion.value && (currentOffset.value += 1);
         loading.value = true;
         const url = "/order";
         try {
@@ -25,8 +27,15 @@ export const useOrdersStore = defineStore("orders", () => {
                 },
             });
             checkStatus(response);
-            if (response.data.length === 0) return (currentOffset.value -= 1);
-            orders.value = [...orders.value, ...response.data];
+
+            if (
+                response.data.length !== previousDownloadLength.value ||
+                response.data.length >= limit
+            ) {
+                orders.value = [...orders.value, ...response.data];
+            }
+
+            previousDownloadLength.value = response.data.length;
         } catch (error) {
             toast.error("Ошибка получения списка заказов " + error);
         } finally {
@@ -42,9 +51,10 @@ export const useOrdersStore = defineStore("orders", () => {
         loading.value = true;
         const url = search ? "/order/find" : "/order";
         try {
-            const response = await api.get(url, { params: { search } });
+            const response = await api.get(url, { params: { search, limit } });
             checkStatus(response);
             orders.value = response.data;
+            previousDownloadLength.value = orders.value.length;
         } catch (error) {
             toast.error("Ошибка получения списка заказов " + error);
         } finally {
