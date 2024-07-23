@@ -36,58 +36,79 @@
         v-spacer
         ControlButton(@click="emit('refresh')"  tooltip="Обновить" icon-name="mdi-refresh")
         ControlButton(@click="save" color="orange-darken-1" variant="text" type="submit" :disabled="!valid" tooltip="Сохранить" icon-name="mdi-floppy")
+        ControlButton( @click="deleteOrder" color="orange-darken-1" variant="text" type="submit" :disabled="!isSameUser" tooltip="Удалить" icon-name="mdi-close")
 
 </template>
 <script setup lang="ts">
-import ControlButton from "@/components/commerce/Orders/ControlButton.vue"
-import {computed, ref, toRefs} from "vue";
-import {useOfferGenerator} from "@/mixins/OfferGenerator";
-import {useCompaniesStore} from "@/pinia-store/companies";
+import ControlButton from "@/components/commerce/Orders/ControlButton.vue";
+import { computed, ref, toRefs } from "vue";
+import { useOfferGenerator } from "@/mixins/OfferGenerator";
+import { useCompaniesStore } from "@/pinia-store/companies";
 import router from "@/router";
 
-const props = defineProps<{ order: Order, valid: boolean | null }>()
-const {order, valid} = toRefs(props)
+const props = defineProps<{
+    order: Order;
+    valid: boolean | null;
+    isSameUser: boolean;
+}>();
+const { order, valid, isSameUser } = toRefs(props);
 
-const emit = defineEmits(["save", "refresh", "saveKP"])
+const emit = defineEmits(["save", "refresh", "saveKP", "deleteOrder"]);
 
-const {previewCommerce, previewToolOrder, previewPlan1, previewPlan2} = useOfferGenerator();
+const { previewCommerce, previewToolOrder, previewPlan1, previewPlan2 } =
+    useOfferGenerator();
 
-const isAllComputed = computed(() => order.value.items.every((e: Item) => e.technology.computed))
-const isAllWorkpieced = computed(() => order.value.items.every((e: Item) => e.customerMaterial || e.technology.assembly || e.technology.workpiece.material.price.amount))
-const isOrderComputed = computed(() => isAllComputed.value && isAllWorkpieced.value)
+const isAllComputed = computed(() =>
+    order.value.items.every((e: Item) => e.technology.computed)
+);
+const isAllWorkpieced = computed(() =>
+    order.value.items.every(
+        (e: Item) =>
+            e.customerMaterial ||
+            e.technology.assembly ||
+            e.technology.workpiece.material.price.amount
+    )
+);
+const isOrderComputed = computed(
+    () => isAllComputed.value && isAllWorkpieced.value
+);
 
-const {getShortList} = useCompaniesStore()
-const companiesList = await getShortList()
+const { getShortList } = useCompaniesStore();
+const companiesList = await getShortList();
 
-const selectedCompanyId = ref<number | undefined>()
+const selectedCompanyId = ref<number | undefined>();
 
 const getCompanyId = (name: string) => {
-    const selectedCompany = companiesList.find(company => company.companyName === name)
-    return selectedCompany && selectedCompany.id
-}
+    const selectedCompany = companiesList.find(
+        (company) => company.companyName === name
+    );
+    return selectedCompany && selectedCompany.id;
+};
 
-const generateSelectCompany = (url: string) => async ({id}: { id: string }) => {
-    const selectedId = getCompanyId(id)
-    selectedCompanyId.value = selectedId
-    // order.value && await previewCommerce(order.value, selectedId)
-    await router.push(`${url}/${order.value.id}/${selectedId}`)
-}
-const selectCompany = generateSelectCompany("/commerce/print-order")
+const generateSelectCompany =
+    (url: string) =>
+    async ({ id }: { id: string }) => {
+        const selectedId = getCompanyId(id);
+        selectedCompanyId.value = selectedId;
+        // order.value && await previewCommerce(order.value, selectedId)
+        await router.push(`${url}/${order.value.id}/${selectedId}`);
+    };
+const selectCompany = generateSelectCompany("/commerce/print-order");
 
-const printToolOrder = generateSelectCompany("/commerce/print-tool")
+const printToolOrder = generateSelectCompany("/commerce/print-tool");
 
-const selectCompanyForKP = ({id}: { id: string }) => {
-    const selectedId = getCompanyId(id)
-    emit("saveKP", {orderId: order.value.id, companyId: selectedId})
-
-}
+const selectCompanyForKP = ({ id }: { id: string }) => {
+    const selectedId = getCompanyId(id);
+    emit("saveKP", { orderId: order.value.id, companyId: selectedId });
+};
 
 const save = () => {
-    emit("save")
-}
+    emit("save");
+};
+
+const deleteOrder = () => {
+    emit("deleteOrder");
+};
 </script>
 
-
-<style scoped lang="sass">
-
-</style>
+<style scoped lang="sass"></style>

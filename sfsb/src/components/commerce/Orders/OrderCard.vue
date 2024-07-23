@@ -6,9 +6,11 @@
             OrderToolbar(
                 :order="orderLocal"
                 :valid="valid"
+                :is-same-user="isSameUser || user.roles.includes('ADMIN')"
                 @save="save"
                 @refresh="refresh"
                 @save-k-p="saveKP"
+                @deleteOrder="deleteOrderHandler"
             )
         .order-card
             v-form.order-card__form(ref="form" v-model="valid")
@@ -46,7 +48,7 @@
                             v-textarea(v-model="orderLocal.description" label="Описание" )
                             v-textarea(v-model="orderLocal.businessProposal" label="Бизнес предложение" )
         AlertDialog(ref="alertDialog")
-
+        Alert2DeleteDialog(ref="alertDialogDelete" title="Вы уверены, что хотите удалить данный заказ?" )
 
 </template>
 <script setup lang="ts">
@@ -73,6 +75,7 @@ import AlertDialog from "@/components/common/AlertDialog.vue";
 import { useCurrentUserStore } from "@/pinia-store/currentUser";
 import { Empty } from "@/mixins/Empty";
 import { useToast } from "vue-toast-notification";
+import Alert2DeleteDialog from "@/components/common/Alert2DeleteDialog.vue";
 
 const toast = useToast();
 
@@ -80,7 +83,7 @@ const router = useRouter();
 const { params } = toRefs(useRoute());
 
 const { orders, loading } = storeToRefs(useOrdersStore());
-const { saveOrder, getOrders, saveKP: storeKP } = useOrdersStore();
+const { saveOrder, getOrders, saveKP: storeKP, deleteOrder } = useOrdersStore();
 
 const hasCurrentOrder = orders.value.find((e) => e.id + "" === params.value.id);
 if (!hasCurrentOrder && params.value.id !== "new") router.push("/not-found");
@@ -95,6 +98,7 @@ const order = computed(() =>
 const orderLocal = ref<Order>(order.value as Order);
 
 const alertDialog = ref<typeof AlertDialog | undefined>();
+const alertDialogDelete = ref<typeof AlertDialog | undefined>();
 
 const form = ref<HTMLFormElement>();
 const valid = ref(false);
@@ -107,20 +111,23 @@ const { fetchCustomers } = useCustomersStore();
 !customers.value.length && (await fetchCustomers());
 
 const { user } = storeToRefs(useCurrentUserStore());
-const isSameUser = () => {
+
+const isSameUser = computed(() => {
     return orderLocal.value.user && orderLocal.value.user.id === user.value?.id;
-};
+});
+
 const refresh = async () => {
     await getOrders();
 };
+
 const save = async () => {
-    if (orderLocal.value.user && !isSameUser() && alertDialog.value) {
+    if (orderLocal.value.user && !isSameUser.value && alertDialog.value) {
         try {
             alertDialog.value.show();
             const res = await alertDialog.value.getAnswer();
             console.log("res", res);
         } catch (error) {
-            return;
+            return toast.error("Ошибка при удалении данного заказа");
         } finally {
             alertDialog.value.hide();
         }
@@ -151,6 +158,19 @@ const saveKP = ({
         "Для сохранения коммерческого предложения выберите компанию-поставщика";
     if (!companyId) return toast.error(ERROR_MESSAGE);
     storeKP(orderId, companyId);
+};
+
+const deleteOrderHandler = async () => {
+    try {
+        alertDialogDelete.value.show();
+        const res = await alertDialogDelete.value.getAnswer();
+        await deleteOrder(order.value);
+        //оьновляем экран, показываем первый элменет в Материалах
+    } catch (error) {
+        return;
+    } finally {
+        alertDialogDelete.value.hide();
+    }
 };
 
 const unwatchEffect = watchEffect(() => {

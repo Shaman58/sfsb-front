@@ -59,9 +59,18 @@ export const useOrdersStore = defineStore("orders", () => {
     };
 
     const deleteOrder = async (order: Order) => {
-        return await query<Order>(
-            async () => await api.delete(`/order/${order.id}`)
-        );
+        loading.value = true;
+        try {
+            await query<Order>(
+                async () => await api.delete(`/order/${order.id}`)
+            );
+            orders.value = orders.value.filter((e) => e.id !== order.id);
+            // toast.success("Заказ успешно удален");
+        } catch (error) {
+            toast.error("Ошибка удаления заказа " + error);
+        } finally {
+            loading.value = false;
+        }
     };
     const saveKP = async (orderId: number, companyId: number) => {
         const url = `/doc/kp/remote`;
