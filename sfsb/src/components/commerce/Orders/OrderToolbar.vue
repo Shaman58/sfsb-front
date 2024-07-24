@@ -36,7 +36,14 @@
         v-spacer
         ControlButton(@click="emit('refresh')"  tooltip="Обновить" icon-name="mdi-refresh")
         ControlButton(@click="save" color="orange-darken-1" variant="text" type="submit" :disabled="!valid" tooltip="Сохранить" icon-name="mdi-floppy")
-        ControlButton( @click="deleteOrder" color="orange-darken-1" variant="text" type="submit" :disabled="!isSameUser" tooltip="Удалить" icon-name="mdi-close")
+        ControlButton(
+            @click="deleteOrder"
+            color="orange-darken-1"
+            variant="text"
+            :disabled="!isSameUser || isNew "
+            tooltip="Удалить"
+            icon-name="mdi-close"
+        )
 
 </template>
 <script setup lang="ts">
@@ -50,8 +57,9 @@ const props = defineProps<{
     order: Order;
     valid: boolean | null;
     isSameUser: boolean;
+    isNew: boolean;
 }>();
-const { order, valid, isSameUser } = toRefs(props);
+const { order, valid, isSameUser, isNew } = toRefs(props);
 
 const emit = defineEmits(["save", "refresh", "saveKP", "deleteOrder"]);
 

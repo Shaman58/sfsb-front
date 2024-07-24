@@ -7,6 +7,7 @@
                 :order="orderLocal"
                 :valid="valid && areAllQuantitieNotNull"
                 :is-same-user="isSameUser || user.roles.includes('ADMIN')"
+                :is-new="isNew"
                 @save="save"
                 @refresh="refresh"
                 @save-k-p="saveKP"
@@ -82,6 +83,8 @@ const toast = useToast();
 
 const router = useRouter();
 const { params } = toRefs(useRoute());
+
+const isNew = computed(() => params.value.id === "new");
 
 const { orders, loading } = storeToRefs(useOrdersStore());
 const {
