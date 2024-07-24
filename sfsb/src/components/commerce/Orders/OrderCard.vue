@@ -104,8 +104,8 @@ const {
 
 const orderLocal = ref<Order>(Empty.Order() as Order);
 
-const alertDialog = ref<typeof AlertDialog | undefined>();
-const alertDialogDelete = ref<typeof AlertDialog | undefined>();
+const alertDialog = ref();
+const alertDialogDelete = ref();
 
 const form = ref<HTMLFormElement>();
 const valid = ref(false);

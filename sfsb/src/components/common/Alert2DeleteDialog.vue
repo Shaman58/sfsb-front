@@ -32,5 +32,9 @@ const getAnswer = () =>
         disagree = () => reject();
     });
 
-defineExpose({ show, hide, getAnswer });
+defineExpose<{
+    show: () => void;
+    hide: () => void;
+    getAnswer: () => Promise<any>;
+}>({ show, hide, getAnswer });
 </script>
