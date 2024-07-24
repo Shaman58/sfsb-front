@@ -5,7 +5,7 @@
                 v-progress-linear(v-show="loading" indeterminate :color="$defaultColor")
             OrderToolbar(
                 :order="orderLocal"
-                :valid="valid"
+                :valid="valid && areAllQuantitieNotNull"
                 :is-same-user="isSameUser || user.roles.includes('ADMIN')"
                 @save="save"
                 @refresh="refresh"
@@ -121,6 +121,10 @@ const { user } = storeToRefs(useCurrentUserStore());
 
 const isSameUser = computed(() => {
     return orderLocal.value.user && orderLocal.value.user.id === user.value?.id;
+});
+
+const areAllQuantitieNotNull = computed(() => {
+    return orderLocal.value.items.every((e) => e.quantity > 0);
 });
 
 const refresh = async () => {
