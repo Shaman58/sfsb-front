@@ -24,7 +24,7 @@
 </template>
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
-import { computed, ref, toRefs } from "vue";
+import { computed, onUnmounted, ref, toRefs, watchEffect } from "vue";
 import LayoutPage from "@/components/common/LayoutPage.vue";
 import { useOrdersStore } from "@/pinia-store/orders";
 import { useRoute, useRouter } from "vue-router";
@@ -51,10 +51,19 @@ const filteredOrders = computed<Order[]>(() =>
                 .includes(filterText.value?.toLowerCase() || "")
     )
 );
+
 const nextPortion = async (ev: Event) => {
     if (!ev) return;
-    await next();
+    await next(filterText.value);
 };
+
+const unwatchFilterText = watchEffect(async () => {
+    await getOrders(filterText.value);
+});
+
+onUnmounted(() => {
+    unwatchFilterText();
+});
 </script>
 <style scoped lang="sass">
 .orders

@@ -181,6 +181,13 @@ const unwatch = watch([params], () => {
     panel.value = params.value.id === "new" ? ["common", "items"] : panel.value;
 });
 
+const unwatchApplicationNumber = watchEffect(() => {
+    console.log("ApplicationNumber", orderLocal.value.applicationNumber);
+    orderLocal.value.applicationNumber = Number(
+        String(orderLocal.value.applicationNumber).replace(/\D+/g, "")
+    );
+});
+
 const init = async () => {
     if (params.value.id === "new") {
         orderLocal.value = Empty.Order() as Order;
@@ -200,6 +207,7 @@ onBeforeRouteUpdate((v) => {
 onUnmounted(() => {
     unwatch();
     unwatchParams();
+    unwatchApplicationNumber();
 });
 </script>
 <style lang="sass">

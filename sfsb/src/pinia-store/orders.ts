@@ -16,13 +16,14 @@ export const useOrdersStore = defineStore("orders", () => {
     let previousDownloadLength = ref(0);
     let completePortion = computed(() => previousDownloadLength.value >= limit);
 
-    const next = async () => {
+    const next = async (search?: string) => {
         completePortion.value && (currentOffset.value += 1);
         loading.value = true;
-        const url = "/order";
+        const url = search ? "/order/find" : "/order";
         try {
             const response = await api.get(url, {
                 params: {
+                    search,
                     offset: currentOffset.value,
                     limit,
                 },
