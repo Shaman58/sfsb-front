@@ -9,7 +9,7 @@
         v-col(cols="12"  xs="12" sm="6" md="7")
             v-textarea(clearable label="Описание доп. расходов" v-model="currentTechnology.outsourcedCostsDescription" rows="2" )
         v-col(cols="12"  xs="12" sm="3" md="2")
-            v-text-field(label="Сумма"  v-model="currentTechnology.outsourcedCosts.amount" type="number" min="0" :rules="[ rules.numeric, rules.min0Validation]" )
+            v-text-field(label="Сумма"  v-model="currentTechnology.outsourcedCosts.amount" type="number" min="0" max="9999999999" step="1" :rules="[ rules.numeric, rules.min0Validation]" )
         v-col(cols="12"  xs="12" sm="3" md="3")
             DurationPicker2(v-model="currentTechnology.technologistTime" label="Время технолога" :rules="[rules.alwaysValid]" )
 
@@ -26,11 +26,12 @@ const { currentItem } = storeToRefs(useTechnologyStore());
 const { rules } = useValidationRules();
 
 const currentTechnology = currentItem.value.technology;
-watchEffect(
-    () =>
-        currentTechnology.outsourcedCosts.amount <= 0 &&
-        (currentTechnology.outsourcedCosts.amount = 0)
-);
+watchEffect(() => {
+    currentTechnology.outsourcedCosts.amount =
+        +currentTechnology.outsourcedCosts.amount.toString().replace(/^0+/, "");
+    currentTechnology.outsourcedCosts.amount <= 0 &&
+        (currentTechnology.outsourcedCosts.amount = 0);
+});
 </script>
 
 <style lang="sass" scoped></style>
