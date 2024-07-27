@@ -9,7 +9,7 @@
                     router-link.list-link.orders__link(:to="'/commerce/orders/new'")
                         span(:style="{color:'orange'}") Добавить новый заказ
                 v-list-item(
-                    v-for="i in filteredOrders"
+                    v-for="i in orders"
                     :key="i.id"
                     :active="+id===i.id"
                     @click="()=>{}"

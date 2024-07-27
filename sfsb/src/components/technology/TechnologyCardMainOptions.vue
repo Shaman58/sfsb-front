@@ -11,24 +11,26 @@
         v-col(cols="12"  xs="12" sm="3" md="2")
             v-text-field(label="Сумма"  v-model="currentTechnology.outsourcedCosts.amount" type="number" min="0" :rules="[ rules.numeric, rules.min0Validation]" )
         v-col(cols="12"  xs="12" sm="3" md="3")
-            DurationPicker(v-model="currentTechnology.technologistTime" label="Время технолога" :rules="[rules.alwaysValid]" )
+            DurationPicker2(v-model="currentTechnology.technologistTime" label="Время технолога" :rules="[rules.alwaysValid]" )
 
 </template>
 
 <script setup lang="ts">
-import DurationPicker from "@/components/technology/DurationPicker.vue";
-import {useValidationRules} from '@/mixins/FieldValidationRules';
-import {useTechnologyStore} from '@/pinia-store/technology';
-import {storeToRefs} from 'pinia';
-import {watchEffect} from "vue";
+import DurationPicker2 from "@/components/technology/DurationPicker2.vue";
+import { useValidationRules } from "@/mixins/FieldValidationRules";
+import { useTechnologyStore } from "@/pinia-store/technology";
+import { storeToRefs } from "pinia";
+import { watchEffect } from "vue";
 
-const {currentItem} = storeToRefs(useTechnologyStore())
-const {rules} = useValidationRules();
+const { currentItem } = storeToRefs(useTechnologyStore());
+const { rules } = useValidationRules();
 
-const currentTechnology = currentItem.value.technology
-watchEffect(() => currentTechnology.outsourcedCosts.amount <= 0 && (currentTechnology.outsourcedCosts.amount = 0))
+const currentTechnology = currentItem.value.technology;
+watchEffect(
+    () =>
+        currentTechnology.outsourcedCosts.amount <= 0 &&
+        (currentTechnology.outsourcedCosts.amount = 0)
+);
 </script>
 
-<style lang="sass" scoped>
-
-</style>
+<style lang="sass" scoped></style>
