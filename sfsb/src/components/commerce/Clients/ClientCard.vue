@@ -87,10 +87,9 @@ const rulesDouble = (value: string) => {
         return e.inn == value;
     });
     const companyName = company && company.companyName;
-    return (
-        (params.value.id !== "new" && !!company) ||
-        `Такой ИНН существует у клиента ${companyName}`
-    );
+    if (params.value.id === "new" && !!company)
+        return `Такой ИНН существует у клиента ${companyName}`;
+    return true;
 };
 
 watch(
