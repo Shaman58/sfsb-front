@@ -4,7 +4,7 @@
         .order-files__container
             label.order-files__new(for="new-file" title="Добавить файл")
                 v-icon(color="orange-lighten-1") mdi-plus
-                input#new-file(type="file" hidden @change="saveOrderFile" accept="image/*,.pdf,.xls,.xlsx,.doc,.docx" )
+                input#new-file(ref="inputElement" type="file" hidden @change="saveOrderFile" accept="image/*,.pdf,.xls,.xlsx,.doc,.docx" )
             v-list.order-files__list
                 v-list-item.order-files__list-item(v-for='(file, index) in files', :key='index')
                     a.order-files__list-link(:href="file.link" target="_blank") {{file.filename}}
@@ -12,37 +12,52 @@
 
 </template>
 <script setup lang="ts">
-
-import {onUnmounted, toRefs, watch} from "vue";
-import {storeToRefs} from "pinia";
+import { onUnmounted, ref, toRefs, watch } from "vue";
+import { storeToRefs } from "pinia";
 import useOrderFiles from "@/pinia-store/orderFiles";
 
-const props = defineProps<{ orderId: number }>()
-const {orderId} = toRefs(props)
+const props = defineProps<{ orderId: number | undefined }>();
+const { orderId } = toRefs(props);
 
-const {files, loading} = storeToRefs(useOrderFiles())
-const {getAllFilesByOrder,saveFile, deleteFile} = useOrderFiles()
-!files.value.length && await getAllFilesByOrder(orderId.value)
+const inputElement = ref<HTMLInputElement>();
+
+const { files, loading, error } = storeToRefs(useOrderFiles());
+const { getAllFilesByOrder, saveFile, deleteFile, clearError } =
+    useOrderFiles();
+await getAllFilesByOrder(orderId.value);
 
 const removeFile = async (file: number) => {
-    await deleteFile(orderId.value, file)
-}
+    await deleteFile(orderId.value, file);
+};
 
-const saveOrderFile = async(ev: Event)=>{
-    const {files} = ev.target as HTMLInputElement
-    if(!files || !files.length) return
-    const fd = new FormData()
-    fd.append("file",files[0])
-    await saveFile(orderId.value, fd)
-}
+const saveOrderFile = async (ev: Event) => {
+    const { files } = ev.target as HTMLInputElement;
+    if (!files || !files.length) return;
+    const fd = new FormData();
+    fd.append("file", files[0]);
+    await saveFile(orderId.value, fd);
+};
 
-const unwatch =watch([orderId], async () => {
-    await getAllFilesByOrder(orderId.value)
-})
+const unwatch = watch([orderId], async () => {
+    console.log("orderId.value", orderId.value);
+    orderId.value && (await getAllFilesByOrder(orderId.value));
+});
 
-onUnmounted(unwatch)
+const unwatchError = watch([error], () => {
+    console.error(error.value);
+    console.log(inputElement.value);
+    if (inputElement.value) {
+        (inputElement.value as HTMLInputElement).value = "";
+        // (inputElement.value as HTMLInputElement).files = ;
+    }
+    clearError();
+});
+
+onUnmounted(() => {
+    unwatch();
+    unwatchError();
+});
 </script>
-
 
 <style scoped lang="sass">
 .order-files
