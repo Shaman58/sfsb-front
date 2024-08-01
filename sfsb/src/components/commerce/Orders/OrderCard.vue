@@ -17,9 +17,9 @@
             v-form.order-card__form(ref="form" v-model="valid")
                 v-expansion-panels.order-card__container(:multiple="true" v-model="panel" )
 
-                    v-expansion-panel.order-card__common(value="common")
+                    v-expansion-panel.order-card__common(value="common" @click="onCommonPanel")
                         v-expansion-panel-title ОБЩИЕ ДАННЫЕ
-                        v-expansion-panel-text
+                        v-expansion-panel-text(:enabled="isNew || isSameUser || isAdmin")
                             div(style="margin-bottom: 1rem;" v-if="orderLocal && orderLocal.user")
                                 span Автор:&nbsp;
                                 strong {{ orderLocal.user.lastName }}&nbsp;
@@ -125,6 +125,9 @@ const { user } = storeToRefs(useCurrentUserStore());
 const isSameUser = computed(() => {
     return orderLocal.value.user && orderLocal.value.user.id === user.value?.id;
 });
+const isAdmin = computed(() => {
+    return user.value?.roles.includes("ADMIN");
+});
 
 const areAllQuantitieNotNull = computed(() => {
     return orderLocal.value.items.every((e) => e.quantity > 0);
@@ -182,6 +185,13 @@ const deleteOrderHandler = async () => {
     } finally {
         alertDialogDelete.value.hide();
     }
+};
+
+const onCommonPanel = () => {
+    if (!isNew.value && !isSameUser.value && !isAdmin.value)
+        toast.error(
+            "Изменить наименование клиента и номер заказа может только владелец"
+        );
 };
 
 const unwatch = watch([params], () => {
@@ -272,4 +282,12 @@ onUnmounted(() => {
 
         @media (width < 1024px)
             padding-inline: 0
+
+    .common-panel
+        opacity: 0.3
+        pointer-events: none
+
+        &[enabled=true]
+            opacity: 1
+            pointer-events: auto
 </style>
