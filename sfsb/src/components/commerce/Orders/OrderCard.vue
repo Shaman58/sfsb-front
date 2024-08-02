@@ -19,7 +19,7 @@
 
                     v-expansion-panel.order-card__common(value="common" @click="onCommonPanel")
                         v-expansion-panel-title ОБЩИЕ ДАННЫЕ
-                        v-expansion-panel-text(:enabled="isNew || isSameUser || isAdmin")
+                        v-expansion-panel-text(:enabled="canOpenCommonPanel")
                             div(style="margin-bottom: 1rem;" v-if="orderLocal && orderLocal.user")
                                 span Автор:&nbsp;
                                 strong {{ orderLocal.user.lastName }}&nbsp;
@@ -128,6 +128,9 @@ const isSameUser = computed(() => {
 const isAdmin = computed(() => {
     return user.value?.roles.includes("ADMIN");
 });
+const canOpenCommonPanel = computed(
+    () => isNew.value || isSameUser.value || isAdmin.value
+);
 
 const areAllQuantitieNotNull = computed(() => {
     return orderLocal.value.items.every((e) => e.quantity > 0);
@@ -188,7 +191,7 @@ const deleteOrderHandler = async () => {
 };
 
 const onCommonPanel = () => {
-    if (!isNew.value && !isSameUser.value && !isAdmin.value)
+    if (!canOpenCommonPanel.value)
         toast.error(
             "Изменить наименование клиента и номер заказа может только владелец"
         );
