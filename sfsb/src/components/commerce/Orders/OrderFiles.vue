@@ -1,9 +1,9 @@
 <template lang="pug">
-    .order-files
+    .order-files(@click="onClick")
         v-progress-linear(v-if="loading" :indeterminate="true" :color="$defaultColor")
-        .order-files__container
-            label.order-files__new(for="new-file" title="Добавить файл")
-                v-icon(color="orange-lighten-1") mdi-plus
+        .order-files__container(:class="{editable:canEdit}" )
+            label.order-files__new(for="new-file" title="Добавить файл" )
+                v-icon(color="orange-lighten-1" ) mdi-plus
                 input#new-file(ref="inputElement" type="file" hidden @change="saveOrderFile" accept="image/*,.pdf,.xls,.xlsx,.doc,.docx" )
             v-list.order-files__list
                 v-list-item.order-files__list-item(v-for='(file, index) in files', :key='index')
@@ -15,9 +15,12 @@
 import { onUnmounted, ref, toRefs, watch } from "vue";
 import { storeToRefs } from "pinia";
 import useOrderFiles from "@/pinia-store/orderFiles";
+import { useToast } from "vue-toast-notification";
 
-const props = defineProps<{ orderId: number | undefined }>();
-const { orderId } = toRefs(props);
+const toast = useToast();
+
+const props = defineProps<{ orderId: number | undefined; canEdit: boolean }>();
+const { orderId, canEdit } = toRefs(props);
 
 const inputElement = ref<HTMLInputElement>();
 
@@ -38,6 +41,10 @@ const saveOrderFile = async (ev: Event) => {
     await saveFile(orderId.value, fd);
 };
 
+const onClick = () => {
+    if (!canEdit.value)
+        toast.error("У вас не доступа для изменения этого блока");
+};
 const unwatch = watch([orderId], async () => {
     console.log("orderId.value", orderId.value);
     orderId.value && (await getAllFilesByOrder(orderId.value));
@@ -66,6 +73,12 @@ onUnmounted(() => {
         height: 100%
         display: flex
         gap: 0.5rem
+        opacity: 0.3
+        pointer-events: none
+
+        &.editable
+            opacity: 1
+            pointer-events: all
 
     & > *
         border-radius: 0.5rem
