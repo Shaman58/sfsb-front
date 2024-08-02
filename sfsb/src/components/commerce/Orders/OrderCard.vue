@@ -19,7 +19,7 @@
 
                     v-expansion-panel.order-card__common(value="common" @click="onCommonPanel")
                         v-expansion-panel-title ОБЩИЕ ДАННЫЕ
-                        v-expansion-panel-text(:enabled="canOpenCommonPanel")
+                        v-expansion-panel-text(:enabled="canOpenCommonPanel" class="common-panel")
                             div(style="margin-bottom: 1rem;" v-if="orderLocal && orderLocal.user")
                                 span Автор:&nbsp;
                                 strong {{ orderLocal.user.lastName }}&nbsp;
@@ -129,7 +129,7 @@ const isAdmin = computed(() => {
     return user.value?.roles.includes("ADMIN");
 });
 const canOpenCommonPanel = computed(
-    () => isNew.value || isSameUser.value || isAdmin.value
+    () => isNew.value || isSameUser.value || isAdmin.value || false
 );
 
 const areAllQuantitieNotNull = computed(() => {
