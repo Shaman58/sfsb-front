@@ -204,7 +204,7 @@
                     prepend-icon="mdi-check"
                     variant="text"
                     type="submit"
-                    :disabled="!valid"
+                    :disabled="!canAdding"
                     :text ="windowWidth > RESOLUTION_HIDE ? (isExist ? 'Изменить' : 'Добавить') : ''"
                 )
 </template>
@@ -290,6 +290,11 @@ const isWorkpiece = computed(() => {
         quantityOfPartsFromWorkpiece.value !== 1 &&
         setup.value.groupAble
     );
+});
+
+const canAdding = computed(() => {
+    const res = !!valid.value && !!setup.value.operation?.operationName;
+    return res;
 });
 
 const save = (setup: Partial<Setup>) => emit("save", setup);
