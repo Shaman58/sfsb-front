@@ -6,8 +6,9 @@ import { registerDirectives } from "@/directives";
 
 const app = createApp(App);
 
-registerPlugins(app)
-registerDirectives(app)
+registerPlugins(app);
+registerDirectives(app);
 
 app.config.globalProperties.$defaultColor = "#2F477E";
-app.mount("#app")
+app.config.globalProperties.$MIN_TIMELINE = 15 * 60 * 1000;
+app.mount("#app");
