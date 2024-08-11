@@ -18,6 +18,7 @@ import supplier from "@/router/supplier";
 import commerce from "@/router/commerce";
 import technology from "@/router/technology";
 import staff from "@/router/staff";
+import WorkflowComponent from "@/components/workflow/WorkflowComponent.vue";
 
 const toast = useToast();
 
@@ -49,6 +50,13 @@ const routes: (RouteRecordRaw & RouteMeta)[] = [
     staff,
     commerce,
     technology,
+    {
+        path: "/workflow",
+        component: WorkflowComponent,
+        meta: {
+            onlyFor: ["ADMIN", "TECHNOLOGIST"],
+        },
+    },
     {
         path: "/not-found",
         component: NotFound,
