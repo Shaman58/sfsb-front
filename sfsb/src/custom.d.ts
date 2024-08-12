@@ -348,3 +348,9 @@ declare interface Task {
     startAt: Date;
     endAt: Date;
 }
+
+declare interface TaskWillMoveData {
+    taskId: number;
+    totalCell: number;
+    cell: number;
+}
