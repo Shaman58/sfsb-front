@@ -1,5 +1,5 @@
 <template lang="pug">
-    .task-component(:draggable @dragstart="onDragStart" ref="taskElement")
+    .task-component(:draggable @dragstart="onDragStart" @dragend="emit('taskBreakMove')" ref="taskElement")
         .task-component__edge.task-component__edge--left(
             @mouseup="emit('leftEdgeUp',task.id)"
             @mousedown="emit('leftEdgeDown', task.id)"
@@ -28,6 +28,7 @@ const emit = defineEmits([
     "leftEdgeUp",
     "rightEdgeUp",
     "taskWillMove",
+    "taskBreakMove",
 ]);
 
 const coordX = ref(0);

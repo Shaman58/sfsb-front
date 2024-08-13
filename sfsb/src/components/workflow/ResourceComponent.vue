@@ -1,5 +1,5 @@
 <template lang="pug">
-    .resource-component(@mouseup="onMouseUp")
+    .resource-component(@mouseup="onMouseUp" @dragleave="onDragLeave")
         h1 {{resourceLength}}
         .resource-component__timeline
             cell-component(
@@ -21,6 +21,7 @@
                 @left-edge-down="onEdgeDown"
                 @right-edge-down="onEdgeDown"
                 @task-will-move="onTaskWillMove"
+                @task-break-move="onTaskBreakMove"
             )
 </template>
 
@@ -84,6 +85,7 @@ const onMouseUp = () => {
 };
 
 const recalcTimeline = () => {
+    if (!timeline.value && !timeline.value.length) return;
     tasks.value.forEach((task) => {
         const { start, end } = placeTask(task);
         for (let i = start - 1; i < end - 1; i++) {
@@ -101,16 +103,32 @@ const onTaskWillMove = (e: TaskWillMoveData) => {
     console.log("resource", taskWillMoveData);
 };
 
-const createPullCell = (id: number): CellComponent[] => {
+const createPullCell = (
+    id: number
+): {
+    pull: CellComponent[];
+    edges: { leftEdge: CellComponent | null; rightEdge: CellComponent | null };
+} => {
     if (!taskWillMoveData) return;
-    let res = [];
+    const pull: CellComponent[] = [];
+
     const from = id - taskWillMoveData.cell;
     if (from < 0) return;
 
     for (let i = from; i < from + taskWillMoveData.totalCell; i++) {
-        res.push(timeline.value[i]);
+        pull.push(timeline.value[i]);
     }
-    return res;
+
+    const leftEdge = from - 1 < 0 ? null : timeline.value[from - 1];
+    const rightEdge =
+        from + taskWillMoveData.totalCell + 1 > resourceLength
+            ? null
+            : timeline.value[from + taskWillMoveData.totalCell + 1];
+    const edges = {
+        leftEdge,
+        rightEdge,
+    };
+    return { pull, edges };
 };
 const onTaskOver = (id: number) => {
     console.log(
@@ -119,7 +137,28 @@ const onTaskOver = (id: number) => {
         taskWillMoveData?.totalCell,
         taskWillMoveData?.cell
     );
-    console.log(createPullCell(id).map((e) => e.getTaskId()));
+    const { pull: pullCells, edges } = createPullCell(id);
+    const pullCellIds = pullCells.map((e) => e.getTaskId());
+
+    //красим те cells, в которых планируется перемещение task
+    const canMove = pullCellIds.every((e) => e === null);
+    if (canMove) {
+        pullCells.forEach((cell) => cell.setEnabledColor());
+    } else {
+        pullCells.forEach((cell) => cell.setDisabledColor());
+    }
+
+    //обуляем цвета пограничных cells
+    edges.leftEdge && edges.leftEdge.clearColor();
+    edges.rightEdge && edges.rightEdge.clearColor();
+};
+
+const onDragLeave = () => {
+    timeline.value.forEach((cell) => cell.clearColor());
+};
+
+const onTaskBreakMove = () => {
+    timeline.value.forEach((cell) => cell.clearColor());
 };
 
 const onTaskHasDrop = (id: number) => {

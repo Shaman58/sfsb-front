@@ -4,16 +4,23 @@
 </template>
 
 <script setup lang="ts">
-import { computed, type Ref, ref } from "vue";
+import { type Ref, ref } from "vue";
+
+const COLOR_QUERY = {
+    disabled: "#ff0000",
+    enabled: "#00ff00",
+};
 
 const props = defineProps<{ id: number }>();
 const taskId: Ref<number | null> = ref(null);
 const dragover = ref(false);
-const color = computed(() => (dragover.value ? "red" : "init"));
+const color = ref("");
 
 const emit = defineEmits(["taskHasDrop", "taskOver"]);
 
-const getTaskId = () => taskId.value;
+const getTaskId = () => {
+    return taskId.value;
+};
 const setTaskId = (id: number | null) => {
     return new Promise((resolve, reject) => {
         if (taskId.value !== null && id !== taskId.value)
@@ -27,6 +34,7 @@ const clear = () => {
 };
 
 const onDragover = (e: DragEvent) => {
+    if (dragover.value) return;
     dragover.value = true;
     emit("taskOver", props.id);
     console.log("cell dragover", e);
@@ -36,10 +44,23 @@ const onDrop = (e: DragEvent) => {
     emit("taskHasDrop", props.id);
 };
 
+const setEnabledColor = () => {
+    color.value = COLOR_QUERY.enabled;
+};
+const setDisabledColor = () => {
+    color.value = COLOR_QUERY.disabled;
+};
+const clearColor = () => {
+    color.value = "";
+};
+
 defineExpose({
     setTaskId,
     clear,
     getTaskId,
+    setEnabledColor,
+    setDisabledColor,
+    clearColor,
 });
 </script>
 
