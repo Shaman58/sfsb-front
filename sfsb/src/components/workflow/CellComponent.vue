@@ -72,4 +72,5 @@ defineExpose({
     border: 1px solid #7777
     font-size: 10px
     background-color: v-bind(color)
+    transition: background-color .2s ease-in-out
 </style>

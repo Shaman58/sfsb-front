@@ -42,7 +42,7 @@ const { proxy } = getCurrentInstance();
 const MIN_TIMELINE_PX = proxy.$MIN_TIMELINE_PX;
 const MIN_TIMELINE = proxy.$MIN_TIMELINE;
 const props = defineProps<{ resource: Resource; clean: boolean }>();
-const emit = defineEmits(["taskWillMove"]);
+const emit = defineEmits(["taskWillMove", "alignTask"]);
 
 const resourceLength = computed(
     () =>
@@ -99,7 +99,7 @@ const recalcTimeline = () => {
 };
 
 const onTaskWillMove = (e: TaskWillMoveData) => {
-    emit("taskWillMove", e);
+    emit("taskWillMove", { ...e, resourceId: props.resource.id });
     console.log("resource", taskWillMoveData);
 };
 
@@ -151,6 +151,11 @@ const onTaskOver = (id: number) => {
     //обуляем цвета пограничных cells
     edges.leftEdge && edges.leftEdge.clearColor();
     edges.rightEdge && edges.rightEdge.clearColor();
+
+    //определяем своя таска или чужая
+    if (!taskWillMoveData || !taskWillMoveData.taskId) return;
+    const task = tasks.value.find((e) => e.id === taskWillMoveData.taskId);
+    !task && emit("alignTask", props.resource.id);
 };
 
 const onDragLeave = () => {
