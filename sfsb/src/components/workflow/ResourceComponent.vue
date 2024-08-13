@@ -33,6 +33,7 @@ import {
     onMounted,
     type Ref,
     ref,
+    watch,
 } from "vue";
 import CellComponent from "@/components/workflow/CellComponent.vue";
 import TaskComponent from "@/components/workflow/TaskComponent.vue";
@@ -40,7 +41,7 @@ import TaskComponent from "@/components/workflow/TaskComponent.vue";
 const { proxy } = getCurrentInstance();
 const MIN_TIMELINE_PX = proxy.$MIN_TIMELINE_PX;
 const MIN_TIMELINE = proxy.$MIN_TIMELINE;
-const props = defineProps<{ resource: Resource }>();
+const props = defineProps<{ resource: Resource; clean: boolean }>();
 const emit = defineEmits(["taskWillMove"]);
 
 const resourceLength = computed(
@@ -55,7 +56,6 @@ const tasks = ref(
 const timeline: Ref<CellComponent[]> = ref([]);
 const placeTask = (task: Task) => {
     const startAt = new Date(props.resource.startAt).getTime();
-    const endAt = new Date(props.resource.endAt).getTime();
     const taskStartAt = new Date(task.startAt).getTime();
     const taskEndAt = new Date(task.endAt).getTime();
     const taskLength = taskEndAt - taskStartAt;
@@ -85,7 +85,7 @@ const onMouseUp = () => {
 };
 
 const recalcTimeline = () => {
-    if (!timeline.value && !timeline.value.length) return;
+    if (!timeline.value.length) return;
     tasks.value.forEach((task) => {
         const { start, end } = placeTask(task);
         for (let i = start - 1; i < end - 1; i++) {
@@ -159,6 +159,7 @@ const onDragLeave = () => {
 
 const onTaskBreakMove = () => {
     timeline.value.forEach((cell) => cell.clearColor());
+    emit("taskWillMove", null);
 };
 
 const onTaskHasDrop = (id: number) => {
@@ -168,6 +169,13 @@ const onTaskHasDrop = (id: number) => {
 onMounted(() => {
     recalcTimeline();
 });
+
+watch(
+    () => props.clean,
+    () => {
+        timeline.value.forEach((cell) => cell.clearColor());
+    }
+);
 </script>
 
 <style scoped lang="sass">

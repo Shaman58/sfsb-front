@@ -350,7 +350,7 @@ declare interface Task {
 }
 
 declare interface TaskWillMoveData {
-    taskId: number;
-    totalCell: number;
-    cell: number;
+    taskId: number | null;
+    totalCell: number | null;
+    cell: number | null;
 }
