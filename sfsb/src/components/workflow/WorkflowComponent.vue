@@ -100,38 +100,50 @@ const moveTask = (cellId: number) => {
         taskWillMoveData;
 
     if (!taskId || !resourceId) return; //TODO: возможно exception или сообщение
-    const resource = findResource(targetResourceId || resourceId);
-    if (!resource) return;
+    let targetResource = targetResourceId && findResource(targetResourceId);
+    const sourceResource = findResource(resourceId);
+    if (!sourceResource) return;
+    if (!targetResource) targetResource = sourceResource;
 
-    const task = findtask(taskId);
-    const startCellId = cellId - cell || 0;
-    const endCellId = startCellId + totalCell;
+    const foundTask = findtask(taskId);
+    if (!foundTask) return;
 
-    const startTime = getTimeByCellId(startCellId, resource).startAt;
-    const endTime = getTimeByCellId(endCellId, resource).endAt;
+    const task: Task = { ...foundTask };
 
-    const foundResourceId = resources.findIndex((r) => r.id === resource.id);
-    const foundTaskId = resources[foundResourceId].tasks.findIndex(
+    //вычисляем новые координаты таски
+    const startCellId = cellId + 1 - cell || 0;
+    const endCellId = startCellId + totalCell - 1;
+
+    const startTime = getTimeByCellId(startCellId, targetResource).startAt;
+    const endTime = getTimeByCellId(endCellId, targetResource).endAt;
+
+    const foundResourceId = resources.findIndex(
+        (r) => r.id === targetResource.id
+    );
+    const foundTaskIndex = resources[foundResourceId].tasks.findIndex(
         (t) => t.id === taskId
     );
 
-    console.log(
-        "before resources",
-        resources[foundResourceId].tasks[foundTaskId].startAt,
-        resources[foundResourceId].tasks[foundTaskId].endAt
-    );
-    resources[foundResourceId].tasks[foundTaskId] = {
-        ...resources[foundResourceId].tasks[foundTaskId],
-        startAt: startTime,
-        endAt: endTime,
-    };
-    // resources[foundResourceId].tasks[foundTaskId].startAt = startTime;
-    // resources[foundResourceId].tasks[foundTaskId].endAt = endTime;
-    console.log(
-        "before resources",
-        resources[foundResourceId].tasks[foundTaskId].startAt,
-        resources[foundResourceId].tasks[foundTaskId].endAt
-    );
+    //устанвливаем новые начало и конец таски
+    task.startAt = startTime;
+    task.endAt = endTime;
+
+    //перемещаем таску на другой ресурс если требуется
+    if (!!targetResourceId && targetResourceId !== resourceId) {
+        if (!targetResource || !task) return;
+        targetResource.tasks = [...targetResource.tasks, task]; //добавляем таску на новый ресурс
+
+        const sourceResource = resources.find((r) => r.id === resourceId);
+        if (!sourceResource) return;
+        const taskIndex = sourceResource.tasks.findIndex(
+            (t) => t.id === task.id
+        );
+        taskIndex !== -1 && sourceResource.tasks.splice(taskIndex, 1); //удаляем таску из ресурса
+        return;
+    }
+    targetResource &&
+        (targetResource.tasks[foundTaskIndex].startAt = task.startAt);
+    targetResource && (targetResource.tasks[foundTaskIndex].endAt = task.endAt); //устанавливаем новые начало и конец таски
 };
 </script>
 

@@ -159,6 +159,7 @@ const onTaskOver = (id: number) => {
 
     //красим те cells, в которых планируется перемещение task
     taskCanMove.value = pullCellIds.every((e) => e === null);
+    emit("taskCanMove", taskCanMove.value);
     if (taskCanMove.value) {
         pullCells.forEach((cell) => cell.setEnabledColor());
     } else {
@@ -198,9 +199,7 @@ watch(
         timeline.value.forEach((cell) => cell.clearColor());
     }
 );
-watch([taskCanMove], () => {
-    emit("taskCanMove", taskCanMove.value);
-});
+
 watch(
     () => props.resource.tasks,
     () => {
