@@ -4,7 +4,7 @@
             @mouseup="emit('leftEdgeUp',task.id)"
             @mousedown="emit('leftEdgeDown', task.id)"
         )
-        .task-component__main {{task.name}} {{start}} {{end}} {{coordX}} {{widthComponent}}
+        .task-component__main(:title="`${task.name} ${start} ${end} ${coordX} ${widthComponent}`") {{task.name}} {{start}} {{end}} {{coordX}} {{widthComponent}}
         .task-component__edge.task-component__edge--right(
             @mouseup="emit('rightEdgeUp', task.id)"
             @mousedown="emit('rightEdgeDown', task.id)"
@@ -57,6 +57,7 @@ const onDragStart = (e: DragEvent) => {
     translate: 0 -100%
     user-select: none
     grid-column: v-bind(start) / v-bind(end)
+    grid-row: 2 / 3
     background-color: #00bcd4
     display: grid
     grid-template-columns: 8px 1fr 8px
@@ -64,4 +65,7 @@ const onDragStart = (e: DragEvent) => {
     &__edge
         background-color: #00c853
         cursor: col-resize
+
+    &__main
+        overflow: hidden
 </style>

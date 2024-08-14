@@ -158,7 +158,9 @@ const onTaskOver = (id: number) => {
     const pullCellIds = pullCells.map((e) => e.getTaskId());
 
     //красим те cells, в которых планируется перемещение task
-    taskCanMove.value = pullCellIds.every((e) => e === null);
+    taskCanMove.value = pullCellIds.every(
+        (e) => e === null || e === taskWillMoveData?.taskId
+    );
     emit("taskCanMove", taskCanMove.value);
     if (taskCanMove.value) {
         pullCells.forEach((cell) => cell.setEnabledColor());

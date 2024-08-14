@@ -104,6 +104,7 @@ const moveTask = (cellId: number) => {
     const sourceResource = findResource(resourceId);
     if (!sourceResource) return;
     if (!targetResource) targetResource = sourceResource;
+    if (!targetResource) return;
 
     const foundTask = findtask(taskId);
     if (!foundTask) return;
@@ -117,9 +118,11 @@ const moveTask = (cellId: number) => {
     const startTime = getTimeByCellId(startCellId, targetResource).startAt;
     const endTime = getTimeByCellId(endCellId, targetResource).endAt;
 
+    if (!("id" in targetResource)) return;
     const foundResourceId = resources.findIndex(
-        (r) => r.id === targetResource.id
+        (r) => r.id === (targetResource as Resource).id
     );
+
     const foundTaskIndex = resources[foundResourceId].tasks.findIndex(
         (t) => t.id === taskId
     );
