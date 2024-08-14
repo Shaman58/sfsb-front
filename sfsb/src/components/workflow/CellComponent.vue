@@ -1,10 +1,10 @@
 <template lang="pug">
-    .cell-component(@dragover.prevent="onDragover" @dragleave.prevent="dragover=false" @drop.prevent="onDrop" )
+    .cell-component(@dragover.prevent="onDragover" @dragleave.prevent="dragover=false" @drop.prevent="onDropEvent(props.id)" )
         pre {{props.id}} {{taskId}}
 </template>
 
 <script setup lang="ts">
-import { type Ref, ref } from "vue";
+import { inject, type Ref, ref } from "vue";
 
 const COLOR_QUERY = {
     disabled: "#ff0000",
@@ -17,6 +17,7 @@ const dragover = ref(false);
 const color = ref("");
 
 const emit = defineEmits(["taskHasDrop", "taskOver"]);
+const onDropEvent = inject("onDropEvent");
 
 const getTaskId = () => {
     return taskId.value;
@@ -37,11 +38,11 @@ const onDragover = (e: DragEvent) => {
     if (dragover.value) return;
     dragover.value = true;
     emit("taskOver", props.id);
-    console.log("cell dragover", e);
 };
 const onDrop = (e: DragEvent) => {
     dragover.value = false;
     emit("taskHasDrop", props.id);
+    console.log("cell drop");
 };
 
 const setEnabledColor = () => {

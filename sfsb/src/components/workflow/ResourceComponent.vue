@@ -42,7 +42,7 @@ const { proxy } = getCurrentInstance();
 const MIN_TIMELINE_PX = proxy.$MIN_TIMELINE_PX;
 const MIN_TIMELINE = proxy.$MIN_TIMELINE;
 const props = defineProps<{ resource: Resource; clean: boolean }>();
-const emit = defineEmits(["taskWillMove", "alignTask"]);
+const emit = defineEmits(["taskWillMove", "alignTask", "taskCanMove"]);
 
 const resourceLength = computed(
     () =>
@@ -50,10 +50,10 @@ const resourceLength = computed(
             new Date(props.resource.startAt).getTime()) /
         MIN_TIMELINE
 );
-const tasks = ref(
-    props.resource.tasks.map((task) => ({ ...task, draggable: true }))
-);
+const tasks = ref(props.resource.tasks.map((e) => ({ ...e, draggable: true })));
 const timeline: Ref<CellComponent[]> = ref([]);
+const taskCanMove = ref(false);
+
 const placeTask = (task: Task) => {
     const startAt = new Date(props.resource.startAt).getTime();
     const taskStartAt = new Date(task.startAt).getTime();
@@ -69,7 +69,7 @@ const placeTask = (task: Task) => {
 
 const taskElements: Ref<TaskComponent[]> = ref([]);
 const taskWillMoveData: TaskWillMoveData | undefined =
-    inject<TaskWillMoveData>("taskWillMoveData");
+    inject<ExtendedTaskWillMoveData>("taskWillMoveData");
 
 const onEdgeDown = (taskId: number) => {
     const task = tasks.value.find((e) => e.id === taskId);
@@ -82,6 +82,12 @@ const onMouseUp = () => {
         task.draggable = true;
     });
     recalcTimeline();
+};
+
+const zeroizeTimeline = () => {
+    timeline.value.forEach((e) => {
+        e.clear();
+    });
 };
 
 const recalcTimeline = () => {
@@ -99,35 +105,46 @@ const recalcTimeline = () => {
 };
 
 const onTaskWillMove = (e: TaskWillMoveData) => {
-    emit("taskWillMove", { ...e, resourceId: props.resource.id });
+    emit("taskWillMove", {
+        ...e,
+        resourceId: props.resource.id,
+    });
     console.log("resource", taskWillMoveData);
 };
 
 const createPullCell = (
-    id: number
+    cellId: number
 ): {
     pull: CellComponent[];
     edges: { leftEdge: CellComponent | null; rightEdge: CellComponent | null };
 } => {
     if (!taskWillMoveData) return;
     const pull: CellComponent[] = [];
+    const edges: {
+        leftEdge: CellComponent | null;
+        rightEdge: CellComponent | null;
+    } = {
+        leftEdge: null,
+        rightEdge: null,
+    };
 
-    const from = id - taskWillMoveData.cell;
-    if (from < 0) return;
+    const from = cellId - taskWillMoveData.cell;
+    if (from >= 0) {
+        for (let i = from; i < from + taskWillMoveData.totalCell; i++) {
+            pull.push(timeline.value[i]);
+        }
 
-    for (let i = from; i < from + taskWillMoveData.totalCell; i++) {
-        pull.push(timeline.value[i]);
+        const leftEdge = from - 1 < 0 ? null : timeline.value[from - 1];
+        const rightEdge =
+            from + taskWillMoveData.totalCell + 1 > resourceLength
+                ? null
+                : timeline.value[from + taskWillMoveData.totalCell + 1];
+        const edges = {
+            leftEdge: leftEdge,
+            rightEdge: rightEdge,
+        };
     }
 
-    const leftEdge = from - 1 < 0 ? null : timeline.value[from - 1];
-    const rightEdge =
-        from + taskWillMoveData.totalCell + 1 > resourceLength
-            ? null
-            : timeline.value[from + taskWillMoveData.totalCell + 1];
-    const edges = {
-        leftEdge,
-        rightEdge,
-    };
     return { pull, edges };
 };
 const onTaskOver = (id: number) => {
@@ -141,8 +158,8 @@ const onTaskOver = (id: number) => {
     const pullCellIds = pullCells.map((e) => e.getTaskId());
 
     //красим те cells, в которых планируется перемещение task
-    const canMove = pullCellIds.every((e) => e === null);
-    if (canMove) {
+    taskCanMove.value = pullCellIds.every((e) => e === null);
+    if (taskCanMove.value) {
         pullCells.forEach((cell) => cell.setEnabledColor());
     } else {
         pullCells.forEach((cell) => cell.setDisabledColor());
@@ -180,6 +197,21 @@ watch(
     () => {
         timeline.value.forEach((cell) => cell.clearColor());
     }
+);
+watch([taskCanMove], () => {
+    emit("taskCanMove", taskCanMove.value);
+});
+watch(
+    () => props.resource.tasks,
+    () => {
+        zeroizeTimeline();
+        tasks.value = props.resource.tasks.map((e) => ({
+            ...e,
+            draggable: true,
+        }));
+        recalcTimeline();
+    },
+    { deep: true }
 );
 </script>
 

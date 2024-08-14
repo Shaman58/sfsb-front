@@ -1,4 +1,4 @@
-export const fakeResources = [
+export const fakeResources: Resource[] = [
     {
         id: 1,
         name: "Resource 1",
@@ -32,7 +32,7 @@ export const fakeResources = [
             {
                 id: 3,
                 name: "Task 3",
-                description: "Task 1 description",
+                description: "Task 3 description",
                 startAt: "2024-08-11T05:00:00.000Z",
                 endAt: "2024-08-11T07:00:00.000Z",
             },

@@ -336,8 +336,8 @@ declare interface Resource {
     id: number;
     name: string;
     description?: string;
-    startAt: Date;
-    endAt: Date;
+    startAt: string;
+    endAt: string;
     tasks: Task[];
 }
 
@@ -345,12 +345,18 @@ declare interface Task {
     id: number;
     name: string;
     description?: string;
-    startAt: Date;
-    endAt: Date;
+    startAt: string;
+    endAt: string;
 }
 
 declare interface TaskWillMoveData {
     taskId: number | null;
     totalCell: number | null;
     cell: number | null;
+}
+
+declare interface ExtendedTaskWillMoveData extends TaskWillMoveData {
+    taskCanMove: boolean;
+    resourceId: number | null;
+    targetResourceId: number | null;
 }
