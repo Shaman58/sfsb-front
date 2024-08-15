@@ -1,5 +1,9 @@
 <template lang="pug">
-    .resource-component(@mouseup="onMouseUp" @dragleave="onDragLeave")
+    .resource-component(
+        @mouseup="onMouseUp"
+        @dragleave="onDragLeave"
+        @mouseleave="onMouseLeave"
+    )
         h1 {{resourceLength}}
         .resource-component__timeline
             cell-component(
@@ -130,6 +134,7 @@ const onCellMove = (id: number, taskId: number, e: MouseEvent) => {
     const rightTaskCellId = getCellIdByTime(currentTask.endAt) - 1;
     console.log({ id, leftTaskCellId, rightTaskCellId });
     //какое планируется смещение границы левое или правое по id cell и task
+    if (id === leftTaskCellId || id === rightTaskCellId) return;
     let direction;
     if (movingTaskLeftEdge.value)
         direction = id < leftTaskCellId ? "left" : "right";
@@ -150,7 +155,9 @@ const recalcTimeline = () => {
         const { start, end } = placeTask(task);
         for (let i = start - 1; i < end - 1; i++) {
             if (timeline.value[i]) {
-                timeline.value[i].setTaskId(task.id);
+                timeline.value[i]
+                    .setTaskId(task.id)
+                    .catch((e) => console.error(e));
             } else {
                 timeline.value[i].clear();
             }
@@ -234,6 +241,11 @@ const onTaskOver = (id: number) => {
 
 const onDragLeave = () => {
     timeline.value.forEach((cell) => cell.clearColor());
+};
+
+const onMouseLeave = () => {
+    movingTaskLeftEdge.value = null;
+    movingTaskRightEdge.value = null;
 };
 
 const onTaskBreakMove = () => {

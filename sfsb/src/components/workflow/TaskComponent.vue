@@ -3,7 +3,7 @@
         .task-component__edge.task-component__edge--left(
             @mousedown="emit('leftEdgeDown', task.id)"
         )
-        .task-component__main {{task.name}} {{start}} {{end}} {{coordX}} {{widthComponent}}
+        .task-component__main {{task.name}} {{start}} {{end}} {{widthComponent}}
         .task-component__edge.task-component__edge--right(
             @mousedown="emit('rightEdgeDown', task.id)"
         )
@@ -40,7 +40,6 @@ const emit = defineEmits([
     "taskBreakMove",
 ]);
 
-const coordX = ref(0);
 const taskElement = ref<HTMLDivElement>();
 const widthComponent = computed(() => taskElement.value?.offsetWidth);
 const totalCellInComponent = computed(

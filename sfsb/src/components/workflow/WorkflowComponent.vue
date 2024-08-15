@@ -10,7 +10,7 @@
             @task-will-move="onTaskWillMove"
             @align-task="onAlignTask"
             @task-can-move="onTaskCanMove"
-            @edge-move="moveEdgeOfTask"
+            @edge-move="onMoveEdgeOfTask"
         )
 </template>
 
@@ -165,7 +165,7 @@ const moveTask = (cellId: number) => {
     targetResource && (targetResource.tasks[foundTaskIndex].endAt = task.endAt); //устанавливаем новые начало и конец таски
 };
 
-const moveEdgeOfTask = (
+const onMoveEdgeOfTask = (
     taskId: number,
     edge: "left" | "right",
     direction: "left" | "right"
@@ -175,9 +175,10 @@ const moveEdgeOfTask = (
     const property = edge === "left" ? "startAt" : "endAt";
     const sign = direction === "left" ? -1 : 1;
 
-    task[property] = new Date(
+    const newDate = new Date(
         new Date(task[property]).getTime() + sign * MIN_TIMELINE
-    ).toString();
+    ).toISOString();
+    task[property] = newDate;
 
     const resource = findResourceByTaskId(taskId);
     const resourceIndex = findResourceIndex(resource.id);
