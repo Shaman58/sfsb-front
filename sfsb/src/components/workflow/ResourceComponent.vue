@@ -9,6 +9,7 @@
                 ref="timeline"
                 @task-has-drop.self="onTaskHasDrop"
                 @task-over="onTaskOver"
+                @cell-mouse-move="onCellMove"
             )
             task-component(
                 v-for="task of tasks "
@@ -18,8 +19,8 @@
                 :end="placeTask(task).end"
                 :draggable="task.draggable"
                 ref="taskElements"
-                @left-edge-down="onEdgeDown"
-                @right-edge-down="onEdgeDown"
+                @left-edge-down="onLeftEdgeDown"
+                @right-edge-down="onRightEdgeDown"
                 @task-will-move="onTaskWillMove"
                 @task-break-move="onTaskBreakMove"
             )
@@ -42,7 +43,14 @@ const { proxy } = getCurrentInstance();
 const MIN_TIMELINE_PX = proxy.$MIN_TIMELINE_PX;
 const MIN_TIMELINE = proxy.$MIN_TIMELINE;
 const props = defineProps<{ resource: Resource; clean: boolean }>();
-const emit = defineEmits(["taskWillMove", "alignTask", "taskCanMove"]);
+const emit = defineEmits([
+    "taskWillMove",
+    "alignTask",
+    "taskCanMove",
+    "edgeMove",
+]);
+const movingTaskLeftEdge = ref<Task | null>(null);
+const movingTaskRightEdge = ref<Task | null>(null);
 
 const resourceLength = computed(
     () =>
@@ -71,10 +79,18 @@ const taskElements: Ref<TaskComponent[]> = ref([]);
 const taskWillMoveData: TaskWillMoveData | undefined =
     inject<ExtendedTaskWillMoveData>("taskWillMoveData");
 
-const onEdgeDown = (taskId: number) => {
+const onEdgeDown = (taskId: number, signal: Ref<Task | null>) => {
     const task = tasks.value.find((e) => e.id === taskId);
     if (!task) return;
     task.draggable = false;
+    signal.value = task;
+};
+
+const onLeftEdgeDown = (taskId: number) => {
+    onEdgeDown(taskId, movingTaskLeftEdge);
+};
+const onRightEdgeDown = (taskId: number) => {
+    onEdgeDown(taskId, movingTaskRightEdge);
 };
 
 const onMouseUp = () => {
@@ -82,6 +98,44 @@ const onMouseUp = () => {
         task.draggable = true;
     });
     recalcTimeline();
+    movingTaskLeftEdge.value = null;
+    movingTaskRightEdge.value = null;
+};
+
+const getCellIdByTime = (
+    time: string,
+    currentResource: Resource = props.resource
+) => {
+    const currentTime = new Date(time);
+    const res =
+        (currentTime.getTime() - new Date(currentResource.startAt).getTime()) /
+        MIN_TIMELINE;
+    return res;
+};
+/*
+    taskId: number,
+    edge: "left" | "right",
+    direction: "left" | "right"
+ */
+const onCellMove = (id: number, taskId: number, e: MouseEvent) => {
+    if (!movingTaskRightEdge.value && !movingTaskLeftEdge.value) return;
+    const currentTask = movingTaskRightEdge.value || movingTaskLeftEdge.value;
+    if (!currentTask) return;
+
+    if (taskId !== currentTask?.id && taskId !== null) return;
+
+    const edge = !!movingTaskLeftEdge.value ? "left" : "right";
+    //определить какие cell занимают левая и правая границы таски
+    const leftTaskCellId = getCellIdByTime(currentTask.startAt);
+    const rightTaskCellId = getCellIdByTime(currentTask.endAt) - 1;
+    console.log({ id, leftTaskCellId, rightTaskCellId });
+    //какое планируется смещение границы левое или правое по id cell и task
+    let direction;
+    if (movingTaskLeftEdge.value)
+        direction = id < leftTaskCellId ? "left" : "right";
+    if (movingTaskRightEdge.value)
+        direction = id < rightTaskCellId ? "left" : "right";
+    emit("edgeMove", currentTask.id, edge, direction);
 };
 
 const zeroizeTimeline = () => {
@@ -204,7 +258,8 @@ watch(
 
 watch(
     () => props.resource.tasks,
-    () => {
+    (value, oldValue) => {
+        console.log("props.resource.tasks изменились", oldValue, value);
         zeroizeTimeline();
         tasks.value = props.resource.tasks.map((e) => ({
             ...e,

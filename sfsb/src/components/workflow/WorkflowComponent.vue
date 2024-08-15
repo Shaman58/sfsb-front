@@ -10,6 +10,7 @@
             @task-will-move="onTaskWillMove"
             @align-task="onAlignTask"
             @task-can-move="onTaskCanMove"
+            @edge-move="moveEdgeOfTask"
         )
 </template>
 
@@ -70,14 +71,29 @@ const findResource = (id: number): Resource | undefined => {
     return resources.find((resource) => resource.id === id);
 };
 
-const findtask = (id: number): Task | undefined => {
+const findResourceByTaskId = (id: number) => {
     const resource = resources.find((resource) =>
         resource.tasks.find((task: Task) => task.id === id)
     );
     if (!resource) return;
+    return resource;
+};
+
+const findResourceIndex = (id: number) => {
+    return resources.findIndex((resource) => resource.id === id);
+};
+
+const findtask = (id: number): Task | undefined => {
+    const resource = findResourceByTaskId(id);
+    if (!resource) return;
     const task = resource?.tasks.find((task: Task) => task.id === id);
     if (!task) return;
     return task;
+};
+const findTaskIndex = (id: number) => {
+    const resource = findResourceByTaskId(id);
+    if (!resource) return;
+    return resource.tasks.findIndex((task) => task.id === id);
 };
 
 const getTimeByCellId = (id: number, resource: Resource) => {
@@ -147,6 +163,27 @@ const moveTask = (cellId: number) => {
     targetResource &&
         (targetResource.tasks[foundTaskIndex].startAt = task.startAt);
     targetResource && (targetResource.tasks[foundTaskIndex].endAt = task.endAt); //устанавливаем новые начало и конец таски
+};
+
+const moveEdgeOfTask = (
+    taskId: number,
+    edge: "left" | "right",
+    direction: "left" | "right"
+) => {
+    const task = findtask(taskId);
+    if (!task) return;
+    const property = edge === "left" ? "startAt" : "endAt";
+    const sign = direction === "left" ? -1 : 1;
+
+    task[property] = new Date(
+        new Date(task[property]).getTime() + sign * MIN_TIMELINE
+    ).toString();
+
+    const resource = findResourceByTaskId(taskId);
+    const resourceIndex = findResourceIndex(resource.id);
+    const taskIndex = findTaskIndex(taskId);
+
+    resources[resourceIndex].tasks[taskIndex] = task;
 };
 </script>
 

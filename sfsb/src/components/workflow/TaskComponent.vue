@@ -1,25 +1,23 @@
 <template lang="pug">
     .task-component(:draggable @dragstart="onDragStart" @dragend="emit('taskBreakMove')" ref="taskElement")
         .task-component__edge.task-component__edge--left(
-            @mouseup="emit('leftEdgeUp',task.id)"
             @mousedown="emit('leftEdgeDown', task.id)"
         )
         .task-component__main {{task.name}} {{start}} {{end}} {{coordX}} {{widthComponent}}
-            v-tooltip(activator="parent" location="start")
-                h3 {{task.name}}
-                p {{task.description}}
-                div Время начала:
-                    date {{formatDateStartAt}}&nbsp;
-                    time
-                        strong {{formatTimeStartAt}}
-                div Время завершения:
-                    date {{formatDateEndAt}}&nbsp;
-                    time
-                        strong {{formatTimeEndAt}}
         .task-component__edge.task-component__edge--right(
-            @mouseup="emit('rightEdgeUp', task.id)"
             @mousedown="emit('rightEdgeDown', task.id)"
         )
+        v-tooltip(activator="parent" location="start")
+            h3 {{task.name}}
+            p {{task.description}}
+            div Время начала:
+                time {{formatDateStartAt}}&nbsp;
+                time
+                    strong {{formatTimeStartAt}}
+            div Время завершения:
+                time {{formatDateEndAt}}&nbsp;
+                time
+                    strong {{formatTimeEndAt}}
 </template>
 
 <script setup lang="ts">
@@ -46,8 +44,12 @@ const coordX = ref(0);
 const taskElement = ref<HTMLDivElement>();
 const widthComponent = computed(() => taskElement.value?.offsetWidth);
 const totalCellInComponent = computed(
-    () => widthComponent.value / parseInt(proxy.$MIN_TIMELINE_PX)
+    () =>
+        (new Date(props.task.endAt).getTime() -
+            new Date(props.task.startAt).getTime()) /
+        proxy.$MIN_TIMELINE
 );
+const pointerEvent = computed(() => (props.draggable ? "all" : "none"));
 
 const formatDate = (date: string) => {
     const options: Intl.DateTimeFormatOptions = {
@@ -101,11 +103,14 @@ const onDragStart = (e: DragEvent) => {
     background-color: #00bcd4
     display: grid
     grid-template-columns: 8px 1fr 8px
+    pointer-events: v-bind(pointerEvent)
 
     &__edge
         background-color: #00c853
         cursor: col-resize
+        pointer-events: all
 
     &__main
         overflow: hidden
+        pointer-events: inherit
 </style>

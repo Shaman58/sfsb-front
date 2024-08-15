@@ -1,5 +1,10 @@
 <template lang="pug">
-    .cell-component(@dragover.prevent="onDragover" @dragleave.prevent="dragover=false" @drop.prevent="onDropEvent(props.id)" )
+    .cell-component(
+        @dragover.prevent="onDragover"
+        @dragleave.prevent="dragover=false"
+        @drop.prevent="onDropEvent(props.id)"
+        @mousemove="onMouseMove"
+    )
         pre {{props.id}} {{taskId}}
 </template>
 
@@ -16,7 +21,7 @@ const taskId: Ref<number | null> = ref(null);
 const dragover = ref(false);
 const color = ref("");
 
-const emit = defineEmits(["taskHasDrop", "taskOver"]);
+const emit = defineEmits(["taskHasDrop", "taskOver", "cellMouseMove"]);
 const onDropEvent = inject("onDropEvent");
 
 const getTaskId = () => {
@@ -53,6 +58,10 @@ const setDisabledColor = () => {
 };
 const clearColor = () => {
     color.value = "";
+};
+
+const onMouseMove = (e: MouseEvent) => {
+    emit("cellMouseMove", props.id, taskId.value, e);
 };
 
 defineExpose({
