@@ -1,5 +1,5 @@
 <template lang="pug">
-    .task-component(:draggable @dragstart="onDragStart" @dragend="emit('taskBreakMove')" ref="taskElement")
+    .task-component(:draggable @dragstart="onDragStart" @dragend="emit('taskBreakMove')" ref="taskElement" )
         .task-component__edge.task-component__edge--left(
             @mousedown="emit('leftEdgeDown', task.id)"
         )
@@ -7,7 +7,10 @@
         .task-component__edge.task-component__edge--right(
             @mousedown="emit('rightEdgeDown', task.id)"
         )
-        v-tooltip(activator="parent" location="start")
+        v-tooltip(
+            activator="parent"
+            location="bottom"
+        )
             h3 {{task.name}}
             p {{task.description}}
             div Время начала:
