@@ -4,7 +4,18 @@
             @mouseup="emit('leftEdgeUp',task.id)"
             @mousedown="emit('leftEdgeDown', task.id)"
         )
-        .task-component__main(:title="`${task.name} ${start} ${end} ${coordX} ${widthComponent}`") {{task.name}} {{start}} {{end}} {{coordX}} {{widthComponent}}
+        .task-component__main {{task.name}} {{start}} {{end}} {{coordX}} {{widthComponent}}
+            v-tooltip(activator="parent" location="start")
+                h3 {{task.name}}
+                p {{task.description}}
+                div Время начала:
+                    date {{formatDateStartAt}}&nbsp;
+                    time
+                        strong {{formatTimeStartAt}}
+                div Время завершения:
+                    date {{formatDateEndAt}}&nbsp;
+                    time
+                        strong {{formatTimeEndAt}}
         .task-component__edge.task-component__edge--right(
             @mouseup="emit('rightEdgeUp', task.id)"
             @mousedown="emit('rightEdgeDown', task.id)"
@@ -37,6 +48,35 @@ const widthComponent = computed(() => taskElement.value?.offsetWidth);
 const totalCellInComponent = computed(
     () => widthComponent.value / parseInt(proxy.$MIN_TIMELINE_PX)
 );
+
+const formatDate = (date: string) => {
+    const options: Intl.DateTimeFormatOptions = {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+    };
+    const res = new Intl.DateTimeFormat("ru-RU", options).format(
+        new Date(date)
+    );
+    return res;
+};
+const formatTime = (date: string) => {
+    const options: Intl.DateTimeFormatOptions = {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+    };
+    const res = new Intl.DateTimeFormat("ru-RU", options).format(
+        new Date(date)
+    );
+    return res;
+};
+
+const formatDateStartAt = computed(() => formatDate(props.task.startAt));
+const formatTimeStartAt = computed(() => formatTime(props.task.startAt));
+const formatDateEndAt = computed(() => formatDate(props.task.endAt));
+const formatTimeEndAt = computed(() => formatTime(props.task.endAt));
 
 const inCell = (coord: number): number => {
     return Math.floor(coord / parseInt(proxy.$MIN_TIMELINE_PX)) + 1;
