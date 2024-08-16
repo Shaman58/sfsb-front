@@ -239,8 +239,12 @@ const onTaskOver = (id: number) => {
     !task && emit("alignTask", props.resource.id);
 };
 
-const onDragLeave = () => {
+const cleanTimeline = () => {
     timeline.value.forEach((cell) => cell.clearColor());
+};
+
+const onDragLeave = () => {
+    cleanTimeline();
 };
 
 const onMouseLeave = () => {
@@ -249,7 +253,7 @@ const onMouseLeave = () => {
 };
 
 const onTaskBreakMove = () => {
-    timeline.value.forEach((cell) => cell.clearColor());
+    cleanTimeline();
     emit("taskWillMove", null);
 };
 
@@ -264,7 +268,7 @@ onMounted(() => {
 watch(
     () => props.clean,
     () => {
-        timeline.value.forEach((cell) => cell.clearColor());
+        cleanTimeline();
     }
 );
 
