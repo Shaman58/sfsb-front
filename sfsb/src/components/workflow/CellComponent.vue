@@ -1,9 +1,10 @@
 <template lang="pug">
     .cell-component(
         :style="{backgroundColor: color}"
-        @dragover.prevent="events.onDragOver(id,resourceId)"
+        @dragover.prevent="events.onDragOver(id,resourceId, taskId)"
         @drop.prevent="onDrop"
         @mousemove="onMouseMove"
+        :data-task-id="taskId"
     )
         pre {{id}} {{taskId}} {{resourceId}}
 </template>
@@ -42,7 +43,9 @@ const clear = () => {
 };
 
 const onDragover = (e: DragEvent) => {};
-const onDrop = (e: DragEvent) => {};
+const onDrop = (e: DragEvent) => {
+    events.onDrop();
+};
 
 const setEnabledColor = () => {
     color.value = COLOR_QUERY.enabled;
@@ -51,7 +54,7 @@ const setDisabledColor = () => {
     color.value = COLOR_QUERY.disabled;
 };
 const clearColor = () => {
-    color.value = "transparent";
+    color.value = "";
 };
 
 const onMouseMove = (e: MouseEvent) => {};

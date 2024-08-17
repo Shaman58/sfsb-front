@@ -3,16 +3,17 @@ import { computed, reactive, ref } from "vue";
 import { fakeResources } from "@/components/workflow/fakeResources";
 
 export const useWorkflowStore = defineStore("workflow", () => {
-    const resources = ref<Resource[]>(fakeResources);
+    const resources = reactive<Resource[]>(fakeResources);
     const resourceObject = computed(() => {
-        return resources.value.reduce((acc, resource) => {
+        return resources.reduce((acc, resource) => {
             acc[resource.id] = resource;
             return acc;
         }, {} as Record<number, Resource>);
     });
     const tasks = computed(() =>
-        resources.value.flatMap((resource) => resource.tasks)
+        resources.flatMap((resource) => resource.tasks)
     );
+    const currentTaskId = ref<number | undefined>(undefined);
 
     const taskWillMoveData = reactive<ExtendedTaskWillMoveData>(
         {} as ExtendedTaskWillMoveData
@@ -37,20 +38,25 @@ export const useWorkflowStore = defineStore("workflow", () => {
     });
 
     //--- signals ---
-    const activeCells = ref<{ cellId: number; resourceId: number }[]>([]);
+    const activeCells = ref<
+        { cellId: number; resourceId: number; taskId: number }[]
+    >([]);
 
     const signals = reactive({
         activeCells,
     });
 
     //--- events ---
-    const onDragOver = (cellId: number, resourceId: number) => {
+    const onDragOver = (cellId: number, resourceId: number, taskId: number) => {
         const hasSameCell = activeCells.value.find(
             (e) => e.cellId === cellId && e.resourceId === resourceId
         );
         if (hasSameCell) return;
         targetResourceId.value = resourceId;
-        activeCells.value = [...activeCells.value, { cellId, resourceId }];
+        activeCells.value = [
+            ...activeCells.value,
+            { cellId, resourceId, taskId },
+        ];
     };
 
     const onDragLeave = (cellId: number, resourceId: number) => {
@@ -63,9 +69,18 @@ export const useWorkflowStore = defineStore("workflow", () => {
         );
     };
 
+    const onDrop = () => {
+        if (!sourceResourceId.value) return;
+        currentTaskId.value && moveTask(currentTaskId.value);
+        sourceResourceId.value = undefined;
+        activeCells.value = [];
+        currentTaskId.value = undefined;
+    };
+
     const events = reactive({
         onDragOver,
         onDragLeave,
+        onDrop,
     });
 
     //--- moving ---
@@ -73,12 +88,24 @@ export const useWorkflowStore = defineStore("workflow", () => {
     const moveTask = (id: number) => {
         if (!targetResourceId.value || !sourceResourceId.value) return;
         const taskIndex = findTask.index(id);
-        if (taskIndex === undefined) return;
-        const task = resourceObject.value[sourceResourceId.value].tasks.slice(
-            taskIndex,
-            1
-        )[0];
-        resourceObject.value[targetResourceId.value].tasks.push(task);
+        const task = findTask.byId(id);
+        if (!task) return;
+        const targetResourceIndex = findResource.index(targetResourceId.value);
+        const sourceResourceIndex = findResource.index(sourceResourceId.value);
+        if (
+            taskIndex === undefined ||
+            targetResourceIndex === undefined ||
+            sourceResourceIndex === undefined
+        )
+            return;
+
+        resources[sourceResourceIndex].tasks = resources[
+            sourceResourceIndex
+        ].tasks.filter((e) => e.id !== id);
+        resources[targetResourceIndex].tasks = [
+            ...resources[targetResourceIndex].tasks,
+            task,
+        ];
 
         targetResourceId.value = undefined;
         sourceResourceId.value = undefined;
@@ -93,17 +120,17 @@ export const useWorkflowStore = defineStore("workflow", () => {
 
     const findResource = {
         byId: (id: number): Resource | undefined => {
-            return resources.value.find((resource) => resource.id === id);
+            return resources.find((resource) => resource.id === id);
         },
         byTaskId: (id: number) => {
-            const resource = resources.value.find((resource) =>
+            const resource = resources.find((resource) =>
                 resource.tasks.find((task: Task) => task.id === id)
             );
             if (!resource) return;
             return resource;
         },
         index: (id: number): number | undefined => {
-            return resources.value.findIndex((resource) => resource.id === id);
+            return resources.findIndex((resource) => resource.id === id);
         },
     };
 
@@ -125,6 +152,7 @@ export const useWorkflowStore = defineStore("workflow", () => {
     return {
         resources,
         tasks,
+        currentTaskId,
         taskWillMoveData,
         find: {
             findResource,

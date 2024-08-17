@@ -46,7 +46,7 @@ const emit = defineEmits([
     "taskBreakMove",
 ]);
 
-const { sourceResourceId } = storeToRefs(useWorkflowStore());
+const { sourceResourceId, currentTaskId } = storeToRefs(useWorkflowStore());
 
 const taskElement = ref<HTMLDivElement>();
 const widthComponent = computed(() => taskElement.value?.offsetWidth);
@@ -94,9 +94,11 @@ const inCell = (coord: number): number => {
 const onDragStart = (e: DragEvent) => {
     const { offsetX } = e;
     sourceResourceId.value = props.resourceId;
+    currentTaskId.value = props.task.id;
 };
 const onDragEnd = (e: DragEvent) => {
     sourceResourceId.value = undefined;
+    // currentTaskId.value = undefined;
 };
 </script>
 

@@ -22,7 +22,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed, getCurrentInstance, type Ref, ref } from "vue";
+import {
+    computed,
+    getCurrentInstance,
+    onMounted,
+    type Ref,
+    ref,
+    watch,
+} from "vue";
 import CellComponent from "@/components/workflow/CellComponent.vue";
 import TaskComponent from "@/components/workflow/TaskComponent.vue";
 
@@ -57,7 +64,37 @@ const placeTask = (task: Task) => {
     };
 };
 
+const recalcTimeline = () => {
+    if (!timeline.value.length) return;
+    tasks.value.forEach((task) => {
+        const { start, end } = placeTask(task);
+        for (let i = start - 1; i < end - 1; i++) {
+            if (timeline.value[i]) {
+                timeline.value[i]
+                    .setTaskId(task.id)
+                    .catch((e) => console.error(e));
+            } else {
+                timeline.value[i].clear();
+            }
+        }
+    });
+};
+
 const taskElements: Ref<TaskComponent[]> = ref([]);
+
+onMounted(() => {
+    recalcTimeline();
+});
+watch(
+    () => props.resource.tasks,
+    () => {
+        tasks.value = props.resource.tasks.map((e) => ({
+            ...e,
+            draggable: true,
+        }));
+    },
+    { deep: true }
+);
 </script>
 
 <style scoped lang="sass">
