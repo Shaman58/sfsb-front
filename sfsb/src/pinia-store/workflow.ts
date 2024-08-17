@@ -19,6 +19,7 @@ export const useWorkflowStore = defineStore("workflow", () => {
     );
     const currentTaskId = ref<number | undefined>(undefined);
     const offsetCell = ref<number | undefined>();
+    const canMove = ref(true);
 
     const taskWillMoveData = reactive<ExtendedTaskWillMoveData>(
         {} as ExtendedTaskWillMoveData
@@ -41,6 +42,12 @@ export const useWorkflowStore = defineStore("workflow", () => {
             _targetResourceId.value = id;
         },
     });
+
+    const targetResource = computed(
+        () =>
+            !!targetResourceId.value &&
+            findResource.byId(targetResourceId.value)
+    );
 
     //--- signals ---
     const activeCells = ref<
@@ -139,7 +146,6 @@ export const useWorkflowStore = defineStore("workflow", () => {
         sourceResourceId.value = undefined;
         activeCells.value = [];
         if (!currentTaskId.value) return;
-        console.log(getTaskBoundaries(currentTaskId.value));
         currentTaskId.value = undefined;
     };
 
@@ -152,10 +158,29 @@ export const useWorkflowStore = defineStore("workflow", () => {
     //--- moving ---
 
     const moveTask = (id: number) => {
-        if (!targetResourceId.value || !sourceResourceId.value) return;
+        if (
+            !targetResourceId.value ||
+            !sourceResourceId.value ||
+            !canMove.value
+        )
+            return;
         const taskIndex = findTask.index(id);
         const task = findTask.byId(id);
         if (!task) return;
+        //--- меняем расположеение таски
+        const start = activeCells.value[0];
+        const end = activeCells.value.at(-1);
+        if (targetResource.value && end) {
+            const startTime = getTimeByIndex(
+                start.cellId,
+                targetResource.value
+            );
+            const endTime = getTimeByIndex(end.cellId, targetResource.value);
+            task.startAt = startTime.start;
+            task.endAt = endTime.end;
+        }
+
+        //--- перемещаем на соотвествующий ресурс
         const targetResourceIndex = findResource.index(targetResourceId.value);
         const sourceResourceIndex = findResource.index(sourceResourceId.value);
         if (
@@ -199,7 +224,7 @@ export const useWorkflowStore = defineStore("workflow", () => {
             return resources.findIndex((resource) => resource.id === id);
         },
     };
-    const findTaskById = (id: number) => {
+    const findTaskById = (id: number): Task | undefined => {
         const resource = findResource.byTaskId(id);
         if (!resource) return;
         const task = resource?.tasks.find((task: Task) => task.id === id);
@@ -229,6 +254,7 @@ export const useWorkflowStore = defineStore("workflow", () => {
         tasks,
         currentTaskId,
         offsetCell,
+        canMove,
         taskWillMoveData,
         find: {
             findResource,

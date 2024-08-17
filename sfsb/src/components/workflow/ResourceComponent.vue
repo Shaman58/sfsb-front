@@ -40,7 +40,8 @@ const MIN_TIMELINE_PX = proxy.$MIN_TIMELINE_PX;
 const MIN_TIMELINE = proxy.$MIN_TIMELINE;
 const props = defineProps<{ resource: Resource }>();
 const { signals } = useWorkflowStore();
-const { sourceResourceId, targetResourceId } = storeToRefs(useWorkflowStore());
+const { sourceResourceId, targetResourceId, currentTaskId, canMove } =
+    storeToRefs(useWorkflowStore());
 
 const movingTaskLeftEdge = ref<Task | null>(null);
 const movingTaskRightEdge = ref<Task | null>(null);
@@ -84,6 +85,10 @@ const recalcTimeline = () => {
     });
 };
 
+const zeroizeTimeline = () => {
+    timeline.value.forEach((e) => e.clear());
+};
+
 const taskElements: Ref<TaskComponent[]> = ref([]);
 
 onMounted(() => {
@@ -95,10 +100,26 @@ watch(
     (value, oldValue) => {
         if (!oldValue.length) return;
         oldValue.forEach((e) => timeline.value[e.cellId].clearColor());
-        props.resource.id === targetResourceId.value &&
-            value.forEach((e) => timeline.value[e.cellId].setEnabledColor());
+        if (props.resource.id !== targetResourceId.value) return;
+
+        const method = value.some(
+            (e) =>
+                !!timeline.value[e.cellId].getTaskId() &&
+                timeline.value[e.cellId].getTaskId() !== currentTaskId.value
+        )
+            ? "setDisabledColor"
+            : "setEnabledColor";
+
+        canMove.value = method === "setDisabledColor" ? false : true;
+        value.forEach((e) => timeline.value[e.cellId - 1][method]());
     }
 );
+watch([currentTaskId], ([value]) => {
+    if (value === undefined) {
+        zeroizeTimeline();
+        recalcTimeline();
+    }
+});
 watch(
     () => props.resource.tasks,
     () => {
