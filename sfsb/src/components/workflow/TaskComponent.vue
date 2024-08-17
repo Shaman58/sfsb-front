@@ -3,24 +3,24 @@
         .task-component__edge.task-component__edge--left(
             @mousedown="emit('leftEdgeDown', task.id)"
         )
-        .task-component__main {{task.name}} {{start}} {{end}} {{widthComponent}}
+        .task-component__main {{task.name}} {{start}} {{end}} {{widthComponent}} {{offsetCell}}
         .task-component__edge.task-component__edge--right(
             @mousedown="emit('rightEdgeDown', task.id)"
         )
-        v-tooltip(
-            activator="parent"
-            location="bottom"
-        )
-            h3 {{task.name}}
-            p {{task.description}}
-            div Время начала:
-                time {{formatDateStartAt}}&nbsp;
-                time
-                    strong {{formatTimeStartAt}}
-            div Время завершения:
-                time {{formatDateEndAt}}&nbsp;
-                time
-                    strong {{formatTimeEndAt}}
+        //v-tooltip(
+        //    activator="parent"
+        //    location="bottom"
+        //)
+        //    h3 {{task.name}}
+        //    p {{task.description}}
+        //    div Время начала:
+        //        time {{formatDateStartAt}}&nbsp;
+        //        time
+        //            strong {{formatTimeStartAt}}
+        //    div Время завершения:
+        //        time {{formatDateEndAt}}&nbsp;
+        //        time
+        //            strong {{formatTimeEndAt}}
 </template>
 
 <script setup lang="ts">
@@ -46,7 +46,9 @@ const emit = defineEmits([
     "taskBreakMove",
 ]);
 
-const { sourceResourceId, currentTaskId } = storeToRefs(useWorkflowStore());
+const { sourceResourceId, currentTaskId, offsetCell } = storeToRefs(
+    useWorkflowStore()
+);
 
 const taskElement = ref<HTMLDivElement>();
 const widthComponent = computed(() => taskElement.value?.offsetWidth);
@@ -93,6 +95,8 @@ const inCell = (coord: number): number => {
 
 const onDragStart = (e: DragEvent) => {
     const { offsetX } = e;
+    offsetCell.value = inCell(offsetX);
+
     sourceResourceId.value = props.resourceId;
     currentTaskId.value = props.task.id;
 };

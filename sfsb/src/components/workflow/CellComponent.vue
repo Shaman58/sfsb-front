@@ -59,26 +59,31 @@ const clearColor = () => {
 
 const onMouseMove = (e: MouseEvent) => {};
 
-watch(
-    () => signals.activeCells,
-    () => {
-        if (
-            signals.activeCells.find(
-                ({ cellId, resourceId }) =>
-                    cellId === props.id && resourceId === props.resourceId
-            )
-        ) {
-            setEnabledColor();
-        }
-    }
-);
+// watch(
+//     () => signals.activeCells,
+//     () => {
+//         if (
+//             signals.activeCells.find(
+//                 ({ cellId, resourceId }) =>
+//                     cellId === props.id && resourceId === props.resourceId
+//             )
+//         ) {
+//             setTimeout(() => {
+//                 setEnabledColor();
+//                 console.log("set enabled color", props.id, props.resourceId);
+//             });
+//         }
+//     }
+// );
 
 watch([sourceResourceId], ([value], [oldValue]) => {
     if (
         (value === undefined && oldValue === props.resourceId) ||
         targetResourceId.value === props.resourceId
     ) {
-        clearColor();
+        setTimeout(() => {
+            clearColor();
+        });
     }
 });
 

@@ -32,11 +32,15 @@ import {
 } from "vue";
 import CellComponent from "@/components/workflow/CellComponent.vue";
 import TaskComponent from "@/components/workflow/TaskComponent.vue";
+import { useWorkflowStore } from "@/pinia-store/workflow";
+import { storeToRefs } from "pinia";
 
 const { proxy } = getCurrentInstance();
 const MIN_TIMELINE_PX = proxy.$MIN_TIMELINE_PX;
 const MIN_TIMELINE = proxy.$MIN_TIMELINE;
 const props = defineProps<{ resource: Resource }>();
+const { signals } = useWorkflowStore();
+const { sourceResourceId, targetResourceId } = storeToRefs(useWorkflowStore());
 
 const movingTaskLeftEdge = ref<Task | null>(null);
 const movingTaskRightEdge = ref<Task | null>(null);
@@ -85,6 +89,16 @@ const taskElements: Ref<TaskComponent[]> = ref([]);
 onMounted(() => {
     recalcTimeline();
 });
+
+watch(
+    () => signals.activeCells,
+    (value, oldValue) => {
+        if (!oldValue.length) return;
+        oldValue.forEach((e) => timeline.value[e.cellId].clearColor());
+        props.resource.id === targetResourceId.value &&
+            value.forEach((e) => timeline.value[e.cellId].setEnabledColor());
+    }
+);
 watch(
     () => props.resource.tasks,
     () => {

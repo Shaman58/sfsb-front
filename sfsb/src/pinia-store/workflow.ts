@@ -1,8 +1,12 @@
 import { defineStore } from "pinia";
-import { computed, reactive, ref } from "vue";
+import { computed, getCurrentInstance, reactive, ref } from "vue";
 import { fakeResources } from "@/components/workflow/fakeResources";
 
 export const useWorkflowStore = defineStore("workflow", () => {
+    const { proxy } = getCurrentInstance();
+    const MIN_TIMELINE_PX = proxy.$MIN_TIMELINE_PX;
+    const MIN_TIMELINE = proxy.$MIN_TIMELINE;
+
     const resources = reactive<Resource[]>(fakeResources);
     const resourceObject = computed(() => {
         return resources.reduce((acc, resource) => {
@@ -14,6 +18,7 @@ export const useWorkflowStore = defineStore("workflow", () => {
         resources.flatMap((resource) => resource.tasks)
     );
     const currentTaskId = ref<number | undefined>(undefined);
+    const offsetCell = ref<number | undefined>();
 
     const taskWillMoveData = reactive<ExtendedTaskWillMoveData>(
         {} as ExtendedTaskWillMoveData
@@ -39,24 +44,83 @@ export const useWorkflowStore = defineStore("workflow", () => {
 
     //--- signals ---
     const activeCells = ref<
-        { cellId: number; resourceId: number; taskId: number }[]
+        { cellId: number; resourceId: number; assignedTaskId?: number }[]
     >([]);
 
     const signals = reactive({
         activeCells,
     });
 
-    //--- events ---
-    const onDragOver = (cellId: number, resourceId: number, taskId: number) => {
-        const hasSameCell = activeCells.value.find(
-            (e) => e.cellId === cellId && e.resourceId === resourceId
+    //--- helpers ---
+    const getCellByTime = (time: string, resource: Resource) => {
+        const { startAt: startResource } = resource;
+        return Math.floor(
+            (new Date(time).getTime() - new Date(startResource).getTime()) /
+                MIN_TIMELINE
         );
-        if (hasSameCell) return;
+    };
+    const getTimeByIndex = (index: number, resource: Resource) => {
+        const { startAt: startResource } = resource;
+        return {
+            start: new Date(
+                new Date(startResource).getTime() + index * MIN_TIMELINE
+            ).toISOString(),
+            end: new Date(
+                new Date(startResource).getTime() + (index + 1) * MIN_TIMELINE
+            ).toISOString(),
+        };
+    };
+    const getTaskBoundaries = (
+        taskId: number
+    ): { left?: number; right?: number } => {
+        const task = findTask.byId(taskId);
+        const resource = findResource.byTaskId(taskId);
+        if (!task || !resource) return { left: undefined, right: undefined };
+        const { startAt, endAt } = task;
+        return {
+            left: getCellByTime(startAt, resource),
+            right: getCellByTime(endAt, resource) - 1,
+        };
+    };
+
+    const createPullCells = (
+        startCell: number,
+        offset: number,
+        totalCells: number
+    ): number[] => {
+        const res: number[] = [];
+        for (
+            let i = startCell - offset + 1;
+            i < startCell - offset + totalCells + 1;
+            i++
+        ) {
+            res.push(i);
+        }
+        return res;
+    };
+
+    //--- events ---
+    const onDragOver = (
+        cellId: number,
+        resourceId: number,
+        assignedTaskId: number
+    ) => {
         targetResourceId.value = resourceId;
-        activeCells.value = [
-            ...activeCells.value,
-            { cellId, resourceId, taskId },
-        ];
+
+        if (!currentTaskId.value) return;
+        // const { left, right } = getTaskBoundaries(currentTaskId.value);
+
+        const pullCells = createPullCells(
+            cellId,
+            offsetCell.value || 0,
+            findTask.totalCells(currentTaskId.value) || 0
+        );
+        console.log({ pullCells });
+        activeCells.value = pullCells.map((cell) => ({
+            cellId: cell,
+            resourceId,
+            assignedTaskId: undefined,
+        }));
     };
 
     const onDragLeave = (cellId: number, resourceId: number) => {
@@ -74,6 +138,8 @@ export const useWorkflowStore = defineStore("workflow", () => {
         currentTaskId.value && moveTask(currentTaskId.value);
         sourceResourceId.value = undefined;
         activeCells.value = [];
+        if (!currentTaskId.value) return;
+        console.log(getTaskBoundaries(currentTaskId.value));
         currentTaskId.value = undefined;
     };
 
@@ -133,19 +199,28 @@ export const useWorkflowStore = defineStore("workflow", () => {
             return resources.findIndex((resource) => resource.id === id);
         },
     };
-
+    const findTaskById = (id: number) => {
+        const resource = findResource.byTaskId(id);
+        if (!resource) return;
+        const task = resource?.tasks.find((task: Task) => task.id === id);
+        if (!task) return;
+        return task;
+    };
     const findTask = {
-        byId: (id: number): Task | undefined => {
-            const resource = findResource.byTaskId(id);
-            if (!resource) return;
-            const task = resource?.tasks.find((task: Task) => task.id === id);
-            if (!task) return;
-            return task;
-        },
+        byId: findTaskById,
         index: (id: number): number | undefined => {
             const resource = findResource.byTaskId(id);
             if (!resource) return;
             return resource.tasks.findIndex((task) => task.id === id);
+        },
+        totalCells: (id: number): number | undefined => {
+            const task = findTaskById(id);
+            if (!task) return;
+            const { startAt, endAt } = task;
+            return Math.floor(
+                (new Date(endAt).getTime() - new Date(startAt).getTime()) /
+                    MIN_TIMELINE
+            );
         },
     };
 
@@ -153,6 +228,7 @@ export const useWorkflowStore = defineStore("workflow", () => {
         resources,
         tasks,
         currentTaskId,
+        offsetCell,
         taskWillMoveData,
         find: {
             findResource,
