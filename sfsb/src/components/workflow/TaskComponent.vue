@@ -1,5 +1,5 @@
 <template lang="pug">
-    .task-component(:draggable @dragstart="onDragStart" @dragend="emit('taskBreakMove')" ref="taskElement" )
+    .task-component(:draggable @dragstart="onDragStart" @dragend="onDragEnd" ref="taskElement" )
         .task-component__edge.task-component__edge--left(
             @mousedown="emit('leftEdgeDown', task.id)"
         )
@@ -25,11 +25,14 @@
 
 <script setup lang="ts">
 import { computed, getCurrentInstance, ref } from "vue";
+import { storeToRefs } from "pinia";
+import { useWorkflowStore } from "@/pinia-store/workflow";
 
 const { proxy } = getCurrentInstance();
 
 const props = defineProps<{
     task: Task;
+    resourceId: number;
     start: number;
     end: number;
     draggable: boolean;
@@ -42,6 +45,8 @@ const emit = defineEmits([
     "taskWillMove",
     "taskBreakMove",
 ]);
+
+const { sourceResourceId } = storeToRefs(useWorkflowStore());
 
 const taskElement = ref<HTMLDivElement>();
 const widthComponent = computed(() => taskElement.value?.offsetWidth);
@@ -88,11 +93,10 @@ const inCell = (coord: number): number => {
 
 const onDragStart = (e: DragEvent) => {
     const { offsetX } = e;
-    emit("taskWillMove", {
-        taskId: props.task.id,
-        totalCell: totalCellInComponent.value,
-        cell: inCell(offsetX),
-    });
+    sourceResourceId.value = props.resourceId;
+};
+const onDragEnd = (e: DragEvent) => {
+    sourceResourceId.value = undefined;
 };
 </script>
 

@@ -1,28 +1,30 @@
 <template lang="pug">
     .cell-component(
-        @dragover.prevent="onDragover"
-        @dragleave.prevent="dragover=false"
-        @drop.prevent="onDropEvent(props.id)"
+        :style="{backgroundColor: color}"
+        @dragover.prevent="events.onDragOver(id,resourceId)"
+        @drop.prevent="onDrop"
         @mousemove="onMouseMove"
     )
-        pre {{props.id}} {{taskId}}
+        pre {{id}} {{taskId}} {{resourceId}}
 </template>
 
 <script setup lang="ts">
-import { inject, type Ref, ref } from "vue";
+import { type Ref, ref, watch } from "vue";
+import { useWorkflowStore } from "@/pinia-store/workflow";
+import { storeToRefs } from "pinia";
 
 const COLOR_QUERY = {
     disabled: "#ff0000",
     enabled: "#00ff00",
 };
 
-const props = defineProps<{ id: number }>();
+const props = defineProps<{ id: number; resourceId: number }>();
 const taskId: Ref<number | null> = ref(null);
 const dragover = ref(false);
 const color = ref("");
 
-const emit = defineEmits(["taskHasDrop", "taskOver", "cellMouseMove"]);
-const onDropEvent = inject("onDropEvent");
+const { signals, events } = useWorkflowStore();
+const { sourceResourceId, targetResourceId } = storeToRefs(useWorkflowStore());
 
 const getTaskId = () => {
     return taskId.value;
@@ -39,16 +41,8 @@ const clear = () => {
     taskId.value = null;
 };
 
-const onDragover = (e: DragEvent) => {
-    if (dragover.value) return;
-    dragover.value = true;
-    emit("taskOver", props.id);
-};
-const onDrop = (e: DragEvent) => {
-    dragover.value = false;
-    emit("taskHasDrop", props.id);
-    console.log("cell drop");
-};
+const onDragover = (e: DragEvent) => {};
+const onDrop = (e: DragEvent) => {};
 
 const setEnabledColor = () => {
     color.value = COLOR_QUERY.enabled;
@@ -57,12 +51,33 @@ const setDisabledColor = () => {
     color.value = COLOR_QUERY.disabled;
 };
 const clearColor = () => {
-    color.value = "";
+    color.value = "transparent";
 };
 
-const onMouseMove = (e: MouseEvent) => {
-    emit("cellMouseMove", props.id, taskId.value, e);
-};
+const onMouseMove = (e: MouseEvent) => {};
+
+watch(
+    () => signals.activeCells,
+    () => {
+        if (
+            signals.activeCells.find(
+                ({ cellId, resourceId }) =>
+                    cellId === props.id && resourceId === props.resourceId
+            )
+        ) {
+            setEnabledColor();
+        }
+    }
+);
+
+watch([sourceResourceId], ([value], [oldValue]) => {
+    if (
+        (value === undefined && oldValue === props.resourceId) ||
+        targetResourceId.value === props.resourceId
+    ) {
+        clearColor();
+    }
+});
 
 defineExpose({
     setTaskId,
@@ -81,6 +96,6 @@ defineExpose({
     border-radius: 5px
     border: 1px solid #7777
     font-size: 10px
-    background-color: v-bind(color)
+    //background-color: v-bind(color)
     transition: background-color .2s ease-in-out
 </style>

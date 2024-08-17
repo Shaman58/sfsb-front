@@ -13,6 +13,7 @@ export const useWorkflowStore = defineStore("workflow", () => {
     const tasks = computed(() =>
         resources.value.flatMap((resource) => resource.tasks)
     );
+
     const taskWillMoveData = reactive<ExtendedTaskWillMoveData>(
         {} as ExtendedTaskWillMoveData
     );
@@ -23,6 +24,9 @@ export const useWorkflowStore = defineStore("workflow", () => {
         get: () => _sourceResourceId.value,
         set: (id: number | undefined) => {
             _sourceResourceId.value = id;
+            if (id === undefined) {
+                activeCells.value = [];
+            }
         },
     });
     const targetResourceId = computed({
@@ -30,6 +34,38 @@ export const useWorkflowStore = defineStore("workflow", () => {
         set: (id: number | undefined) => {
             _targetResourceId.value = id;
         },
+    });
+
+    //--- signals ---
+    const activeCells = ref<{ cellId: number; resourceId: number }[]>([]);
+
+    const signals = reactive({
+        activeCells,
+    });
+
+    //--- events ---
+    const onDragOver = (cellId: number, resourceId: number) => {
+        const hasSameCell = activeCells.value.find(
+            (e) => e.cellId === cellId && e.resourceId === resourceId
+        );
+        if (hasSameCell) return;
+        targetResourceId.value = resourceId;
+        activeCells.value = [...activeCells.value, { cellId, resourceId }];
+    };
+
+    const onDragLeave = (cellId: number, resourceId: number) => {
+        const hasSameCell = activeCells.value.find(
+            (e) => e.cellId === cellId && e.resourceId === resourceId
+        );
+        if (hasSameCell) return;
+        activeCells.value = activeCells.value.filter(
+            (e) => e.cellId !== cellId && e.resourceId !== resourceId
+        );
+    };
+
+    const events = reactive({
+        onDragOver,
+        onDragLeave,
     });
 
     //--- moving ---
@@ -103,5 +139,7 @@ export const useWorkflowStore = defineStore("workflow", () => {
             shrinkTaskLeft,
             shrinkTaskRight,
         },
+        signals,
+        events,
     };
 });
