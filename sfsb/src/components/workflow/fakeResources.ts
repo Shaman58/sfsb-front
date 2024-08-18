@@ -45,4 +45,28 @@ export const fakeResources: Resource[] = [
             },
         ],
     },
+    {
+        id: 3,
+        name: "Resource 3",
+        description: "Resource 3 description",
+        startAt: "2024-08-11T00:00:00.000Z",
+        endAt: "2024-08-12T00:00:00.000Z",
+        tasks: [],
+    },
+    {
+        id: 4,
+        name: "Resource 4",
+        description: "Resource 4 description",
+        startAt: "2024-08-11T00:00:00.000Z",
+        endAt: "2024-08-12T00:00:00.000Z",
+        tasks: [],
+    },
+    {
+        id: 5,
+        name: "Resource 5",
+        description: "Resource 5s description",
+        startAt: "2024-08-11T00:00:00.000Z",
+        endAt: "2024-08-12T00:00:00.000Z",
+        tasks: [],
+    },
 ];

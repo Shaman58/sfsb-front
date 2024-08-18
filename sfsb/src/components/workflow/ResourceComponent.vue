@@ -5,6 +5,7 @@
         @mouseleave="onMouseLeave"
     )
         h1 {{resourceLength}}
+        .btn(@click="onBtnClick") TEST
         .resource-component__timeline
             cell-component(
                 v-for="cell of resourceLength"
@@ -42,6 +43,7 @@ import {
 } from "vue";
 import CellComponent from "@/components/workflow/CellComponent.vue";
 import TaskComponent from "@/components/workflow/TaskComponent.vue";
+import { useWorkflowStore } from "@/pinia-store/workflow";
 
 const { proxy } = getCurrentInstance();
 const MIN_TIMELINE_PX = proxy.$MIN_TIMELINE_PX;
@@ -65,6 +67,17 @@ const resourceLength = computed(
 const tasks = ref(props.resource.tasks.map((e) => ({ ...e, draggable: true })));
 const timeline: Ref<CellComponent[]> = ref([]);
 const taskCanMove = ref(false);
+
+const { resources, changeTask } = useWorkflowStore();
+
+const onBtnClick = () => {
+    const task = resources[0].tasks[0];
+    const { endAt } = task;
+    const newEndAt = new Date(
+        new Date(endAt).getTime() + 30 * 60 * 1000
+    ).toISOString();
+    changeTask.endAt(task.id, newEndAt);
+};
 
 const placeTask = (task: Task) => {
     const startAt = new Date(props.resource.startAt).getTime();

@@ -1,5 +1,4 @@
 <template lang="pug">
-    div {{refresh ? "-" : "--"}}
     .workflow-component
         resource-component(
             v-for="resource in resources"
@@ -16,18 +15,19 @@
 
 <script setup lang="ts">
 import ResourceComponent from "@/components/workflow/ResourceComponent.vue";
-import { fakeResources } from "./fakeResources";
 import { getCurrentInstance, provide, reactive, ref } from "vue";
+import { useWorkflowStore } from "@/pinia-store/workflow";
 
 const { proxy } = getCurrentInstance();
 const MIN_TIMELINE_PX = proxy.$MIN_TIMELINE_PX;
 const MIN_TIMELINE = proxy.$MIN_TIMELINE;
 
-const resources = reactive(fakeResources);
+// const resources = reactive(fakeResources);
 const resourcesRefs = ref([]);
 const clean = ref(false);
 const targetResourceId = ref<number | undefined>();
-const refresh = ref(false); //для пренудительной перерисовки
+
+const { resources, find, changeTask } = useWorkflowStore();
 
 const doClean = (resourceId: number) => {
     return targetResourceId.value === resourceId && clean.value;
@@ -67,34 +67,6 @@ const onAlignTask = (id: number) => {
 const onTaskCanMove = (value: boolean) => {
     taskWillMoveData.taskCanMove = value;
 };
-const findResource = (id: number): Resource | undefined => {
-    return resources.find((resource) => resource.id === id);
-};
-
-const findResourceByTaskId = (id: number) => {
-    const resource = resources.find((resource) =>
-        resource.tasks.find((task: Task) => task.id === id)
-    );
-    if (!resource) return;
-    return resource;
-};
-
-const findResourceIndex = (id: number) => {
-    return resources.findIndex((resource) => resource.id === id);
-};
-
-const findtask = (id: number): Task | undefined => {
-    const resource = findResourceByTaskId(id);
-    if (!resource) return;
-    const task = resource?.tasks.find((task: Task) => task.id === id);
-    if (!task) return;
-    return task;
-};
-const findTaskIndex = (id: number) => {
-    const resource = findResourceByTaskId(id);
-    if (!resource) return;
-    return resource.tasks.findIndex((task) => task.id === id);
-};
 
 const getTimeByCellId = (id: number, resource: Resource) => {
     const resourceStartAt = resource.startAt;
@@ -110,19 +82,21 @@ const getTimeByCellId = (id: number, resource: Resource) => {
     };
 };
 
+//TODO: перенести в pinia
 const moveTask = (cellId: number) => {
     console.log("pre resources", resources);
     const { taskId, totalCell, cell, targetResourceId, resourceId } =
         taskWillMoveData;
 
     if (!taskId || !resourceId) return; //TODO: возможно exception или сообщение
-    let targetResource = targetResourceId && findResource(targetResourceId);
-    const sourceResource = findResource(resourceId);
+    let targetResource =
+        targetResourceId && find.findResource.byId(targetResourceId);
+    const sourceResource = find.findResource.byId(resourceId);
     if (!sourceResource) return;
     if (!targetResource) targetResource = sourceResource;
     if (!targetResource) return;
 
-    const foundTask = findtask(taskId);
+    const foundTask = find.findTask.byId(taskId);
     if (!foundTask) return;
 
     const task: Task = { ...foundTask };
@@ -165,12 +139,13 @@ const moveTask = (cellId: number) => {
     targetResource && (targetResource.tasks[foundTaskIndex].endAt = task.endAt); //устанавливаем новые начало и конец таски
 };
 
+//TODO: перенести в pinia
 const onMoveEdgeOfTask = (
     taskId: number,
     edge: "left" | "right",
     direction: "left" | "right"
 ) => {
-    const task = findtask(taskId);
+    const task = find.findTask.byId(taskId);
     if (!task) return;
     const property = edge === "left" ? "startAt" : "endAt";
     const sign = direction === "left" ? -1 : 1;
@@ -180,9 +155,9 @@ const onMoveEdgeOfTask = (
     ).toISOString();
     task[property] = newDate;
 
-    const resource = findResourceByTaskId(taskId);
-    const resourceIndex = findResourceIndex(resource.id);
-    const taskIndex = findTaskIndex(taskId);
+    const resource = find.findResource.byTaskId(taskId);
+    const resourceIndex = find.findResource.index(resource.id);
+    const taskIndex = find.findTask.index(taskId);
 
     resources[resourceIndex].tasks[taskIndex] = task;
 };
