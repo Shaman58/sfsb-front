@@ -1,9 +1,21 @@
 <template lang="pug">
-    .task-component(:draggable @dragstart="onDragStart" @dragend="emit('taskBreakMove')" ref="taskElement" )
+    .task-component(
+        :draggable
+        @dragstart="onDragStart"
+        @dragend="emit('taskBreakMove')"
+        @contextmenu.prevent="menu=true"
+        ref="taskElement"
+    )
         .task-component__edge.task-component__edge--left(
             @mousedown="emit('leftEdgeDown', task.id)"
         )
-        .task-component__main(:style="{backgroundColor: props.draggable?'green':'red'}") {{task.name}} {{start}} {{end}}
+        .task-component__main() {{task.name}} {{start}} {{end}}
+            v-menu(v-model="menu" :close-on-content-click="false" activator="parent" location="end" min-width="300px" )
+                v-card
+                    v-form
+                        v-text-field(label="Описание" v-model.lazy="props.task.description")
+                        set-time(v-model:startAt="props.task.startAt" v-model:endAt="props.task.endAt")
+
         .task-component__edge.task-component__edge--right(
             @mousedown="emit('rightEdgeDown', task.id)"
         )
@@ -21,12 +33,16 @@
                 time {{formatDateEndAt}}&nbsp;
                 time
                     strong {{formatTimeEndAt}}
+
 </template>
 
 <script setup lang="ts">
 import { computed, getCurrentInstance, ref } from "vue";
+import SetTime from "@/components/workflow/SetTime.vue";
 
 const { proxy } = getCurrentInstance();
+
+const menu = ref(false);
 
 const props = defineProps<{
     task: Task;
