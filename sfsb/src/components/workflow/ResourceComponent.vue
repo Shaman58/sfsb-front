@@ -35,7 +35,6 @@
 import {
     computed,
     getCurrentInstance,
-    inject,
     onMounted,
     type Ref,
     ref,
@@ -68,7 +67,7 @@ const tasks = ref(props.resource.tasks.map((e) => ({ ...e, draggable: true })));
 const timeline: Ref<CellComponent[]> = ref([]);
 const taskCanMove = ref(false);
 
-const { resources, changeTask } = useWorkflowStore();
+const { resources, changeTask, taskWillMoveData } = useWorkflowStore();
 
 const onBtnClick = () => {
     const task = resources[0].tasks[0];
@@ -93,8 +92,6 @@ const placeTask = (task: Task) => {
 };
 
 const taskElements: Ref<TaskComponent[]> = ref([]);
-const taskWillMoveData: TaskWillMoveData | undefined =
-    inject<ExtendedTaskWillMoveData>("taskWillMoveData");
 
 const onEdgeDown = (taskId: number, signal: Ref<Task | null>) => {
     const task = tasks.value.find((e) => e.id === taskId);
@@ -135,6 +132,7 @@ const getCellIdByTime = (
     direction: "left" | "right"
  */
 const onCellMove = (id: number, taskId: number, e: MouseEvent) => {
+    console.log("cell mouse move");
     if (!movingTaskRightEdge.value && !movingTaskLeftEdge.value) return;
     const currentTask = movingTaskRightEdge.value || movingTaskLeftEdge.value;
     if (!currentTask) return;
