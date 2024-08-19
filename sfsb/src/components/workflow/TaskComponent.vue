@@ -3,7 +3,7 @@
         .task-component__edge.task-component__edge--left(
             @mousedown="emit('leftEdgeDown', task.id)"
         )
-        .task-component__main {{task.name}} {{start}} {{end}} {{widthComponent}}
+        .task-component__main(:style="{backgroundColor: props.draggable?'green':'red'}") {{task.name}} {{start}} {{end}}
         .task-component__edge.task-component__edge--right(
             @mousedown="emit('rightEdgeDown', task.id)"
         )
@@ -94,6 +94,8 @@ const onDragStart = (e: DragEvent) => {
         cell: inCell(offsetX),
     });
 };
+
+//TODO: сделать выпадающее меню с возможностью установки точного времени начала и конца,выбрать ресурс, изменить описание
 </script>
 
 <style scoped lang="sass">

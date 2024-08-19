@@ -66,6 +66,7 @@ const resourceLength = computed(
 const tasks = ref(props.resource.tasks.map((e) => ({ ...e, draggable: true })));
 const timeline: Ref<CellComponent[]> = ref([]);
 const taskCanMove = ref(false);
+const onCellMoveX = ref(0);
 
 const { resources, changeTask, taskWillMoveData } = useWorkflowStore();
 
@@ -133,6 +134,12 @@ const getCellIdByTime = (
  */
 const onCellMove = (id: number, taskId: number, e: MouseEvent) => {
     console.log("cell mouse move");
+    //ограничение на минимальное смещение
+    const { x } = e;
+    const delta = Math.abs(onCellMoveX.value - x);
+    if (delta < 30) return;
+    onCellMoveX.value = x;
+
     if (!movingTaskRightEdge.value && !movingTaskLeftEdge.value) return;
     const currentTask = movingTaskRightEdge.value || movingTaskLeftEdge.value;
     if (!currentTask) return;
@@ -140,10 +147,12 @@ const onCellMove = (id: number, taskId: number, e: MouseEvent) => {
     if (taskId !== currentTask?.id && taskId !== null) return;
 
     const edge = !!movingTaskLeftEdge.value ? "left" : "right";
+
     //определить какие cell занимают левая и правая границы таски
     const leftTaskCellId = getCellIdByTime(currentTask.startAt);
     const rightTaskCellId = getCellIdByTime(currentTask.endAt) - 1;
     console.log({ id, leftTaskCellId, rightTaskCellId });
+
     //какое планируется смещение границы левое или правое по id cell и task
     if (id === leftTaskCellId || id === rightTaskCellId) return;
     let direction;
@@ -284,10 +293,14 @@ watch(
     (value, oldValue) => {
         console.log("props.resource.tasks изменились", oldValue, value);
         zeroizeTimeline();
-        tasks.value = props.resource.tasks.map((e) => ({
-            ...e,
-            draggable: true,
-        }));
+        tasks.value = props.resource.tasks.map((e) => {
+            const draggable =
+                e.id === movingTaskLeftEdge.value?.id ||
+                e.id === movingTaskRightEdge.value?.id
+                    ? false
+                    : true;
+            return { ...e, draggable };
+        });
         recalcTimeline();
     },
     { deep: true }

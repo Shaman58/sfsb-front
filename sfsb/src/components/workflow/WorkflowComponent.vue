@@ -26,14 +26,8 @@ const resourcesRefs = ref([]);
 const clean = ref(false);
 const targetResourceId = ref<number | undefined>();
 
-const {
-    resources,
-    find,
-    changeTask,
-    taskWillMoveData,
-    moveTask,
-    onMoveEdgeOfTask,
-} = useWorkflowStore();
+const { resources, taskWillMoveData, moveTask, onMoveEdgeOfTask } =
+    useWorkflowStore();
 
 const doClean = (resourceId: number) => {
     return targetResourceId.value === resourceId && clean.value;
@@ -68,8 +62,6 @@ const onAlignTask = (id: number) => {
 const onTaskCanMove = (value: boolean) => {
     taskWillMoveData.taskCanMove = value;
 };
-
-//TODO: перенести в pinia
 </script>
 
 <style scoped lang="sass"></style>
