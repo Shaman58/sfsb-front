@@ -126,6 +126,64 @@ export const useWorkflowStore = defineStore("workflow", () => {
         };
     };
 
+    const replaceTask = (
+        taskId: number,
+        targetResourceId: number,
+        newTaskStartAt?: string,
+        newTaskEndAt?: string
+    ) => {
+        const task: Task | undefined = findTaskById(taskId);
+        if (!task) return;
+        const sourceResource: Resource | undefined =
+            findResource.byTaskId(taskId);
+        const targetResource: Resource | undefined =
+            findResource.byId(targetResourceId);
+
+        //проверить нг пересечение целевого ресурса и исходного
+        const taskStartAt = newTaskStartAt
+            ? new Date(newTaskStartAt).getTime()
+            : new Date(task?.startAt).getTime();
+        const taskEndAt = newTaskEndAt
+            ? new Date(newTaskEndAt).getTime()
+            : new Date(task?.endAt).getTime();
+
+        const correct =
+            targetResource &&
+            targetResource.tasks.every((e) => {
+                const targetStartAt = new Date(e.startAt).getTime();
+                const targetEndAt = new Date(e.endAt).getTime();
+
+                // const include =
+                //     taskStartAt >= targetStartAt && taskEndAt <= targetEndAt;
+                // const taskOffsetLeft =
+                //     taskStartAt < targetStartAt && taskEndAt >= targetStartAt;
+                // const taskOffsetRight =
+                //     taskStartAt < +taskEndAt && taskEndAt > targetEndAt;
+                // const exclude = taskStartAt <= targetStartAt && taskEndAt >= targetEndAt;
+
+                // return !include || !taskOffsetLeft || !taskOffsetRight || !exclude;
+
+                const atLeft =
+                    taskStartAt < targetStartAt && taskEndAt < targetStartAt;
+                const atRight =
+                    taskStartAt > targetEndAt && taskEndAt > targetEndAt;
+
+                return atLeft || atRight;
+            });
+        if (!correct) return;
+
+        targetResource &&
+            task &&
+            (targetResource.tasks = [...targetResource.tasks, task]);
+        sourceResource &&
+            (sourceResource.tasks = [
+                ...sourceResource?.tasks.filter((e) => e.id !== taskId),
+            ]);
+
+        newTaskStartAt && (task.startAt = newTaskStartAt);
+        newTaskEndAt && (task.endAt = newTaskEndAt);
+    };
+
     const moveTask = (cellId: number) => {
         console.log("pre resources", resources);
         const { taskId, totalCell, cell, targetResourceId, resourceId } =
@@ -216,5 +274,6 @@ export const useWorkflowStore = defineStore("workflow", () => {
         changeTask,
         moveTask,
         onMoveEdgeOfTask,
+        replaceTask,
     };
 });

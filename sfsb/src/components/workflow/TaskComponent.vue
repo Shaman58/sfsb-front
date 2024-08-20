@@ -11,10 +11,15 @@
         )
         .task-component__main() {{task.name}} {{start}} {{end}}
             v-menu(v-model="menu" :close-on-content-click="false" activator="parent" location="end" min-width="300px" )
-                v-card
+                v-card.pa-2()
                     v-form
-                        v-text-field(label="Описание" v-model.lazy="props.task.description")
-                        set-time(v-model:startAt="props.task.startAt" v-model:endAt="props.task.endAt")
+                        v-text-field(label="Описание" v-model.lazy="localTask.description")
+                        set-time(v-model:startAt="localTask.startAt" v-model:endAt="localTask.endAt")
+                        replace-to-resource(:resourceId="find.findResource.byTaskId(localTask.id)?.id" @change="onResourceChange")
+                    .d-flex.justify-center
+                        v-btn-group
+                            v-btn.flex-grow-1(color="orange-darken-1" @click="onTaskChange") Изменить
+                            v-btn.flex-grow-1(color="grey-lighten-3" @click="menu=false") Отмена
 
         .task-component__edge.task-component__edge--right(
             @mousedown="emit('rightEdgeDown', task.id)"
@@ -39,10 +44,13 @@
 <script setup lang="ts">
 import { computed, getCurrentInstance, ref } from "vue";
 import SetTime from "@/components/workflow/SetTime.vue";
+import ReplaceToResource from "@/components/workflow/ReplaceToResource.vue";
+import { useWorkflowStore } from "@/pinia-store/workflow";
 
 const { proxy } = getCurrentInstance();
 
 const menu = ref(false);
+const { find, replaceTask } = useWorkflowStore();
 
 const props = defineProps<{
     task: Task;
@@ -58,13 +66,15 @@ const emit = defineEmits([
     "taskWillMove",
     "taskBreakMove",
 ]);
+const localTask = ref({ ...props.task });
+const changingResource = ref(find.findResource.byTaskId(props.task.id)?.id);
 
 const taskElement = ref<HTMLDivElement>();
 const widthComponent = computed(() => taskElement.value?.offsetWidth);
 const totalCellInComponent = computed(
     () =>
-        (new Date(props.task.endAt).getTime() -
-            new Date(props.task.startAt).getTime()) /
+        (new Date(localTask.value.endAt).getTime() -
+            new Date(localTask.value.startAt).getTime()) /
         proxy.$MIN_TIMELINE
 );
 const pointerEvent = computed(() => (props.draggable ? "all" : "none"));
@@ -111,7 +121,27 @@ const onDragStart = (e: DragEvent) => {
     });
 };
 
-//TODO: сделать выпадающее меню с возможностью установки точного времени начала и конца,выбрать ресурс, изменить описание
+const onResourceChange = (resourceId: number) => {
+    changingResource.value = resourceId;
+};
+
+const onTaskChange = () => {
+    menu.value = false;
+    console.log(localTask.value, changingResource.value);
+    if (!localTask.value) return;
+    if (
+        find.findResource.byTaskId(props.task.id)?.id !==
+            changingResource.value &&
+        typeof changingResource.value === "number"
+    ) {
+        replaceTask(
+            localTask.value.id,
+            changingResource.value,
+            localTask.value.startAt,
+            localTask.value.endAt
+        );
+    }
+};
 </script>
 
 <style scoped lang="sass">
