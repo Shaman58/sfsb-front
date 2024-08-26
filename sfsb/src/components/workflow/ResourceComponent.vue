@@ -68,7 +68,7 @@ const timeline: Ref<CellComponent[]> = ref([]);
 const taskCanMove = ref(false);
 const onCellMoveX = ref(0);
 
-const { resources, changeTask, taskWillMoveData } = useWorkflowStore();
+const { resources, changeTask, taskWillMoveData, find } = useWorkflowStore();
 
 const onBtnClick = () => {
     const task = resources[0].tasks[0];
@@ -302,6 +302,23 @@ watch(
             return { ...e, draggable };
         });
         recalcTimeline();
+    },
+    { deep: true }
+);
+
+watch(
+    [resources],
+    () => {
+        const resource = find.findResource.byId(props.resource.id);
+        if (!resource) return;
+        tasks.value = resource.tasks.map((e) => {
+            const draggable =
+                e.id === movingTaskLeftEdge.value?.id ||
+                e.id === movingTaskRightEdge.value?.id
+                    ? false
+                    : true;
+            return { ...e, draggable };
+        });
     },
     { deep: true }
 );

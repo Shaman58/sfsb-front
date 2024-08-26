@@ -42,7 +42,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, getCurrentInstance, ref } from "vue";
+import { computed, getCurrentInstance, ref, watch } from "vue";
 import SetTime from "@/components/workflow/SetTime.vue";
 import ReplaceToResource from "@/components/workflow/ReplaceToResource.vue";
 import { useWorkflowStore } from "@/pinia-store/workflow";
@@ -142,6 +142,14 @@ const onTaskChange = () => {
         );
     }
 };
+
+watch(
+    [props],
+    () => {
+        localTask.value = { ...props.task };
+    },
+    { deep: true }
+);
 </script>
 
 <style scoped lang="sass">

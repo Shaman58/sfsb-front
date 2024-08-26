@@ -189,7 +189,7 @@ export const useWorkflowStore = defineStore("workflow", () => {
         const { taskId, totalCell, cell, targetResourceId, resourceId } =
             taskWillMoveData;
 
-        if (!taskId || !resourceId) return; //TODO: возможно exception или сообщение
+        if (!taskId || !resourceId || !totalCell || !cell) return; //TODO: возможно exception или сообщение
         let targetResource =
             targetResourceId && findResource.byId(targetResourceId);
         const sourceResource = findResource.byId(resourceId);
@@ -251,10 +251,9 @@ export const useWorkflowStore = defineStore("workflow", () => {
         const property = edge === "left" ? "startAt" : "endAt";
         const sign = direction === "left" ? -1 : 1;
 
-        const newDate = new Date(
+        task[property] = new Date(
             new Date(task[property]).getTime() + sign * MIN_TIMELINE
         ).toISOString();
-        task[property] = newDate;
 
         const resource = findResource.byTaskId(taskId);
         if (!resource) return;
