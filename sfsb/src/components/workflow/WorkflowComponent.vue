@@ -64,4 +64,10 @@ const onTaskCanMove = (value: boolean) => {
 };
 </script>
 
-<style scoped lang="sass"></style>
+<style scoped lang="sass">
+.workflow-component
+    width: 100vw
+    margin-top: 2rem
+    height: calc(100vh - 2rem)
+    overflow: auto
+</style>

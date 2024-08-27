@@ -4,8 +4,7 @@
         @dragleave="onDragLeave"
         @mouseleave="onMouseLeave"
     )
-        h1 {{resourceLength}}
-        .btn(@click="onBtnClick") TEST
+        h2.resource-component__title {{resource.name}}
         .resource-component__timeline
             cell-component(
                 v-for="cell of resourceLength"
@@ -331,4 +330,9 @@ watch(
         display: grid
         grid-template-columns: repeat(v-bind(resourceLength), v-bind(MIN_TIMELINE_PX))
         grid-template-rows: repeat(2, v-bind(MIN_TIMELINE_PX))
+
+    &__title
+        position: sticky
+        left: 0
+        width: max-content
 </style>
