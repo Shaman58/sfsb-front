@@ -12,7 +12,7 @@ declare module "*.jpeg" {
 }
 
 declare module "*.vue" {
-    import {defineComponent} from "vue";
+    import { defineComponent } from "vue";
     const Component: ReturnType<typeof defineComponent>;
     export default Component;
 }
@@ -38,7 +38,7 @@ declare interface NavItem {
     path: string;
     label: string;
     role?: string[];
-    submenu?: NavItem[]
+    submenu?: NavItem[];
 }
 
 declare interface OrderFile {
@@ -67,8 +67,7 @@ declare interface Customer {
     updated: string | null;
 }
 
-declare interface PartialCustomer extends Partial<Customer> {
-}
+declare interface PartialCustomer extends Partial<Customer> {}
 
 declare interface Department {
     id: number;
@@ -79,7 +78,7 @@ declare interface Department {
 
 declare interface ItemPrice {
     amount: number;
-    currency: "RUB";
+    currency: RUB;
     formatted?: string;
 }
 
@@ -132,9 +131,9 @@ declare interface Operation {
 }
 
 declare interface AdditionalTool extends Tool {
-    workpiece?: Workpiece,
-    amount: number,
-    processTime: string
+    workpiece?: Workpiece;
+    amount: number;
+    processTime: string;
 }
 
 declare interface Setup {
@@ -158,7 +157,7 @@ declare interface Setup {
     group: boolean;
     cooperate: boolean;
     aggregate: boolean;
-    groupAble?: boolean
+    groupAble?: boolean;
 }
 
 declare interface Technology {
@@ -188,7 +187,7 @@ declare interface Item {
     updated?: string;
     price: ItemPrice;
     customerMaterial: boolean;
-    uid?: number | string
+    uid?: number | string;
     quantity: number;
     technology: Technology;
 }
@@ -220,113 +219,133 @@ declare interface Person {
 }
 
 declare interface Logo {
-    id: number,
-    created: string,
-    updated: string,
-    filename: string,
-    link: string,
-    user: null | Person
+    id: number;
+    created: string;
+    updated: string;
+    filename: string;
+    link: string;
+    user: null | Person;
 }
 
 declare interface Company extends Customer {
-    logo: null | Logo
+    logo: null | Logo;
 }
 
-declare interface PartialCompany extends Parial<Company> {
-}
+declare interface PartialCompany extends Parial<Company> {}
 
-declare type OperationTimeManagement = "COMPUTED" | "PROCESS_TIME_ONLY" | "FULL"
+declare type OperationTimeManagement = COMPUTED | PROCESS_TIME_ONLY | FULL;
 
 declare interface Operation {
-    id: number,
-    created: null | string,
-    updated: string,
-    operationName: string,
-    paymentPerHour: ItemPrice,
-    operationTimeManagement: OperationTimeManagement
+    id: number;
+    created: null | string;
+    updated: string;
+    operationName: string;
+    paymentPerHour: ItemPrice;
+    operationTimeManagement: OperationTimeManagement;
 }
 
 declare type Role = string;
 declare type Roles = string[];
 
 declare interface FileOrder {
-    id: number,
-    created: string | null,
-    updated: string | null,
-    filename: string,
-    link: string,
-    user: unknown | null
+    id: number;
+    created: string | null;
+    updated: string | null;
+    filename: string;
+    link: string;
+    user: unknown | null;
 }
 
 declare interface KPItem {
-    id?: string,
-    created: string | null,
-    updated: string | null,
-    itemPrice: number,
-    name: string,
-    decimal: string,
-    amount: number,
-    totalPrice: number
+    id?: string;
+    created: string | null;
+    updated: string | null;
+    itemPrice: number;
+    name: string;
+    decimal: string;
+    amount: number;
+    totalPrice: number;
 }
 
 declare interface KP {
-    id?: number,
-    created?: string | null,
-    updated?: string | null,
-    applicationNumber: number,
-    businessProposal: string,
-    items: KPItem[],
-    customerId: number,
-    createdBy: string,
-    companyId: number,
-    system: boolean
+    id?: number;
+    created?: string | null;
+    updated?: string | null;
+    applicationNumber: number;
+    businessProposal: string;
+    items: KPItem[];
+    customerId: number;
+    createdBy: string;
+    companyId: number;
+    system: boolean;
 }
 
 declare interface KPResponse {
-    content: KP[],
+    content: KP[];
     pageable: {
-        pageNumber: number,
-        pageSize: number,
+        pageNumber: number;
+        pageSize: number;
         sort: {
-            empty: boolean,
-            sorted: boolean,
-            unsorted: boolean
-        },
-        offset: number,
-        paged: boolean,
-        unpaged: boolean
-    },
-    totalPages: number,
-    totalElements: number,
-    last: boolean,
-    size: number,
-    number: number,
+            empty: boolean;
+            sorted: boolean;
+            unsorted: boolean;
+        };
+        offset: number;
+        paged: boolean;
+        unpaged: boolean;
+    };
+    totalPages: number;
+    totalElements: number;
+    last: boolean;
+    size: number;
+    number: number;
     sort: {
-        empty: boolean,
-        sorted: boolean,
-        unsorted: boolean
-    },
-    numberOfElements: number,
-    first: boolean,
-    empty: boolean
+        empty: boolean;
+        sorted: boolean;
+        unsorted: boolean;
+    };
+    numberOfElements: number;
+    first: boolean;
+    empty: boolean;
 }
 
 declare interface ToolPrintItem {
-    name: string,
-    description: string,
-    amount: number,
-    itemPrice: number
+    name: string;
+    description: string;
+    amount: number;
+    itemPrice: number;
 }
 
 declare interface ToolPrint {
-    header: string,
-    body: string,
-    footer: string,
-    tools: ToolPrintItem[]
+    header: string;
+    body: string;
+    footer: string;
+    tools: ToolPrintItem[];
 }
 
 declare interface CountryCode {
-    name: string,
-    dial_code: string,
-    code: string
+    name: string;
+    dial_code: string;
+    code: string;
+}
+
+declare interface Task {
+    id: number;
+    workflowId: number;
+    name: string;
+    technology: string;
+    color: string;
+    startAt: string;
+    endAt: string;
+    duration: number;
+    description: string;
+}
+
+declare interface Resource {
+    id: number;
+    name: string;
+    description: string;
+    startAt: string;
+    endAt: string;
+    tasks: Task[];
 }
