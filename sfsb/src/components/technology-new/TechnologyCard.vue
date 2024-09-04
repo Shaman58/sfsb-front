@@ -45,7 +45,15 @@ const refresh = async () => {};
 watch(
     [params],
     async () => {
-        order.value = await getOrderById(+params.value.id);
+        const foundOrder =
+            orders.value.length === 0
+                ? undefined
+                : orders.value.find((e: Order) => e.id === +params.value.id);
+        if (foundOrder) {
+            order.value = foundOrder;
+        } else {
+            order.value = await getOrderById(+params.value.id);
+        }
     },
     { immediate: true }
 );
