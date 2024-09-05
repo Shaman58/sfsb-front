@@ -9,6 +9,7 @@ import TaskComponent from "@/components/workflow/TaskComponent.vue";
 import { computed, inject, reactive, ref } from "vue";
 import { storeToRefs } from "pinia";
 import useTaskMoving from "@/pinia-store/taskMoving";
+import { coordinatesToTime } from "@/mixins/coordinatesAmdTime";
 
 const props = defineProps<{ resource: Resource }>();
 
@@ -50,32 +51,19 @@ const drop = (e: DragEvent) => {
     );
     console.log("drop", e, droppedTask);
 
-    const timezoneOffsetMs = new Date().getTimezoneOffset() * 60 * 1000;
-    const initStartAtMs = new Date("09.02.2024").getTime() - timezoneOffsetMs;
-    const initDate = new Date(initStartAtMs).toISOString();
-    console.log(initDate);
-
-    const offsetTimeMs = (e.x / scale.value) * (3600 * 1000);
-    const pointerOffsetMs = (droppedTask.offsetX / scale.value) * (3600 * 1000);
-
-    const durationMs =
-        new Date(droppedTask.endAt).getTime() -
-        new Date(droppedTask.startAt).getTime();
-    droppedTask.startAt = new Date(
-        -pointerOffsetMs + offsetTimeMs + initStartAtMs + timezoneOffsetMs
-    ).toISOString();
-    droppedTask.endAt = new Date(
-        -pointerOffsetMs +
-            offsetTimeMs +
-            initStartAtMs +
-            durationMs +
-            timezoneOffsetMs
-    ).toISOString();
-
     let matchTaskIndex = tasks.findIndex((e) => e.id === droppedTask.id);
     if (matchTaskIndex === undefined) return;
-    tasks[matchTaskIndex].startAt = droppedTask.startAt;
-    tasks[matchTaskIndex].endAt = droppedTask.endAt;
+
+    const newStartDate = coordinatesToTime(
+        e.x - droppedTask.offsetX,
+        scale.value
+    );
+    const newEndDate = coordinatesToTime(
+        e.x - droppedTask.offsetX + durationTrackingTask.value,
+        scale.value
+    );
+    tasks[matchTaskIndex].startAt = newStartDate;
+    tasks[matchTaskIndex].endAt = newEndDate;
 };
 const dragenter = () => {};
 const dragleave = () => {};
