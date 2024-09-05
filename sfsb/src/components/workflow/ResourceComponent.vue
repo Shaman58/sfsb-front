@@ -1,12 +1,55 @@
 <template lang="pug">
-    .resource
-        task-component(v-for="task in props.resource.tasks" :key="task.id"  :task)
+    .resource(@dragover.prevent="dragover" @drop.prevent="drop" @dragenter.prevent="dragenter" @dragleave.prevent="dragleave")
+        task-component(v-for="task in tasks" :key="task.id"  :task)
 </template>
 
 <script setup lang="ts">
 import TaskComponent from "@/components/workflow/TaskComponent.vue";
+import { inject, reactive } from "vue";
 
 const props = defineProps<{ resource: Resource }>();
+
+const tasks = reactive(props.resource.tasks);
+
+const scale = inject("scale");
+
+const dragover = () => {};
+const drop = (e: DragEvent) => {
+    const dropedTask: Task & { offsetX: number } = JSON.parse(
+        e.dataTransfer?.getData("task")
+    );
+    console.log("drop", e, dropedTask);
+
+    const timezoneOffsetMs = new Date().getTimezoneOffset() * 60 * 1000;
+    const initStartAtMs = new Date("09.02.2024").getTime() - timezoneOffsetMs;
+    const initDate = new Date(initStartAtMs).toISOString();
+    console.log(initDate);
+
+    const offsetTimeMs = (e.offsetX / scale.value) * (3600 * 1000);
+    const pointerOffsetMs = (dropedTask.offsetX / scale.value) * (3600 * 1000);
+
+    const durationMs =
+        new Date(dropedTask.endAt).getTime() -
+        new Date(dropedTask.startAt).getTime();
+    dropedTask.startAt = new Date(
+        -pointerOffsetMs + offsetTimeMs + initStartAtMs + timezoneOffsetMs
+    ).toISOString();
+    dropedTask.endAt = new Date(
+        -pointerOffsetMs +
+            offsetTimeMs +
+            initStartAtMs +
+            durationMs +
+            timezoneOffsetMs
+    ).toISOString();
+
+    let matchTaskIndex = tasks.findIndex((e) => e.id === dropedTask.id);
+    tasks[matchTaskIndex].startAt = dropedTask.startAt;
+    tasks[matchTaskIndex].endAt = dropedTask.endAt;
+
+    //TODO: скорректировать точку указателя мышки при перетаскивании
+};
+const dragenter = () => {};
+const dragenterOff = () => {};
 </script>
 
 <style scoped lang="sass">

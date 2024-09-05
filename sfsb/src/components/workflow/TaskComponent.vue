@@ -1,5 +1,5 @@
 <template lang="pug">
-    .task(draggable="true" :style="{width: duration + 'px', left: left + 'px'}") {{scale}} {{duration}}
+    .task(draggable="true" @dragend="onDragEnd" @dragstart="onDragStart" :style="{width: duration + 'px', left: left + 'px'}") {{scale}} {{duration}}
 
 </template>
 <script setup lang="ts">
@@ -21,6 +21,15 @@ const left = computed(
             (3600 * 1000)) *
         scale!.value
 );
+
+const onDragStart = (e: DragEvent) => {
+    e.dataTransfer!.setData(
+        "task",
+        JSON.stringify({ ...props.task, offsetX: e.offsetX })
+    );
+};
+
+const onDragEnd = (e: DragEvent) => {};
 </script>
 
 <style scoped lang="sass">
