@@ -1,13 +1,23 @@
 <template lang="pug">
-    .task(draggable="true" @dragend="onDragEnd" @dragstart="onDragStart" :style="{width: duration + 'px', left: left + 'px'}") {{scale}} {{duration}}
+    .task(ref="element" draggable="true" @dragend="onDragEnd" @dragstart="onDragStart" :style="{width: duration + 'px', left: left + 'px'}") {{scale}} {{duration}}
 
 </template>
 <script setup lang="ts">
-import { computed, inject, type Ref, toRefs } from "vue";
+import { computed, inject, ref, type Ref, toRefs } from "vue";
+import { storeToRefs } from "pinia";
+import useTaskMoving from "@/pinia-store/taskMoving";
 
 const props = defineProps<{ task: Task }>();
 const { startAt, endAt, color } = toRefs(props.task);
+
 const scale = inject<Ref<number>>("scale");
+
+const { taskMoving } = storeToRefs(useTaskMoving());
+
+const element = ref<HTMLDivElement>();
+
+defineExpose({ element });
+
 const duration = computed(
     () =>
         ((new Date(endAt.value).getTime() - new Date(startAt.value).getTime()) /
@@ -27,9 +37,12 @@ const onDragStart = (e: DragEvent) => {
         "task",
         JSON.stringify({ ...props.task, offsetX: e.offsetX })
     );
+    taskMoving.value = { ...props.task, offsetX: e.offsetX };
 };
 
-const onDragEnd = (e: DragEvent) => {};
+const onDragEnd = (e: DragEvent) => {
+    taskMoving.value = null;
+};
 </script>
 
 <style scoped lang="sass">
