@@ -47,12 +47,14 @@ onMounted(() => getResources());
         padding-block: 8px
 
     &__timeline
+        display: inline-block
         height: 100%
         width: 100%
         position: absolute
         top: 0
         left: 0
         overflow: auto
+        container: timeline / inline-size
 
     &__scale
         max-width: 300px

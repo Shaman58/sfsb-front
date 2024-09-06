@@ -1,6 +1,7 @@
 <template lang="pug">
-    .task(ref="element" draggable="true" @dragend="onDragEnd" @dragstart="onDragStart" :style="{width: duration + 'px', left: left + 'px'}") {{scale}} {{duration}}
-
+    .task(ref="element" :draggable="canDraggable" @dragend="onDragEnd" @dragstart="onDragStart" :style="{width: duration + 'px', left: left + 'px'}")
+        .task__border.task__border_left(@mousedown.prevent="selectBorder('left')")
+        .task__border.task__border_right(@mousedown.prevent="selectBorder('right')")
 </template>
 <script setup lang="ts">
 import { computed, inject, ref, type Ref, toRefs } from "vue";
@@ -11,8 +12,9 @@ const props = defineProps<{ task: Task }>();
 const { startAt, endAt, color } = toRefs(props.task);
 
 const scale = inject<Ref<number>>("scale");
+const canDraggable = ref(true);
 
-const { taskMoving } = storeToRefs(useTaskMoving());
+const { taskMoving, borderMoving } = storeToRefs(useTaskMoving());
 
 const element = ref<HTMLDivElement>();
 
@@ -43,6 +45,10 @@ const onDragStart = (e: DragEvent) => {
 const onDragEnd = (e: DragEvent) => {
     taskMoving.value = null;
 };
+
+const selectBorder = (border: "left" | "right") => {
+    borderMoving.value = { ...props.task, border };
+};
 </script>
 
 <style scoped lang="sass">
@@ -53,4 +59,11 @@ const onDragEnd = (e: DragEvent) => {
     height: calc(100% - var(--margin) * 2)
     position: absolute
     top: var(--margin)
+    display: flex
+    justify-content: space-between
+
+    &__border
+        width: 8px
+        background-color: #000
+        border-inline: 1px solid #fff
 </style>
