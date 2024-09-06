@@ -53,4 +53,7 @@ onMounted(() => getResources());
         top: 0
         left: 0
         overflow: auto
+
+    &__scale
+        max-width: 300px
 </style>
