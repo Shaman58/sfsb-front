@@ -1,5 +1,12 @@
 <template lang="pug">
-    .resource(@dragover.prevent="dragover" @drop.prevent="drop" @dragenter.prevent="dragenter" @dragleave.prevent="dragleave" @dragover.)
+    .resource(
+        @dragover.prevent="dragover"
+        @drop.prevent="drop"
+        @dragenter.prevent="dragenter"
+        @dragleave.prevent="dragleave"
+        @mouseup.prevent="mouseup"
+        @mousemove.prevent="mousemove"
+    )
         .task-shadow(
             ref="taskShadow"
             :style="{width: durationTrackingTask + 'px', left: dragOverPosition+'px', backgroundColor: isIntersected? 'orange':'#77f5'}"
@@ -9,14 +16,16 @@
 
 <script setup lang="ts">
 import TaskComponent from "@/components/workflow/TaskComponent.vue";
-import { computed, inject, reactive, ref } from "vue";
+import { computed, inject, reactive, ref, watch } from "vue";
 import { storeToRefs } from "pinia";
 import useTaskMoving from "@/pinia-store/taskMoving";
 import {
     areElementsOverlapping,
     coordinatesToTime,
 } from "@/mixins/coordinatesAndTime";
+import { useToast } from "vue-toast-notification";
 
+const toast = useToast();
 const props = defineProps<{ resource: Resource }>();
 
 const tasks = reactive(props.resource.tasks);
@@ -24,7 +33,7 @@ const taskRefs = ref<TaskComponent[]>();
 
 const scale = inject("scale");
 
-const { taskMoving } = storeToRefs(useTaskMoving());
+const { taskMoving, borderMoving } = storeToRefs(useTaskMoving());
 const taskShadow = ref<HTMLDivElement>();
 const isIntersected = ref(false);
 const tracking = computed(() => taskMoving.value);
@@ -54,6 +63,8 @@ const dragover = (e: DragEvent) => {
     console.log("areElementsOverlapping", isIntersected);
 };
 const drop = (e: DragEvent) => {
+    if (isIntersected.value)
+        return toast.error("Это время занято другой задачей");
     const droppedTask: Task & { offsetX: number } = JSON.parse(
         e.dataTransfer?.getData("task")
     );
@@ -75,13 +86,31 @@ const drop = (e: DragEvent) => {
 };
 const dragenter = () => {};
 const dragleave = () => {};
+const mouseup = () => {
+    borderMoving.value = null;
+};
+const mousemove = (e: MouseEvent) => {
+    const { x } = e;
+    if (!borderMoving.value) return;
+    const time = coordinatesToTime(x, scale.value);
+    const taskIndex = tasks.findIndex((e) => e.id === borderMoving.value?.id);
+    console.log({ taskIndex });
+    if (taskIndex === -1) return;
+
+    if (borderMoving.value.border === "left") tasks[taskIndex].startAt = time;
+    if (borderMoving.value.border === "right") tasks[taskIndex].endAt = time;
+};
+
+watch([borderMoving], () => {
+    console.log("borderMoving", borderMoving.value);
+});
 </script>
 
 <style scoped lang="sass">
 .resource
     position: relative
     height: 60px
-    width: 100%
+    width: 100cqw
     background-color: #fff2
     backdrop-filter: blur(2px)
     margin-block: 4px
