@@ -16,7 +16,7 @@ const { taskMoving } = storeToRefs(useTaskMoving());
 
 const element = ref<HTMLDivElement>();
 
-defineExpose({ element });
+defineExpose({ element, id: props.task.id });
 
 const duration = computed(
     () =>
