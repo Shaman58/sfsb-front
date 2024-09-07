@@ -24,7 +24,7 @@ import { storeToRefs } from "pinia";
 import useTaskMoving from "@/pinia-store/taskMoving";
 
 const tasks = ref(Array.from({ length: 4 }));
-const scale = ref(30);
+const scale = ref(60);
 const daysElement = ref<Day>();
 const workflowBody = ref<HTMLElement>();
 const { resources, getResources } = useWorkflow();

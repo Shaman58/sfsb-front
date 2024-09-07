@@ -12,12 +12,12 @@
             ref="taskShadow"
             :style="{width: durationTrackingTask + 'px', left: dragOverPosition+'px', backgroundColor: isIntersected? 'orange':'#77f5'}"
         )
-        task-component(v-for="task in tasks" :key="task.id"  :task ref="taskRefs")
+        task-component(v-for="task in tasks" :key="task.id"  :task ref="taskRefs" :active="task.id===taskMoving?.id")
 </template>
 
 <script setup lang="ts">
 import TaskComponent from "@/components/workflow/TaskComponent.vue";
-import { computed, inject, reactive, ref, watch } from "vue";
+import { computed, inject, ref, watch } from "vue";
 import { storeToRefs } from "pinia";
 import useTaskMoving from "@/pinia-store/taskMoving";
 import {
@@ -25,43 +25,62 @@ import {
     coordinatesToTime,
 } from "@/mixins/coordinatesAndTime";
 import { useToast } from "vue-toast-notification";
+import { useWorkflow } from "@/pinia-store/workflow";
 
 const toast = useToast();
 const props = defineProps<{ resource: Resource }>();
 
-const tasks = reactive(props.resource.tasks);
+const tasks = ref(props.resource.tasks);
 const taskRefs = ref<TaskComponent[]>();
 const resourceRef = ref<HTMLElement>();
 
 const scale = inject("scale");
 
 const { taskMoving, borderMoving, scrollBody } = storeToRefs(useTaskMoving());
+const { relocateTask } = useWorkflow();
+
 const taskShadow = ref<HTMLDivElement>();
 const isIntersected = ref(false);
 const tracking = computed(() => taskMoving.value);
 const durationTrackingTask = computed(() => {
-    if (!taskMoving.value) return 0;
-    return (
-        ((new Date(taskMoving.value.endAt).getTime() -
-            new Date(taskMoving.value.startAt).getTime()) /
-            (3600 * 1000)) *
-        scale!.value
-    );
+    if (!taskMoving.value && !borderMoving.value) return 0;
+    if (tracking.value) {
+        return (
+            ((new Date(taskMoving.value.endAt).getTime() -
+                new Date(taskMoving.value.startAt).getTime()) /
+                (3600 * 1000)) *
+            scale!.value
+        );
+    }
+    if (borderMoving.value) {
+        return (
+            ((new Date(borderMoving.value.endAt).getTime() -
+                new Date(borderMoving.value.startAt).getTime()) /
+                (3600 * 1000)) *
+            scale!.value
+        );
+    }
+    return 0;
 });
 const dragOverPosition = ref(0);
+
+const refineIsIntersected = () => {
+    isIntersected.value = taskRefs.value?.some((e) => {
+        if (e.id === taskMoving.value?.id || e.id === borderMoving.value?.id)
+            return false;
+        return areElementsOverlapping(
+            taskShadow.value as HTMLElement,
+            e.element
+        );
+    });
+};
 
 const dragover = (e: DragEvent) => {
     console.log("dragover", scrollBody.value);
     if (dragOverPosition.value === e.x + scrollBody.value) return;
     dragOverPosition.value = e.x + scrollBody.value - taskMoving.value?.offsetX;
     if (!taskShadow.value) return;
-    isIntersected.value = taskRefs.value?.some((e) => {
-        if (e.id === taskMoving.value?.id) return false;
-        return areElementsOverlapping(
-            taskShadow.value as HTMLElement,
-            e.element
-        );
-    });
+    refineIsIntersected();
     console.log("areElementsOverlapping", isIntersected);
 };
 const drop = (e: DragEvent) => {
@@ -72,22 +91,42 @@ const drop = (e: DragEvent) => {
     );
     console.log("drop", e, droppedTask);
 
-    let matchTaskIndex = tasks.findIndex((e) => e.id === droppedTask.id);
-    if (matchTaskIndex === undefined) return;
-
-    const newStartDate = coordinatesToTime(
-        e.x + scrollBody.value - droppedTask.offsetX,
-        scale.value
-    );
-    const newEndDate = coordinatesToTime(
-        e.x +
-            scrollBody.value -
-            droppedTask.offsetX +
-            durationTrackingTask.value,
-        scale.value
-    );
-    tasks[matchTaskIndex].startAt = newStartDate;
-    tasks[matchTaskIndex].endAt = newEndDate;
+    let matchTaskIndex = tasks.value.findIndex((e) => e.id === droppedTask.id);
+    if (matchTaskIndex === -1) {
+        matchTaskIndex = tasks.value.findIndex((e) => e.id === droppedTask.id);
+        const newStartDate = coordinatesToTime(
+            e.x + scrollBody.value - droppedTask.offsetX,
+            scale.value
+        );
+        const newEndDate = coordinatesToTime(
+            e.x +
+                scrollBody.value -
+                droppedTask.offsetX +
+                durationTrackingTask.value,
+            scale.value
+        );
+        // const newTask = tasks.value[matchTaskIndex];
+        // newTask.startAt = newStartDate;
+        // newTask.endAt = newEndDate;
+        relocateTask(droppedTask.id, props.resource, {
+            startAt: newStartDate,
+            endAt: newEndDate,
+        });
+    } else {
+        const newStartDate = coordinatesToTime(
+            e.x + scrollBody.value - droppedTask.offsetX,
+            scale.value
+        );
+        const newEndDate = coordinatesToTime(
+            e.x +
+                scrollBody.value -
+                droppedTask.offsetX +
+                durationTrackingTask.value,
+            scale.value
+        );
+        tasks[matchTaskIndex].startAt = newStartDate;
+        tasks[matchTaskIndex].endAt = newEndDate;
+    }
 };
 const dragenter = () => {};
 const dragleave = () => {};
@@ -97,18 +136,61 @@ const mouseup = () => {
 const mousemove = (e: MouseEvent) => {
     const { x } = e;
     if (!borderMoving.value) return;
+    if (dragOverPosition.value === e.x + scrollBody.value) return;
+
+    const prevTime =
+        borderMoving.value.border === "left"
+            ? borderMoving.value.startAt
+            : borderMoving.value.endAt;
+    const prevDragOverPosition = dragOverPosition.value;
+
     const time = coordinatesToTime(x, scale.value);
-    const taskIndex = tasks.findIndex((e) => e.id === borderMoving.value?.id);
-    console.log({ taskIndex });
+    const taskIndex = tasks.value.findIndex(
+        (e) => e.id === borderMoving.value?.id
+    );
+    console.log(borderMoving.value.startAt, borderMoving.value.endAt);
     if (taskIndex === -1) return;
 
-    if (borderMoving.value.border === "left") tasks[taskIndex].startAt = time;
-    if (borderMoving.value.border === "right") tasks[taskIndex].endAt = time;
+    if (borderMoving.value.border === "left") {
+        tasks[taskIndex].startAt = time;
+        borderMoving.value.startAt = time;
+        dragOverPosition.value = e.x + scrollBody.value;
+    }
+    if (borderMoving.value.border === "right") {
+        tasks[taskIndex].endAt = time;
+        borderMoving.value.endAt = time;
+        dragOverPosition.value =
+            e.x + scrollBody.value - durationTrackingTask.value;
+    }
+    refineIsIntersected();
+    if (isIntersected.value) {
+        toast.error("Это время занято другой задачей");
+        if (borderMoving.value.border === "left") {
+            tasks[taskIndex].startAt = prevTime;
+            borderMoving.value.startAt = prevTime;
+            dragOverPosition.value = prevDragOverPosition;
+        }
+        if (borderMoving.value.border === "right") {
+            tasks[taskIndex].endAt = prevTime;
+            borderMoving.value.endAt = prevTime;
+            dragOverPosition.value = prevDragOverPosition;
+        }
+    }
 };
 
 watch([borderMoving], () => {
     console.log("borderMoving", borderMoving.value);
 });
+watch([durationTrackingTask], () => {
+    console.log("durationTrackingTask", durationTrackingTask.value);
+});
+watch(
+    () => props.resource.tasks,
+    (newTasks) => {
+        tasks.value = newTasks;
+    },
+    { deep: true }
+);
 </script>
 
 <style scoped lang="sass">
