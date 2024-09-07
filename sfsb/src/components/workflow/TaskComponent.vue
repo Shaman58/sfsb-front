@@ -1,5 +1,11 @@
 <template lang="pug">
-    .task(ref="element" :draggable="canDraggable" @dragend="onDragEnd" @dragstart="onDragStart" :style="{width: duration + 'px', left: left + 'px'}")
+    .task(
+        ref="element"
+        :draggable="canDraggable"
+        @dragend="onDragEnd"
+        @dragstart="onDragStart"
+        :style="{width: duration + 'px', left: left + 'px', boxShadow}"
+    )
         .task__border.task__border_left(@mousedown.prevent="selectBorder('left')")
         .task__border.task__border_right(@mousedown.prevent="selectBorder('right')")
 </template>
@@ -8,7 +14,7 @@ import { computed, inject, ref, type Ref, toRefs } from "vue";
 import { storeToRefs } from "pinia";
 import useTaskMoving from "@/pinia-store/taskMoving";
 
-const props = defineProps<{ task: Task }>();
+const props = defineProps<{ task: Task; active: boolean }>();
 const { startAt, endAt, color } = toRefs(props.task);
 
 const scale = inject<Ref<number>>("scale");
@@ -17,6 +23,9 @@ const canDraggable = ref(true);
 const { taskMoving, borderMoving } = storeToRefs(useTaskMoving());
 
 const element = ref<HTMLDivElement>();
+const boxShadow = computed(
+    () => `0 0 ${props.active ? "18px" : "0"} ${color.value}`
+);
 
 defineExpose({ element, id: props.task.id });
 
