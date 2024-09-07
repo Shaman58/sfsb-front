@@ -1,10 +1,11 @@
 <template lang="pug">
-    .timeline-container
+    .day-container
         .hour-line(v-for="(hour, index) in hours"
             :key="index"
             :class="{ even: index % 2 === 0, odd: index % 2 !== 0 }"
             :style="{ width: lineWidth + 'px' }"
         )
+            .hour-line__caption {{index.toString().padStart(2, '0')}}:00
 </template>
 
 <script setup lang="ts">
@@ -14,20 +15,27 @@ const hours = Array.from({ length: 24 }, (_, i) => i);
 </script>
 
 <style scoped lang="sass">
-.timeline-container
-    position: absolute
-    top: 0
-    left: 0
+.day-container
+    //position: absolute
+    //top: 0
+    //left: 0
     height: 100%
-    display: flex
-    height: 100%
+    display: inline-block
+    white-space: nowrap
+//display: flex
 // Высота контейнера для линии
 
 
 .hour-line
+    display: inline-block
     height: 100%
     border-right: 1px solid black
+    container: hour / inline-size
     // Основная линия
+
+    &__caption
+        text-align: center
+        font-size: clamp(10px, 10cqw, 18px)
 
     &.even
         background-color: #e0e0e0

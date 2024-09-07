@@ -110,7 +110,7 @@ watch([borderMoving], () => {
 .resource
     position: relative
     height: 60px
-    width: 100cqw
+    //width: 100cqw
     background-color: #fff2
     backdrop-filter: blur(2px)
     margin-block: 4px
