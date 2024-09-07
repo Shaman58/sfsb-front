@@ -1,5 +1,5 @@
 <template lang="pug">
-    .day-container
+    .day-container(ref="dayContainer")
         .hour-line(v-for="(hour, index) in hours"
             :key="index"
             :class="{ even: index % 2 === 0, odd: index % 2 !== 0 }"
@@ -9,7 +9,11 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from "vue";
+
 const props = defineProps<{ lineWidth: number }>();
+const dayContainer = ref<HTMLElement>();
+defineExpose({ dayContainer });
 
 const hours = Array.from({ length: 24 }, (_, i) => i);
 </script>
