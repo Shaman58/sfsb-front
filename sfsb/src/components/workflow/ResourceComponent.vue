@@ -1,5 +1,6 @@
 <template lang="pug">
     .resource(
+        ref="resourceRef"
         @dragover.prevent="dragover"
         @drop.prevent="drop"
         @dragenter.prevent="dragenter"
@@ -30,10 +31,11 @@ const props = defineProps<{ resource: Resource }>();
 
 const tasks = reactive(props.resource.tasks);
 const taskRefs = ref<TaskComponent[]>();
+const resourceRef = ref<HTMLElement>();
 
 const scale = inject("scale");
 
-const { taskMoving, borderMoving } = storeToRefs(useTaskMoving());
+const { taskMoving, borderMoving, scrollBody } = storeToRefs(useTaskMoving());
 const taskShadow = ref<HTMLDivElement>();
 const isIntersected = ref(false);
 const tracking = computed(() => taskMoving.value);
@@ -49,9 +51,9 @@ const durationTrackingTask = computed(() => {
 const dragOverPosition = ref(0);
 
 const dragover = (e: DragEvent) => {
-    e.preventDefault();
-    if (dragOverPosition.value === e.x) return;
-    dragOverPosition.value = e.x - taskMoving.value?.offsetX;
+    console.log("dragover", scrollBody.value);
+    if (dragOverPosition.value === e.x + scrollBody.value) return;
+    dragOverPosition.value = e.x + scrollBody.value - taskMoving.value?.offsetX;
     if (!taskShadow.value) return;
     isIntersected.value = taskRefs.value?.some((e) => {
         if (e.id === taskMoving.value?.id) return false;
@@ -74,11 +76,14 @@ const drop = (e: DragEvent) => {
     if (matchTaskIndex === undefined) return;
 
     const newStartDate = coordinatesToTime(
-        e.x - droppedTask.offsetX,
+        e.x + scrollBody.value - droppedTask.offsetX,
         scale.value
     );
     const newEndDate = coordinatesToTime(
-        e.x - droppedTask.offsetX + durationTrackingTask.value,
+        e.x +
+            scrollBody.value -
+            droppedTask.offsetX +
+            durationTrackingTask.value,
         scale.value
     );
     tasks[matchTaskIndex].startAt = newStartDate;

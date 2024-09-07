@@ -3,10 +3,10 @@
         .workflow__header
             .workflow__scale
                 v-slider(v-model="scale" label="Масштаб" track-color="green" min="10" max="200" )
-        .workflow__body
+        .workflow__body(ref="workflowBody" @scroll="onScroll")
             .workflow__days
-                Day(:line-width="scale")
-            .workflow__resources
+                Day(:line-width="scale" ref="daysElement")
+            .workflow__resources(:style="{width: daysElement?.dayContainer.getBoundingClientRect().width+'px'}")
                 Resource(v-for="resource in resources" :key="resource.id" :resource)
 
             .workflow__now
@@ -21,13 +21,21 @@ import Day from "@/components/workflow/Day.vue";
 import Resource from "@/components/workflow/ResourceComponent.vue";
 import { useWorkflow } from "@/pinia-store/workflow";
 import { storeToRefs } from "pinia";
+import useTaskMoving from "@/pinia-store/taskMoving";
 
 const tasks = ref(Array.from({ length: 4 }));
 const scale = ref(30);
+const daysElement = ref<Day>();
+const workflowBody = ref<HTMLElement>();
 const { resources, getResources } = useWorkflow();
 const { getAllTasks } = storeToRefs(useWorkflow());
+
+const { scrollBody } = storeToRefs(useTaskMoving());
 provide("scale", scale);
 
+const onScroll = () => {
+    scrollBody.value = workflowBody.value?.scrollLeft || 0;
+};
 onMounted(() => getResources());
 </script>
 
