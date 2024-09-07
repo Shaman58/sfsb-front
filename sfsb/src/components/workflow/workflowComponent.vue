@@ -2,11 +2,12 @@
     .workflow
         .workflow__header
             .workflow__scale
-                v-slider(v-model="scale" label="Масштаб" track-color="green")
+                v-slider(v-model="scale" label="Масштаб" track-color="green" min="10" max="200" )
         .workflow__body
-            .workflow__timeline
-                TimeLineComponent(:line-width="scale")
-                ResourceComponent(v-for="resource in resources" :key="resource.id" :resource)
+            .workflow__days
+                Day(:line-width="scale")
+            .workflow__resources
+                Resource(v-for="resource in resources" :key="resource.id" :resource)
 
             .workflow__now
         .workflow__footer
@@ -16,8 +17,8 @@
 
 <script setup lang="ts">
 import { onMounted, provide, ref } from "vue";
-import TimeLineComponent from "@/components/workflow/TimeLineComponent.vue";
-import ResourceComponent from "@/components/workflow/ResourceComponent.vue";
+import Day from "@/components/workflow/Day.vue";
+import Resource from "@/components/workflow/ResourceComponent.vue";
 import { useWorkflow } from "@/pinia-store/workflow";
 import { storeToRefs } from "pinia";
 
@@ -42,20 +43,20 @@ onMounted(() => getResources());
 
     &__body
         position: relative
+        overflow: auto
 
     &__header
         padding-block: 8px
 
-    &__timeline
-        display: inline-block
+    &__days
         height: 100%
-        width: 100%
-        position: absolute
-        top: 0
-        left: 0
-        overflow: auto
-        container: timeline / inline-size
 
     &__scale
         max-width: 300px
+
+    &__resources
+        position: absolute
+        top: 2rem
+        left: 0
+        width: 100%
 </style>
