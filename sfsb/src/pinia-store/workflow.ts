@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { computed, reactive } from "vue";
+import { computed, ComputedRef, reactive } from "vue";
 import workflowApi from "@/api/workflowApi";
 
 export const useWorkflow = defineStore("workflow", () => {
@@ -15,6 +15,23 @@ export const useWorkflow = defineStore("workflow", () => {
         if (resources.length === 0) return [];
         return resources.flatMap((resource) => resource.tasks);
     });
+
+    const getFirstTask: ComputedRef<Task> = computed(
+        () =>
+            getAllTasks.value.sort(
+                (a: Task, b: Task) =>
+                    new Date(a.startAt).getTime() -
+                    new Date(b.startAt).getTime()
+            )[0]
+    );
+
+    const getLastTask: ComputedRef<Task> = computed(
+        () =>
+            getAllTasks.value.sort(
+                (a: Task, b: Task) =>
+                    new Date(b.endAt).getTime() - new Date(a.endAt).getTime()
+            )[0]
+    );
 
     const getTaskById = (id: number): Task | undefined =>
         getAllTasks.value.find((task) => task.id === id);
@@ -39,6 +56,28 @@ export const useWorkflow = defineStore("workflow", () => {
 
         return daysDifference;
     };
+
+    const daysRange = (
+        firstTask = getFirstTask.value,
+        lastTask = getLastTask.value
+    ): ComputedRef<Date[]> =>
+        computed(() => {
+            if (!firstTask || !lastTask) return [];
+            const diff = calculateDaysDifference(
+                firstTask.startAt,
+                lastTask.endAt
+            );
+
+            const res: Date[] = [];
+            let day = new Date(
+                new Date(firstTask.startAt).toISOString().split("T")[0]
+            );
+            for (let i = 0; i < diff; i++) {
+                res.push(day);
+                day = new Date(day.setDate(day.getDate() + 1));
+            }
+            return res;
+        });
 
     const relocateTask = (
         task: Task | number,
@@ -84,7 +123,11 @@ export const useWorkflow = defineStore("workflow", () => {
     return {
         resources,
         getAllTasks,
+        getFirstTask,
+        getLastTask,
         getResources,
         relocateTask,
+        calculateDaysDifference,
+        daysRange,
     };
 });

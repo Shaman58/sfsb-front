@@ -7,6 +7,9 @@
         :style="{width: duration + 'px', left: left + 'px', boxShadow}"
     )
         .task__border.task__border_left(@mousedown.prevent="selectBorder('left')")
+        .task__caption
+            h4 {{props.task.name}}
+            p {{props.task.description}}
         .task__border.task__border_right(@mousedown.prevent="selectBorder('right')")
 </template>
 <script setup lang="ts">
@@ -75,4 +78,9 @@ const selectBorder = (border: "left" | "right") => {
         width: 8px
         background-color: #000
         border-inline: 1px solid #fff
+
+    &__caption
+        flex: 1
+        display: grid
+        place-items: center
 </style>

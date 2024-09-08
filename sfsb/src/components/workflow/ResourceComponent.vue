@@ -124,8 +124,8 @@ const drop = (e: DragEvent) => {
                 durationTrackingTask.value,
             scale.value
         );
-        tasks[matchTaskIndex].startAt = newStartDate;
-        tasks[matchTaskIndex].endAt = newEndDate;
+        tasks.value[matchTaskIndex].startAt = newStartDate;
+        tasks.value[matchTaskIndex].endAt = newEndDate;
     }
 };
 const dragenter = () => {};
@@ -152,12 +152,12 @@ const mousemove = (e: MouseEvent) => {
     if (taskIndex === -1) return;
 
     if (borderMoving.value.border === "left") {
-        tasks[taskIndex].startAt = time;
+        tasks.value[taskIndex].startAt = time;
         borderMoving.value.startAt = time;
         dragOverPosition.value = e.x + scrollBody.value;
     }
     if (borderMoving.value.border === "right") {
-        tasks[taskIndex].endAt = time;
+        tasks.value[taskIndex].endAt = time;
         borderMoving.value.endAt = time;
         dragOverPosition.value =
             e.x + scrollBody.value - durationTrackingTask.value;
@@ -166,12 +166,12 @@ const mousemove = (e: MouseEvent) => {
     if (isIntersected.value) {
         toast.error("Это время занято другой задачей");
         if (borderMoving.value.border === "left") {
-            tasks[taskIndex].startAt = prevTime;
+            tasks.value[taskIndex].startAt = prevTime;
             borderMoving.value.startAt = prevTime;
             dragOverPosition.value = prevDragOverPosition;
         }
         if (borderMoving.value.border === "right") {
-            tasks[taskIndex].endAt = prevTime;
+            tasks.value[taskIndex].endAt = prevTime;
             borderMoving.value.endAt = prevTime;
             dragOverPosition.value = prevDragOverPosition;
         }
@@ -189,7 +189,7 @@ watch(
     (newTasks) => {
         tasks.value = newTasks;
     },
-    { deep: true }
+    { deep: true, immediate: true }
 );
 </script>
 
