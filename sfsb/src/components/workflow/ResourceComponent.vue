@@ -9,8 +9,9 @@
         @mousemove.prevent="mousemove"
     )
         .task-shadow(
+            :class="{'over': doMove}"
             ref="taskShadow"
-            :style="{width: durationTrackingTask + 'px', left: dragOverPosition+'px', backgroundColor: isIntersected? 'orange':'#77f5'}"
+            :style="{width: durationTrackingTask + 'px', left: dragOverPosition+'px', backgroundColor: isIntersected? 'orange':''}"
         )
         task-component(v-for="task in tasks" :key="task.id"  :task ref="taskRefs" :active="task.id===taskMoving?.id")
 </template>
@@ -35,6 +36,7 @@ const taskRefs = ref<TaskComponent[]>();
 const resourceRef = ref<HTMLElement>();
 
 const scale = inject("scale");
+const doMove = ref(false);
 
 const { taskMoving, borderMoving, scrollBody } = storeToRefs(useTaskMoving());
 const { relocateTask } = useWorkflow();
@@ -76,6 +78,7 @@ const refineIsIntersected = () => {
 };
 
 const dragover = (e: DragEvent) => {
+    doMove.value = true;
     console.log("dragover", scrollBody.value);
     if (dragOverPosition.value === e.x + scrollBody.value) return;
     dragOverPosition.value = e.x + scrollBody.value - taskMoving.value?.offsetX;
@@ -128,12 +131,18 @@ const drop = (e: DragEvent) => {
         tasks.value[matchTaskIndex].endAt = newEndDate;
     }
 };
-const dragenter = () => {};
-const dragleave = () => {};
+const dragenter = () => {
+    // doMove.value = true;
+};
+const dragleave = () => {
+    doMove.value = false;
+};
 const mouseup = () => {
     borderMoving.value = null;
+    doMove.value = false;
 };
 const mousemove = (e: MouseEvent) => {
+    doMove.value = true;
     const { x } = e;
     if (!borderMoving.value) return;
     if (dragOverPosition.value === e.x + scrollBody.value) return;
@@ -206,8 +215,10 @@ watch(
 .task-shadow
     height: 100%
     opacity: 0.5
-    background-color: #77f5
     position: absolute
     top: 0
     left: 0
+
+    &.over
+        background-color: #7777
 </style>
