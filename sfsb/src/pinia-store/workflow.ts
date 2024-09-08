@@ -126,6 +126,7 @@ export const useWorkflow = defineStore("workflow", () => {
         getFirstTask,
         getLastTask,
         getResources,
+        getResourceByTaskId,
         relocateTask,
         calculateDaysDifference,
         daysRange,
