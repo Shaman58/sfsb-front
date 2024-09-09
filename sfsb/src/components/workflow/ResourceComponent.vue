@@ -8,19 +8,19 @@
         @mouseup.prevent="mouseup"
         @mousemove.prevent="mousemove"
     )
-        shadow(:resource-id="resource.id")
+        shadow(ref="shadowRef" :resource-id="resource.id" :intersected)
         task-component(
+            ref="taskRefs"
             v-for="task in tasks"
             :key="task.id"
             :task
-            ref="taskRefs"
             :active="task.id===taskMoving?.id"
         )
 </template>
 
 <script setup lang="ts">
 import TaskComponent from "@/components/workflow/TaskComponent.vue";
-import { computed, inject, ref, watch } from "vue";
+import { computed, inject, onMounted, ref, watch } from "vue";
 import { storeToRefs } from "pinia";
 import useTaskMoving from "@/pinia-store/taskMoving";
 import { coordinatesToTime } from "@/mixins/coordinatesAndTime";
@@ -31,9 +31,12 @@ import Shadow from "@/components/workflow/Shadow.vue";
 const toast = useToast();
 const props = defineProps<{ resource: Resource }>();
 
+const shadowRef = ref<Shadow>();
 const tasks = ref(props.resource.tasks);
-const taskRefs = ref<TaskComponent[]>();
+const taskRefs = ref<TaskComponent[]>([]);
 const resourceRef = ref<HTMLElement>();
+
+const intersected = ref(false);
 
 const scale = inject("scale");
 
@@ -42,8 +45,6 @@ const { taskMoving, borderMoving, scrollBody, activeResource } = storeToRefs(
 );
 const { relocateTask, resources, getResourceByTaskId } = useWorkflow();
 
-const taskShadow = ref<HTMLDivElement>();
-const isIntersected = ref(false);
 const tracking = computed(() => taskMoving.value);
 const durationTrackingTask = computed(() => {
     if (!taskMoving.value && !borderMoving.value) return 0;
@@ -73,11 +74,12 @@ const dragover = (e: DragEvent) => {
     if (dragOverPosition.value === e.x + scrollBody.value) return;
     dragOverPosition.value = e.x + scrollBody.value - taskMoving.value?.offsetX;
     taskMoving.value && (taskMoving.value.x = dragOverPosition.value);
-    if (!taskShadow.value) return;
-    // refineIsIntersected();
+    // if (!taskShadow.value) return;
+    intersected.value = isIntersected();
+    console.log("intersected.value", intersected.value);
 };
 const drop = (e: DragEvent) => {
-    if (isIntersected.value)
+    if (intersected.value)
         return toast.error("Это время занято другой задачей");
     const droppedTask: Task & { offsetX: number } = JSON.parse(
         e.dataTransfer?.getData("task")
@@ -128,6 +130,8 @@ const mousemove = (e: MouseEvent) => {
     const { x } = e;
     if (!borderMoving.value) return;
     borderMoving.value.x = e.x;
+    intersected.value = isIntersected();
+    console.log("intersected.value", intersected.value);
 
     const prevTime =
         borderMoving.value.border === "left"
@@ -149,7 +153,7 @@ const mousemove = (e: MouseEvent) => {
         tasks.value[taskIndex].endAt = time;
         borderMoving.value.endAt = time;
     }
-    if (isIntersected.value) {
+    if (intersected.value) {
         toast.error("Это время занято другой задачей");
         if (borderMoving.value.border === "left") {
             tasks.value[taskIndex].startAt = prevTime;
@@ -183,6 +187,43 @@ watch(
     },
     { deep: true }
 );
+
+const isIntersected = () => {
+    console.log("taskRefs.value", taskRefs.value);
+    if (taskRefs.value?.length === 0) return false;
+    return taskRefs.value?.some((e) => {
+        if (e.id === borderMoving.value?.id || e.id === taskMoving.value?.id)
+            return false;
+        const { left: taskLeft, width: taskWidth } =
+            e.element.getBoundingClientRect();
+        const taskRight = taskLeft + taskWidth;
+
+        console.log({ taskLeft, taskRight });
+
+        const { left: shadowLeft, width: shadowWidth } =
+            shadowRef.value!.element.getBoundingClientRect();
+        const shadowRight = shadowLeft + shadowWidth;
+
+        console.log({ shadowLeft, shadowRight });
+
+        return (
+            (shadowLeft > taskLeft && shadowLeft < taskRight) ||
+            (shadowRight < taskRight && shadowRight > taskLeft) ||
+            (shadowLeft < taskLeft && shadowRight > taskRight)
+        );
+    });
+};
+
+onMounted(() => {
+    console.log("mounted");
+    console.log("taskRefs.value", taskRefs.value);
+    console.log("shadowRef.value", shadowRef.value);
+});
+
+watch([taskMoving], () => {
+    intersected.value = isIntersected();
+    console.log("taskMoving.value", taskMoving.value);
+});
 </script>
 
 <style scoped lang="sass">

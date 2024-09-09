@@ -1,5 +1,7 @@
 <template lang="pug">
     .shadow(
+        :class="{intersected}"
+        ref="element"
         v-show="activeResource === resourceId && (taskMoving || borderMoving)"
         :style="{left: x + 'px', width: width + 'px'}"
     )
@@ -8,9 +10,13 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import useTaskMoving from "@/pinia-store/taskMoving";
-import { computed, inject } from "vue";
+import { computed, inject, ref } from "vue";
 
-const props = defineProps<{ resourceId: number }>();
+const props = defineProps<{ resourceId: number; intersected: boolean }>();
+
+const element = ref<HTMLElement>();
+
+defineExpose({ element });
 
 const { taskMoving, borderMoving, activeResource } = storeToRefs(
     useTaskMoving()
