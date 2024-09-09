@@ -3,6 +3,7 @@
         .workflow__header
             .workflow__scale
                 v-slider(v-model="scale" label="Масштаб" track-color="green" min="10" max="200" )
+            .div {{scrollBody}}
         .workflow__body(ref="workflowBody" @scroll="onScroll")
             .workflow__days
                 Day(:line-width="scale" ref="daysElement")
