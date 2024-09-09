@@ -6,11 +6,11 @@
         @dragstart="onDragStart"
         :style="{width: duration + 'px', left: left + 'px', boxShadow}"
     )
-        .task__border.task__border_left(@mousedown.prevent="selectBorder('left')")
+        .task__border.task__border_left(@mousedown.prevent="selectBorder($event,'left')")
         .task__caption
             h4 {{props.task.name}}
             p {{props.task.description}}
-        .task__border.task__border_right(@mousedown.prevent="selectBorder('right')")
+        .task__border.task__border_right(@mousedown.prevent="selectBorder($event,'right')")
 </template>
 <script setup lang="ts">
 import { computed, inject, ref, type Ref, toRefs } from "vue";
@@ -31,7 +31,7 @@ const boxShadow = computed(
 );
 
 defineExpose({ element, id: props.task.id });
-
+const { scrollBody } = storeToRefs(useTaskMoving());
 const duration = computed(
     () =>
         ((new Date(endAt.value).getTime() - new Date(startAt.value).getTime()) /
@@ -49,17 +49,21 @@ const left = computed(
 const onDragStart = (e: DragEvent) => {
     e.dataTransfer!.setData(
         "task",
-        JSON.stringify({ ...props.task, offsetX: e.offsetX })
+        JSON.stringify({ ...props.task, offsetX: e.offsetX, x: e.x })
     );
-    taskMoving.value = { ...props.task, offsetX: e.offsetX };
+    taskMoving.value = { ...props.task, offsetX: e.offsetX, x: e.x };
 };
 
 const onDragEnd = (e: DragEvent) => {
     taskMoving.value = null;
 };
 
-const selectBorder = (border: "left" | "right") => {
-    borderMoving.value = { ...props.task, border };
+const selectBorder = (event: MouseEvent, border: "left" | "right") => {
+    borderMoving.value = {
+        ...props.task,
+        border,
+        x: event.x + scrollBody.value,
+    };
 };
 </script>
 
