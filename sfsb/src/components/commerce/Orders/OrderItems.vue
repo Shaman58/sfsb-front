@@ -1,7 +1,7 @@
 <template lang="pug">
     .order-items
         v-list.order-items__items-list
-            v-list-item.order-items__items-first(@click="addNewItem" :disabled="!canAddNewItem") Добавить новую позицию
+            v-list-item.order-items__items-first(@click="addNewItem" :disabled="!canAddNewItem" role="button") Добавить новую позицию
             v-list-item(v-for="(i,index) in items"  :key="index"
                 :active="isActive(i)")
                 OrderItem(:item="i" @remove="removeItem(i)" @select="$event=>changeItem($event)")
@@ -146,8 +146,20 @@ onUnmounted(() => {
             border-radius: 8px
 
     &__items-first
+        cursor: pointer
         position: sticky
         z-index: 2
         top: -8px
         background-color: rgb(var(--v-theme-background))
+        box-shadow: -4px -4px 8px #8886
+        width: calc(100% - 8px)
+        margin-inline: 4px
+        margin-bottom: 4px
+        transition: all .3s
+
+        &:hover
+            margin-inline: 0px
+            width: calc(100%)
+            background-color: rgb(var(--v-theme-surface))
+            box-shadow: 4px 4px 8px transparent
 </style>

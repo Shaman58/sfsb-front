@@ -23,7 +23,7 @@ const navItems: NavItem[] = [
             },
             {
                 path: "toolings",
-                label: "Остастка",
+                label: "Оснастка",
                 role: ["TECHNOLOGIST", "ADMIN"],
             },
         ],
