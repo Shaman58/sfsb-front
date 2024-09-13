@@ -5,7 +5,7 @@
             v-text-field(label="фильтр" v-model="filterText" clearable)
         template(#list)
             v-list.orders__list
-                v-list-item(@click="()=>{}" :active="id==='new'")
+                v-list-item.add-order(@click="()=>{}" :active="id==='new'")
                     router-link.list-link.orders__link(:to="'/commerce/orders/new'")
                         span(:style="{color:'orange'}") Добавить новый заказ
                 v-list-item(
@@ -82,4 +82,12 @@ onUnmounted(() => {
 
 .fade-enter-from, .fade-leave-to
     opacity: 0
+
+.add-order
+    position: sticky
+    top: -0.5rem
+    background: rgb(var(--v-theme-background))
+    z-index: 1
+    width: 100%
+    height: 48px
 </style>
