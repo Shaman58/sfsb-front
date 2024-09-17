@@ -151,6 +151,7 @@ onUnmounted(() => {
         z-index: 2
         top: -8px
         background-color: rgb(var(--v-theme-background))
+        color: orange
         box-shadow: -4px -4px 8px #8886
         width: calc(100% - 8px)
         margin-inline: 4px
