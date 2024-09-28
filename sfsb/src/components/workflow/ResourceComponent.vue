@@ -44,6 +44,7 @@ const { taskMoving, borderMoving, scrollBody, activeResource } = storeToRefs(
     useTaskMoving()
 );
 const { relocateTask, resources, getResourceByTaskId } = useWorkflow();
+const { getFirstDayStart } = storeToRefs(useWorkflow());
 
 const tracking = computed(() => taskMoving.value);
 const durationTrackingTask = computed(() => {
@@ -90,14 +91,16 @@ const drop = (e: DragEvent) => {
     if (matchTaskIndex === -1) {
         const newStartDate = coordinatesToTime(
             e.x + scrollBody.value - droppedTask.offsetX,
-            scale.value
+            scale.value,
+            getFirstDayStart.value
         );
         const newEndDate = coordinatesToTime(
             e.x +
                 scrollBody.value -
                 droppedTask.offsetX +
                 durationTrackingTask.value,
-            scale.value
+            scale.value,
+            getFirstDayStart.value
         );
 
         relocateTask(droppedTask.id, props.resource, {
@@ -107,14 +110,16 @@ const drop = (e: DragEvent) => {
     } else {
         const newStartDate = coordinatesToTime(
             e.x + scrollBody.value - droppedTask.offsetX,
-            scale.value
+            scale.value,
+            getFirstDayStart.value
         );
         const newEndDate = coordinatesToTime(
             e.x +
                 scrollBody.value -
                 droppedTask.offsetX +
                 durationTrackingTask.value,
-            scale.value
+            scale.value,
+            getFirstDayStart.value
         );
         tasks.value[matchTaskIndex].startAt = newStartDate;
         tasks.value[matchTaskIndex].endAt = newEndDate;
@@ -138,7 +143,11 @@ const mousemove = (e: MouseEvent) => {
             ? borderMoving.value.startAt
             : borderMoving.value.endAt;
 
-    const time = coordinatesToTime(x + scrollBody.value, scale.value);
+    const time = coordinatesToTime(
+        x + scrollBody.value,
+        scale.value,
+        getFirstDayStart.value
+    );
     const taskIndex = tasks.value.findIndex(
         (e) => e.id === borderMoving.value?.id
     );

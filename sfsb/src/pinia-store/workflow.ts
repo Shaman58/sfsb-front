@@ -57,27 +57,26 @@ export const useWorkflow = defineStore("workflow", () => {
         return daysDifference;
     };
 
-    const daysRange = (
-        firstTask = getFirstTask.value,
-        lastTask = getLastTask.value
-    ): ComputedRef<Date[]> =>
-        computed(() => {
-            if (!firstTask || !lastTask) return [];
-            const diff = calculateDaysDifference(
-                firstTask.startAt,
-                lastTask.endAt
-            );
+    const getDaysRange: ComputedRef<Date[]> = computed(() => {
+        if (!getFirstTask.value || !getLastTask.value) return [];
+        const diff = calculateDaysDifference(
+            getFirstTask.value.startAt,
+            getLastTask.value.endAt
+        );
 
-            const res: Date[] = [];
-            let day = new Date(
-                new Date(firstTask.startAt).toISOString().split("T")[0]
-            );
-            for (let i = 0; i < diff; i++) {
-                res.push(day);
-                day = new Date(day.setDate(day.getDate() + 1));
-            }
-            return res;
-        });
+        const res: Date[] = [];
+        let day = new Date(
+            new Date(getFirstTask.value.startAt).toISOString().split("T")[0]
+        );
+        for (let i = 0; i < diff; i++) {
+            const inserted = new Date(day);
+            res.push(inserted);
+            day = new Date(day.setDate(day.getDate() + 1));
+        }
+        return res;
+    });
+
+    const getFirstDayStart = computed(() => getDaysRange.value[0]);
 
     const relocateTask = (
         task: Task | number,
@@ -125,10 +124,11 @@ export const useWorkflow = defineStore("workflow", () => {
         getAllTasks,
         getFirstTask,
         getLastTask,
+        getDaysRange,
+        getFirstDayStart,
         getResources,
         getResourceByTaskId,
         relocateTask,
         calculateDaysDifference,
-        daysRange,
     };
 });

@@ -9,6 +9,7 @@
         .task__border.task__border_left(@mousedown.prevent="selectBorder($event,'left')")
         .task__caption
             h4 {{props.task.name}}
+            div {{console}}
             p {{props.task.description}}
         .task__border.task__border_right(@mousedown.prevent="selectBorder($event,'right')")
 </template>
@@ -16,6 +17,7 @@
 import { computed, inject, ref, type Ref, toRefs } from "vue";
 import { storeToRefs } from "pinia";
 import useTaskMoving from "@/pinia-store/taskMoving";
+import { useWorkflow } from "@/pinia-store/workflow";
 
 const props = defineProps<{ task: Task; active: boolean }>();
 const { startAt, endAt, color } = toRefs(props.task);
@@ -24,11 +26,16 @@ const scale = inject<Ref<number>>("scale");
 const canDraggable = ref(true);
 
 const { taskMoving, borderMoving } = storeToRefs(useTaskMoving());
+const { getFirstTask } = storeToRefs(useWorkflow());
+
+const startDate = new Date(getFirstTask.value.startAt).setHours(0, 0, 0, 0);
 
 const element = ref<HTMLDivElement>();
 const boxShadow = computed(
     () => `0 0 ${props.active ? "18px" : "0"} ${color.value}`
 );
+
+const console = ref("");
 
 defineExpose({ element, id: props.task.id });
 const { scrollBody } = storeToRefs(useTaskMoving());
@@ -40,9 +47,7 @@ const duration = computed(
 );
 const left = computed(
     () =>
-        ((new Date(startAt.value).getTime() -
-            new Date("2024-09-02T00:00:00").getTime()) /
-            (3600 * 1000)) *
+        ((new Date(startAt.value).getTime() - startDate) / (3600 * 1000)) *
         scale!.value
 );
 
