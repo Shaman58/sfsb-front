@@ -7,6 +7,7 @@
         @dragleave.prevent="dragleave"
         @mouseup.prevent="mouseup"
         @mousemove.prevent="mousemove"
+        :style="{width: overallWidth+'px'}"
     )
         shadow(ref="shadowRef" :resource-id="resource.id" :intersected)
         task-component(
@@ -29,7 +30,7 @@ import { useWorkflow } from "@/pinia-store/workflow";
 import Shadow from "@/components/workflow/Shadow.vue";
 
 const toast = useToast();
-const props = defineProps<{ resource: Resource }>();
+const props = defineProps<{ resource: Resource; overallWidth: number }>();
 
 const shadowRef = ref<Shadow>();
 const tasks = ref(props.resource.tasks);
