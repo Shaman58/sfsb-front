@@ -1,13 +1,14 @@
 <template lang="pug">
     .workflow
         .workflow__header
+            div {{taskMoving}}
             .workflow__scale
                 v-slider(v-model="scale" label="Масштаб" track-color="green" min="10" max="200" )
             .div {{scrollBody}}
         .workflow__body(ref="workflowBody" @scroll="onScroll")
             .workflow__days
-                Day(:line-width="scale" ref="daysElement")
-            .workflow__resources(:style="{width: daysElement?.dayContainer.getBoundingClientRect().width+'px'}")
+                Day( v-for="day in getDaysRange" :key="day" :line-width="scale" :day)
+            .workflow__resources(:style="{width: '100%'}")
                 Resource(v-for="resource in resources" :key="resource.id" :resource)
 
             .workflow__now
@@ -29,7 +30,11 @@ const scale = ref(60);
 const daysElement = ref<Day>();
 const workflowBody = ref<HTMLElement>();
 const { resources, getResources } = useWorkflow();
-const { getAllTasks } = storeToRefs(useWorkflow());
+const { getAllTasks, getFirstTask, getLastTask, getDaysRange } = storeToRefs(
+    useWorkflow()
+);
+
+const { taskMoving } = storeToRefs(useTaskMoving());
 
 const { scrollBody } = storeToRefs(useTaskMoving());
 provide("scale", scale);
@@ -37,7 +42,9 @@ provide("scale", scale);
 const onScroll = () => {
     scrollBody.value = workflowBody.value?.scrollLeft || 0;
 };
-onMounted(() => getResources());
+onMounted(() => {
+    getResources();
+});
 </script>
 
 <style scoped lang="sass">
@@ -59,13 +66,14 @@ onMounted(() => getResources());
 
     &__days
         height: 100%
+        display: flex
 
     &__scale
         max-width: 300px
 
     &__resources
         position: absolute
-        top: 2rem
+        top: 3rem
         left: 0
         width: 100%
 </style>
