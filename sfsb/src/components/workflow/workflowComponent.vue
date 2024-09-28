@@ -7,9 +7,9 @@
             .div {{scrollBody}}
         .workflow__body(ref="workflowBody" @scroll="onScroll")
             .workflow__days
-                Day( v-for="day in getDaysRange" :key="day" :line-width="scale" :day)
+                Day( v-for="day in getDaysRange" :key="day" :line-width="scale" :day ref="daysElement")
             .workflow__resources(:style="{width: '100%'}")
-                Resource(v-for="resource in resources" :key="resource.id" :resource)
+                Resource(v-for="resource in resources" :key="resource.id" :resource :overallWidth)
 
             .workflow__now
         .workflow__footer
@@ -18,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, provide, ref } from "vue";
+import { nextTick, onMounted, provide, ref, watch } from "vue";
 import Day from "@/components/workflow/Day.vue";
 import Resource from "@/components/workflow/ResourceComponent.vue";
 import { useWorkflow } from "@/pinia-store/workflow";
@@ -27,7 +27,8 @@ import useTaskMoving from "@/pinia-store/taskMoving";
 
 const tasks = ref(Array.from({ length: 4 }));
 const scale = ref(60);
-const daysElement = ref<Day>();
+const overallWidth = ref(window.innerWidth);
+const daysElement = ref<Day[]>();
 const workflowBody = ref<HTMLElement>();
 const { resources, getResources } = useWorkflow();
 const { getAllTasks, getFirstTask, getLastTask, getDaysRange } = storeToRefs(
@@ -42,9 +43,19 @@ provide("scale", scale);
 const onScroll = () => {
     scrollBody.value = workflowBody.value?.scrollLeft || 0;
 };
-onMounted(() => {
-    getResources();
+const refreshOverallWidth = () => {
+    if (!daysElement.value || daysElement.value?.length === 0) return;
+    overallWidth.value = [...daysElement.value].reduce((acc: Day, cur: Day) => {
+        acc += cur.dayContainer.getBoundingClientRect().width;
+        return acc;
+    }, 0);
+};
+onMounted(async () => {
+    await getResources();
+    await nextTick();
+    refreshOverallWidth();
 });
+watch([scale], refreshOverallWidth, { immediate: true });
 </script>
 
 <style scoped lang="sass">
