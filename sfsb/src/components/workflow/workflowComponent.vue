@@ -55,7 +55,14 @@ onMounted(async () => {
     await nextTick();
     refreshOverallWidth();
 });
-watch([scale], refreshOverallWidth, { immediate: true });
+watch(
+    [scale],
+    async () => {
+        await nextTick();
+        refreshOverallWidth();
+    },
+    { immediate: true }
+);
 </script>
 
 <style scoped lang="sass">
