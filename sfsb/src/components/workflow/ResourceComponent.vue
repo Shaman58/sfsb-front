@@ -45,7 +45,7 @@ const { taskMoving, borderMoving, scrollBody, activeResource } = storeToRefs(
     useTaskMoving()
 );
 const { relocateTask, resources, getResourceByTaskId } = useWorkflow();
-const { getFirstDayStart } = storeToRefs(useWorkflow());
+const { getFirstDayStart, getAllTasks } = storeToRefs(useWorkflow());
 
 const tracking = computed(() => taskMoving.value);
 const durationTrackingTask = computed(() => {
@@ -182,6 +182,7 @@ watch([durationTrackingTask], () => {
 watch(
     () => props.resource.tasks,
     (newTasks) => {
+        console.log("newTasks", newTasks);
         tasks.value = newTasks;
     },
     { deep: true, immediate: true }
@@ -232,7 +233,9 @@ onMounted(() => {
 
 watch([taskMoving], () => {
     intersected.value = isIntersected();
-    console.log("taskMoving.value", taskMoving.value);
+});
+watch([getAllTasks], () => {
+    console.log("getAllTasks from resource", getAllTasks.value);
 });
 </script>
 
