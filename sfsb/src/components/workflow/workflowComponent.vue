@@ -30,10 +30,9 @@ const scale = ref(60);
 const overallWidth = ref(window.innerWidth);
 const daysElement = ref<Day[]>();
 const workflowBody = ref<HTMLElement>();
-const { resources, getResources } = useWorkflow();
-const { getAllTasks, getFirstTask, getLastTask, getDaysRange } = storeToRefs(
-    useWorkflow()
-);
+const { resources, getAllTasks, getFirstTask, getLastTask, getDaysRange } =
+    storeToRefs(useWorkflow());
+const { getResources } = useWorkflow();
 
 const { taskMoving } = storeToRefs(useTaskMoving());
 
@@ -63,6 +62,9 @@ watch(
     },
     { immediate: true }
 );
+watch([getAllTasks], () => {
+    console.log("getAllTasks", getAllTasks.value);
+});
 </script>
 
 <style scoped lang="sass">
