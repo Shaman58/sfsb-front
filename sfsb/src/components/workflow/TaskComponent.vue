@@ -47,8 +47,8 @@ const canDraggable = ref(true);
 const menu = ref(false); // Показывать меню
 
 const { taskMoving, borderMoving } = storeToRefs(useTaskMoving());
-const { getFirstTask } = storeToRefs(useWorkflow());
-const { relocateTask } = useWorkflow();
+const { getFirstTask, resources } = storeToRefs(useWorkflow());
+const { setTaskParam, relocateTask } = useWorkflow();
 
 const startDate = new Date(getFirstTask.value.startAt).setHours(0, 0, 0, 0);
 
@@ -67,6 +67,9 @@ const duration = computed(
             (3600 * 1000)) *
         scale!.value
 );
+watch(duration, () => {
+    console.log("duration", duration.value);
+});
 const left = computed(
     () =>
         ((new Date(startAt.value).getTime() - startDate) / (3600 * 1000)) *
@@ -93,19 +96,20 @@ const selectBorder = (event: MouseEvent, border: "left" | "right") => {
     };
 };
 
-const onChange = (newValue: Task) => {
-    console.log("data to change", newValue);
-    relocateTask(newValue.id, newValue.workflowId, {
-        startAt: newValue.startAt,
-        endAt: newValue.endAt,
-    });
+const onChange = ({
+    endAt,
+    startAt,
+    description,
+    workflowId,
+    name,
+    color,
+}: Task) => {
+    console.log("data to change");
+    setTaskParam(props.task.id, "startAt", startAt);
+    setTaskParam(props.task.id, "endAt", endAt);
+    setTaskParam(props.task.id, "description", description);
+    relocateTask(props.task.id, workflowId);
 };
-watch([props.task], () => {
-    console.log("props.task", props.task);
-});
-watch([left], () => {
-    console.log("left", left.value);
-});
 </script>
 
 <style scoped lang="sass">

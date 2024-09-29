@@ -14,8 +14,8 @@
             ref="taskRefs"
             v-for="task in tasks"
             :key="task.id"
+            :active="isActive(task)"
             :task
-            :active="task.id===taskMoving?.id"
         )
 </template>
 
@@ -68,6 +68,8 @@ const durationTrackingTask = computed(() => {
     }
     return 0;
 });
+
+const isActive = (task: Task) => task.id === taskMoving.value?.id;
 const dragOverPosition = ref(0);
 
 const dragover = (e: DragEvent) => {

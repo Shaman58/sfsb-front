@@ -119,6 +119,16 @@ export const useWorkflow = defineStore("workflow", () => {
                 ));
     };
 
+    const setTaskParam = (id: number, param: keyof Task, value: any) => {
+        const currentResource = getResourceByTaskId(id);
+        if (!currentResource)
+            return console.error("Resource not found by task id", id);
+        const taskIndex = currentResource.tasks.findIndex((e) => e.id === id);
+        if (taskIndex === -1) return console.error("Task not found by id", id);
+        (currentResource.tasks[taskIndex] as Record<keyof Task, any>)[param] =
+            value;
+    };
+
     return {
         resources,
         getAllTasks,
@@ -130,5 +140,6 @@ export const useWorkflow = defineStore("workflow", () => {
         getResourceByTaskId,
         relocateTask,
         calculateDaysDifference,
+        setTaskParam,
     };
 });
