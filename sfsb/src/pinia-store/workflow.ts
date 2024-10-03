@@ -73,8 +73,13 @@ export const useWorkflow = defineStore("workflow", () => {
         );
 
         const res: Date[] = [];
+        const timeOffset = new Date().getTimezoneOffset() * 60000;
         let day = new Date(
-            new Date(getFirstTask.value.startAt).toISOString().split("T")[0]
+            new Date(
+                new Date(getFirstTask.value.startAt).getTime() - timeOffset
+            )
+                .toISOString()
+                .split("T")[0]
         );
         for (let i = 0; i < diff; i++) {
             const inserted = new Date(day);
@@ -113,11 +118,11 @@ export const useWorkflow = defineStore("workflow", () => {
                 : resourceTo;
 
         currentTask &&
-        currentResourceTo &&
-        (currentResourceTo.tasks = [
-            ...(currentResourceTo.tasks || []),
-            { ...(currentTask as Required<Task>) },
-        ]);
+            currentResourceTo &&
+            (currentResourceTo.tasks = [
+                ...(currentResourceTo.tasks || []),
+                { ...(currentTask as Required<Task>) },
+            ]);
         const currentTaskId = currentResourceFrom?.tasks.findIndex(
             (task: Task) => task.id === currentTask?.id
         );
@@ -126,13 +131,13 @@ export const useWorkflow = defineStore("workflow", () => {
             (e) => e.id === currentResourceFrom?.id
         );
         currentTask &&
-        currentTaskId !== undefined &&
-        currentResourceFrom !== undefined &&
-        currentResourceFromIndex !== -1 &&
-        (resources[currentResourceFromIndex].tasks =
-            currentResourceFrom.tasks.filter(
-                (_, i: number) => i !== currentTaskId
-            ));
+            currentTaskId !== undefined &&
+            currentResourceFrom !== undefined &&
+            currentResourceFromIndex !== -1 &&
+            (resources[currentResourceFromIndex].tasks =
+                currentResourceFrom.tasks.filter(
+                    (_, i: number) => i !== currentTaskId
+                ));
     };
 
     const setTaskParam = (id: number, param: keyof Task, value: any) => {
@@ -145,10 +150,23 @@ export const useWorkflow = defineStore("workflow", () => {
             value;
     };
 
+    const reorderTask = async <T extends Task>(
+        newTask: T,
+        oldTask: T
+    ): Promise<void> => {
+        try {
+            await tasksApi.post(`/replace/${newTask.workflowId}`, newTask);
+            relocateTask(newTask.id, newTask.workflowId, newTask);
+        } catch (err: any) {
+            console.error(err);
+            toast.error(err.response.data.message);
+        }
+    };
+
     const sendTask = async (
-        task: Task & { offsetX: number; x: number },
+        task: Task | (Task & { offsetX: number; x: number }),
         previousState: Task | undefined
-    ) => {
+    ): Promise<boolean> => {
         const convertedTask = {
             ...task,
             startAt: toLocaleDate(task.startAt),
@@ -160,34 +178,42 @@ export const useWorkflow = defineStore("workflow", () => {
                 convertedTask
             );
             console.log(data);
+            return true;
         } catch (err: any) {
             const resource = getResourceByTaskId(task.id);
-            if (!resource)
-                return console.error(
+            if (!resource) {
+                console.error(
                     "сетевая ошибка + не нашел ресурс по переданному task.id = " +
-                    task.id,
+                        task.id,
                     err
                 );
+                return false;
+            }
             const resourceIndex = resources.findIndex(
                 (e) => e.id === resource.id
             );
             const taskInStoreIndex = resource.tasks.findIndex(
                 (e) => e.id === task.id
             );
-            if (taskInStoreIndex === -1)
-                return console.error(
+            if (taskInStoreIndex === -1) {
+                console.error(
                     "сетевая ошибка + не нашел task в ресурсе task.id = " +
-                    task.id,
+                        task.id,
                     err
                 );
+                return false;
+            }
             //возвращаем значкние в store из task.previousState
-            if (!previousState)
-                return console.error("Не передан previousState");
+            if (!previousState) {
+                console.error("Не передан previousState");
+                return false;
+            }
             resources[resourceIndex].tasks[taskInStoreIndex].startAt =
                 toLocaleDate(previousState.startAt);
             resources[resourceIndex].tasks[taskInStoreIndex].endAt =
                 toLocaleDate(previousState.endAt);
-            "message" in err && toast.error(err.message);
+            "message" in err && toast.error(err.response.data.message);
+            return false;
         }
     };
 
@@ -205,5 +231,6 @@ export const useWorkflow = defineStore("workflow", () => {
         setTaskParam,
         sendTask,
         toLocaleDate,
+        reorderTask,
     };
 });

@@ -21,7 +21,7 @@
 
 <script setup lang="ts">
 import TaskComponent from "@/components/workflow/TaskComponent.vue";
-import { computed, inject, onMounted, ref, watch } from "vue";
+import { computed, inject, onMounted, ref, toValue, watch } from "vue";
 import { storeToRefs } from "pinia";
 import useTaskMoving from "@/pinia-store/taskMoving";
 import { coordinatesToTime } from "@/mixins/coordinatesAndTime";
@@ -48,8 +48,14 @@ const {
     activeResource,
     borderMovingPreviousState,
 } = storeToRefs(useTaskMoving());
-const { relocateTask, resources, getResourceByTaskId, sendTask, toLocaleDate } =
-    useWorkflow();
+const {
+    relocateTask,
+    resources,
+    getResourceByTaskId,
+    sendTask,
+    toLocaleDate,
+    reorderTask,
+} = useWorkflow();
 const { getFirstDayStart, getAllTasks } = storeToRefs(useWorkflow());
 
 const tracking = computed(() => taskMoving.value);
@@ -58,7 +64,7 @@ const durationTrackingTask = computed(() => {
     if (tracking.value) {
         return (
             ((new Date(taskMoving.value!.endAt).getTime() -
-                    new Date(taskMoving.value!.startAt).getTime()) /
+                new Date(taskMoving.value!.startAt).getTime()) /
                 (3600 * 1000)) *
             scale!.value
         );
@@ -66,7 +72,7 @@ const durationTrackingTask = computed(() => {
     if (borderMoving.value) {
         return (
             ((new Date(borderMoving.value.endAt).getTime() -
-                    new Date(borderMoving.value.startAt).getTime()) /
+                new Date(borderMoving.value.startAt).getTime()) /
                 (3600 * 1000)) *
             scale!.value
         );
@@ -87,7 +93,7 @@ const dragover = (e: DragEvent) => {
     intersected.value = isIntersected();
     console.log("intersected.value", intersected.value);
 };
-const drop = (e: DragEvent) => {
+const drop = async (e: DragEvent) => {
     // if (intersected.value)
     //     return toast.error("Это время занято другой задачей");
     const droppedTask: Task & { offsetX: number } = JSON.parse(
@@ -104,17 +110,27 @@ const drop = (e: DragEvent) => {
         );
         const newEndDate = coordinatesToTime(
             e.x +
-            scrollBody.value -
-            droppedTask.offsetX +
-            durationTrackingTask.value,
+                scrollBody.value -
+                droppedTask.offsetX +
+                durationTrackingTask.value,
             scale.value,
             getFirstDayStart.value
         );
 
-        relocateTask(droppedTask.id, props.resource, {
-            startAt: newStartDate,
-            endAt: newEndDate,
-        });
+        // relocateTask(droppedTask.id, props.resource, {
+        //     startAt: newStartDate,
+        //     endAt: newEndDate,
+        // });
+        taskMoving.value?.previousState &&
+            reorderTask(
+                {
+                    ...taskMoving.value,
+                    startAt: toLocaleDate(newStartDate),
+                    endAt: toLocaleDate(newEndDate),
+                    workflowId: props.resource.id,
+                } as Task,
+                toValue(taskMoving.value.previousState)
+            );
     } else {
         const newStartDate = coordinatesToTime(
             e.x + scrollBody.value - droppedTask.offsetX,
@@ -123,14 +139,26 @@ const drop = (e: DragEvent) => {
         );
         const newEndDate = coordinatesToTime(
             e.x +
-            scrollBody.value -
-            droppedTask.offsetX +
-            durationTrackingTask.value,
+                scrollBody.value -
+                droppedTask.offsetX +
+                durationTrackingTask.value,
             scale.value,
             getFirstDayStart.value
         );
-        tasks.value[matchTaskIndex].startAt = newStartDate;
-        tasks.value[matchTaskIndex].endAt = newEndDate;
+        // tasks.value[matchTaskIndex].startAt = newStartDate;
+        // tasks.value[matchTaskIndex].endAt = newEndDate;
+        const res = await sendTask(
+            {
+                ...taskMoving.value,
+                startAt: toLocaleDate(newStartDate),
+                endAt: toLocaleDate(newEndDate),
+            } as Task,
+            taskMoving.value?.previousState
+        );
+        if (res) {
+            tasks.value[matchTaskIndex].startAt = newStartDate;
+            tasks.value[matchTaskIndex].endAt = newEndDate;
+        }
     }
 };
 const dragenter = () => {};
@@ -138,10 +166,10 @@ const dragleave = () => {};
 const mouseup = () => {
     console.log("mouseup", borderMoving.value);
     borderMoving.value &&
-    sendTask(
-        borderMoving.value as Task & { offsetX: number; x: number },
-        borderMovingPreviousState.value
-    );
+        sendTask(
+            borderMoving.value as Task & { offsetX: number; x: number },
+            borderMovingPreviousState.value
+        );
     borderMoving.value = null;
 };
 const mousemove = (e: MouseEvent) => {
