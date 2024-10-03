@@ -4,7 +4,7 @@
         :draggable="canDraggable"
         @dragend="onDragEnd"
         @dragstart="onDragStart"
-        @mousedown.right.prevent.stop="menu=true"
+        @mousedown.right.prevent.stop="onMouseDown($event)"
         @contextmenu.prevent.stop="()=>{}"
         :style="{width: duration + 'px', left: left + 'px', boxShadow}"
     )
@@ -113,10 +113,19 @@ const onChange = ({
     color,
 }: Task) => {
     console.log("data to change");
-    setTaskParam(props.task.id, "startAt", startAt);
-    setTaskParam(props.task.id, "endAt", endAt);
-    setTaskParam(props.task.id, "description", description);
-    relocateTask(props.task.id, workflowId);
+    // setTaskParam(props.task.id, "startAt", startAt);
+    // setTaskParam(props.task.id, "endAt", endAt);
+    // setTaskParam(props.task.id, "description", description);
+    relocateTask(
+        { ...props.task, startAt, endAt, description, workflowId },
+        props.task
+    );
+};
+
+const onMouseDown = (event: MouseEvent) => {
+    console.log("event.button", event.button);
+    if (event.button !== 2) return;
+    menu.value = !menu.value;
 };
 </script>
 
