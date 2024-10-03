@@ -2,7 +2,6 @@
     v-menu.menu(
         v-model="menu"
         :close-on-content-click="false"
-        activator="parent"
         location="end"
         scroll-strategy="reposition"
         min-width="300px"

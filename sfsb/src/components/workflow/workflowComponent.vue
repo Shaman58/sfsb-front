@@ -2,6 +2,8 @@
     .workflow
         .workflow__header
             div {{taskMoving}}
+            div
+                button(@click="getResources") Обновить
             .workflow__scale
                 v-slider(v-model="scale" label="Масштаб" track-color="green" min="10" max="200" )
             .div {{scrollBody}}
@@ -9,7 +11,7 @@
             .workflow__days
                 Day( v-for="day in getDaysRange" :key="day" :line-width="scale" :day ref="daysElement")
             .workflow__resources(:style="{width: '100%'}")
-                Resource(v-for="resource in resources" :key="resource.id" :resource :overallWidth)
+                Resource(v-for="resource in resources" :key="resource" :resource :overallWidth)
 
             .workflow__now
         .workflow__footer

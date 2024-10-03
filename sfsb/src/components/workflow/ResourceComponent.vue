@@ -95,42 +95,47 @@ const drop = (e: DragEvent) => {
     );
     console.log("drop", e, droppedTask);
 
+    const newStartDate = coordinatesToTime(
+        e.x + scrollBody.value - droppedTask.offsetX,
+        scale.value,
+        getFirstDayStart.value
+    );
+    const newEndDate = coordinatesToTime(
+        e.x +
+            scrollBody.value -
+            droppedTask.offsetX +
+            durationTrackingTask.value,
+        scale.value,
+        getFirstDayStart.value
+    );
+
     let matchTaskIndex = tasks.value.findIndex((e) => e.id === droppedTask.id);
     if (matchTaskIndex === -1) {
-        const newStartDate = coordinatesToTime(
-            e.x + scrollBody.value - droppedTask.offsetX,
-            scale.value,
-            getFirstDayStart.value
+        // relocateTask(droppedTask.id, props.resource, {
+        //     startAt: newStartDate,
+        //     endAt: newEndDate,
+        // });
+        relocateTask(
+            {
+                ...droppedTask,
+                workflowId: props.resource.id,
+                startAt: toLocaleDate(newStartDate),
+                endAt: toLocaleDate(newEndDate),
+            },
+            droppedTask
         );
-        const newEndDate = coordinatesToTime(
-            e.x +
-                scrollBody.value -
-                droppedTask.offsetX +
-                durationTrackingTask.value,
-            scale.value,
-            getFirstDayStart.value
-        );
-
-        relocateTask(droppedTask.id, props.resource, {
-            startAt: newStartDate,
-            endAt: newEndDate,
-        });
     } else {
-        const newStartDate = coordinatesToTime(
-            e.x + scrollBody.value - droppedTask.offsetX,
-            scale.value,
-            getFirstDayStart.value
+        // tasks.value[matchTaskIndex].startAt = newStartDate;
+        // tasks.value[matchTaskIndex].endAt = newEndDate;
+        relocateTask(
+            {
+                ...droppedTask,
+                workflowId: props.resource.id,
+                startAt: toLocaleDate(newStartDate),
+                endAt: toLocaleDate(newEndDate),
+            },
+            droppedTask
         );
-        const newEndDate = coordinatesToTime(
-            e.x +
-                scrollBody.value -
-                droppedTask.offsetX +
-                durationTrackingTask.value,
-            scale.value,
-            getFirstDayStart.value
-        );
-        tasks.value[matchTaskIndex].startAt = newStartDate;
-        tasks.value[matchTaskIndex].endAt = newEndDate;
     }
 };
 const dragenter = () => {};
