@@ -118,7 +118,7 @@ const onChange = ({
     // setTaskParam(props.task.id, "description", description);
     relocateTask(
         { ...props.task, startAt, endAt, description, workflowId },
-        props.task
+        workflowId
     );
 };
 
