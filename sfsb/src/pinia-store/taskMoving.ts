@@ -11,9 +11,11 @@ const useTaskMoving = defineStore("taskMoving", () => {
     const borderMovingPreviousState = ref<Task | undefined>();
     const scrollBody = ref(0);
     const activeResource = ref<number | undefined>();
+    const taskMovingPreviousState = ref<Task | undefined>();
 
     return {
         taskMoving,
+        taskMovingPreviousState,
         borderMoving,
         borderMovingPreviousState,
         scrollBody,
