@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { computed, ComputedRef, reactive } from "vue";
 import workflowApi from "@/api/workflowApi";
+import tasksApi from "@/api/tasksApi";
 
 export const useWorkflow = defineStore("workflow", () => {
     const resources = reactive<Resource[]>([]);
@@ -43,11 +44,15 @@ export const useWorkflow = defineStore("workflow", () => {
     };
 
     const calculateDaysDifference = (date1: string, date2: string): number => {
-        const time1 = new Date(date1).getTime();
-        const time2 = new Date(date2).getTime();
+        const time1 = new Date(date1);
+        time1.setHours(0, 0, 0);
+        const time1ms = time1.getTime();
+        const time2 = new Date(date2);
+        time2.setHours(23, 59, 59);
+        const time2ms = time2.getTime();
 
         // Разница во времени в миллисекундах
-        const timeDifference = Math.abs(time2 - time1);
+        const timeDifference = Math.abs(time2ms - time1ms);
 
         // Преобразуем миллисекунды в дни
         const daysDifference = Math.ceil(
@@ -77,6 +82,14 @@ export const useWorkflow = defineStore("workflow", () => {
     });
 
     const getFirstDayStart = computed(() => getDaysRange.value[0]);
+
+    const toLocaleDate = (value: string | Date) => {
+        const offset = new Date().getTimezoneOffset() * 60000;
+        const date = new Date(new Date(value).getTime() - offset)
+            .toISOString()
+            .slice(0, -1);
+        return date;
+    };
 
     const relocateTask = (
         task: Task | number,
@@ -129,6 +142,51 @@ export const useWorkflow = defineStore("workflow", () => {
             value;
     };
 
+    const sendTask = async (
+        task: Task & { offsetX: number; x: number },
+        previousState: Task | undefined
+    ) => {
+        const convertedTask = {
+            ...task,
+            startAt: toLocaleDate(task.startAt),
+            endAt: toLocaleDate(task.endAt),
+        };
+        try {
+            const { data } = await tasksApi.post(
+                `/replace/${task.workflowId}`,
+                convertedTask
+            );
+            console.log(data);
+        } catch (e) {
+            const resource = getResourceByTaskId(task.id);
+            if (!resource)
+                return console.error(
+                    "сетевая ошибка + не нашел ресурс по переданному task.id = " +
+                        task.id,
+                    e
+                );
+            const resourceIndex = resources.findIndex(
+                (e) => e.id === resource.id
+            );
+            const taskInStoreIndex = resource.tasks.findIndex(
+                (e) => e.id === task.id
+            );
+            if (taskInStoreIndex === -1)
+                return console.error(
+                    "сетевая ошибка + не нашел task в ресурсе task.id = " +
+                        task.id,
+                    e
+                );
+            //возвращаем значкние в store из task.previousState
+            if (!previousState)
+                return console.error("Не передан previousState");
+            resources[resourceIndex].tasks[taskInStoreIndex].startAt =
+                toLocaleDate(previousState.startAt);
+            resources[resourceIndex].tasks[taskInStoreIndex].endAt =
+                toLocaleDate(previousState.endAt);
+        }
+    };
+
     return {
         resources,
         getAllTasks,
@@ -141,5 +199,7 @@ export const useWorkflow = defineStore("workflow", () => {
         relocateTask,
         calculateDaysDifference,
         setTaskParam,
+        sendTask,
+        toLocaleDate,
     };
 });

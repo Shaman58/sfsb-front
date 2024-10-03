@@ -32,7 +32,7 @@
         ParamsTask(v-model:menu="menu" v-model:task="props.task" @change="onChange($event)")
 </template>
 <script setup lang="ts">
-import { computed, inject, ref, type Ref, toRefs, watch } from "vue";
+import { computed, inject, ref, type Ref, toRefs } from "vue";
 import { storeToRefs } from "pinia";
 import useTaskMoving from "@/pinia-store/taskMoving";
 import { useWorkflow } from "@/pinia-store/workflow";
@@ -46,7 +46,9 @@ const canDraggable = ref(true);
 
 const menu = ref(false); // Показывать меню
 
-const { taskMoving, borderMoving } = storeToRefs(useTaskMoving());
+const { taskMoving, borderMoving, borderMovingPreviousState } = storeToRefs(
+    useTaskMoving()
+);
 const { getFirstTask, resources } = storeToRefs(useWorkflow());
 const { setTaskParam, relocateTask } = useWorkflow();
 
@@ -67,9 +69,7 @@ const duration = computed(
             (3600 * 1000)) *
         scale!.value
 );
-watch(duration, () => {
-    console.log("duration", duration.value);
-});
+
 const left = computed(
     () =>
         ((new Date(startAt.value).getTime() - startDate) / (3600 * 1000)) *
@@ -81,7 +81,12 @@ const onDragStart = (e: DragEvent) => {
         "task",
         JSON.stringify({ ...props.task, offsetX: e.offsetX, x: e.x })
     );
-    taskMoving.value = { ...props.task, offsetX: e.offsetX, x: e.x };
+    taskMoving.value = {
+        ...props.task,
+        previousState: props.task,
+        offsetX: e.offsetX,
+        x: e.x,
+    };
 };
 
 const onDragEnd = (e: DragEvent) => {
@@ -94,6 +99,8 @@ const selectBorder = (event: MouseEvent, border: "left" | "right") => {
         border,
         x: event.x + scrollBody.value,
     };
+    !borderMovingPreviousState.value &&
+        (borderMovingPreviousState.value = { ...props.task });
 };
 
 const onChange = ({
