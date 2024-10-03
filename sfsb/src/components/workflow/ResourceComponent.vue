@@ -41,10 +41,15 @@ const intersected = ref(false);
 
 const scale = inject("scale");
 
-const { taskMoving, borderMoving, scrollBody, activeResource } = storeToRefs(
-    useTaskMoving()
-);
-const { relocateTask, resources, getResourceByTaskId } = useWorkflow();
+const {
+    taskMoving,
+    borderMoving,
+    scrollBody,
+    activeResource,
+    borderMovingPreviousState,
+} = storeToRefs(useTaskMoving());
+const { relocateTask, resources, getResourceByTaskId, sendTask, toLocaleDate } =
+    useWorkflow();
 const { getFirstDayStart, getAllTasks } = storeToRefs(useWorkflow());
 
 const tracking = computed(() => taskMoving.value);
@@ -83,8 +88,8 @@ const dragover = (e: DragEvent) => {
     console.log("intersected.value", intersected.value);
 };
 const drop = (e: DragEvent) => {
-    if (intersected.value)
-        return toast.error("Это время занято другой задачей");
+    // if (intersected.value)
+    //     return toast.error("Это время занято другой задачей");
     const droppedTask: Task & { offsetX: number } = JSON.parse(
         e.dataTransfer?.getData("task")
     );
@@ -131,6 +136,12 @@ const drop = (e: DragEvent) => {
 const dragenter = () => {};
 const dragleave = () => {};
 const mouseup = () => {
+    console.log("mouseup", borderMoving.value);
+    borderMoving.value &&
+        sendTask(
+            borderMoving.value as Task & { offsetX: number; x: number },
+            borderMovingPreviousState.value
+        );
     borderMoving.value = null;
 };
 const mousemove = (e: MouseEvent) => {
@@ -158,29 +169,26 @@ const mousemove = (e: MouseEvent) => {
     if (taskIndex === -1) return;
 
     if (borderMoving.value.border === "left") {
-        tasks.value[taskIndex].startAt = time;
-        borderMoving.value.startAt = time;
+        tasks.value[taskIndex].startAt = toLocaleDate(time);
+        borderMoving.value.startAt = toLocaleDate(time);
     }
     if (borderMoving.value.border === "right") {
-        tasks.value[taskIndex].endAt = time;
-        borderMoving.value.endAt = time;
+        tasks.value[taskIndex].endAt = toLocaleDate(time);
+        borderMoving.value.endAt = toLocaleDate(time);
     }
-    if (intersected.value) {
-        toast.error("Это время занято другой задачей");
-        if (borderMoving.value.border === "left") {
-            tasks.value[taskIndex].startAt = prevTime;
-            borderMoving.value.startAt = prevTime;
-        }
-        if (borderMoving.value.border === "right") {
-            tasks.value[taskIndex].endAt = prevTime;
-            borderMoving.value.endAt = prevTime;
-        }
-    }
+    // if (intersected.value) {
+    //     toast.error("Это время занято другой задачей");
+    //     if (borderMoving.value.border === "left") {
+    //         tasks.value[taskIndex].startAt = prevTime;
+    //         borderMoving.value.startAt = prevTime;
+    //     }
+    //     if (borderMoving.value.border === "right") {
+    //         tasks.value[taskIndex].endAt = prevTime;
+    //         borderMoving.value.endAt = prevTime;
+    //     }
+    // }
 };
 
-watch([durationTrackingTask], () => {
-    console.log("durationTrackingTask", durationTrackingTask.value);
-});
 watch(
     () => props.resource.tasks,
     (newTasks) => {
