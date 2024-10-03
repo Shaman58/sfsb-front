@@ -58,7 +58,7 @@ const durationTrackingTask = computed(() => {
     if (tracking.value) {
         return (
             ((new Date(taskMoving.value!.endAt).getTime() -
-                new Date(taskMoving.value!.startAt).getTime()) /
+                    new Date(taskMoving.value!.startAt).getTime()) /
                 (3600 * 1000)) *
             scale!.value
         );
@@ -66,7 +66,7 @@ const durationTrackingTask = computed(() => {
     if (borderMoving.value) {
         return (
             ((new Date(borderMoving.value.endAt).getTime() -
-                new Date(borderMoving.value.startAt).getTime()) /
+                    new Date(borderMoving.value.startAt).getTime()) /
                 (3600 * 1000)) *
             scale!.value
         );
@@ -95,47 +95,42 @@ const drop = (e: DragEvent) => {
     );
     console.log("drop", e, droppedTask);
 
-    const newStartDate = coordinatesToTime(
-        e.x + scrollBody.value - droppedTask.offsetX,
-        scale.value,
-        getFirstDayStart.value
-    );
-    const newEndDate = coordinatesToTime(
-        e.x +
+    let matchTaskIndex = tasks.value.findIndex((e) => e.id === droppedTask.id);
+    if (matchTaskIndex === -1) {
+        const newStartDate = coordinatesToTime(
+            e.x + scrollBody.value - droppedTask.offsetX,
+            scale.value,
+            getFirstDayStart.value
+        );
+        const newEndDate = coordinatesToTime(
+            e.x +
             scrollBody.value -
             droppedTask.offsetX +
             durationTrackingTask.value,
-        scale.value,
-        getFirstDayStart.value
-    );
+            scale.value,
+            getFirstDayStart.value
+        );
 
-    let matchTaskIndex = tasks.value.findIndex((e) => e.id === droppedTask.id);
-    if (matchTaskIndex === -1) {
-        // relocateTask(droppedTask.id, props.resource, {
-        //     startAt: newStartDate,
-        //     endAt: newEndDate,
-        // });
-        relocateTask(
-            {
-                ...droppedTask,
-                workflowId: props.resource.id,
-                startAt: toLocaleDate(newStartDate),
-                endAt: toLocaleDate(newEndDate),
-            },
-            droppedTask
-        );
+        relocateTask(droppedTask.id, props.resource, {
+            startAt: newStartDate,
+            endAt: newEndDate,
+        });
     } else {
-        // tasks.value[matchTaskIndex].startAt = newStartDate;
-        // tasks.value[matchTaskIndex].endAt = newEndDate;
-        relocateTask(
-            {
-                ...droppedTask,
-                workflowId: props.resource.id,
-                startAt: toLocaleDate(newStartDate),
-                endAt: toLocaleDate(newEndDate),
-            },
-            droppedTask
+        const newStartDate = coordinatesToTime(
+            e.x + scrollBody.value - droppedTask.offsetX,
+            scale.value,
+            getFirstDayStart.value
         );
+        const newEndDate = coordinatesToTime(
+            e.x +
+            scrollBody.value -
+            droppedTask.offsetX +
+            durationTrackingTask.value,
+            scale.value,
+            getFirstDayStart.value
+        );
+        tasks.value[matchTaskIndex].startAt = newStartDate;
+        tasks.value[matchTaskIndex].endAt = newEndDate;
     }
 };
 const dragenter = () => {};
@@ -143,10 +138,10 @@ const dragleave = () => {};
 const mouseup = () => {
     console.log("mouseup", borderMoving.value);
     borderMoving.value &&
-        sendTask(
-            borderMoving.value as Task & { offsetX: number; x: number },
-            borderMovingPreviousState.value
-        );
+    sendTask(
+        borderMoving.value as Task & { offsetX: number; x: number },
+        borderMovingPreviousState.value
+    );
     borderMoving.value = null;
 };
 const mousemove = (e: MouseEvent) => {

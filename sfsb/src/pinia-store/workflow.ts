@@ -1,24 +1,23 @@
 import { defineStore } from "pinia";
-import { computed, ComputedRef, ref } from "vue";
+import { computed, ComputedRef, reactive } from "vue";
 import workflowApi from "@/api/workflowApi";
 import tasksApi from "@/api/tasksApi";
 import { useToast } from "vue-toast-notification";
 
 export const useWorkflow = defineStore("workflow", () => {
-    const resources = ref<Resource[]>([]);
+    const resources = reactive<Resource[]>([]);
     const toast = useToast();
 
     const getResources = async () => {
         const { data } = await workflowApi.get("/all");
         data.forEach(
-            (resource: Resource, index: number) =>
-                (resources.value[index] = resource)
+            (resource: Resource, index: number) => (resources[index] = resource)
         );
     };
 
     const getAllTasks = computed((): Task[] => {
-        if (resources.value.length === 0) return [];
-        return resources.value.flatMap((resource) => resource.tasks);
+        if (resources.length === 0) return [];
+        return resources.flatMap((resource) => resource.tasks);
     });
 
     const getFirstTask: ComputedRef<Task> = computed(
@@ -42,7 +41,7 @@ export const useWorkflow = defineStore("workflow", () => {
         getAllTasks.value.find((task) => task.id === id);
 
     const getResourceByTaskId = (id: number): Resource | undefined => {
-        return resources.value.find((resource) =>
+        return resources.find((resource) =>
             resource.tasks.some((task) => task.id === id)
         );
     };
@@ -74,16 +73,11 @@ export const useWorkflow = defineStore("workflow", () => {
         );
 
         const res: Date[] = [];
-        const timeOffset = new Date().getTimezoneOffset() * 60000;
         let day = new Date(
-            new Date(
-                new Date(getFirstTask.value.startAt).getTime() - timeOffset
-            )
-                .toISOString()
-                .split("T")[0]
+            new Date(getFirstTask.value.startAt).toISOString().split("T")[0]
         );
         for (let i = 0; i < diff; i++) {
-            const inserted = new Date(day.getTime() - timeOffset);
+            const inserted = new Date(day);
             res.push(inserted);
             day = new Date(day.setDate(day.getDate() + 1));
         }
@@ -92,7 +86,7 @@ export const useWorkflow = defineStore("workflow", () => {
 
     const getFirstDayStart = computed(() => getDaysRange.value[0]);
 
-    const toLocaleDate = (value: string | Date): string => {
+    const toLocaleDate = (value: string | Date) => {
         const offset = new Date().getTimezoneOffset() * 60000;
         const date = new Date(new Date(value).getTime() - offset)
             .toISOString()
@@ -100,97 +94,45 @@ export const useWorkflow = defineStore("workflow", () => {
         return date;
     };
 
-    // const relocateTask = (
-    //     task: Task | number,
-    //     resourceTo: Resource | number,
-    //     newData?: Partial<Task>
-    // ): void => {
-    //     const currentTask =
-    //         typeof task === "number"
-    //             ? { ...getTaskById(task), ...newData }
-    //             : { ...task, ...newData };
-    //     let currentResourceFrom: Resource | undefined;
-    //     if (currentTask?.id !== undefined) {
-    //         currentResourceFrom = getResourceByTaskId(currentTask.id);
-    //     }
-    //     const currentResourceTo =
-    //         typeof resourceTo === "number"
-    //             ? resources.value.find((resource) => resource.id === resourceTo)
-    //             : resourceTo;
-    //
-    //     currentTask &&
-    //         currentResourceTo &&
-    //         (currentResourceTo.tasks = [
-    //             ...(currentResourceTo.tasks || []),
-    //             { ...(currentTask as Required<Task>) },
-    //         ]);
-    //     const currentTaskId = currentResourceFrom?.tasks.findIndex(
-    //         (task: Task) => task.id === currentTask?.id
-    //     );
-    //
-    //     const currentResourceFromIndex = resources.value.findIndex(
-    //         (e) => e.id === currentResourceFrom?.id
-    //     );
-    //     currentTask &&
-    //         currentTaskId !== undefined &&
-    //         currentResourceFrom !== undefined &&
-    //         currentResourceFromIndex !== -1 &&
-    //         (resources.value[currentResourceFromIndex].tasks =
-    //             currentResourceFrom.tasks.filter(
-    //                 (_, i: number) => i !== currentTaskId
-    //             ));
-    // };
-
-    const relocateTask = async <T extends Task>(
-        newTask: T,
-        oldTask: T
-    ): Promise<void> => {
-        const resourceTo = resources.value.find(
-            (resource) => resource.id === newTask.workflowId
-        );
-        const resourceFrom = resources.value.find(
-            (resource) => resource.id === oldTask.workflowId
-        );
-        if (!resourceFrom || !resourceTo)
-            return console.error(
-                "Resource not found by task id",
-                newTask,
-                oldTask
-            );
-
-        const currentResourceFromIndex = resources.value.findIndex(
-            (e) => e.id === resourceFrom.id
-        );
-        const currentResourceToIndex = resources.value.findIndex(
-            (e) => e.id === resourceTo.id
-        );
-
-        try {
-            // await sendTask(newTask, oldTask);
-            await tasksApi.post(`/replace/${newTask.workflowId}`, newTask);
-
-            //перенос дданных из одного ресурса в другой
-            const currentTaskIndex = resources.value[
-                currentResourceFromIndex
-            ].tasks.findIndex((t) => t.id === oldTask.id);
-            resources.value[currentResourceToIndex].tasks[
-                currentTaskIndex
-            ].startAt = newTask.startAt;
-            resources.value[currentResourceToIndex].tasks[
-                currentTaskIndex
-            ].endAt = newTask.endAt;
-            resources.value[currentResourceToIndex].tasks[
-                currentTaskIndex
-            ].workflowId = newTask.workflowId;
-            // if (newTask.workflowId !== oldTask.workflowId)
-            //     resources.value[currentResourceFromIndex].tasks.splice(
-            //         currentTaskIndex,
-            //         1
-            //     );
-        } catch (err: any) {
-            console.error(err);
-            toast.error(err.response.data.message);
+    const relocateTask = (
+        task: Task | number,
+        resourceTo: Resource | number,
+        newData?: Partial<Task>
+    ): void => {
+        const currentTask =
+            typeof task === "number"
+                ? { ...getTaskById(task), ...newData }
+                : { ...task, ...newData };
+        let currentResourceFrom: Resource | undefined;
+        if (currentTask?.id !== undefined) {
+            currentResourceFrom = getResourceByTaskId(currentTask.id);
         }
+        const currentResourceTo =
+            typeof resourceTo === "number"
+                ? resources.find((resource) => resource.id === resourceTo)
+                : resourceTo;
+
+        currentTask &&
+        currentResourceTo &&
+        (currentResourceTo.tasks = [
+            ...(currentResourceTo.tasks || []),
+            { ...(currentTask as Required<Task>) },
+        ]);
+        const currentTaskId = currentResourceFrom?.tasks.findIndex(
+            (task: Task) => task.id === currentTask?.id
+        );
+
+        const currentResourceFromIndex = resources.findIndex(
+            (e) => e.id === currentResourceFrom?.id
+        );
+        currentTask &&
+        currentTaskId !== undefined &&
+        currentResourceFrom !== undefined &&
+        currentResourceFromIndex !== -1 &&
+        (resources[currentResourceFromIndex].tasks =
+            currentResourceFrom.tasks.filter(
+                (_, i: number) => i !== currentTaskId
+            ));
     };
 
     const setTaskParam = (id: number, param: keyof Task, value: any) => {
@@ -204,7 +146,7 @@ export const useWorkflow = defineStore("workflow", () => {
     };
 
     const sendTask = async (
-        task: Task | (Task & { offsetX: number; x: number }),
+        task: Task & { offsetX: number; x: number },
         previousState: Task | undefined
     ) => {
         const convertedTask = {
@@ -223,10 +165,10 @@ export const useWorkflow = defineStore("workflow", () => {
             if (!resource)
                 return console.error(
                     "сетевая ошибка + не нашел ресурс по переданному task.id = " +
-                        task.id,
+                    task.id,
                     err
                 );
-            const resourceIndex = resources.value.findIndex(
+            const resourceIndex = resources.findIndex(
                 (e) => e.id === resource.id
             );
             const taskInStoreIndex = resource.tasks.findIndex(
@@ -235,15 +177,15 @@ export const useWorkflow = defineStore("workflow", () => {
             if (taskInStoreIndex === -1)
                 return console.error(
                     "сетевая ошибка + не нашел task в ресурсе task.id = " +
-                        task.id,
+                    task.id,
                     err
                 );
             //возвращаем значкние в store из task.previousState
             if (!previousState)
                 return console.error("Не передан previousState");
-            resources.value[resourceIndex].tasks[taskInStoreIndex].startAt =
+            resources[resourceIndex].tasks[taskInStoreIndex].startAt =
                 toLocaleDate(previousState.startAt);
-            resources.value[resourceIndex].tasks[taskInStoreIndex].endAt =
+            resources[resourceIndex].tasks[taskInStoreIndex].endAt =
                 toLocaleDate(previousState.endAt);
             "message" in err && toast.error(err.message);
         }
