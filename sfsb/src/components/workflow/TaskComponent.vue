@@ -4,7 +4,8 @@
         :draggable="canDraggable"
         @dragend="onDragEnd"
         @dragstart="onDragStart"
-        @contextmenu.prevent.stop="menu=true"
+        @mousedown.right.prevent.stop="menu=true"
+        @contextmenu.prevent.stop="()=>{}"
         :style="{width: duration + 'px', left: left + 'px', boxShadow}"
     )
         .task__border.task__border_left(@mousedown.prevent="selectBorder($event,'left')")
@@ -89,7 +90,7 @@ const onDragStart = (e: DragEvent) => {
     };
 };
 
-const onDragEnd = (e: DragEvent) => {
+const onDragEnd = () => {
     taskMoving.value = null;
 };
 
