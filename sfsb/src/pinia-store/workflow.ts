@@ -2,9 +2,12 @@ import { defineStore } from "pinia";
 import { computed, ComputedRef, reactive } from "vue";
 import workflowApi from "@/api/workflowApi";
 import tasksApi from "@/api/tasksApi";
+import { useToast } from "vue-toast-notification";
 
 export const useWorkflow = defineStore("workflow", () => {
     const resources = reactive<Resource[]>([]);
+    const toast = useToast();
+
     const getResources = async () => {
         const { data } = await workflowApi.get("/all");
         data.forEach(
@@ -157,13 +160,13 @@ export const useWorkflow = defineStore("workflow", () => {
                 convertedTask
             );
             console.log(data);
-        } catch (e) {
+        } catch (err: any) {
             const resource = getResourceByTaskId(task.id);
             if (!resource)
                 return console.error(
                     "сетевая ошибка + не нашел ресурс по переданному task.id = " +
                         task.id,
-                    e
+                    err
                 );
             const resourceIndex = resources.findIndex(
                 (e) => e.id === resource.id
@@ -175,7 +178,7 @@ export const useWorkflow = defineStore("workflow", () => {
                 return console.error(
                     "сетевая ошибка + не нашел task в ресурсе task.id = " +
                         task.id,
-                    e
+                    err
                 );
             //возвращаем значкние в store из task.previousState
             if (!previousState)
@@ -184,6 +187,7 @@ export const useWorkflow = defineStore("workflow", () => {
                 toLocaleDate(previousState.startAt);
             resources[resourceIndex].tasks[taskInStoreIndex].endAt =
                 toLocaleDate(previousState.endAt);
+            "message" in err && toast.error(err.message);
         }
     };
 
