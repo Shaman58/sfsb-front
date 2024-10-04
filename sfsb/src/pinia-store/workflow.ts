@@ -117,12 +117,45 @@ export const useWorkflow = defineStore("workflow", () => {
                 ? resources.find((resource) => resource.id === resourceTo)
                 : resourceTo;
 
+        if (currentResourceFrom?.id === currentResourceTo?.id) {
+            const resourceIndex = resources.findIndex(
+                (r) => r.id === currentResourceFrom?.id
+            );
+            const taskIndex = currentResourceFrom?.tasks?.findIndex(
+                (t) => t.id === currentTask.id
+            );
+            console.log(
+                "currentResourceFrom, currentTask",
+                currentResourceFrom,
+                currentTask
+            );
+
+            if (
+                currentResourceFrom !== undefined &&
+                taskIndex !== undefined &&
+                resourceIndex !== undefined
+            ) {
+                resources[resourceIndex].tasks[taskIndex] = currentTask as Task;
+                // currentTask.startAt &&
+                //     (resources[resourceIndex].tasks[taskIndex].startAt =
+                //         currentTask.startAt);
+                // currentTask.endAt &&
+                //     (resources[resourceIndex].tasks[taskIndex].endAt =
+                //         currentTask.endAt);
+                // currentTask.description &&
+                //     (resources[resourceIndex].tasks[taskIndex].description =
+                //         currentTask.description);
+            }
+            return;
+        }
+
         currentTask &&
             currentResourceTo &&
             (currentResourceTo.tasks = [
                 ...(currentResourceTo.tasks || []),
                 { ...(currentTask as Required<Task>) },
             ]);
+
         const currentTaskId = currentResourceFrom?.tasks.findIndex(
             (task: Task) => task.id === currentTask?.id
         );
@@ -130,6 +163,7 @@ export const useWorkflow = defineStore("workflow", () => {
         const currentResourceFromIndex = resources.findIndex(
             (e) => e.id === currentResourceFrom?.id
         );
+
         currentTask &&
             currentTaskId !== undefined &&
             currentResourceFrom !== undefined &&
