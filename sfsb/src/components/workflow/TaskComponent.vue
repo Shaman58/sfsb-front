@@ -10,36 +10,38 @@
     )
         .task__border.task__border_left(@mousedown.prevent="selectBorder($event,'left')")
         .task__caption
-            h4 {{props.task.name}}
+            h4 {{name}}
             div {{consoleText}}
-            p {{props.task.description}}
+            p {{description}}
         .task__border.task__border_right(@mousedown.prevent="selectBorder($event,'right')")
 
         v-tooltip(
             activator="parent"
             location="bottom"
         )
-            h3 {{task.name}}
-            p {{task.description}}
+            h3 {{name}}
+            p {{description}}
             div Время начала:
-                time {{new Date(task.startAt).toLocaleDateString()}}&nbsp;
+                time {{new Date(startAt).toLocaleDateString()}}&nbsp;
                 time
-                    strong {{new Date(task.startAt).toLocaleTimeString()}}
+                    strong {{new Date(startAt).toLocaleTimeString()}}
             div Время завершения:
-                time {{new Date(task.endAt).toLocaleDateString()}}&nbsp;
+                time {{new Date(endAt).toLocaleDateString()}}&nbsp;
                 time
-                    strong {{new Date(task.endAt).toLocaleTimeString()}}
+                    strong {{new Date(endAt).toLocaleTimeString()}}
 
         ParamsTask(v-model:menu="menu" v-model:task="props.task" @change="onChange($event)")
 </template>
 <script setup lang="ts">
-import { computed, inject, ref, type Ref, watch } from "vue";
+import { computed, inject, ref, type Ref, toRefs } from "vue";
 import { storeToRefs } from "pinia";
 import useTaskMoving from "@/pinia-store/taskMoving";
 import { useWorkflow } from "@/pinia-store/workflow";
 import ParamsTask from "@/components/workflow/ParamsTask.vue";
 
 const props = defineProps<{ task: Task; active: boolean }>();
+
+const { startAt, endAt, name, description, color } = toRefs(props.task);
 
 const scale = inject<Ref<number>>("scale");
 const canDraggable = ref(true);
@@ -50,7 +52,7 @@ const { taskMoving, borderMoving, borderMovingPreviousState } = storeToRefs(
     useTaskMoving()
 );
 const { getFirstTask, resources } = storeToRefs(useWorkflow());
-const { setTaskParam, reorderTask } = useWorkflow();
+const { reorderTask } = useWorkflow();
 
 const startDate = new Date(getFirstTask.value.startAt).setHours(0, 0, 0, 0);
 
@@ -58,7 +60,7 @@ const element = ref<HTMLDivElement>();
 const boxShadow = computed(
     () => `0 0 ${props.active ? "18px" : "0"} ${props.task.color}`
 );
-const color = computed(() => props.task.color);
+// const color = computed(() => props.task.color);
 
 const consoleText = ref("");
 
@@ -114,13 +116,6 @@ const onChange = ({
     color,
 }: Task) => {
     console.log("data to change");
-    // setTaskParam(props.task.id, "startAt", startAt);
-    // setTaskParam(props.task.id, "endAt", endAt);
-    // setTaskParam(props.task.id, "description", description);
-    // relocateTask(
-    //     { ...props.task, startAt, endAt, description, workflowId },
-    //     workflowId
-    // );
     reorderTask(
         { ...props.task, startAt, endAt, description, workflowId },
         props.task
@@ -138,15 +133,18 @@ const onContextMenu = (event: MouseEvent) => {
     event.stopPropagation();
 };
 
-watch(
-    () => props.task,
-    () => {
-        console.log("TaskComponent props.task was changed", props.task);
-    }
-);
-watch([props.task.startAt], () => {
-    console.log("TaskComponent startAt was changed", props.task.startAt);
-});
+// watch([props], () => {
+//     console.log("TaskComponent props was changed", props);
+// });
+// watch([props.task], () => {
+//     console.log("TaskComponent props.task was changed", props.task);
+// });
+// watch([startAt], () => {
+//     console.log("TaskComponent startAt was changed", startAt.value);
+// });
+// watch([endAt], () => {
+//     console.log("TaskComponent endAt was changed", endAt.value);
+// });
 </script>
 
 <style scoped lang="sass">
