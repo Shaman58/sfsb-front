@@ -55,6 +55,7 @@ const {
     sendTask,
     toLocaleDate,
     reorderTask,
+    setTaskParam,
 } = useWorkflow();
 const { getFirstDayStart, getAllTasks } = storeToRefs(useWorkflow());
 

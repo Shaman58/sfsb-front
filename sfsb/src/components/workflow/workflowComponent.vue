@@ -67,6 +67,13 @@ watch(
 watch([getAllTasks], () => {
     console.log("getAllTasks", getAllTasks.value);
 });
+watch(
+    () => resources,
+    () => {
+        console.log("resources", resources.value);
+    },
+    { immediate: true }
+);
 </script>
 
 <style scoped lang="sass">

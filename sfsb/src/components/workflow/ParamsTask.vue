@@ -4,7 +4,9 @@
         :close-on-content-click="false"
         location="end"
         scroll-strategy="reposition"
-        min-width="300px"
+        transition="slide-y-transition"
+        @contextmenu.stop.prevent="()=>{}"
+        :style="{left: '50%', translate: '-50% 0', maxWidth: '520px'}"
     )
         v-card.pa-2()
             h3.menu__header {{task.name}}
@@ -45,6 +47,7 @@ watch([startAt, endAt], () => {
 
 <style scoped lang="sass">
 .menu
+
     &__header
         text-align: center
 </style>

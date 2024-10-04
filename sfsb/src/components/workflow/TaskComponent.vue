@@ -5,7 +5,7 @@
         @dragend="onDragEnd"
         @dragstart="onDragStart"
         @mousedown.right.prevent.stop="onMouseDown($event)"
-        @contextmenu.prevent.stop="()=>{}"
+        @contextmenu.prevent.stop="onContextMenu($event)"
         :style="{width: duration + 'px', left: left + 'px', boxShadow}"
     )
         .task__border.task__border_left(@mousedown.prevent="selectBorder($event,'left')")
@@ -33,14 +33,13 @@
         ParamsTask(v-model:menu="menu" v-model:task="props.task" @change="onChange($event)")
 </template>
 <script setup lang="ts">
-import { computed, inject, ref, type Ref, toRefs } from "vue";
+import { computed, inject, ref, type Ref, watch } from "vue";
 import { storeToRefs } from "pinia";
 import useTaskMoving from "@/pinia-store/taskMoving";
 import { useWorkflow } from "@/pinia-store/workflow";
 import ParamsTask from "@/components/workflow/ParamsTask.vue";
 
 const props = defineProps<{ task: Task; active: boolean }>();
-const { startAt, endAt, color } = toRefs(props.task);
 
 const scale = inject<Ref<number>>("scale");
 const canDraggable = ref(true);
@@ -51,14 +50,15 @@ const { taskMoving, borderMoving, borderMovingPreviousState } = storeToRefs(
     useTaskMoving()
 );
 const { getFirstTask, resources } = storeToRefs(useWorkflow());
-const { setTaskParam, relocateTask } = useWorkflow();
+const { setTaskParam, reorderTask } = useWorkflow();
 
 const startDate = new Date(getFirstTask.value.startAt).setHours(0, 0, 0, 0);
 
 const element = ref<HTMLDivElement>();
 const boxShadow = computed(
-    () => `0 0 ${props.active ? "18px" : "0"} ${color.value}`
+    () => `0 0 ${props.active ? "18px" : "0"} ${props.task.color}`
 );
+const color = computed(() => props.task.color);
 
 const consoleText = ref("");
 
@@ -66,14 +66,15 @@ defineExpose({ element, id: props.task.id });
 const { scrollBody } = storeToRefs(useTaskMoving());
 const duration = computed(
     () =>
-        ((new Date(endAt.value).getTime() - new Date(startAt.value).getTime()) /
+        ((new Date(props.task.endAt).getTime() -
+            new Date(props.task.startAt).getTime()) /
             (3600 * 1000)) *
         scale!.value
 );
 
 const left = computed(
     () =>
-        ((new Date(startAt.value).getTime() - startDate) / (3600 * 1000)) *
+        ((new Date(props.task.startAt).getTime() - startDate) / (3600 * 1000)) *
         scale!.value
 );
 
@@ -116,9 +117,13 @@ const onChange = ({
     // setTaskParam(props.task.id, "startAt", startAt);
     // setTaskParam(props.task.id, "endAt", endAt);
     // setTaskParam(props.task.id, "description", description);
-    relocateTask(
+    // relocateTask(
+    //     { ...props.task, startAt, endAt, description, workflowId },
+    //     workflowId
+    // );
+    reorderTask(
         { ...props.task, startAt, endAt, description, workflowId },
-        workflowId
+        props.task
     );
 };
 
@@ -127,6 +132,21 @@ const onMouseDown = (event: MouseEvent) => {
     if (event.button !== 2) return;
     menu.value = !menu.value;
 };
+
+const onContextMenu = (event: MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+};
+
+watch(
+    () => props.task,
+    () => {
+        console.log("TaskComponent props.task was changed", props.task);
+    }
+);
+watch([props.task.startAt], () => {
+    console.log("TaskComponent startAt was changed", props.task.startAt);
+});
 </script>
 
 <style scoped lang="sass">
