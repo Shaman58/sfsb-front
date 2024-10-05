@@ -18,7 +18,6 @@ import supplier from "@/router/supplier";
 import commerce from "@/router/commerce";
 import technology from "@/router/technology";
 import staff from "@/router/staff";
-import WorkflowComponent from "@/components/workflow/workflowComponent.vue";
 
 const toast = useToast();
 
@@ -52,7 +51,7 @@ const routes: (RouteRecordRaw & RouteMeta)[] = [
     technology,
     {
         path: "/workflow",
-        component: WorkflowComponent,
+        component: () => import("../components/workflow/workflowComponent.vue"),
         meta: {
             onlyFor: ["ADMIN", "TECHNOLOGIST"],
         },
