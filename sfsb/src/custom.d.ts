@@ -348,4 +348,5 @@ declare interface Resource {
     startAt: string;
     endAt: string;
     tasks: Task[];
+    operations: string[];
 }

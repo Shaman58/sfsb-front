@@ -13,8 +13,8 @@
         div.content
             div Наименование: &nbsp;
                 strong {{resource.name}}
-            ul.tasks
-                li.task(v-for="task in resource.tasks", :key="task.id") {{JSON.stringify(task,null,2)}}
+            ul.operations
+                li.operation(v-for="operation in resource.operations", :key="operation") {{JSON.stringify(operation,null,2)}}
 
 </template>
 
@@ -45,12 +45,12 @@ const menu = defineModel<boolean>("menu");
 .content
     width: 100cqw
 
-.tasks
+.operations
     margin-top: 1rem
     height: 83cqh
     overflow: auto
 
-.task
+.operation
     padding: 0.5em
 
     &:nth-child(even)
