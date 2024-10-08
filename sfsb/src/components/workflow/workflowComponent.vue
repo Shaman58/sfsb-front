@@ -11,13 +11,13 @@
             .workflow__days
                 Day( v-for="day in getDaysRange" :key="day" :line-width="scale" :day ref="daysElement")
             .workflow__resources(:style="{width: '100%'}")
-                Resource(v-for="resource in resources" :key="resource" :resource :overallWidth)
-
+                Resource(v-for="resource in resources" :key="resource" :resource :overallWidth @resourcemenu="onResourceMenu")
 
             .workflow__now
         .workflow__footer
             .workflow__stat Общее количество ресурсов: {{resources.length}}
             .workflow__stat Общее количество задач: {{getAllTasks.length}}
+        ResourceInfo(v-model:menu="resourcemenu", :resource="currentResource")
 </template>
 
 <script setup lang="ts">
@@ -27,6 +27,7 @@ import Resource from "@/components/workflow/ResourceComponent.vue";
 import { useWorkflow } from "@/pinia-store/workflow";
 import { storeToRefs } from "pinia";
 import useTaskMoving from "@/pinia-store/taskMoving";
+import ResourceInfo from "@/components/workflow/ResourceInfo.vue";
 
 const tasks = ref(Array.from({ length: 4 }));
 const scale = ref(60);
@@ -36,6 +37,9 @@ const workflowBody = ref<HTMLElement>();
 const { resources, getAllTasks, getFirstTask, getLastTask, getDaysRange } =
     storeToRefs(useWorkflow());
 const { getResources } = useWorkflow();
+
+const resourcemenu = ref(false);
+const currentResource = ref<Resource>();
 
 const { taskMoving } = storeToRefs(useTaskMoving());
 
@@ -78,6 +82,11 @@ watch(
     },
     { immediate: true }
 );
+
+const onResourceMenu = (event: Resource) => {
+    resourcemenu.value = true;
+    currentResource.value = event;
+};
 </script>
 
 <style scoped lang="sass">

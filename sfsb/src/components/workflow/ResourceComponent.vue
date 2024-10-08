@@ -5,7 +5,7 @@
         @drop.prevent="drop"
         @dragenter.prevent="dragenter"
         @dragleave.prevent="dragleave"
-        @mouseup.prevent="mouseup"
+        @mouseup.prevent="mouseup($event)"
         @mousemove.prevent="mousemove"
         :style="{width: overallWidth+'px'}"
     )
@@ -35,6 +35,7 @@ import Shadow from "@/components/workflow/Shadow.vue";
 
 const toast = useToast();
 const props = defineProps<{ resource: Resource; overallWidth: number }>();
+const emit = defineEmits(["resourcemenu"]);
 
 const shadowRef = ref<Shadow>();
 const tasks = ref(props.resource.tasks);
@@ -170,14 +171,17 @@ const drop = async (e: DragEvent) => {
 };
 const dragenter = () => {};
 const dragleave = () => {};
-const mouseup = () => {
-    console.log("mouseup", borderMoving.value);
+const mouseup = (event: MouseEvent) => {
+    console.log("mouseup", borderMoving.value, event.target);
     borderMoving.value &&
         sendTask(
             borderMoving.value as Task & { offsetX: number; x: number },
             borderMovingPreviousState.value
         );
     borderMoving.value = null;
+
+    if (!(event.target as HTMLElement).classList.contains("resource")) return;
+    emit("resourcemenu", props.resource);
 };
 const mousemove = (e: MouseEvent) => {
     activeResource.value = props.resource.id;
@@ -310,7 +314,7 @@ watch([getAllTasks], () => {
     position: absolute
     z-index: 2
     height: 100%
-    t0: 0
+    top: 0
     left: v-bind(offsetLabel)
     border-radius: 4px
     background-color: #fffb
