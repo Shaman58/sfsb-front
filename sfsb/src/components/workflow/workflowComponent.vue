@@ -13,6 +13,7 @@
             .workflow__resources(:style="{width: '100%'}")
                 Resource(v-for="resource in resources" :key="resource" :resource :overallWidth)
 
+
             .workflow__now
         .workflow__footer
             .workflow__stat Общее количество ресурсов: {{resources.length}}
@@ -46,10 +47,13 @@ const onScroll = () => {
 };
 const refreshOverallWidth = () => {
     if (!daysElement.value || daysElement.value?.length === 0) return;
-    overallWidth.value = [...daysElement.value].reduce((acc: Day, cur: Day) => {
-        acc += cur.dayContainer.getBoundingClientRect().width;
-        return acc;
-    }, 0);
+    overallWidth.value = ([...daysElement.value] as Day[]).reduce(
+        (acc: Day, cur: Day) => {
+            acc += cur.dayContainer.getBoundingClientRect().width;
+            return acc;
+        },
+        0
+    ) as number;
 };
 onMounted(async () => {
     await getResources();
