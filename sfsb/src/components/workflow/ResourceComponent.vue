@@ -9,6 +9,10 @@
         @mousemove.prevent="mousemove"
         :style="{width: overallWidth+'px'}"
     )
+        .label
+            div {{resource.name}}
+            div {{resource.description}}
+            div {{resource.tasks.map(task=>task.name)}}
         shadow(ref="shadowRef" :resource-id="resource.id" :intersected)
         task-component(
             ref="taskRefs"
@@ -58,6 +62,8 @@ const {
     setTaskParam,
 } = useWorkflow();
 const { getFirstDayStart, getAllTasks } = storeToRefs(useWorkflow());
+
+const offsetLabel = computed(() => scrollBody.value + "px");
 
 const tracking = computed(() => taskMoving.value);
 const durationTrackingTask = computed(() => {
@@ -299,4 +305,16 @@ watch([getAllTasks], () => {
 
     &.over
         background-color: #77f7
+
+.label
+    position: absolute
+    z-index: 2
+    height: 100%
+    t0: 0
+    left: v-bind(offsetLabel)
+    border-radius: 4px
+    background-color: #fffb
+    padding: 4px
+    backdrop-filter: blur(4px)
+    font-size: 11px
 </style>
