@@ -7,6 +7,7 @@
             .workflow__scale
                 v-slider(v-model="scale" label="Масштаб" track-color="green" min="10" max="200" )
             .div {{scrollBody}}
+            AddResource(:items="operations")
         .workflow__body(ref="workflowBody" @scroll="onScroll")
             .workflow__days
                 Day( v-for="day in getDaysRange" :key="day" :line-width="scale" :day ref="daysElement")
@@ -28,6 +29,8 @@ import { useWorkflow } from "@/pinia-store/workflow";
 import { storeToRefs } from "pinia";
 import useTaskMoving from "@/pinia-store/taskMoving";
 import ResourceInfo from "@/components/workflow/ResourceInfo.vue";
+import AddResource from "@/components/workflow/AddResource.vue";
+import { useOrdersInWorkflow } from "@/pinia-store/ordersInWorkflow";
 
 const tasks = ref(Array.from({ length: 4 }));
 const scale = ref(60);
@@ -37,6 +40,9 @@ const workflowBody = ref<HTMLElement>();
 const { resources, getAllTasks, getFirstTask, getLastTask, getDaysRange } =
     storeToRefs(useWorkflow());
 const { getResources } = useWorkflow();
+
+const { operations } = storeToRefs(useOrdersInWorkflow());
+const { getOperations } = useOrdersInWorkflow();
 
 const resourcemenu = ref(false);
 const currentResource = ref<Resource>();
@@ -63,6 +69,8 @@ onMounted(async () => {
     await getResources();
     await nextTick();
     refreshOverallWidth();
+    if (!operations.value || operations.value.length === 0)
+        await getOperations();
 });
 watch(
     [scale],
@@ -105,13 +113,15 @@ const onResourceMenu = (event: Resource) => {
 
     &__header
         padding-block: 8px
+        display: flex
+        align-items: center
 
     &__days
         height: 100%
         display: flex
 
     &__scale
-        max-width: 300px
+        width: 300px
 
     &__resources
         position: absolute
