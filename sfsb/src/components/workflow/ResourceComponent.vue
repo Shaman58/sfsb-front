@@ -11,8 +11,6 @@
     )
         .label
             div {{resource.name}}
-            div {{resource.description}}
-            div {{resource.tasks.map(task=>task.name)}}
         shadow(ref="shadowRef" :resource-id="resource.id" :intersected)
         task-component(
             ref="taskRefs"
@@ -321,4 +319,7 @@ watch([getAllTasks], () => {
     padding: 4px
     backdrop-filter: blur(4px)
     font-size: 11px
+    display: grid
+    place-items: center
+    width: 80px
 </style>

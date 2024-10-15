@@ -6,7 +6,6 @@
                 button(@click="getResources") Обновить
             .workflow__scale
                 v-slider(v-model="scale" label="Масштаб" track-color="green" min="10" max="200" )
-            .div {{scrollBody}}
             AddResource(:items="operations")
         .workflow__body(ref="workflowBody" @scroll="onScroll")
             .workflow__days
@@ -97,7 +96,7 @@ const onResourceMenu = (event: Resource) => {
 };
 </script>
 
-<style scoped lang="sass">
+<style lang="sass">
 .workflow
     background-color: #ddd
     width: 100vw
@@ -123,9 +122,15 @@ const onResourceMenu = (event: Resource) => {
     &__scale
         width: 300px
 
+        & > .v-input > .v-input__details
+            display: none
+
     &__resources
         position: absolute
         top: 3rem
         left: 0
         width: 100%
+
+.v-slider .v-input__details
+    display: none
 </style>
