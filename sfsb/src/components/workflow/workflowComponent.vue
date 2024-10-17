@@ -7,6 +7,7 @@
             .workflow__scale
                 v-slider(v-model="scale" label="Масштаб" track-color="green" min="10" max="200" )
             AddResource(:items="operations")
+            AddTechnology(:items="[1,2,3,4,5]")
         .workflow__body(ref="workflowBody" @scroll="onScroll")
             .workflow__days
                 Day( v-for="day in getDaysRange" :key="day" :line-width="scale" :day ref="daysElement")
@@ -30,6 +31,7 @@ import useTaskMoving from "@/pinia-store/taskMoving";
 import ResourceInfo from "@/components/workflow/ResourceInfo.vue";
 import AddResource from "@/components/workflow/AddResource.vue";
 import { useOrdersInWorkflow } from "@/pinia-store/ordersInWorkflow";
+import AddTechnology from "@/components/workflow/AddTechnology.vue";
 
 const tasks = ref(Array.from({ length: 4 }));
 const scale = ref(60);
@@ -113,6 +115,7 @@ const onResourceMenu = (event: Resource) => {
     &__header
         padding-block: 8px
         display: flex
+        gap: 8px
         align-items: center
 
     &__days

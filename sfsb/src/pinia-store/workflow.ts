@@ -251,6 +251,14 @@ export const useWorkflow = defineStore("workflow", () => {
         }
     };
 
+    const addTaskManual = async (tech: CreateManualTechnology) => {
+        try {
+            await tasksApi.post(`/auto-allocation`, tech);
+        } catch (error) {
+            console.error(error as unknown);
+            toast.error((error as any).response.data.message);
+        }
+    };
     return {
         resources,
         getAllTasks,
@@ -266,5 +274,6 @@ export const useWorkflow = defineStore("workflow", () => {
         sendTask,
         toLocaleDate,
         reorderTask,
+        addTaskManual,
     };
 });

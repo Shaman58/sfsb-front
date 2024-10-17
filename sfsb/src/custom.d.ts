@@ -350,3 +350,11 @@ declare interface Resource {
     tasks: Task[];
     operations: string[];
 }
+
+declare interface CreateManualTechnology {
+    name: string;
+    tasks: {
+        name: string;
+        operation: string;
+    }[];
+}
