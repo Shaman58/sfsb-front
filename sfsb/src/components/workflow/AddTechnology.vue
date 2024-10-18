@@ -45,7 +45,7 @@ const toast = useToast();
 
 const { operations } = storeToRefs(useOrdersInWorkflow());
 const { getOperations } = useOrdersInWorkflow();
-const { addTaskManual } = useWorkflow();
+const { addTaskManual, getResources } = useWorkflow();
 
 const technologyName = ref("");
 
@@ -63,6 +63,7 @@ const onAdd = async (isActive: Ref<boolean>) => {
     };
     await addTaskManual(res);
     isActive.value = false;
+    await getResources();
 };
 
 const addSelectedItem = () => {
