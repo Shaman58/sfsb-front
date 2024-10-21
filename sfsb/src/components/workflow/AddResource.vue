@@ -16,7 +16,7 @@
                         v-model="operations"
                         clearable
                         chips
-                        label="Технология"
+                        label="Операции"
                         :items="items"
                         multiple)
 
@@ -31,6 +31,9 @@
 import { type Ref, ref, watchEffect } from "vue";
 import { useOrdersInWorkflow } from "@/pinia-store/ordersInWorkflow";
 import { useWorkflow } from "@/pinia-store/workflow";
+import { useToast } from "vue-toast-notification";
+
+const toast = useToast();
 
 const props = defineProps<{ items: string[] }>();
 const name = ref("");
@@ -40,6 +43,9 @@ const { add } = useOrdersInWorkflow();
 const { getResources } = useWorkflow();
 
 const onAdd = async (isActive: Ref<boolean>) => {
+    if (!name.value) return toast.error("Введите название ресурса");
+    if (!operations.value.length)
+        return toast.error("Добавьте операции в ресурс");
     isActive.value = false;
     await add({
         name: name.value,
