@@ -339,6 +339,7 @@ declare interface Task {
     endAt: string;
     duration: number;
     description: string;
+    operation: string;
 }
 
 declare interface Resource {
