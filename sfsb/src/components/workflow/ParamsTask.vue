@@ -18,6 +18,11 @@
                 v-btn-group
                     v-btn.flex-grow-1(color="orange-darken-1" @click="onTaskChange") Изменить
                     v-btn.flex-grow-1(color="grey-lighten-3" @click="menu=false") Отмена
+            .footer
+                div Технология: &nbsp;
+                    strong {{task.technology}}
+                div Операция: &nbsp;
+                    strong {{task.operation}}
 </template>
 
 <script setup lang="ts">
@@ -50,4 +55,17 @@ watch([startAt, endAt], () => {
 
     &__header
         text-align: center
+
+
+    .footer
+        border-top: 1px solid #eee
+        padding: 1rem
+        margin-top: 1rem
+
+        & > *
+            font-size: 13px
+            color: #999
+
+            & > *
+                font-weight: 800
 </style>
