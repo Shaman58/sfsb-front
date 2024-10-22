@@ -9,7 +9,7 @@
         @mousemove.prevent="mousemove"
         :style="{width: overallWidth+'px'}"
     )
-        .label
+        .label(@contextmenu.prevent="emit('resourcemenu', props.resource)")
             div {{resource.name}}
         shadow(ref="shadowRef" :resource-id="resource.id" :intersected)
         task-component(
@@ -178,8 +178,8 @@ const mouseup = (event: MouseEvent) => {
         );
     borderMoving.value = null;
 
-    if (!(event.target as HTMLElement).classList.contains("resource")) return;
-    emit("resourcemenu", props.resource);
+    // if (!(event.target as HTMLElement).classList.contains("resource")) return;
+    // emit("resourcemenu", props.resource);
 };
 const mousemove = (e: MouseEvent) => {
     activeResource.value = props.resource.id;
