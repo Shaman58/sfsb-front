@@ -9,9 +9,9 @@
             AddResource(:items="operations")
             AddTechnology(:items="[1,2,3,4,5]")
         .workflow__body(ref="workflowBody" @scroll="onScroll")
-            .workflow__days
+            .workflow__days(ref="daysListElement" :style="{height: containerHeight+'px'}")
                 Day( v-for="day in getDaysRange" :key="day" :line-width="scale" :day ref="daysElement")
-            .workflow__resources(:style="{width: '100%'}")
+            .workflow__resources(ref = "resourceListElement" :style="{width: '100%'}")
                 Resource(v-for="resource in resources" :key="resource" :resource :overallWidth @resourcemenu="onResourceMenu")
 
             .workflow__now
@@ -22,7 +22,7 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, onMounted, provide, ref, watch } from "vue";
+import { nextTick, onMounted, onUnmounted, provide, ref, watch } from "vue";
 import Day from "@/components/workflow/Day.vue";
 import Resource from "@/components/workflow/ResourceComponent.vue";
 import { useWorkflow } from "@/pinia-store/workflow";
@@ -53,6 +53,15 @@ const { taskMoving } = storeToRefs(useTaskMoving());
 const { scrollBody } = storeToRefs(useTaskMoving());
 provide("scale", scale);
 
+const daysListElement = ref<HTMLElement>();
+const resourceListElement = ref<HTMLElement>();
+const containerHeight = ref<number | undefined>();
+
+const handleResize = () => {
+    containerHeight.value =
+        resourceListElement.value?.getBoundingClientRect().height;
+};
+
 const onScroll = () => {
     scrollBody.value = workflowBody.value?.scrollLeft || 0;
 };
@@ -72,7 +81,17 @@ onMounted(async () => {
     refreshOverallWidth();
     if (!operations.value || operations.value.length === 0)
         await getOperations();
+
+    window.addEventListener("resize", handleResize);
+    window.addEventListener("wheel", handleResize);
+    handleResize();
 });
+
+onUnmounted(() => {
+    window.removeEventListener("resize", handleResize);
+    window.removeEventListener("wheel", handleResize);
+});
+
 watch(
     [scale],
     async () => {
@@ -121,6 +140,16 @@ const onResourceMenu = (event: Resource) => {
     &__days
         height: 100%
         display: flex
+        position: absolute
+        bottom: 0
+        left: 0
+        right: 0
+        top: 0
+        width: 100%
+
+    &__day
+        height: 100%
+
 
     &__scale
         width: 300px
