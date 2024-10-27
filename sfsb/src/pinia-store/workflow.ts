@@ -24,7 +24,14 @@ export const useWorkflow = defineStore("workflow", () => {
 
     const getResources = getResourcesFactory(
         // (resource: Resource, index: number) => (resources[index] = resource)
-        (resource: Resource, index: number) => resources.push(resource)
+        (resource: Resource, index: number) => {
+            const resourceFound = resources.find((e) => e.id === resource.id);
+            if (resourceFound) {
+                resourceFound?.tasks.push(...resource.tasks);
+            } else {
+                resources.push(resource);
+            }
+        }
     );
 
     const getAllTasks = computed((): Task[] => {
