@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { computed, ComputedRef, reactive } from "vue";
+import { computed, ComputedRef, reactive, ref } from "vue";
 import workflowApi from "@/api/workflowApi";
 import tasksApi from "@/api/tasksApi";
 import { useToast } from "vue-toast-notification";
@@ -7,13 +7,25 @@ import { useToast } from "vue-toast-notification";
 export const useWorkflow = defineStore("workflow", () => {
     const resources = reactive<Resource[]>([]);
     const toast = useToast();
+    const currentOffset = ref(1);
+    const limit = 5;
 
-    const getResources = async () => {
-        const { data } = await workflowApi.get("/all");
-        data.forEach(
-            (resource: Resource, index: number) => (resources[index] = resource)
-        );
-    };
+    const getResourcesFactory =
+        (cb: (resource: Resource, index: number) => void) => async () => {
+            const {
+                data: { workflows, offset },
+            } = await workflowApi.get("/all-paged", {
+                params: { offset: currentOffset.value, limit },
+            });
+            workflows.forEach(cb);
+            console.log(workflows.flatMap((workflow: any) => workflow.tasks));
+            currentOffset.value = offset;
+        };
+
+    const getResources = getResourcesFactory(
+        // (resource: Resource, index: number) => (resources[index] = resource)
+        (resource: Resource, index: number) => resources.push(resource)
+    );
 
     const getAllTasks = computed((): Task[] => {
         if (resources.length === 0) return [];

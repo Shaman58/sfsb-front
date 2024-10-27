@@ -11,6 +11,7 @@
         .workflow__body(ref="workflowBody" @scroll="onScroll")
             .workflow__days(ref="daysListElement" :style="{height: containerHeight+'px'}")
                 Day( v-for="day in getDaysRange" :key="day" :line-width="scale" :day ref="daysElement")
+                .scroll-trigger(ref="scrollTrigger")
             .workflow__resources(ref = "resourceListElement" :style="{width: '100%'}")
                 Resource(v-for="resource in resources" :key="resource" :resource :overallWidth @resourcemenu="onResourceMenu")
 
@@ -36,7 +37,7 @@ import AddTechnology from "@/components/workflow/AddTechnology.vue";
 const tasks = ref(Array.from({ length: 4 }));
 const scale = ref(60);
 const overallWidth = ref(window.innerWidth);
-const daysElement = ref<Day[]>();
+const daysElement = ref<Day[] | undefined>();
 const workflowBody = ref<HTMLElement>();
 const { resources, getAllTasks, getFirstTask, getLastTask, getDaysRange } =
     storeToRefs(useWorkflow());
@@ -55,6 +56,8 @@ provide("scale", scale);
 
 const daysListElement = ref<HTMLElement>();
 const resourceListElement = ref<HTMLElement>();
+const scrollTrigger = ref<HTMLElement>();
+const startObserve = ref(false);
 const containerHeight = ref<number | undefined>();
 
 const handleResize = () => {
@@ -85,6 +88,26 @@ onMounted(async () => {
     window.addEventListener("resize", handleResize);
     window.addEventListener("wheel", handleResize);
     handleResize();
+
+    const io = new IntersectionObserver(
+        (entries) => {
+            entries.forEach(async (entry) => {
+                if (!startObserve.value) {
+                    return (startObserve.value = true);
+                } else if (entry.isIntersecting) {
+                    //обработка события IntersectionObserver
+                    console.log(entry.target === scrollTrigger.value);
+                    console.log("entry", entry);
+                    await getResources();
+
+                    await nextTick();
+                    refreshOverallWidth();
+                }
+            });
+        },
+        { root: workflowBody.value }
+    );
+    scrollTrigger.value && io.observe(scrollTrigger.value);
 });
 
 onUnmounted(() => {
@@ -163,6 +186,13 @@ const onResourceMenu = (event: Resource) => {
         left: 0
         width: 100%
 
+
 .v-slider .v-input__details
     display: none
+
+.scroll-trigger
+    display: block
+    height: 100%
+    background: red
+    flex: 0 0 1px
 </style>
