@@ -8,24 +8,30 @@ export const useWorkflow = defineStore("workflow", () => {
     const resources = reactive<Resource[]>([]);
     const toast = useToast();
     const currentOffset = ref(1);
-    const limit = 5;
+    const currentLimit = ref(5);
 
     const getResourcesFactory =
         (cb: (resource: Resource, index: number) => void) => async () => {
             const {
-                data: { workflows, offset },
+                data: { workflows, offset, limit },
             } = await workflowApi.get("/all-paged", {
-                params: { offset: currentOffset.value, limit },
+                params: {
+                    offset: currentOffset.value,
+                    limit: currentLimit.value,
+                },
             });
             workflows.forEach(cb);
             console.log(workflows.flatMap((workflow: any) => workflow.tasks));
             currentOffset.value = offset;
+            currentLimit.value = limit;
         };
 
     const getResources = getResourcesFactory(
         // (resource: Resource, index: number) => (resources[index] = resource)
         (resource: Resource, index: number) => {
-            const resourceFound = resources.find((e) => e.id === resource.id);
+            const resourceFound: Resource | undefined = resources.find(
+                (e) => e.id === resource.id
+            );
             if (resourceFound) {
                 resourceFound?.tasks.push(...resource.tasks);
             } else {
