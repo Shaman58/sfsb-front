@@ -12,6 +12,7 @@
             .workflow__days(ref="daysListElement" :style="{height: containerHeight+'px'}")
                 Day( v-for="day in getDaysRange" :key="day" :line-width="scale" :day ref="daysElement")
                 .scroll-trigger(ref="scrollTrigger")
+                .scroll-expander
             .workflow__resources(ref = "resourceListElement" :style="{width: '100%'}")
                 Resource(v-for="resource in resources" :key="resource" :resource :overallWidth @resourcemenu="onResourceMenu")
 
@@ -195,4 +196,7 @@ const onResourceMenu = (event: Resource) => {
     height: 100%
     background: red
     flex: 0 0 1px
+
+.scroll-expander
+    flex: 0 0 50px
 </style>
