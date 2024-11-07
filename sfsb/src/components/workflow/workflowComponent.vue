@@ -1,13 +1,13 @@
 <template lang="pug">
     .workflow
         .workflow__header
-            div {{taskMoving}}
             div
                 button(@click="getResources") Обновить
             .workflow__scale
                 v-slider(v-model="scale" label="Масштаб" track-color="green" min="10" max="200" )
             AddResource(:items="operations")
             AddTechnology(:items="[1,2,3,4,5]")
+            v-btn(color="primary" @click="gotoCurrentHour") Текущий час
         .workflow__body(ref="workflowBody" @scroll="onScroll")
             .workflow__days(ref="daysListElement" :style="{height: containerHeight+'px'}")
                 Day( v-for="day in getDaysRange" :key="day" :line-width="scale" :day ref="daysElement")
@@ -75,6 +75,15 @@ const refreshOverallWidth = () => {
         0
     ) as number;
 };
+
+const gotoCurrentHour = () => {
+    const currentHourElement = document.querySelector(".hour-line.current-day");
+    currentHourElement?.scrollIntoView({
+        behavior: "smooth",
+        inline: "center",
+    });
+};
+
 onMounted(async () => {
     await getResources();
     await nextTick();

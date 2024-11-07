@@ -1,29 +1,40 @@
 <template lang="pug">
-    .day
+    .day(:class="{'day-active': isCurrentDay}")
         .day__header {{day.toLocaleDateString()}}
         .day__container(ref="dayContainer")
             .hour-line(v-for="(hour, index) in hours"
                 :key="index"
-                :class="{ even: index % 2 === 0, odd: index % 2 !== 0 }"
+                :class="{ even: index % 2 === 0, odd: index % 2 !== 0,  'current-day': isCurrentHour(index) }"
                 :style="{ width: lineWidth + 'px' }"
             )
                 .hour-line__caption {{index.toString().padStart(2, '0')}}:00
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 
 const props = defineProps<{ lineWidth: number; day: Date }>();
 const dayContainer = ref<HTMLElement>();
 defineExpose({ dayContainer });
 
 const hours = Array.from({ length: 24 }, (_, i) => i);
+const isCurrentDay = computed(() => {
+    const res = new Date(props.day).getDate() === new Date().getDate();
+    return res;
+});
+const isCurrentHour = (index: number) => {
+    const res = isCurrentDay.value && new Date().getHours() + 1 === index;
+    return res;
+};
 </script>
 
 <style scoped lang="sass">
 .day
     border-left: 1px solid black
     border-right: 1px solid black
+
+    &.day-active
+        box-shadow: 0 0 1rem red
 
     &__container
         //position: absolute
@@ -46,6 +57,8 @@ const hours = Array.from({ length: 24 }, (_, i) => i);
     container: hour / inline-size
     // Основная линия
 
+
+
     &__caption
         text-align: center
         font-size: clamp(10px, 10cqw, 18px)
@@ -56,5 +69,8 @@ const hours = Array.from({ length: 24 }, (_, i) => i);
 
     &.odd
         background-color: #c0c0c0
+
+    &.current-day
+        background-color: red
 // Цвет для нечетных часов */
 </style>
