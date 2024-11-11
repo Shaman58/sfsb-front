@@ -9,7 +9,9 @@
         :style="{left: '50%', translate: '-50% 0', maxWidth: '600px'}"
     )
         v-card.pa-2()
-            h3.menu__header {{task.name}}
+            h3.menu__header
+                span(v-if="!showEditName" @click="changeName") {{localTask.name}}
+                v-text-field(v-if="showEditName" label="Название" v-model.lazy="localTask.name")
             v-form
                 v-text-field(label="Описание" v-model.lazy="task.description")
                 SetTime(v-model:start-at="localTask.startAt" v-model:end-at="localTask.endAt")
@@ -49,6 +51,8 @@ const emit = defineEmits(["change"]);
 
 const dialog = ref(false);
 
+const showEditName = ref(false);
+
 const { startAt, endAt } = toRefs(task.value);
 const localTask = ref<Task>({ ...task.value } as Task);
 
@@ -63,6 +67,10 @@ const onTaskDelete = async () => {
     dialog.value = false;
     await deleteTask(localTask.value.id);
     menu.value = false;
+};
+
+const changeName = () => {
+    showEditName.value = true;
 };
 
 watch([startAt, endAt], () => {

@@ -117,7 +117,7 @@ const onChange = ({
 }: Task) => {
     console.log("data to change");
     reorderTask(
-        { ...props.task, startAt, endAt, description, workflowId },
+        { ...props.task, startAt, endAt, description, workflowId, name },
         props.task
     );
 };
