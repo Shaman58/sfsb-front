@@ -1,5 +1,5 @@
 <template lang="pug">
-    .day(:class="{'day-active': isCurrentDay}")
+    .day(:class="{'day-active': isCurrentDay}", :data-day="refresher")
         .day__header {{day.toLocaleDateString()}}
         .day__container(ref="dayContainer")
             .hour-line(v-for="(hour, index) in hours"
@@ -11,11 +11,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 
 const props = defineProps<{ lineWidth: number; day: Date }>();
 const dayContainer = ref<HTMLElement>();
 defineExpose({ dayContainer });
+
+const refresher = ref(0);
+const timer = ref();
 
 const hours = Array.from({ length: 24 }, (_, i) => i);
 const isCurrentDay = computed(() => {
@@ -26,6 +29,18 @@ const isCurrentHour = (index: number) => {
     const res = isCurrentDay.value && new Date().getHours() + 1 === index;
     return res;
 };
+
+const update = () => {
+    refresher.value += 1;
+};
+
+onMounted(() => {
+    timer.value = setInterval(update, 60000);
+});
+
+onUnmounted(() => {
+    timer.value && clearInterval(timer.value);
+});
 </script>
 
 <style scoped lang="sass">
