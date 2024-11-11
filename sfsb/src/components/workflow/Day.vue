@@ -21,12 +21,27 @@ const refresher = ref(0);
 const timer = ref();
 
 const hours = Array.from({ length: 24 }, (_, i) => i);
+const isCurrentYear = computed(() => {
+    const res = new Date(props.day).getFullYear() === new Date().getFullYear();
+    return res;
+});
+
+const isCurrentMonth = computed(() => {
+    const res = new Date(props.day).getMonth() === new Date().getMonth();
+    return res;
+});
+
 const isCurrentDay = computed(() => {
     const res = new Date(props.day).getDate() === new Date().getDate();
     return res;
 });
+
 const isCurrentHour = (index: number) => {
-    const res = isCurrentDay.value && new Date().getHours() + 1 === index;
+    const res =
+        isCurrentYear.value &&
+        isCurrentMonth.value &&
+        isCurrentDay.value &&
+        new Date().getHours() + 1 === index;
     return res;
 };
 

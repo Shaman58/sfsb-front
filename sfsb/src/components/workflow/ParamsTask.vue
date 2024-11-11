@@ -6,7 +6,7 @@
         scroll-strategy="reposition"
         transition="slide-y-transition"
         @contextmenu.stop.prevent="()=>{}"
-        :style="{left: '50%', translate: '-50% 0', maxWidth: '520px'}"
+        :style="{left: '50%', translate: '-50% 0', maxWidth: '600px'}"
     )
         v-card.pa-2()
             h3.menu__header {{task.name}}
@@ -17,18 +17,29 @@
             .d-flex.justify-center
                 v-btn-group
                     v-btn.flex-grow-1(color="orange-darken-1" @click="onTaskChange") Изменить
+                    v-btn.flex-grow-1(color="black" @click="dialog=true") Удалить
                     v-btn.flex-grow-1(color="grey-lighten-3" @click="menu=false") Отмена
             .footer
                 div Технология: &nbsp;
                     strong {{task.technology}}
                 div Операция: &nbsp;
                     strong {{task.operation}}
+
+    v-dialog(v-model='dialog' max-width='420' persistent='')
+        v-card(text='Вы подтверждаете удаление задачи?' title="Данная задача будет удалена.")
+            template(v-slot:actions='')
+                v-spacer
+                v-btn(@click='onTaskDelete')
+                    | ДА
+                v-btn(@click='dialog = false')
+                    | НЕТ
 </template>
 
 <script setup lang="ts">
 import { type ModelRef, ref, toRefs, watch } from "vue";
 import SetTime from "@/components/workflow/SetTime.vue";
 import RepalceToResource from "@/components/workflow/RepalceToResource.vue";
+import { useWorkflow } from "@/pinia-store/workflow";
 
 const menu = defineModel<boolean>("menu");
 const task: ModelRef<Task, string> = defineModel<Task>("task", {
@@ -36,11 +47,21 @@ const task: ModelRef<Task, string> = defineModel<Task>("task", {
 });
 const emit = defineEmits(["change"]);
 
+const dialog = ref(false);
+
 const { startAt, endAt } = toRefs(task.value);
 const localTask = ref<Task>({ ...task.value } as Task);
 
+const { deleteTask } = useWorkflow();
+
 const onTaskChange = () => {
     emit("change", localTask.value);
+    menu.value = false;
+};
+
+const onTaskDelete = async () => {
+    dialog.value = false;
+    await deleteTask(localTask.value.id);
     menu.value = false;
 };
 

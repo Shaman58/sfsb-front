@@ -259,6 +259,17 @@ export const useWorkflow = defineStore("workflow", () => {
             toast.error((error as any).response.data.message);
         }
     };
+
+    const deleteTask = async (id: number) => {
+        try {
+            await tasksApi.delete(`/delete/${id}`);
+            await getResources();
+            toast.success("Удалено");
+        } catch (error) {
+            console.error(error as unknown);
+            toast.error((error as any).response.data.message);
+        }
+    };
     return {
         resources,
         getAllTasks,
@@ -275,5 +286,6 @@ export const useWorkflow = defineStore("workflow", () => {
         toLocaleDate,
         reorderTask,
         addTaskManual,
+        deleteTask,
     };
 });
