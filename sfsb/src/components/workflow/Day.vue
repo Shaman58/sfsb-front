@@ -60,8 +60,20 @@ onUnmounted(() => {
 
 <style scoped lang="sass">
 .day
-    border-left: 1px solid black
-    border-right: 1px solid black
+    //border-left: 1px solid black
+    //border-right: 1px solid black
+    position: relative
+
+    &:nth-child(even)::after
+        content: ''
+        position: absolute
+        z-index: 2
+        top: 0
+        bottom: 0
+        left: 0
+        width: 1px
+        background: #181818
+
 
     &.day-active
         box-shadow: 0 0 1rem red
