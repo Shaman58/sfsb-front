@@ -157,6 +157,7 @@ const onContextMenu = (event: MouseEvent) => {
     top: var(--margin)
     display: flex
     justify-content: space-between
+    overflow: hidden
 
     &__border
         width: 8px
