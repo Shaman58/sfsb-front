@@ -16,7 +16,7 @@
                         v-text-field(v-model="currentName" label="Название")
                         v-select(
                             v-model="currentOperation"
-                            label="Технология"
+                            label="Операция"
                             :items="operations"
                         )
                         v-icon(@click="addSelectedItem" icon="mdi-plus-circle-outline")

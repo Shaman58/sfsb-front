@@ -10,7 +10,7 @@
             span.navbar__version(:style="{color:'white'}") {{ version }}
             v-toolbar-items.ml-5.navbar__menu(style="overflow-x: auto;")
                 .navbar__item
-                    router-link.navbar__link(:to="'/support'") ТЕХПОДДЕЖКА
+                    router-link.navbar__link(:to="'/support'") ТЕХПОДДЕРЖКА
                 .navbar__item(v-for="navitem in CONSTS.MAINMENU" :key="navitem.path" :hidden="navitem.role && navitem.role.length && !user?.roles.some(e => navitem.role?.includes(e))")
                     div(v-if="'submenu' in navitem" )
                         div

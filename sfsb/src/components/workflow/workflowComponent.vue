@@ -13,6 +13,9 @@
                 variant="flat"
                 @click="splitMode = !splitMode"
             )
+                v-icon(v-if="splitMode" color="black" icon="mdi-arrow-split-vertical" size="large" title="Разделить")
+                v-icon(v-else color="white" icon="mdi-arrow-split-vertical" size="large" title="Разделить")
+
             v-btn(color="primary" @click="gotoCurrentHour") Текущий час
         .workflow__body(ref="workflowBody" @scroll="onScroll")
             .workflow__days(ref="daysListElement" :style="{height: containerHeight+'px'}")

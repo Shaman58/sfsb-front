@@ -1,6 +1,8 @@
 <template lang="pug">
     .day(:class="{'day-active': isCurrentDay}", :data-day="refresher")
-        .day__header {{day.toLocaleDateString()}}
+        .day__header
+            strong {{day.toLocaleDateString('ru-RU', {weekday: 'long'})}}
+            span &nbsp;{{day.toLocaleDateString()}}
         .day__container(ref="dayContainer")
             .hour-line(v-for="(hour, index) in hours"
                 :key="index"
@@ -64,7 +66,7 @@ onUnmounted(() => {
     //border-right: 1px solid black
     position: relative
 
-    &:nth-child(even)::after
+    &::after
         content: ''
         position: absolute
         z-index: 2
@@ -74,9 +76,6 @@ onUnmounted(() => {
         width: 1px
         background: #181818
 
-
-    &.day-active
-        box-shadow: 0 0 1rem red
 
     &__container
         //position: absolute
@@ -88,6 +87,9 @@ onUnmounted(() => {
 
     &__header
         text-align: center
+        width: max-content
+        margin: 0 auto 8px
+        border-bottom: 1px solid #7777
 //display: flex
 // Высота контейнера для линии
 

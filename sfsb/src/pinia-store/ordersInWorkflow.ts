@@ -10,7 +10,7 @@ export const useOrdersInWorkflow = defineStore("ordersInWorkflow", () => {
 
     const getOperations = async () => {
         try {
-            const res = await ordersApi.get("operations");
+            const res = await workflowApi.get("operations");
             operations.value = res.data;
         } catch (error: any) {
             toast.error(error.data.message);
