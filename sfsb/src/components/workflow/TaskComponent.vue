@@ -107,14 +107,15 @@ const selectBorder = (event: MouseEvent, border: "left" | "right") => {
         (borderMovingPreviousState.value = { ...props.task });
 };
 
-const onChange = ({
-    endAt,
-    startAt,
-    description,
-    workflowId,
-    name,
-    color,
-}: Task) => {
+const onChange = (v: Task) => {
+    const {
+        endAt,
+        startAt,
+        description,
+        workflowId,
+        name,
+        color,
+    } = v;
     console.log("data to change");
     reorderTask(
         { ...props.task, startAt, endAt, description, workflowId, name },

@@ -136,15 +136,7 @@ export const useWorkflow = defineStore("workflow", () => {
                 resourceIndex !== undefined
             ) {
                 resources[resourceIndex].tasks[taskIndex] = currentTask as Task;
-                // currentTask.startAt &&
-                //     (resources[resourceIndex].tasks[taskIndex].startAt =
-                //         currentTask.startAt);
-                // currentTask.endAt &&
-                //     (resources[resourceIndex].tasks[taskIndex].endAt =
-                //         currentTask.endAt);
-                // currentTask.description &&
-                //     (resources[resourceIndex].tasks[taskIndex].description =
-                //         currentTask.description);
+
             }
             return;
         }
@@ -190,6 +182,7 @@ export const useWorkflow = defineStore("workflow", () => {
     ): Promise<void> => {
         try {
             await tasksApi.post(`/replace/${newTask.workflowId}`, newTask);
+            oldTask = Object.assign(oldTask, newTask);
             relocateTask(newTask.id, newTask.workflowId, newTask);
         } catch (err: any) {
             console.error(err);

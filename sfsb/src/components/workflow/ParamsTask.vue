@@ -13,7 +13,7 @@
                 span(v-if="!showEditName" @click="changeName") {{localTask.name}}
                 v-text-field(v-if="showEditName" label="Название" v-model.lazy="localTask.name")
             v-form
-                v-text-field(label="Описание" v-model.lazy="task.description")
+                v-text-field(label="Описание" v-model.lazy="localTask.description")
                 SetTime(v-model:start-at="localTask.startAt" v-model:end-at="localTask.endAt")
                 RepalceToResource(v-model:resourceId="localTask.workflowId")
             .d-flex.justify-center
