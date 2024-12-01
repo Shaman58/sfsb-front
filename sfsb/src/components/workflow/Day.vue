@@ -43,7 +43,7 @@ const isCurrentHour = (index: number) => {
         isCurrentYear.value &&
         isCurrentMonth.value &&
         isCurrentDay.value &&
-        new Date().getHours() + 1 === index;
+        new Date().getHours() === index;
     return res;
 };
 

@@ -7,6 +7,7 @@
                 v-slider(v-model="scale" label="Масштаб" track-color="green" min="10" max="200" )
             AddResource(:items="operations")
             AddTechnology(:items="[1,2,3,4,5]")
+
             v-btn(
                 :color="splitMode? 'red' : 'surface-variant'"
                 :text="splitMode ?'Разделение...' : 'Разделить технологию'"
@@ -15,6 +16,15 @@
             )
                 v-icon(v-if="splitMode" color="black" icon="mdi-arrow-split-vertical" size="large" title="Разделить")
                 v-icon(v-else color="white" icon="mdi-arrow-split-vertical" size="large" title="Разделить")
+
+            v-btn(
+                :color="watchNowMode? 'red' : 'surface-variant'"
+                :text="''"
+                variant="flat"
+                @click="watchNowMode = !watchNowMode"
+            )
+                v-icon(v-if="watchNowMode" color="black" icon="mdi-clock" size="large" title="Разделить")
+                v-icon(v-else color="white" icon="mdi-clock" size="large" title="Разделить")
 
             v-btn(color="primary" @click="gotoCurrentHour") Текущий час
         .workflow__body(ref="workflowBody" @scroll="onScroll")
@@ -42,10 +52,12 @@ import AddResource from "@/components/workflow/AddResource.vue";
 import { useOrdersInWorkflow } from "@/pinia-store/ordersInWorkflow";
 import AddTechnology from "@/components/workflow/AddTechnology.vue";
 
+type DayType = typeof Day;
+
 const tasks = ref(Array.from({ length: 4 }));
 const scale = ref(60); // масштаб px/час
 const overallWidth = ref(window.innerWidth);
-const daysElement = ref<Day[]>();
+const daysElement = ref<DayType[]>();
 const workflowBody = ref<HTMLElement>();
 const { resources, getAllTasks, getFirstTask, getLastTask, getDaysRange } =
     storeToRefs(useWorkflow());
@@ -79,8 +91,8 @@ const onScroll = () => {
 };
 const refreshOverallWidth = () => {
     if (!daysElement.value || daysElement.value?.length === 0) return;
-    overallWidth.value = ([...daysElement.value] as Day[]).reduce(
-        (acc: Day, cur: Day) => {
+    overallWidth.value = ([...daysElement.value]).reduce(
+        (acc, cur) => {
             acc += cur.dayContainer.getBoundingClientRect().width;
             return acc;
         },
@@ -96,6 +108,8 @@ const gotoCurrentHour = () => {
     });
 };
 
+const watchNowMode = ref(false)
+const int = ref();
 onMounted(async () => {
     await getResources();
     await nextTick();
@@ -106,11 +120,18 @@ onMounted(async () => {
     window.addEventListener("resize", handleResize);
     window.addEventListener("wheel", handleResize);
     handleResize();
+
+    int.value = setInterval(() => {
+        watchNowMode.value && gotoCurrentHour();
+    },2000);
+
 });
 
 onUnmounted(() => {
     window.removeEventListener("resize", handleResize);
     window.removeEventListener("wheel", handleResize);
+
+    clearInterval(int.value);
 });
 
 watch(
