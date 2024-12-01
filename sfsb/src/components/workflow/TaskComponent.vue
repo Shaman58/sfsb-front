@@ -4,9 +4,13 @@
         :draggable="canDraggable"
         @dragend="onDragEnd"
         @dragstart="onDragStart"
+        @mouseup="onMouseUp"
         @mousedown.right.prevent.stop="onMouseDown($event)"
         @contextmenu.prevent.stop="onContextMenu($event)"
-        :style="{width: duration + 'px', left: left + 'px', boxShadow}"
+        :style="{width: duration + 'px', left: left + 'px', boxShadow, cursor: splitMode ? 'col-resize' : ''}"
+        @mouseenter="mouseEnter = true"
+        @mouseleave="mouseEnter = false"
+        @mousemove.stop="onMouseMove($event)"
     )
         .task__border.task__border_left(@mousedown.prevent="selectBorder($event,'left')")
         .task__caption
@@ -14,6 +18,7 @@
             div {{consoleText}}
             p {{description}}
         .task__border.task__border_right(@mousedown.prevent="selectBorder($event,'right')")
+
 
         v-tooltip(
             activator="parent"
@@ -31,6 +36,9 @@
                     strong {{new Date(endAt).toLocaleTimeString()}}
 
         ParamsTask(v-model:menu="menu" v-model:task="props.task" @change="onChange($event)")
+
+        v-tooltip(v-model="isSplitActive" :style="{ top: `${tooltipPosition.y}px`, left: `${tooltipPosition.x}px`, position: 'absolute' }")
+            span Время разделения: {{splitText}}
 </template>
 <script setup lang="ts">
 import { computed, inject, ref, type Ref, toRefs } from "vue";
@@ -47,6 +55,13 @@ const scale = inject<Ref<number>>("scale");
 const canDraggable = ref(true);
 
 const menu = ref(false); // Показывать меню
+
+const splitMode = inject("splitMode");
+const splitText = ref("splitText");
+const mouseEnter = ref(false);
+const isSplitActive = computed(() => splitMode.value && mouseEnter.value);
+const tooltipPosition = ref({ x: 0, y: 0 });
+const tooltipVisible = ref(false);
 
 const { taskMoving, borderMoving, borderMovingPreviousState } = storeToRefs(
     useTaskMoving()
@@ -81,6 +96,11 @@ const left = computed(
 );
 
 const onDragStart = (e: DragEvent) => {
+    if (splitMode.value) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+    }
     e.dataTransfer!.setData(
         "task",
         JSON.stringify({ ...props.task, offsetX: e.offsetX, x: e.x })
@@ -129,9 +149,39 @@ const onMouseDown = (event: MouseEvent) => {
     menu.value = !menu.value;
 };
 
+const onMouseUp = (event: MouseEvent) => {
+    if (!splitMode.value) {
+        event.preventDefault();
+        return;
+    }
+};
+
 const onContextMenu = (event: MouseEvent) => {
     event.preventDefault();
     event.stopPropagation();
+};
+
+const onMouseMove = (event: MouseEvent) => {
+    tooltipPosition.value = {
+        x: event.x + 20, // Смещение от указателя по горизонтали
+        y: event.y + 20, // Смещение от указателя по вертикали
+    };
+    splitText.value = coordsToTime(event.offsetX)?.toString() || "";
+};
+
+const coordsToTime = (x: number): Date | undefined => {
+    const time = new Date(startAt.value);
+    if (scale?.value === undefined) {
+        console.error("scale is undefined");
+        return;
+    }
+    const startHour = time.getHours();
+    const startMinutes = time.getMinutes();
+    time.setHours(
+        Math.floor(startHour + x / scale.value),
+        Math.floor(startMinutes + (x % scale.value) / (scale.value / 60))
+    );
+    return time;
 };
 
 // watch([props], () => {

@@ -7,6 +7,12 @@
                 v-slider(v-model="scale" label="Масштаб" track-color="green" min="10" max="200" )
             AddResource(:items="operations")
             AddTechnology(:items="[1,2,3,4,5]")
+            v-btn(
+                :color="splitMode? 'red' : 'surface-variant'"
+                :text="splitMode ?'Разделение...' : 'Разделить технологию'"
+                variant="flat"
+                @click="splitMode = !splitMode"
+            )
             v-btn(color="primary" @click="gotoCurrentHour") Текущий час
         .workflow__body(ref="workflowBody" @scroll="onScroll")
             .workflow__days(ref="daysListElement" :style="{height: containerHeight+'px'}")
@@ -34,7 +40,7 @@ import { useOrdersInWorkflow } from "@/pinia-store/ordersInWorkflow";
 import AddTechnology from "@/components/workflow/AddTechnology.vue";
 
 const tasks = ref(Array.from({ length: 4 }));
-const scale = ref(60);
+const scale = ref(60); // масштаб px/час
 const overallWidth = ref(window.innerWidth);
 const daysElement = ref<Day[]>();
 const workflowBody = ref<HTMLElement>();
@@ -46,7 +52,7 @@ const { operations } = storeToRefs(useOrdersInWorkflow());
 const { getOperations } = useOrdersInWorkflow();
 
 const resourcemenu = ref(false);
-const currentResource = ref<Resource>();
+const currentResource = ref<Resource | undefined>();
 
 const { taskMoving } = storeToRefs(useTaskMoving());
 
@@ -56,6 +62,9 @@ provide("scale", scale);
 const daysListElement = ref<HTMLElement>();
 const resourceListElement = ref<HTMLElement>();
 const containerHeight = ref<number | undefined>();
+
+const splitMode = ref(false);
+provide("splitMode", splitMode);
 
 const handleResize = () => {
     containerHeight.value =
