@@ -10,7 +10,7 @@
         :style="{width: duration + 'px', left: left + 'px', boxShadow, cursor: splitMode ? 'col-resize' : ''}"
         @mouseenter="mouseEnter = true"
         @mouseleave="mouseEnter = false"
-        @mousemove.stop="onMouseMove($event)"
+        @mousemove="onMouseMove($event)"
     )
         .task__border.task__border_left(@mousedown.prevent="selectBorder($event,'left')")
         .task__caption
@@ -56,10 +56,10 @@ const canDraggable = ref(true);
 
 const menu = ref(false); // Показывать меню
 
-const splitMode = inject("splitMode");
+const splitMode = inject<Ref<boolean>>("splitMode");
 const splitText = ref("splitText");
 const mouseEnter = ref(false);
-const isSplitActive = computed(() => splitMode.value && mouseEnter.value);
+const isSplitActive = computed(() => splitMode?.value && mouseEnter.value);
 const tooltipPosition = ref({ x: 0, y: 0 });
 const tooltipVisible = ref(false);
 
@@ -96,7 +96,7 @@ const left = computed(
 );
 
 const onDragStart = (e: DragEvent) => {
-    if (splitMode.value) {
+    if (splitMode?.value) {
         e.preventDefault();
         e.stopPropagation();
         return;
@@ -150,7 +150,7 @@ const onMouseDown = (event: MouseEvent) => {
 };
 
 const onMouseUp = (event: MouseEvent) => {
-    if (!splitMode.value) {
+    if (!splitMode?.value) {
         event.preventDefault();
         return;
     }
@@ -162,6 +162,8 @@ const onContextMenu = (event: MouseEvent) => {
 };
 
 const onMouseMove = (event: MouseEvent) => {
+    if (!splitMode?.value) return;
+    event.stopPropagation();
     tooltipPosition.value = {
         x: event.x + 20, // Смещение от указателя по горизонтали
         y: event.y + 20, // Смещение от указателя по вертикали

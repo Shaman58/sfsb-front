@@ -26,7 +26,7 @@
                 v-icon(v-if="watchNowMode" color="black" icon="mdi-clock" size="large" title="Разделить")
                 v-icon(v-else color="white" icon="mdi-clock" size="large" title="Разделить")
 
-            v-btn(color="primary" @click="gotoCurrentHour") Текущий час
+            //v-btn(color="primary" @click="gotoCurrentHour") Текущий час
         .workflow__body(ref="workflowBody" @scroll="onScroll")
             .workflow__days(ref="daysListElement" :style="{height: containerHeight+'px'}")
                 Day( v-for="day in getDaysRange" :key="day" :line-width="scale" :day ref="daysElement")
