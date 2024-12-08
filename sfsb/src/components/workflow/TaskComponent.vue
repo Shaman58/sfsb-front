@@ -7,7 +7,7 @@
         @mouseup="onMouseUp"
         @mousedown.right.prevent.stop="onMouseDown($event)"
         @contextmenu.prevent.stop="onContextMenu($event)"
-        :style="{width: duration + 'px', left: left + 'px', boxShadow, cursor: splitMode ? 'col-resize' : ''}"
+        :style="{width: duration + 'px', left: left + 'px', boxShadow, cursor}"
         @mouseenter="mouseEnter = true"
         @mouseleave="mouseEnter = false"
         @mousemove="onMouseMove($event)"
@@ -41,7 +41,7 @@
             span Время разделения: {{splitText}}
 </template>
 <script setup lang="ts">
-import { computed, inject, ref, type Ref, toRefs } from "vue";
+import {computed, inject, ref, type Ref, toRefs, watch} from "vue";
 import { storeToRefs } from "pinia";
 import useTaskMoving from "@/pinia-store/taskMoving";
 import { useWorkflow } from "@/pinia-store/workflow";
@@ -50,6 +50,8 @@ import ParamsTask from "@/components/workflow/ParamsTask.vue";
 const props = defineProps<{ task: Task; active: boolean }>();
 
 const { startAt, endAt, name, description, color } = toRefs(props.task);
+
+const emit = defineEmits(["busyEvent"]);
 
 const scale = inject<Ref<number>>("scale");
 const canDraggable = ref(true);
@@ -66,8 +68,8 @@ const tooltipVisible = ref(false);
 const { taskMoving, borderMoving, borderMovingPreviousState } = storeToRefs(
     useTaskMoving()
 );
-const { getFirstTask, resources } = storeToRefs(useWorkflow());
-const { reorderTask } = useWorkflow();
+const { getFirstTask, resources, busy } = storeToRefs(useWorkflow());
+const { reorderTask, split } = useWorkflow();
 
 const startDate = new Date(getFirstTask.value.startAt).setHours(0, 0, 0, 0);
 
@@ -94,6 +96,13 @@ const left = computed(
         ((new Date(props.task.startAt).getTime() - startDate) / (3600 * 1000)) *
         scale!.value
 );
+
+const cursor = computed(() => {
+    let res = "pointer";
+    if (splitMode?.value) res = "col-resize";
+    if(busy.value) res = "wait";
+    return res
+});
 
 const onDragStart = (e: DragEvent) => {
     if (splitMode?.value) {
@@ -149,11 +158,12 @@ const onMouseDown = (event: MouseEvent) => {
     menu.value = !menu.value;
 };
 
-const onMouseUp = (event: MouseEvent) => {
+const onMouseUp = async (event: MouseEvent) => {
     if (!splitMode?.value) {
         event.preventDefault();
         return;
     }
+    await split(splitText.value, props.task);
 };
 
 const onContextMenu = (event: MouseEvent) => {
@@ -168,7 +178,7 @@ const onMouseMove = (event: MouseEvent) => {
         x: event.x + 20, // Смещение от указателя по горизонтали
         y: event.y + 20, // Смещение от указателя по вертикали
     };
-    splitText.value = coordsToTime(event.offsetX)?.toString() || "";
+    splitText.value = coordsToTime(event.offsetX+10)?.toString() || "";
 };
 
 const coordsToTime = (x: number): Date | undefined => {
@@ -185,6 +195,10 @@ const coordsToTime = (x: number): Date | undefined => {
     );
     return time;
 };
+
+watch([busy], () => {
+    emit("busyEvent", busy.value);
+}, {immediate: true});
 
 // watch([props], () => {
 //     console.log("TaskComponent props was changed", props);

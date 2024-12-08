@@ -1,18 +1,22 @@
-import { defineStore } from "pinia";
-import { computed, ComputedRef, reactive } from "vue";
+import {defineStore} from "pinia";
+import {computed, ComputedRef, reactive, ref} from "vue";
 import workflowApi from "@/api/workflowApi";
 import tasksApi from "@/api/tasksApi";
-import { useToast } from "vue-toast-notification";
+import {useToast} from "vue-toast-notification";
 
 export const useWorkflow = defineStore("workflow", () => {
     const resources = reactive<Resource[]>([]);
     const toast = useToast();
+    const gettingResources = ref<boolean>(false);
+    const busy = ref<boolean>(false);
 
     const getResources = async () => {
-        const { data } = await workflowApi.get("/all");
+        gettingResources.value = true;
+        const {data} = await workflowApi.get("/all");
         data.forEach(
             (resource: Resource, index: number) => (resources[index] = resource)
         );
+        gettingResources.value = false;
     };
 
     const getAllTasks = computed((): Task[] => {
@@ -81,7 +85,7 @@ export const useWorkflow = defineStore("workflow", () => {
                 .toISOString()
                 .split("T")[0]
         );
-        for (let i = 0; i < diff; i++) {
+        for (let i = 0; i <= diff; i++) {
             const inserted = new Date(day);
             res.push(inserted);
             day = new Date(day.setDate(day.getDate() + 1));
@@ -106,8 +110,8 @@ export const useWorkflow = defineStore("workflow", () => {
     ): void => {
         const currentTask =
             typeof task === "number"
-                ? { ...getTaskById(task), ...newData }
-                : { ...task, ...newData };
+                ? {...getTaskById(task), ...newData}
+                : {...task, ...newData};
         let currentResourceFrom: Resource | undefined;
         if (currentTask?.id !== undefined) {
             currentResourceFrom = getResourceByTaskId(currentTask.id);
@@ -142,11 +146,11 @@ export const useWorkflow = defineStore("workflow", () => {
         }
 
         currentTask &&
-            currentResourceTo &&
-            (currentResourceTo.tasks = [
-                ...(currentResourceTo.tasks || []),
-                { ...(currentTask as Required<Task>) },
-            ]);
+        currentResourceTo &&
+        (currentResourceTo.tasks = [
+            ...(currentResourceTo.tasks || []),
+            {...(currentTask as Required<Task>)},
+        ]);
 
         const currentTaskId = currentResourceFrom?.tasks.findIndex(
             (task: Task) => task.id === currentTask?.id
@@ -157,13 +161,13 @@ export const useWorkflow = defineStore("workflow", () => {
         );
 
         currentTask &&
-            currentTaskId !== undefined &&
-            currentResourceFrom !== undefined &&
-            currentResourceFromIndex !== -1 &&
-            (resources[currentResourceFromIndex].tasks =
-                currentResourceFrom.tasks.filter(
-                    (_, i: number) => i !== currentTaskId
-                ));
+        currentTaskId !== undefined &&
+        currentResourceFrom !== undefined &&
+        currentResourceFromIndex !== -1 &&
+        (resources[currentResourceFromIndex].tasks =
+            currentResourceFrom.tasks.filter(
+                (_, i: number) => i !== currentTaskId
+            ));
     };
 
     const setTaskParam = (id: number, param: keyof Task, value: any) => {
@@ -200,7 +204,7 @@ export const useWorkflow = defineStore("workflow", () => {
             endAt: toLocaleDate(task.endAt),
         };
         try {
-            const { data } = await tasksApi.post(
+            const {data} = await tasksApi.post(
                 `/replace/${task.workflowId}`,
                 convertedTask
             );
@@ -211,7 +215,7 @@ export const useWorkflow = defineStore("workflow", () => {
             if (!resource) {
                 console.error(
                     "сетевая ошибка + не нашел ресурс по переданному task.id = " +
-                        task.id,
+                    task.id,
                     err
                 );
                 return false;
@@ -225,7 +229,7 @@ export const useWorkflow = defineStore("workflow", () => {
             if (taskInStoreIndex === -1) {
                 console.error(
                     "сетевая ошибка + не нашел task в ресурсе task.id = " +
-                        task.id,
+                    task.id,
                     err
                 );
                 return false;
@@ -263,6 +267,21 @@ export const useWorkflow = defineStore("workflow", () => {
             toast.error((error as any).response.data.message);
         }
     };
+
+    const split = async (time: string, task: Task): Promise<void> => {
+        const timeStr = new Date(new Date(time).getTime() - new Date().getTimezoneOffset()*60*1000)
+            .toISOString().replace(/\.[0-9]{3}[z|Z]$/,"");
+        try {
+            busy.value = true;
+            const a = await tasksApi.post(`/split?time=${timeStr}`, task, {})
+            console.log(a)
+            await getResources();
+            busy.value = false;
+        } catch (error) {
+            busy.value = false;
+            toast.error((error as any).response.data.error);
+        }
+    }
     return {
         resources,
         getAllTasks,
@@ -270,6 +289,8 @@ export const useWorkflow = defineStore("workflow", () => {
         getLastTask,
         getDaysRange,
         getFirstDayStart,
+        busy,
+        gettingResources,
         getResources,
         getResourceByTaskId,
         relocateTask,
@@ -280,5 +301,6 @@ export const useWorkflow = defineStore("workflow", () => {
         reorderTask,
         addTaskManual,
         deleteTask,
+        split
     };
 });

@@ -41,7 +41,7 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, onMounted, onUnmounted, provide, ref, watch } from "vue";
+import {nextTick, onMounted, onUnmounted, provide, ref, watch, watchEffect} from "vue";
 import Day from "@/components/workflow/Day.vue";
 import Resource from "@/components/workflow/ResourceComponent.vue";
 import { useWorkflow } from "@/pinia-store/workflow";
@@ -157,6 +157,8 @@ const onResourceMenu = (event: Resource) => {
     resourcemenu.value = true;
     currentResource.value = event;
 };
+
+watchEffect(()=>console.log("getDaysRange", getDaysRange.value.map(x=>x.toISOString())));
 </script>
 
 <style lang="sass">
