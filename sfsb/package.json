@@ -10,8 +10,10 @@
     "docker": "docker build -t voskanvl/sfsb-front:0.2.4 . && docker push voskanvl/sfsb-front:0.2.4"
   },
   "dependencies": {
+    "@date-io/date-fns": "^3.0.0",
     "@josempgon/vue-keycloak": "^2.5.0",
     "@mdi/font": "7.0.96",
+    "date-fns": "^3.6.0",
     "file-saver": "^2.0.5",
     "keycloak-js": "^22.0.5",
     "mammoth": "^1.6.0",

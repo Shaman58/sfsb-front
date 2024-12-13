@@ -56,6 +56,18 @@ const navItems: NavItem[] = [
         path: "/workflow",
         label: "Производство",
         role: ["TECHNOLOGIST", "ADMIN"],
+        submenu: [
+            {
+                path: "workflow",
+                label: "График",
+                role: ["TECHNOLOGIST", "ADMIN"],
+            },
+            {
+                path: "calendars",
+                label: "Календари",
+                role: ["TECHNOLOGIST", "ADMIN"],
+            },
+        ]
     },
 ];
 

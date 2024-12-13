@@ -50,8 +50,15 @@ const routes: (RouteRecordRaw & RouteMeta)[] = [
     commerce,
     technology,
     {
-        path: "/workflow",
+        path: "/workflow/workflow",
         component: () => import("../components/workflow/workflowComponent.vue"),
+        meta: {
+            onlyFor: ["ADMIN", "TECHNOLOGIST"],
+        },
+    },
+    {
+        path: "/workflow/calendars",
+        component: () => import("../components/workflow/calendars/CalendarComponent.vue"),
         meta: {
             onlyFor: ["ADMIN", "TECHNOLOGIST"],
         },

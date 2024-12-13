@@ -1,18 +1,11 @@
-/**
- * plugins/vuetify.js
- *
- * Framework documentation: https://vuetifyjs.com`
- */
+// Plugins/vuetify.js
 
-// Styles
-import '@mdi/font/css/materialdesignicons.css'
-import 'vuetify/styles'
+import '@mdi/font/css/materialdesignicons.css';
+import 'vuetify/styles';
+import { createVuetify } from 'vuetify';
+import { md3 } from 'vuetify/blueprints';
+import { ru, en } from 'vuetify/locale'; // Импорт локализации Vuetify
 
-// Composables
-import {createVuetify} from 'vuetify'
-import {md3} from "vuetify/blueprints";
-
-// https://vuetifyjs.com/en/introduction/why-vuetify/#feature-guides
 export default createVuetify({
     defaults: {
         VBtn: {
@@ -22,7 +15,7 @@ export default createVuetify({
         },
     },
     theme: {
-        defaultTheme: "light",
+        defaultTheme: 'light',
         themes: {
             light: {
                 colors: {
@@ -30,8 +23,12 @@ export default createVuetify({
                     secondary: '#6b6b6b',
                 },
             },
-
         },
     },
-    blueprint: md3
-})
+    blueprint: md3,
+    locale: {
+        locale: 'ru', // Установить текущую локаль
+        fallback: 'en', // Установить резервную локаль
+        messages: { ru, en }, // Подключить сообщения
+    },
+});
