@@ -64,12 +64,25 @@ import {ref, watch, onMounted, computed} from "vue";
 import {useRoute} from "vue-router";
 import {useCalendars} from "@/pinia-store/calendar";
 
-const attributesCalendar = ref([
-    {
-        highlight: true,
-        dates: [new Date('2024-12-01'), new Date('2024-12-05')],
-    },
-])
+function getDatesForWeekday(year, weekday) {
+    const dates = [];
+    let date = new Date(year, 0, 1); // Начало года
+
+    // Найти первую указанную дату дня недели
+    date.setDate(date.getDate() + ((weekday - date.getDay() + 7) % 7));
+
+    // Добавить все даты указанного дня недели в массив
+    while (date.getFullYear() === year) {
+        dates.push(new Date(date));
+        date.setDate(date.getDate() + 7); // Переход к следующей неделе
+    }
+
+    return dates;
+}
+
+const saturdays2024 = getDatesForWeekday(2024, 6); // 6 - Суббота
+const sunday2024 = getDatesForWeekday(2024, 7);
+
 const date = ref([new Date(2024, 11, 15), new Date(2024, 11, 11)]);
 
 const {getCalendarById} = useCalendars();
@@ -81,7 +94,28 @@ const data = ref<Calendar | undefined>(),
     description = ref<string | undefined>(),
     weekends = ref<string []>([]),
     menu2 = ref(false),
-    menu3 = ref(false);
+    menu3 = ref(false),
+    dates = ref<Date[]>([new Date('2024-12-01'), new Date('2024-12-05')]);
+
+const forAttributesDates = computed(() => [
+    weekends.value.includes('SATURDAY') ? saturdays2024 :[],
+    weekends.value.includes('SUNDAY')?sunday2024:[]
+].flat())
+
+const attributesCalendar = computed(() => [
+    {
+        highlight: true,
+        dates: dates.value,
+    },
+    {
+        highlight: {
+            color: 'purple',
+            fillMode: 'light',
+        },
+        dates: forAttributesDates.value,
+    },
+
+])
 
 
 const dayClick = (day: CalendarDay) => {
@@ -126,7 +160,7 @@ watch(() => route.params.id, async (newId) => {
         return;
     };
     data.value = await getCalendarById(newId);
-    attributesCalendar.value[0].dates = data.value?.holyDays;
+    dates.value = data.value?.holyDays;
     timeBegin.value = data.value?.beginWatch
     timeEnd.value = data.value?.endWatch;
     title.value = data.value?.calendarName;
@@ -140,6 +174,10 @@ watch(() => weekends.value, () => {
 </script>
 
 <style scoped lang="sass">
+.vc-highlight[data-key='saturdays']
+    background-color: lightblue
+    border-radius: 50%
+
 .calendar
     box-sizing: border-box
     padding: 1rem
