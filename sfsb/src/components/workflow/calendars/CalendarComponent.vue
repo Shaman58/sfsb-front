@@ -1,5 +1,5 @@
 <template lang="pug">
-    LayoutPage.users(:background="'#7757e069'")
+    LayoutPage.users(:background="'#629cf763'")
         template(#title) Календари
         template(#filter)
             v-text-field(label="фильтр" v-model="filterText" clearable)
@@ -31,14 +31,19 @@ import LayoutPage from "@/components/common/LayoutPage.vue";
 import {onMounted, ref, watch} from "vue";
 import {storeToRefs} from "pinia";
 import {useCalendars} from "@/pinia-store/calendar";
+import {useRouter} from "vue-router";
 
 const filterText = ref("");
 
 const {calendars} = storeToRefs(useCalendars());
 const {getCalendars} = useCalendars()
 
+const router = useRouter()
+
 onMounted(async() => {
     await getCalendars();
+    const id = calendars.value[0].id;
+    router.push({ path: `/workflow/calendars/${id}` });
 })
 
 

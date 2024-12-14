@@ -1,35 +1,61 @@
 <template lang="pug">
     .calendar
-        .calendar__header
-            v-container
-                div
-                    v-text-field(hide-details="auto" label="Название" v-model="title" )
-                    v-text-field(hide-details="auto" label="Описание" v-model="description" )
+        .calendar__header.d-flex.ga-2
+            v-card.w-100
+                v-text-field(hide-details="auto" label="Название" v-model="title" )
+            v-card.w-100
+                v-text-field(hide-details="auto" label="Описание" v-model="description" )
         .calendar__calendar
-            v-container
+            v-card.w-100
                 VCalendar(
                     ref="calendar"
                     :attributes="attributesCalendar"
-                    :rows="3"
-                    :columns="4"
+                    :rows="2"
+                    :columns="6"
                     :step="1"
-                    :min-date="startDate"
                     mode="multiple"
                     @dayclick="dayClick"
                 )
         .calendar__pickers
+            //v-card.w-100.d-flex.flex-column.ga-2
+            //    v-time-picker(title="Начало смены" v-model="timeBegin" format="24hr")
+            //    v-time-picker(title="Конец смены" v-model="timeEnd" format="24hr")
             v-container
-                v-time-picker(title="Выберите время" v-model="timeBegin" format="24hr")
-                v-time-picker(title="Выберите время" v-model="timeEnd" format="24hr")
-                pre {{ data }}
+                v-row.ga-2
+                    v-card.flex-fill.pa-3
+                        v-text-field(v-model='timeBegin'
+                            :active='menu2'
+                            :focus='menu2'
+                            label='Начало смены'
+                            prepend-icon='mdi-clock-time-four-outline'
+                            readonly=''
+                            hide-details
+                        )
+                            v-menu(v-model='menu2' :close-on-content-click='false' activator='parent' transition='scale-transition')
+                                v-time-picker(v-if='menu2' v-model='timeBegin' full-width='')
+                    v-card.flex-fill.pa-3
+                        v-text-field(v-model='timeEnd'
+                            :active='menu3'
+                            :focus='menu3'
+                            label='Конец смены'
+                            prepend-icon='mdi-clock-time-four-outline'
+                            readonly=''
+                            hide-details
+                        )
+                            v-menu(v-model='menu3' :close-on-content-click='false' activator='parent' transition='scale-transition')
+                                v-time-picker(v-if='menu3' v-model='timeEnd' full-width='')
+
         .calendar__weekends
-            v-container.d-flex(justify="space-evenly")
-                v-checkbox( label="Суббота" value="SATURDAY" v-model="weekends" )
-                v-checkbox( label="Воскресенье" value="SUNDAY" v-model="weekends" )
+            v-card.w-100
+                v-toolbar(color="blue-grey" dark flat)
+                    v-toolbar-title Выходные дни
+                div.d-flex.align-center.ga-2.pa-2
+                    v-switch( color="blue" label="Суббота" value="SATURDAY" v-model="weekends" hide-details)
+                    v-switch( color="blue" label="Воскресенье" value="SUNDAY" v-model="weekends" hide-details)
         .calendar__controls
-            v-container
-                v-btn(color="primary" @click="save") Сохранить
-                v-btn(color="secondary" @click="reset") Отменить
+            v-card.w-100.d-flex.ga-2.pa-2.align-center
+                v-btn.btn( variant="tonal" color="red" @click="save") Сохранить
+                v-btn.btn(variant="tonal" @click="reset") Отменить
 </template>
 
 <script setup lang="ts">
@@ -52,7 +78,9 @@ const data = ref<Calendar | undefined>(),
     calendar = ref(),
     title = ref<string | undefined>(),
     description = ref<string | undefined>(),
-    weekends = ref<(string | null)[]>([]);
+    weekends = ref<(string | null)[]>([]),
+    menu2 = ref(false),
+    menu3 = ref(false);
 
 
 const dayClick = (day: CalendarDay) => {
@@ -86,23 +114,25 @@ watch(() => calendar.value, () => {
 <style scoped lang="sass">
 .calendar
     display: grid
-    grid-template-columns: 2fr 1fr
-    grid-template-areas: "header header" "calendar pickers" "weekends pickers" "controls controls"
+    grid-template-columns: 1fr
+    gap: .5rem
 
-    &__header
-        grid-area: header
 
-    &__calendar
-        grid-area: calendar
-
-    &__pickers
-        grid-area: pickers
+    //&__header
+    //    grid-area: header
+    //
+    //
+    //&__calendar
+    //    grid-area: calendar
+    //
+    //&__pickers
+    //    grid-area: pickers
 
     &__weekends
-        grid-area: weekends
+        //grid-area: weekends
         display: flex
         justify-content: space-evenly
 
     &__controls
-        grid-area: controls
+        //grid-area: controls
 </style>
