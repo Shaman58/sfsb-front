@@ -33,7 +33,7 @@
                             hide-details
                         )
                             v-menu(v-model='menu2' :close-on-content-click='false' activator='parent' transition='scale-transition')
-                                v-time-picker(v-if='menu2' v-model='timeBegin' full-width='')
+                                v-time-picker(v-if='menu2' v-model='timeBegin' full-width='' format="24hr" )
                     v-card.flex-fill.pa-3
                         v-text-field(v-model='timeEnd'
                             :active='menu3'
@@ -44,7 +44,7 @@
                             hide-details
                         )
                             v-menu(v-model='menu3' :close-on-content-click='false' activator='parent' transition='scale-transition')
-                                v-time-picker(v-if='menu3' v-model='timeEnd' full-width='')
+                                v-time-picker(v-if='menu3' v-model='timeEnd' full-width='' format="24hr")
 
         .calendar__weekends
             v-card.w-100
@@ -55,7 +55,7 @@
                     v-switch( color="blue" label="Воскресенье" value="SUNDAY" v-model="weekends" hide-details)
         .calendar__controls
             v-card.w-100.d-flex.ga-2.pa-2.align-center
-                v-btn.btn( variant="tonal" color="red" @click="save") Сохранить
+                v-btn.btn( variant="tonal" color="red" @click="save()") Сохранить
                 v-btn.btn(variant="tonal" @click="reset()") Сбросить
 </template>
 
@@ -79,7 +79,7 @@ const data = ref<Calendar | undefined>(),
     calendar = ref(),
     title = ref<string | undefined>(),
     description = ref<string | undefined>(),
-    weekends = ref<(string | null)[]>([]),
+    weekends = ref<string []>([]),
     menu2 = ref(false),
     menu3 = ref(false);
 
@@ -102,7 +102,20 @@ const reset=()=>{
     timeEnd.value = '';
     title.value = '';
     description.value = '';
-    weekends.value = '';
+    weekends.value = [];
+}
+
+const save = () => {
+  const dataToSend:Calendar = {
+      calendarName: title.value,
+      description: description.value,
+      weekends: weekends.value,
+      holyDays: attributesCalendar.value[0].dates,
+      beginWatch: timeBegin.value,
+      endWatch: timeEnd.value,
+      weekEnds: weekends.value,
+  }
+  console.log(dataToSend);
 }
 
 
@@ -120,8 +133,8 @@ watch(() => route.params.id, async (newId) => {
     description.value = data.value?.calendarDescription;
     weekends.value = data.value?.weekEnds;
 }, {immediate: true});
-watch(() => calendar.value, () => {
-    console.log(attributesCalendar.value);
+watch(() => weekends.value, () => {
+    console.log(weekends.value);
 })
 
 </script>
@@ -134,20 +147,18 @@ watch(() => calendar.value, () => {
     grid-template-columns: 1fr
     gap: .5rem
 
-
     &__header
         position: sticky
         top: 0
         z-index: 1
 
-
     &__weekends
         display: flex
         justify-content: space-evenly
 
-    &::v-deep .vc-pane-layout
+    :deep(.vc-pane-layout)
         grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)) !important
-    &::v-deep .vc-container
+    :deep(.vc-container)
         width: 100%
 
 </style>
