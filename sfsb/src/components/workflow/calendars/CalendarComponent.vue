@@ -9,8 +9,8 @@
             v-list
                 v-list-item
                     v-list-item-title
-                        router-link.list-link(:to="`/commerce/clients/new`")
-                            div(:style="{color: 'orange'}") Добавить новую компанию
+                        router-link.list-link(:to="`/workflow/calendars/new`")
+                            div(:style="{color: 'orange'}") Добавить новый календарь
                 v-list-item(
                     v-for="calendar in calendars"
                     :key="calendar.id"

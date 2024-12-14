@@ -1,10 +1,11 @@
 <template lang="pug">
     .calendar
-        .calendar__header.d-flex.ga-2
-            v-card.w-100
-                v-text-field(hide-details="auto" label="Название" v-model="title" )
-            v-card.w-100
-                v-text-field(hide-details="auto" label="Описание" v-model="description" )
+        .calendar__header
+            v-card.w-100.d-flex.ga-2.pa-2
+                v-card.w-100
+                    v-text-field(hide-details="auto" label="Название" v-model="title" )
+                v-card.w-100
+                    v-text-field(hide-details="auto" label="Описание" v-model="description" )
         .calendar__calendar
             v-card.w-100
                 VCalendar(
@@ -55,7 +56,7 @@
         .calendar__controls
             v-card.w-100.d-flex.ga-2.pa-2.align-center
                 v-btn.btn( variant="tonal" color="red" @click="save") Сохранить
-                v-btn.btn(variant="tonal" @click="reset") Отменить
+                v-btn.btn(variant="tonal" @click="reset()") Сбросить
 </template>
 
 <script setup lang="ts">
@@ -95,9 +96,22 @@ onMounted(async () => {
     await calendar.value.move({month: 1, year: new Date().getFullYear()})
 })
 
+const reset=()=>{
+    attributesCalendar.value[0].dates = [];
+    timeBegin.value = ''
+    timeEnd.value = '';
+    title.value = '';
+    description.value = '';
+    weekends.value = '';
+}
+
 
 const route = useRoute();
 watch(() => route.params.id, async (newId) => {
+    if (!newId || newId==='new') {
+        reset();
+        return;
+    };
     data.value = await getCalendarById(newId);
     attributesCalendar.value[0].dates = data.value?.holyDays;
     timeBegin.value = data.value?.beginWatch
@@ -114,26 +128,26 @@ watch(() => calendar.value, () => {
 
 <style scoped lang="sass">
 .calendar
+    box-sizing: border-box
+    padding: 1rem
     display: grid
     grid-template-columns: 1fr
     gap: .5rem
 
 
-    //&__header
-    //    grid-area: header
-    //
-    //
-    //&__calendar
-    //    grid-area: calendar
-    //
-    //&__pickers
-    //    grid-area: pickers
+    &__header
+        position: sticky
+        top: 0
+        z-index: 1
+
 
     &__weekends
-        //grid-area: weekends
         display: flex
         justify-content: space-evenly
 
-    &__controls
-        //grid-area: controls
+    &::v-deep .vc-pane-layout
+        grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)) !important
+    &::v-deep .vc-container
+        width: 100%
+
 </style>
