@@ -60,11 +60,11 @@
 </template>
 
 <script setup lang="ts">
-import {ref, watch, onMounted, computed} from "vue";
+import {ref, watch, onMounted, computed, toValue} from "vue";
 import {useRoute} from "vue-router";
 import {useCalendars} from "@/pinia-store/calendar";
 
-function getDatesForWeekday(year, weekday) {
+function getDatesForWeekday(year: number, weekday:number ) {
     const dates = [];
     let date = new Date(year, 0, 1); // Начало года
 
@@ -92,7 +92,7 @@ const data = ref<Calendar | undefined>(),
     calendar = ref(),
     title = ref<string | undefined>(),
     description = ref<string | undefined>(),
-    weekends = ref<string []>([]),
+    weekends = ref<(string|null)[]>([]),
     menu2 = ref(false),
     menu3 = ref(false),
     dates = ref<Date[]>([new Date('2024-12-01'), new Date('2024-12-05')]);
@@ -118,7 +118,7 @@ const attributesCalendar = computed(() => [
 ])
 
 
-const dayClick = (day: CalendarDay) => {
+const dayClick = (day) => {
     console.log(day);
     attributesCalendar.value[0].dates.push(day.id);
 }
@@ -141,31 +141,31 @@ const reset=()=>{
 
 const save = () => {
   const dataToSend:Calendar = {
-      calendarName: title.value,
-      description: description.value,
-      weekends: weekends.value,
-      holyDays: attributesCalendar.value[0].dates,
-      beginWatch: timeBegin.value,
-      endWatch: timeEnd.value,
-      weekEnds: weekends.value,
+      beginWatch: toValue(timeBegin.value)||'',
+      endWatch: toValue(timeEnd.value)||'',
+      calendarName: toValue(title.value)||'',
+      description: toValue(description.value)||'',
+      holyDays: attributesCalendar.value[0].dates.map(e=>new Date(e).toISOString().split('T')[0])||[],
+      id: 0,
+      weekEnds: toValue(weekends.value)||[],
   }
   console.log(dataToSend);
 }
 
 
 const route = useRoute();
-watch(() => route.params.id, async (newId) => {
+watch(() => route.params.id, async (newId: string) => {
     if (!newId || newId==='new') {
         reset();
         return;
     };
-    data.value = await getCalendarById(newId);
-    dates.value = data.value?.holyDays;
+    data.value = await getCalendarById(+newId);
+    dates.value = data.value?.holyDays.map(e=>new Date(e))||([] as Date[]);
     timeBegin.value = data.value?.beginWatch
     timeEnd.value = data.value?.endWatch;
     title.value = data.value?.calendarName;
-    description.value = data.value?.calendarDescription;
-    weekends.value = data.value?.weekEnds;
+    description.value = data.value?.description||'';
+    weekends.value = data.value?.weekEnds||[];
 }, {immediate: true});
 watch(() => weekends.value, () => {
     console.log(weekends.value);
