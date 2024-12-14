@@ -18,6 +18,9 @@ import supplier from "@/router/supplier";
 import commerce from "@/router/commerce";
 import technology from "@/router/technology";
 import staff from "@/router/staff";
+import TechnologyCard from "@/components/technology-new/TechnologyCard.vue";
+import CalendarDetails from "@/components/workflow/calendars/CalendarDetails.vue";
+import {useCalendars} from "@/pinia-store/calendar";
 
 const toast = useToast();
 
@@ -62,6 +65,16 @@ const routes: (RouteRecordRaw & RouteMeta)[] = [
         meta: {
             onlyFor: ["ADMIN", "TECHNOLOGIST"],
         },
+        children: [
+            {
+                path: ":id",
+                component: CalendarDetails,
+                meta: {
+                    onlyFor: ["TECHNOLOGIST", "ADMIN"],
+                    name: "Календарь",
+                },
+            }
+        ]
     },
     {
         path: "/not-found",

@@ -359,3 +359,14 @@ declare interface CreateManualTechnology {
         operation: string;
     }[];
 }
+
+declare type weekends = 'WEDNESDAY' | 'SUNDAY'
+declare interface Calendar {
+    id: number,
+    calendarName: string,
+    beginWatch: string,
+    endWatch: string,
+    description?: string|null,
+    holyDays: string[],
+    weekEnds: [weekends|null,weekends|null]
+}

@@ -41,6 +41,7 @@ watch(
 </script>
 
 <style lang="sass">
+
 .v-toolbar__content
     height: 32px !important
 
