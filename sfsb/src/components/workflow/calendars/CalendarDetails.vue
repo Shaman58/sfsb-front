@@ -104,6 +104,7 @@ watch(() => route.params.id, async (newId) => {
     timeEnd.value = data.value?.endWatch;
     title.value = data.value?.calendarName;
     description.value = data.value?.calendarDescription;
+    weekends.value = data.value?.weekEnds;
 }, {immediate: true});
 watch(() => calendar.value, () => {
     console.log(attributesCalendar.value);
