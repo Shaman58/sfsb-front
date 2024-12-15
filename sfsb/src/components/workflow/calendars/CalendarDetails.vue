@@ -1,13 +1,18 @@
 <template lang="pug">
     .calendar
         .calendar__header
-            v-card.w-100.d-flex.ga-2.pa-2
-                v-card.w-100
-                    v-text-field(hide-details="auto" label="Название" v-model="title" )
-                v-card.w-100
-                    v-text-field(hide-details="auto" label="Описание" v-model="description" )
+            v-card
+                v-toolbar(color="purple-darken-4" dark flat)
+                    v-toolbar-title Название календаря и его описание
+                v-card.w-100.d-flex.ga-2.pa-2
+                    v-card.w-100
+                        v-text-field(hide-details="auto" label="Название" v-model="title" )
+                    v-card.w-100
+                        v-text-field(hide-details="auto" label="Описание" v-model="description" )
         .calendar__calendar
             v-card.w-100
+                v-toolbar(color="deep-orange lighten-2" dark flat)
+                    v-toolbar-title Праздничные дни
                 VCalendar(
                     ref="calendar"
                     :attributes="attributesCalendar"
@@ -18,37 +23,37 @@
                     @dayclick="dayClick"
                 )
         .calendar__pickers
-            //v-card.w-100.d-flex.flex-column.ga-2
-            //    v-time-picker(title="Начало смены" v-model="timeBegin" format="24hr")
-            //    v-time-picker(title="Конец смены" v-model="timeEnd" format="24hr")
-            v-container
-                v-row.ga-2
-                    v-card.flex-fill.pa-3
-                        v-text-field(v-model='timeBegin'
-                            :active='menu2'
-                            :focus='menu2'
-                            label='Начало смены'
-                            prepend-icon='mdi-clock-time-four-outline'
-                            readonly=''
-                            hide-details
-                        )
-                            v-menu(v-model='menu2' :close-on-content-click='false' activator='parent' transition='scale-transition')
-                                v-time-picker(v-if='menu2' v-model='timeBegin' full-width='' format="24hr" )
-                    v-card.flex-fill.pa-3
-                        v-text-field(v-model='timeEnd'
-                            :active='menu3'
-                            :focus='menu3'
-                            label='Конец смены'
-                            prepend-icon='mdi-clock-time-four-outline'
-                            readonly=''
-                            hide-details
-                        )
-                            v-menu(v-model='menu3' :close-on-content-click='false' activator='parent' transition='scale-transition')
-                                v-time-picker(v-if='menu3' v-model='timeEnd' full-width='' format="24hr")
+            v-card.w-100
+                v-toolbar(color="brown-darken-4" dark flat)
+                    v-toolbar-title Рабочее время
+                v-container
+                    v-row.ga-2
+                        v-card.flex-fill.pa-3
+                            v-text-field(v-model='timeBegin'
+                                :active='menu2'
+                                :focus='menu2'
+                                label='Начало смены'
+                                prepend-icon='mdi-clock-time-four-outline'
+                                readonly=''
+                                hide-details
+                            )
+                                v-menu(v-model='menu2' :close-on-content-click='false' activator='parent' transition='scale-transition')
+                                    v-time-picker(v-if='menu2' v-model='timeBegin' full-width='' format="24hr" )
+                        v-card.flex-fill.pa-3
+                            v-text-field(v-model='timeEnd'
+                                :active='menu3'
+                                :focus='menu3'
+                                label='Конец смены'
+                                prepend-icon='mdi-clock-time-four-outline'
+                                readonly=''
+                                hide-details
+                            )
+                                v-menu(v-model='menu3' :close-on-content-click='false' activator='parent' transition='scale-transition')
+                                    v-time-picker(v-if='menu3' v-model='timeEnd' full-width='' format="24hr")
 
         .calendar__weekends
             v-card.w-100
-                v-toolbar(color="blue-grey" dark flat)
+                v-toolbar(color="purple-lighten-3" dark flat)
                     v-toolbar-title Выходные дни
                 div.d-flex.align-center.ga-2.pa-2
                     v-switch( color="blue" label="Суббота" value="SATURDAY" v-model="weekends" hide-details)
