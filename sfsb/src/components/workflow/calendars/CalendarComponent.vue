@@ -51,5 +51,10 @@ onMounted(async() => {
 
 
 <style scoped lang="sass">
+.list-link
+    cursor: pointer
+
+:deep(.v-list-item)
+    cursor: pointer
 
 </style>
