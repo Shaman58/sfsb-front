@@ -11,15 +11,16 @@ export const useCalendars = defineStore("calendar", () => {
 
     const getCalendars = async () => {
         gettingData.value = true;
-        let data: Calendar[] = [];
+        let resData: Calendar[] = [];
         try {
-            data = await calendarApi.get("/all");
+            const {data} = await calendarApi.get("/all");
             calendars.value = data;
+            resData = data;
         } catch (e) {
             err.value = e;
         }
         gettingData.value = false;
-        return data;
+        return resData;
     };
 
     const getCalendarById = async (id: number) => {
