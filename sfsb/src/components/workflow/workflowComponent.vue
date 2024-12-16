@@ -26,6 +26,13 @@
                 v-icon(v-if="watchNowMode" color="black" icon="mdi-clock" size="large" title="Разделить")
                 v-icon(v-else color="white" icon="mdi-clock" size="large" title="Разделить")
 
+            v-btn(
+                :color="'surface-variant'"
+                :text="'Календари'"
+                variant="flat"
+                @click="router.push('/calendars')"
+            ) Календари
+
             //v-btn(color="primary" @click="gotoCurrentHour") Текущий час
         .workflow__body(ref="workflowBody" @scroll="onScroll")
             .workflow__days(ref="daysListElement" :style="{height: containerHeight+'px'}")
@@ -51,8 +58,11 @@ import ResourceInfo from "@/components/workflow/ResourceInfo.vue";
 import AddResource from "@/components/workflow/AddResource.vue";
 import { useOrdersInWorkflow } from "@/pinia-store/ordersInWorkflow";
 import AddTechnology from "@/components/workflow/AddTechnology.vue";
+import {useRouter} from "vue-router";
 
 type DayType = typeof Day;
+
+const router =useRouter();
 
 const tasks = ref(Array.from({ length: 4 }));
 const scale = ref(60); // масштаб px/час

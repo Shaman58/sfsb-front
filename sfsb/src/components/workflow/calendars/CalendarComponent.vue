@@ -9,14 +9,14 @@
             v-list
                 v-list-item
                     v-list-item-title
-                        router-link.list-link(:to="`/workflow/calendars/new`")
+                        router-link.list-link(:to="`/calendars/new`")
                             div(:style="{color: 'orange'}") Добавить новый календарь
                 v-list-item(
                     v-for="calendar in calendars"
                     :key="calendar.id"
                 )
                     v-list-item-title
-                        router-link.list-link(:to="`/workflow/calendars/${calendar.id}`") {{calendar.description || calendar.calendarName}}
+                        router-link.list-link(:to="`/calendars/${calendar.id}`") {{calendar.description || calendar.calendarName}}
 
         template(#card)
             suspended-component
@@ -43,7 +43,7 @@ const router = useRouter()
 onMounted(async() => {
     await getCalendars();
     const id = calendars.value[0].id;
-    router.push({ path: `/workflow/calendars/${id}` });
+    router.push({ path: `/calendars/${id}` });
 })
 
 

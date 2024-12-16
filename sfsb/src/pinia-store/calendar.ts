@@ -2,6 +2,7 @@ import {defineStore} from "pinia";
 import {computed, ComputedRef, reactive, ref} from "vue";
 import calendarApi from "@/api/calendarApi";
 import {useToast} from "vue-toast-notification";
+import data from "@/router/data";
 
 export const useCalendars = defineStore("calendar", () => {
     const calendars = ref<Calendar[]>([])
@@ -10,13 +11,15 @@ export const useCalendars = defineStore("calendar", () => {
 
     const getCalendars = async () => {
         gettingData.value = true;
+        let data: Calendar[] = [];
         try {
-            const {data} = await calendarApi.get("/all");
+            data = await calendarApi.get("/all");
             calendars.value = data;
         } catch (e) {
             err.value = e;
         }
         gettingData.value = false;
+        return data;
     };
 
     const getCalendarById = async (id: number) => {
@@ -30,9 +33,34 @@ export const useCalendars = defineStore("calendar", () => {
         gettingData.value = false;
     }
 
+    const add = async (calendar: Calendar) => {
+        gettingData.value = true;
+        try {
+            await calendarApi.post("/add", calendar);
+            await getCalendars();
+        } catch (e) {
+            err.value = e;
+        }
+        gettingData.value = false;
+    }
+
+    const change = async (calendar: Calendar) => {
+        gettingData.value = true;
+        try {
+            await calendarApi.put("/change", calendar);
+            const data=await getCalendars();
+            calendars.value = data;
+        } catch (e) {
+            err.value = e;
+        }
+        gettingData.value = false;
+    }
+
     return {
         calendars,
         getCalendars,
-        getCalendarById
+        getCalendarById,
+        add,
+        change
     };
 });

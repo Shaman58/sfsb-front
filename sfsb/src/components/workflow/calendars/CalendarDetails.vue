@@ -69,6 +69,8 @@ import {ref, watch, onMounted, computed, toValue} from "vue";
 import {useRoute} from "vue-router";
 import {useCalendars} from "@/pinia-store/calendar";
 
+const route = useRoute();
+
 function getDatesForWeekday(year: number, weekday: number) {
     const dates = [];
     let date = new Date(year, 0, 1); // Начало года
@@ -90,7 +92,7 @@ const sunday2024 = getDatesForWeekday(2024, 7);
 
 const date = ref([new Date(2024, 11, 15), new Date(2024, 11, 11)]);
 
-const {getCalendarById} = useCalendars();
+const {getCalendarById, add, change} = useCalendars();
 const data = ref<Calendar | undefined>(),
     timeBegin = ref<string | undefined>(),
     timeEnd = ref<string | undefined>(),
@@ -156,14 +158,14 @@ const save = () => {
         calendarName: toValue(title.value) || '',
         description: toValue(description.value) || '',
         holyDays: attributesCalendar.value[0].dates.map(e => new Date(e).toISOString().split('T')[0]) || [],
-        id: 0,
+        id: route.params.id==='new' ? 0 :+route.params.id,
         weekEnds: toValue(weekends.value) || [],
     }
+    dataToSend.id ? change(dataToSend) : add(dataToSend) ;
     console.log(dataToSend);
 }
 
 
-const route = useRoute();
 watch(() => route.params.id, async (newId: string) => {
     if (!newId || newId === 'new') {
         reset();
