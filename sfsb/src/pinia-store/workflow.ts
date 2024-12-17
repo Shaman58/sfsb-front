@@ -282,6 +282,19 @@ export const useWorkflow = defineStore("workflow", () => {
             toast.error((error as any).response.data.error);
         }
     }
+
+    const applyCalendarToTask = async (calendarId: number, duration: number, task: Task): Promise<boolean> => {
+        busy.value = true;
+        try {
+            await tasksApi.post(`/duration?calendarId=${calendarId}`, {...task,duration}, {})
+            return true;
+        } catch (error) {
+            console.error(error as unknown);
+            toast.error((error as any).response.data.message);
+            return false;
+        }
+        busy.value = false;
+    }
     return {
         resources,
         getAllTasks,
@@ -301,6 +314,7 @@ export const useWorkflow = defineStore("workflow", () => {
         reorderTask,
         addTaskManual,
         deleteTask,
-        split
+        split,
+        applyCalendarToTask
     };
 });

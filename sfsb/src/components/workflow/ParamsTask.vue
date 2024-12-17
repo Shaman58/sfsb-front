@@ -17,17 +17,10 @@
                 v-text-field(label="Описание" v-model.lazy="localTask.description")
 
                 v-switch(color="blue" v-model="switchControl" :label="switchControl ?  'Календарь':'Обычное поведение' ")
-                v-card.d-flex.justify-center.ga-2.mb-2(v-if="switchControl")
+                .d-flex.justify-center.ga-2.mb-2(v-if="switchControl")
                     v-card.flex-1-1-0.pa-3
-                        v-text-field(v-model='duration'
-                            :active='durationMenu'
-                            :focus='durationMenu'
-                            label='Продолжительность'
-                            readonly=''
-                            hide-details
-                        )
-                            v-menu(v-model='durationMenu' :close-on-content-click='false' activator='parent' transition='scale-transition')
-                                v-time-picker(v-if='durationMenu' v-model='duration' full-width='' format="24hr" title="Конец смены" hide-details)
+                        v-text-field.mb-2(label="Часы:" v-model="hours" type="number" min="0" hide-details)
+                        v-text-field(label="Минуты:" v-model="minutes" type="number" min="0" hide-details)
                     v-card.flex-1-1-0.pa-3
                         v-select(label="Календари" v-model="calendarId" :items="calendars" hide-details item-title="calendarName" item-value="id")
                             template(v-slot:item="{ props, item }")
@@ -64,12 +57,15 @@ import RepalceToResource from "@/components/workflow/RepalceToResource.vue";
 import { useWorkflow } from "@/pinia-store/workflow";
 import {storeToRefs} from "pinia";
 import {useCalendars} from "@/pinia-store/calendar";
+import {useToast} from "vue-toast-notification";
+
+const toast = useToast();
 
 const menu = defineModel<boolean>("menu");
 const task: ModelRef<Task, string> = defineModel<Task>("task", {
     required: true,
 });
-const emit = defineEmits(["change"]);
+const emit = defineEmits(["change","applyCalendar"]);
 
 const dialog = ref(false);
 
@@ -86,10 +82,18 @@ const calendarId = ref();
 const switchControl = ref(false);
 const durationMenu = ref(false);
 const duration = ref('');
-const durationLong = ref(false);
 
+const hours = ref(0);
+const minutes = ref(0);
 const onTaskChange = () => {
-    emit("change", localTask.value);
+    if(switchControl.value && !calendarId.value) return toast.error("Выберите календарь");
+    switchControl.value
+        ?emit("applyCalendar", {
+            calendarId: calendarId.value,
+            duration:timeToMinutes(`${hours.value}:${minutes.value}`),
+            task: localTask.value
+        })
+        :emit("change", localTask.value);
     menu.value = false;
 };
 
@@ -116,7 +120,7 @@ watch([startAt, endAt], () => {
 watch([switchControl],async (v) => {
     if(!v) return;
     if(!calendars.value.length) await getCalendars();
-},{immediate:true});
+});
 watch([duration],(v) => console.log('duration',v));
 watch([calendarId],(v) => console.log('calendarId',v));
 

@@ -35,7 +35,7 @@
                 time
                     strong {{new Date(endAt).toLocaleTimeString()}}
 
-        ParamsTask(v-model:menu="menu" v-model:task="props.task" @change="onChange($event)")
+        ParamsTask(v-model:menu="menu" v-model:task="props.task" @change="onChange($event)" @apply-calendar="applyCalendar($event)")
 
         v-tooltip(v-model="isSplitActive" :style="{ top: `${tooltipPosition.y}px`, left: `${tooltipPosition.x}px`, position: 'absolute' }")
             span Время разделения: {{splitText}}
@@ -69,7 +69,7 @@ const { taskMoving, borderMoving, borderMovingPreviousState } = storeToRefs(
     useTaskMoving()
 );
 const { getFirstTask, resources, busy } = storeToRefs(useWorkflow());
-const { reorderTask, split } = useWorkflow();
+const { reorderTask, split, applyCalendarToTask } = useWorkflow();
 
 const startDate = new Date(getFirstTask.value.startAt).setHours(0, 0, 0, 0);
 
@@ -150,6 +150,13 @@ const onChange = (v: Task) => {
         { ...props.task, startAt, endAt, description, workflowId, name },
         props.task
     );
+};
+
+
+const applyCalendar = async(v:{calendarId: number, duration: number, task: Task}) => {
+    const {calendarId,duration,task} = v;
+    console.log("applyCalendar", calendarId, duration);
+    await applyCalendarToTask(calendarId, duration,task);
 };
 
 const onMouseDown = (event: MouseEvent) => {
