@@ -18,7 +18,7 @@
 
                 v-switch(color="blue" v-model="switchControl" :label="switchControl ?  'Календарь':'Обычное поведение' ")
                 v-card.d-flex.justify-center.ga-2.mb-2(v-if="switchControl")
-                    v-card.flex-fill.pa-3
+                    v-card.flex-1-1-0.pa-3
                         v-text-field(v-model='duration'
                             :active='durationMenu'
                             :focus='durationMenu'
@@ -28,7 +28,7 @@
                         )
                             v-menu(v-model='durationMenu' :close-on-content-click='false' activator='parent' transition='scale-transition')
                                 v-time-picker(v-if='durationMenu' v-model='duration' full-width='' format="24hr" title="Конец смены" hide-details)
-                    v-card.flex-fill.pa-3
+                    v-card.flex-1-1-0.pa-3
                         v-select(label="Календари" v-model="calendarId" :items="calendars" hide-details item-title="calendarName" item-value="id")
                             template(v-slot:item="{ props, item }")
                                 v-list-item(v-bind="props" :subtitle="item.calendarName")
