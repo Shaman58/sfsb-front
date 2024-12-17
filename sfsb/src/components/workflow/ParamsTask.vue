@@ -6,18 +6,26 @@
         scroll-strategy="reposition"
         transition="slide-y-transition"
         @contextmenu.stop.prevent="()=>{}"
-        :style="{left: '50%', translate: '-50% 0', maxWidth: '600px'}"
+        :style="{left: '50%', translate: '-50% 0', width: '500px'}"
     )
         v-card.pa-2()
             h3.menu__header
                 span(v-if="!showEditName" @click="changeName") {{localTask.name}}
                 v-text-field(v-if="showEditName" label="Название" v-model.lazy="localTask.name")
 
-            v-form
+            v-form.menu__form
                 v-text-field(label="Описание" v-model.lazy="localTask.description")
 
                 v-switch(color="blue" v-model="switchControl" :label="switchControl ?  'Календарь':'Обычное поведение' ")
+
                 v-card.ga-2.mb-2(v-if="switchControl")
+                    v-card.mb-2
+                        v-toolbar(color="purple-lighten-3" dark flat)
+                            v-toolbar-title Время начала
+                        v-card.pa-2
+                            label(for="computedStartAt")
+                                input.w-100(type="datetime-local" v-model="localTask.startAt" id="computedStartAt")
+
 
                     v-card.mb-2
                         v-toolbar(color="purple-lighten-3" dark flat)
@@ -33,8 +41,9 @@
                                 v-list-item(v-bind="props" :subtitle="item.calendarName")
 
 
-                SetTime(v-model:start-at="localTask.startAt" v-model:end-at="localTask.endAt")
-                RepalceToResource(v-model:resourceId="localTask.workflowId")
+                div(v-else)
+                    SetTime(v-model:start-at="localTask.startAt" v-model:end-at="localTask.endAt")
+                    RepalceToResource(v-model:resourceId="localTask.workflowId")
             .d-flex.justify-center
                 v-btn-group
                     v-btn.flex-grow-1(color="orange-darken-1" @click="onTaskChange") Изменить
@@ -136,8 +145,14 @@ watch([calendarId],(v) => console.log('calendarId',v));
 <style scoped lang="sass">
 .menu
 
+    ::v-deep(.v-overlay__content)
+        width: 100%
+
     &__header
         text-align: center
+
+    &__form
+        height: 480px
 
 
     .footer
