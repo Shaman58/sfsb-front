@@ -12,8 +12,28 @@
             h3.menu__header
                 span(v-if="!showEditName" @click="changeName") {{localTask.name}}
                 v-text-field(v-if="showEditName" label="Название" v-model.lazy="localTask.name")
+
             v-form
                 v-text-field(label="Описание" v-model.lazy="localTask.description")
+
+                v-switch(color="blue" v-model="switchControl" :label="switchControl ?  'Календарь':'Обычное поведение' ")
+                v-card.d-flex.justify-center.ga-2.mb-2(v-if="switchControl")
+                    v-card.flex-fill.pa-3
+                        v-text-field(v-model='duration'
+                            :active='durationMenu'
+                            :focus='durationMenu'
+                            label='Продолжительность'
+                            readonly=''
+                            hide-details
+                        )
+                            v-menu(v-model='durationMenu' :close-on-content-click='false' activator='parent' transition='scale-transition')
+                                v-time-picker(v-if='durationMenu' v-model='duration' full-width='' format="24hr" title="Конец смены" hide-details)
+                    v-card.flex-fill.pa-3
+                        v-select(label="Календари" v-model="calendarId" :items="calendars" hide-details item-title="calendarName" item-value="id")
+                            template(v-slot:item="{ props, item }")
+                                v-list-item(v-bind="props" :subtitle="item.calendarName")
+
+
                 SetTime(v-model:start-at="localTask.startAt" v-model:end-at="localTask.endAt")
                 RepalceToResource(v-model:resourceId="localTask.workflowId")
             .d-flex.justify-center
@@ -42,6 +62,8 @@ import { type ModelRef, ref, toRefs, watch } from "vue";
 import SetTime from "@/components/workflow/SetTime.vue";
 import RepalceToResource from "@/components/workflow/RepalceToResource.vue";
 import { useWorkflow } from "@/pinia-store/workflow";
+import {storeToRefs} from "pinia";
+import {useCalendars} from "@/pinia-store/calendar";
 
 const menu = defineModel<boolean>("menu");
 const task: ModelRef<Task, string> = defineModel<Task>("task", {
@@ -57,6 +79,14 @@ const { startAt, endAt } = toRefs(task.value);
 const localTask = ref<Task>({ ...task.value } as Task);
 
 const { deleteTask } = useWorkflow();
+const {calendars} = storeToRefs(useCalendars())
+const {getCalendars} = useCalendars()
+const calendarId = ref();
+
+const switchControl = ref(false);
+const durationMenu = ref(false);
+const duration = ref('');
+const durationLong = ref(false);
 
 const onTaskChange = () => {
     emit("change", localTask.value);
@@ -72,11 +102,25 @@ const onTaskDelete = async () => {
 const changeName = () => {
     showEditName.value = true;
 };
+const timeToMinutes=(time: string) => {
+    const [hours, minutes] = time.split(':').map(Number);
+    return hours * 60 + minutes;
+}
+
+
 
 watch([startAt, endAt], () => {
     console.log("время изменилось");
     localTask.value = { ...task.value };
 });
+watch([switchControl],async (v) => {
+    if(!v) return;
+    if(!calendars.value.length) await getCalendars();
+},{immediate:true});
+watch([duration],(v) => console.log('duration',v));
+watch([calendarId],(v) => console.log('calendarId',v));
+
+
 </script>
 
 <style scoped lang="sass">

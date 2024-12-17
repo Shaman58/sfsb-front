@@ -38,7 +38,7 @@
                                 hide-details
                             )
                                 v-menu(v-model='menu2' :close-on-content-click='false' activator='parent' transition='scale-transition')
-                                    v-time-picker(v-if='menu2' v-model='timeBegin' full-width='' format="24hr" )
+                                    v-time-picker(v-if='menu2' v-model='timeBegin' full-width='' format="24hr" title="Начало смены" )
                         v-card.flex-fill.pa-3
                             v-text-field(v-model='timeEnd'
                                 :active='menu3'
@@ -49,7 +49,7 @@
                                 hide-details
                             )
                                 v-menu(v-model='menu3' :close-on-content-click='false' activator='parent' transition='scale-transition')
-                                    v-time-picker(v-if='menu3' v-model='timeEnd' full-width='' format="24hr")
+                                    v-time-picker(v-if='menu3' v-model='timeEnd' full-width='' format="24hr" title="Конец смены")
 
         .calendar__weekends
             v-card.w-100
@@ -158,10 +158,10 @@ const save = () => {
         calendarName: toValue(title.value) || '',
         description: toValue(description.value) || '',
         holyDays: attributesCalendar.value[0].dates.map(e => new Date(e).toISOString().split('T')[0]) || [],
-        id: route.params.id==='new' ? 0 :+route.params.id,
+        id: route.params.id === 'new' ? 0 : +route.params.id,
         weekEnds: toValue(weekends.value) || [],
     }
-    dataToSend.id ? change(dataToSend) : add(dataToSend) ;
+    dataToSend.id ? change(dataToSend) : add(dataToSend);
     console.log(dataToSend);
 }
 
