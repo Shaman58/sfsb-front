@@ -17,11 +17,17 @@
                 v-text-field(label="Описание" v-model.lazy="localTask.description")
 
                 v-switch(color="blue" v-model="switchControl" :label="switchControl ?  'Календарь':'Обычное поведение' ")
-                .d-flex.justify-center.ga-2.mb-2(v-if="switchControl")
-                    v-card.flex-1-1-0.pa-3
-                        v-text-field.mb-2(label="Часы:" v-model="hours" type="number" min="0" hide-details)
-                        v-text-field(label="Минуты:" v-model="minutes" type="number" min="0" hide-details)
-                    v-card.flex-1-1-0.pa-3
+                v-card.ga-2.mb-2(v-if="switchControl")
+
+                    v-card.mb-2
+                        v-toolbar(color="purple-lighten-3" dark flat)
+                            v-toolbar-title Продолжительность
+                        .d-flex.justify-center.pa-3.ga-2.mb-2
+                            v-text-field(label="Часы:" v-model="hours" type="number" min="0" hide-details)
+                            v-text-field(label="Минуты:" v-model="minutes" type="number" min="0" hide-details)
+                    v-card
+                        v-toolbar(color="blue-lighten-3" dark flat)
+                            v-toolbar-title Выбор календаря
                         v-select(label="Календари" v-model="calendarId" :items="calendars" hide-details item-title="calendarName" item-value="id")
                             template(v-slot:item="{ props, item }")
                                 v-list-item(v-bind="props" :subtitle="item.calendarName")
