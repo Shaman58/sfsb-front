@@ -1,8 +1,8 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import ordersApi from "@/api/orders";
 import { useToast } from "vue-toast-notification";
 import workflowApi from "@/api/workflowApi";
+import ordersApi from "@/api/orders";
 
 export const useOrdersInWorkflow = defineStore("ordersInWorkflow", () => {
     const toast = useToast();
@@ -10,7 +10,7 @@ export const useOrdersInWorkflow = defineStore("ordersInWorkflow", () => {
 
     const getOperations = async () => {
         try {
-            const res = await workflowApi.get("operations");
+            const res = await ordersApi.get("operations");
             operations.value = res.data;
         } catch (error: any) {
             toast.error(error.data.message);
