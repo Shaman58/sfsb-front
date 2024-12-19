@@ -101,7 +101,9 @@ onUnmounted(() => {
     container: hour / inline-size
     // Основная линия
 
-
+    @container (width <= 32px)
+        .hour-line__caption
+            display: none
 
     &__caption
         text-align: center
