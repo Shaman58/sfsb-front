@@ -95,7 +95,6 @@ const {getCalendars} = useCalendars()
 const calendarId = ref();
 
 const switchControl = ref(false);
-const durationMenu = ref(false);
 const duration = ref('');
 
 const hours = ref(0);
@@ -127,7 +126,10 @@ const timeToMinutes=(time: string) => {
 }
 
 
-
+watch([task.value], () => {
+    hours.value = Math.floor(task.value.duration/60);
+    minutes.value = task.value.duration%60;
+},{immediate:true});
 watch([startAt, endAt], () => {
     console.log("время изменилось");
     localTask.value = { ...task.value };

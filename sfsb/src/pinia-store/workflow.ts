@@ -286,7 +286,12 @@ export const useWorkflow = defineStore("workflow", () => {
     const applyCalendarToTask = async (calendarId: number, duration: number, task: Task): Promise<boolean> => {
         busy.value = true;
         try {
-            await tasksApi.post(`/duration?calendarId=${calendarId}`, {...task,duration}, {})
+            const {data:responceTask} =await tasksApi.post(`/duration?calendarId=${calendarId}`, {...task,duration}, {})
+            console.log(responceTask);
+            const resource = getResourceByTaskId(task.id);
+            const taskIndex = resource?.tasks.findIndex(t=>t.id === task.id)
+            if (taskIndex === -1 || taskIndex === undefined || resource === undefined) return false;
+            resource.tasks[taskIndex] = responceTask;
             return true;
         } catch (error) {
             console.error(error as unknown);
