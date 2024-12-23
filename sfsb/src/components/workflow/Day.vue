@@ -1,12 +1,18 @@
 <template lang="pug">
-    .day(:class="{'day-active': isCurrentDay}", :data-day="refresher")
+    .day(:class="{'day-active': isCurrentDay, small: lineWidth < 6}", :data-day="refresher")
         .day__header
-            strong {{day.toLocaleDateString('ru-RU', {weekday: 'long'})}}
-            span &nbsp;{{day.toLocaleDateString()}}
+            .long
+                strong {{day.toLocaleDateString('ru-RU', {weekday: 'long'})}}
+                span &nbsp;{{day.toLocaleDateString()}}
+            .short
+                strong {{day.toLocaleDateString('ru-RU', {weekday: 'short'})}}
+                span &nbsp;{{day.toLocaleDateString().split('.').slice(0, 2).join('.')}}
+            .xs
+                span &nbsp;{{day.toLocaleDateString().split('.')[0]}}
         .day__container(ref="dayContainer")
             .hour-line(v-for="(hour, index) in hours"
                 :key="index"
-                :class="{ even: index % 2 === 0, odd: index % 2 !== 0,  'current-day': isCurrentHour(index) }"
+                :class="{ even: index % 2 === 0, odd: index % 2 !== 0,  'current-day': isCurrentHour(index), small: lineWidth < 6 }"
                 :style="{ width: lineWidth + 'px' }"
             )
                 .hour-line__caption {{index.toString().padStart(2, '0')}}:00
@@ -66,10 +72,17 @@ onUnmounted(() => {
     //border-right: 1px solid black
     position: relative
 
+    &.small:nth-child(odd)
+        background-color: #ccc
+
+        .day__header
+            &:nth-child(odd)
+                background-color: #ccc
+
+
     &::after
         content: ''
         position: absolute
-        z-index: 2
         top: 0
         bottom: 0
         left: 0
@@ -86,10 +99,43 @@ onUnmounted(() => {
         white-space: nowrap
 
     &__header
+        position: sticky
+        top: 0
+        z-index: 1
+        background: #ddd
         text-align: center
-        width: max-content
+        //width: max-content
         margin: 0 auto 8px
         border-bottom: 1px solid #7777
+        container: day-header / inline-size
+
+        &::after
+            content: ''
+            position: absolute
+            top: 0
+            bottom: 0
+            left: 0
+            width: 1px
+            background: #181818
+
+        .short, .xs
+            display: none
+
+
+        @container (width <= 240px)
+            .long
+                display: none
+            .short
+                display: block
+        @container (width <= 120px)
+            .short
+                strong
+                    display: none
+        @container (width <= 50px)
+            .short
+                display: none
+            .xs
+                display: block
 //display: flex
 // Высота контейнера для линии
 
@@ -104,6 +150,10 @@ onUnmounted(() => {
     @container (width <= 32px)
         .hour-line__caption
             display: none
+
+    &.small:is(.even,.odd)
+            background-color: transparent
+            border-right-color: transparent
 
     &__caption
         text-align: center

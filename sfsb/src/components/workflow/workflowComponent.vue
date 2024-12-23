@@ -4,7 +4,7 @@
             div
                 button(@click="getResources") Обновить
             .workflow__scale
-                v-slider(v-model="scale" label="Масштаб" track-color="green" min="10" max="200" )
+                v-slider(v-model="scale" label="Масштаб" track-color="green" min="1" max="20" )
             AddResource(:items="operations")
             AddTechnology(:items="[1,2,3,4,5]")
 
@@ -65,7 +65,7 @@ type DayType = typeof Day;
 const router =useRouter();
 
 const tasks = ref(Array.from({ length: 4 }));
-const scale = ref(60); // масштаб px/час
+const scale = ref(5); // масштаб px/час
 const overallWidth = ref(window.innerWidth);
 const daysElement = ref<DayType[]>();
 const workflowBody = ref<HTMLElement>();
