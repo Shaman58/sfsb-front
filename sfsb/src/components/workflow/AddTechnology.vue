@@ -12,6 +12,7 @@
                 v-form.form
                     v-text-field(v-model="technologyName" label="Название")
 
+                    v-text-field(v-model="orderNumber" label="Номер заказа")
                     .selected
                         v-text-field(v-model="currentName" label="Название")
                         v-select(
@@ -51,15 +52,17 @@ const technologyName = ref("");
 
 const currentOperation = ref("");
 const currentName = ref("");
+const orderNumber = ref<string | null>(null);
 
 const selectedItems: Ref<{ name: string; operation: string }[]> = ref([]);
 
 const onAdd = async (isActive: Ref<boolean>) => {
-    if (!technologyName.value)
-        return toast.error("Вы забыли назвать технологию");
+    // if (!technologyName.value)
+    //     return toast.error("Вы забыли назвать технологию");
     const res: CreateManualTechnology = {
         name: technologyName.value,
         tasks: selectedItems.value,
+        orderNumber: orderNumber.value,
     };
     await addTaskManual(res);
     isActive.value = false;

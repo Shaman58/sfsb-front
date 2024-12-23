@@ -340,6 +340,8 @@ declare interface Task {
     duration: number;
     description: string;
     operation: string;
+    orderNumber: string;
+    calendarId: number|null;
 }
 
 declare interface Resource {
@@ -358,6 +360,7 @@ declare interface CreateManualTechnology {
         name: string;
         operation: string;
     }[];
+    orderNumber: string|null;
 }
 
 declare type weekends = 'WEDNESDAY' | 'SUNDAY'

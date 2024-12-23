@@ -26,6 +26,8 @@
         )
             h3 {{name}}
             p {{description}}
+            div Номер заказа:
+                strong {{orderNumber}}
             div Время начала:
                 time {{new Date(startAt).toLocaleDateString()}}&nbsp;
                 time
@@ -49,7 +51,7 @@ import ParamsTask from "@/components/workflow/ParamsTask.vue";
 
 const props = defineProps<{ task: Task; active: boolean }>();
 
-const { startAt, endAt, name, description, color } = toRefs(props.task);
+const { startAt, endAt, name, description, color, orderNumber } = toRefs(props.task);
 
 const emit = defineEmits(["busyEvent"]);
 

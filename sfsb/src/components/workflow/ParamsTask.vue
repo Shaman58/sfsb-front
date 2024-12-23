@@ -50,6 +50,8 @@
                     v-btn.flex-grow-1(color="black" @click="dialog=true") Удалить
                     v-btn.flex-grow-1(color="grey-lighten-3" @click="menu=false") Отмена
             .footer
+                div Номер заказа: &nbsp;
+                    strong {{task.orderNumber}}
                 div Технология: &nbsp;
                     strong {{task.technology}}
                 div Операция: &nbsp;
@@ -129,6 +131,7 @@ const timeToMinutes=(time: string) => {
 watch([task.value], () => {
     hours.value = Math.floor(task.value.duration/60);
     minutes.value = task.value.duration%60;
+    calendarId.value = task.value.calendarId;
 },{immediate:true});
 watch([startAt, endAt], () => {
     console.log("время изменилось");
