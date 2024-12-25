@@ -207,25 +207,43 @@ const coordsToTime = (x: number): Date | undefined => {
         Math.floor(startMinutes + (x % scale.value) / (scale.value / 60))
     );
     return time;
+
+};
+const wfbody = ref(document.querySelector<HTMLElement>(".workflow__body"));
+
+let last_known_scroll_position = {
+    scrollLeft: 0, offsetLeft: 0
 };
 
-const onTaskScroll = (e: WheelEvent) => {
-
-    setTimeout(() => {
-        const wfbody = document.querySelector<HTMLElement>(".workflow__body");
-        const {scrollLeft} = wfbody
-        const {offsetLeft} = element.value
-        taskCaption.value && ((scrollLeft - offsetLeft) > 0) && (taskCaption.value.style.left = `${(scrollLeft - offsetLeft + OFFSET)}px`);
-    })
-
+let ticking = false;
+const moveTaskCaption = ({scrollLeft, offsetLeft}: { scrollLeft: number, offsetLeft: number }) => {
+    taskCaption.value && ((scrollLeft - offsetLeft) > 0) && (taskCaption.value.style.left = `${(scrollLeft - offsetLeft + OFFSET)}px`);
 }
 
+const onTaskScroll = (e: WheelEvent) => {
+    const {scrollLeft} = wfbody.value
+    const {offsetLeft} = element.value
+
+    last_known_scroll_position = {scrollLeft, offsetLeft}
+    if (!ticking) {
+        window.requestAnimationFrame(function () {
+            moveTaskCaption(last_known_scroll_position);
+            ticking = false;
+
+        });
+        ticking = true;
+    }
+
+}
 onMounted(() => {
-    window.addEventListener("wheel", onTaskScroll);
+
+    // window.addEventListener("wheel", onTaskScroll);
+    wfbody.value!.addEventListener("scroll", onTaskScroll);
 })
 
 onUnmounted(() => {
-    window.removeEventListener("wheel", onTaskScroll);
+    // window.removeEventListener("wheel", onTaskScroll);
+    wfbody.value!.removeEventListener("scroll", onTaskScroll);
 })
 
 watch([busy], () => {
