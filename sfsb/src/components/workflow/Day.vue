@@ -40,7 +40,9 @@ const isCurrentMonth = computed(() => {
 });
 
 const isCurrentDay = computed(() => {
-    const res = new Date(props.day).getDate() === new Date().getDate();
+    const res = new Date(props.day).getDate() === new Date().getDate()
+        && (new Date(props.day).getMonth() === new Date().getMonth())
+        && (new Date(props.day).getFullYear() === new Date().getFullYear());
     return res;
 });
 
@@ -74,6 +76,16 @@ onUnmounted(() => {
 
     &.small:nth-child(odd)
         background-color: #ccc
+
+        &.day-active::before
+            content: ''
+            position: absolute
+            top: 0
+            bottom: 0
+            left: 50%
+            translate: -50% 0
+            width: 6px
+            background: red
 
         .day__header
             &:nth-child(odd)

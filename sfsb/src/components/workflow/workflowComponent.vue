@@ -116,6 +116,7 @@ const gotoCurrentHour = () => {
     currentHourElement?.scrollIntoView({
         behavior: "smooth",
         inline: "center",
+        block: "nearest",
     });
 };
 
