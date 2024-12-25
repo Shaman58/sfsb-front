@@ -13,10 +13,10 @@
         @mousemove="onMouseMove($event)"
     )
         .task__border.task__border_left(@mousedown.prevent="selectBorder($event,'left')")
-        .task__caption
+        .task__caption(ref="taskCaption")
             h4 {{name}}
             div {{consoleText}}
-            p {{description}}
+            p {{orderNumber}}
         .task__border.task__border_right(@mousedown.prevent="selectBorder($event,'right')")
 
 
@@ -43,15 +43,15 @@
             span Время разделения: {{splitText}}
 </template>
 <script setup lang="ts">
-import {computed, inject, ref, type Ref, toRefs, watch} from "vue";
-import { storeToRefs } from "pinia";
+import {computed, inject, onMounted, onUnmounted, ref, type Ref, toRefs, watch} from "vue";
+import {storeToRefs} from "pinia";
 import useTaskMoving from "@/pinia-store/taskMoving";
-import { useWorkflow } from "@/pinia-store/workflow";
+import {useWorkflow} from "@/pinia-store/workflow";
 import ParamsTask from "@/components/workflow/ParamsTask.vue";
 
 const props = defineProps<{ task: Task; active: boolean }>();
 
-const { startAt, endAt, name, description, color, orderNumber } = toRefs(props.task);
+const {startAt, endAt, name, description, color, orderNumber} = toRefs(props.task);
 
 const emit = defineEmits(["busyEvent"]);
 
@@ -64,18 +64,22 @@ const splitMode = inject<Ref<boolean>>("splitMode");
 const splitText = ref("splitText");
 const mouseEnter = ref(false);
 const isSplitActive = computed(() => splitMode?.value && mouseEnter.value);
-const tooltipPosition = ref({ x: 0, y: 0 });
+const tooltipPosition = ref({x: 0, y: 0});
 const tooltipVisible = ref(false);
 
-const { taskMoving, borderMoving, borderMovingPreviousState } = storeToRefs(
+const {taskMoving, borderMoving, borderMovingPreviousState} = storeToRefs(
     useTaskMoving()
 );
-const { getFirstTask, resources, busy } = storeToRefs(useWorkflow());
-const { reorderTask, split, applyCalendarToTask } = useWorkflow();
+const {getFirstTask, resources, busy} = storeToRefs(useWorkflow());
+const {reorderTask, split, applyCalendarToTask} = useWorkflow();
 
 const startDate = new Date(getFirstTask.value.startAt).setHours(0, 0, 0, 0);
 
 const element = ref<HTMLDivElement>();
+const taskCaption = ref<HTMLDivElement>();
+const OFFSET = 90;
+const OFFSET_px = OFFSET + "px";
+
 const boxShadow = computed(
     () => `0 0 ${props.active ? "18px" : "0"} ${props.task.color}`
 );
@@ -83,12 +87,12 @@ const boxShadow = computed(
 
 const consoleText = ref("");
 
-defineExpose({ element, id: props.task.id });
-const { scrollBody } = storeToRefs(useTaskMoving());
+defineExpose({element, id: props.task.id});
+const {scrollBody} = storeToRefs(useTaskMoving());
 const duration = computed(
     () =>
         ((new Date(props.task.endAt).getTime() -
-            new Date(props.task.startAt).getTime()) /
+                new Date(props.task.startAt).getTime()) /
             (3600 * 1000)) *
         scale!.value
 );
@@ -102,7 +106,7 @@ const left = computed(
 const cursor = computed(() => {
     let res = "pointer";
     if (splitMode?.value) res = "col-resize";
-    if(busy.value) res = "wait";
+    if (busy.value) res = "wait";
     return res
 });
 
@@ -114,7 +118,7 @@ const onDragStart = (e: DragEvent) => {
     }
     e.dataTransfer!.setData(
         "task",
-        JSON.stringify({ ...props.task, offsetX: e.offsetX, x: e.x })
+        JSON.stringify({...props.task, offsetX: e.offsetX, x: e.x})
     );
     taskMoving.value = {
         ...props.task,
@@ -135,7 +139,7 @@ const selectBorder = (event: MouseEvent, border: "left" | "right") => {
         x: event.x + scrollBody.value,
     };
     !borderMovingPreviousState.value &&
-        (borderMovingPreviousState.value = { ...props.task });
+    (borderMovingPreviousState.value = {...props.task});
 };
 
 const onChange = (v: Task) => {
@@ -149,16 +153,16 @@ const onChange = (v: Task) => {
     } = v;
     console.log("data to change");
     reorderTask(
-        { ...props.task, startAt, endAt, description, workflowId, name },
+        {...props.task, startAt, endAt, description, workflowId, name},
         props.task
     );
 };
 
 
-const applyCalendar = async(v:{calendarId: number, duration: number, task: Task}) => {
-    const {calendarId,duration,task} = v;
+const applyCalendar = async (v: { calendarId: number, duration: number, task: Task }) => {
+    const {calendarId, duration, task} = v;
     console.log("applyCalendar", calendarId, duration);
-    await applyCalendarToTask(calendarId, duration,task);
+    await applyCalendarToTask(calendarId, duration, task);
 };
 
 const onMouseDown = (event: MouseEvent) => {
@@ -187,7 +191,7 @@ const onMouseMove = (event: MouseEvent) => {
         x: event.x + 20, // Смещение от указателя по горизонтали
         y: event.y + 20, // Смещение от указателя по вертикали
     };
-    splitText.value = coordsToTime(event.offsetX+10)?.toString() || "";
+    splitText.value = coordsToTime(event.offsetX + 10)?.toString() || "";
 };
 
 const coordsToTime = (x: number): Date | undefined => {
@@ -204,6 +208,25 @@ const coordsToTime = (x: number): Date | undefined => {
     );
     return time;
 };
+
+const onTaskScroll = (e: WheelEvent) => {
+
+    setTimeout(() => {
+        const wfbody = document.querySelector<HTMLElement>(".workflow__body");
+        const {scrollLeft} = wfbody
+        const {offsetLeft} = element.value
+        taskCaption.value && ((scrollLeft - offsetLeft) > 0) && (taskCaption.value.style.left = `${(scrollLeft - offsetLeft + OFFSET)}px`);
+    })
+
+}
+
+onMounted(() => {
+    window.addEventListener("wheel", onTaskScroll);
+})
+
+onUnmounted(() => {
+    window.removeEventListener("wheel", onTaskScroll);
+})
 
 watch([busy], () => {
     emit("busyEvent", busy.value);
@@ -241,7 +264,16 @@ watch([busy], () => {
         border-inline: 1px solid #fff
 
     &__caption
+        position: absolute
+        top: 0
+        //left: v-bind(OFFSET_px)
+        left: 1rem
         flex: 1
-        display: grid
-        place-items: center
+        //display: grid
+        //place-items: center
+
+        & > *
+            width: fit-content
+
+
 </style>

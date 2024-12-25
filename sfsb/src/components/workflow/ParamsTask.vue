@@ -14,7 +14,7 @@
                 v-text-field(v-if="showEditName" label="Название" v-model.lazy="localTask.name")
 
             v-form.menu__form
-                v-text-field(label="Описание" v-model.lazy="localTask.description")
+                v-textarea(label="Описание" v-model.lazy="localTask.description")
 
                 v-switch(color="blue" v-model="switchControl" :label="switchControl ?  'Календарь':'Обычное поведение' ")
 
@@ -141,8 +141,10 @@ watch([switchControl],async (v) => {
     if(!v) return;
     if(!calendars.value.length) await getCalendars();
 });
-watch([duration],(v) => console.log('duration',v));
-watch([calendarId],(v) => console.log('calendarId',v));
+watch([menu],(v) => {
+    if(!v) return;
+    localTask.value = { ...task.value } as Task
+});
 
 
 </script>

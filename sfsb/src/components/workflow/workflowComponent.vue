@@ -91,6 +91,7 @@ const containerHeight = ref<number | undefined>();
 const splitMode = ref(false);
 provide("splitMode", splitMode);
 
+
 const handleResize = () => {
     containerHeight.value =
         resourceListElement.value?.getBoundingClientRect().height;
