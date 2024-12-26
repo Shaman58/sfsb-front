@@ -235,6 +235,7 @@ const onTaskScroll = (e: WheelEvent) => {
 
 }
 onMounted(() => {
+    wfbody.value = document.querySelector<HTMLElement>(".workflow__body");
     wfbody.value!.addEventListener("scroll", onTaskScroll);
 })
 

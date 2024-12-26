@@ -18,7 +18,7 @@
                             v-col
                                 v-text-field( v-model="currentName" label="Название" hide-details)
                             v-col
-                                v-text-field( v-model="duration" type="number" label="Продолжительность, час" hide-details)
+                                v-text-field( v-model="duration" type="number" min="0" label="Продолжительность, час" hide-details)
 
                         v-row.ga-2
                             v-col
