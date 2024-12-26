@@ -13,14 +13,37 @@
                     v-text-field(v-model="technologyName" label="Название")
 
                     v-text-field(v-model="orderNumber" label="Номер заказа")
-                    .selected
-                        v-text-field(v-model="currentName" label="Название")
-                        v-select(
-                            v-model="currentOperation"
-                            label="Операция"
-                            :items="operations"
-                        )
-                        v-icon(@click="addSelectedItem" icon="mdi-plus-circle-outline")
+                    v-card.selected.pa-4(variant="outlined" )
+                        v-row.ga-2
+                            v-col
+                                v-text-field( v-model="currentName" label="Название" hide-details)
+                            v-col
+                                v-text-field( v-model="duration" label="Продолжительность" hide-details)
+
+                        v-row.ga-2
+                            v-col
+                                v-text-field(
+                                    cols="6"
+                                    v-model='start'
+                                    :active='startMenu'
+                                    :focus='startMenu'
+                                    label='Время начала'
+                                    readonly=''
+                                    hide-details
+                                )
+                                    v-menu(v-model='startMenu' :close-on-content-click='false' activator='parent' transition='scale-transition')
+                                        v-time-picker(v-if='startMenu' v-model='start' full-width='' format="24hr" title="Время начала" )
+                            v-col
+                                v-select(
+                                    hide-details
+                                    v-model="calendarId"
+                                    label="Календарь"
+                                    :items="calendars"
+                                    item-title="calendarName"
+                                    item-value="id"
+                                )
+                        v-card-actions
+                            v-btn(@click="addSelectedItem" prepend-icon="mdi-plus-circle-outline") Добавить пункт
                 ul.list
                     li.item(v-for="(item, index) in selectedItems" :key="index")
                         v-icon(@click="removeSelectedItem(item)" icon="$close")
@@ -41,6 +64,7 @@ import { useOrdersInWorkflow } from "@/pinia-store/ordersInWorkflow";
 import { onMounted, type Ref, ref } from "vue";
 import { useToast } from "vue-toast-notification";
 import { useWorkflow } from "@/pinia-store/workflow";
+import {useCalendars} from "@/pinia-store/calendar";
 
 const toast = useToast();
 
@@ -53,6 +77,15 @@ const technologyName = ref("");
 const currentOperation = ref("");
 const currentName = ref("");
 const orderNumber = ref<string | null>(null);
+
+const duration = ref();
+
+const start = ref();
+const startMenu = ref(false);
+
+const calendarId = ref();
+const {calendars} = storeToRefs(useCalendars())
+const {getCalendars} = useCalendars()
 
 const selectedItems: Ref<{ name: string; operation: string }[]> = ref([]);
 
@@ -91,11 +124,15 @@ onMounted(async () => {
     if (!operations.value.length) {
         await getOperations();
     }
+    if(!calendars.value.length) {
+        await getCalendars();
+        calendarId.value = calendars.value[0].id
+    }
 });
 </script>
 
 <style scoped lang="sass">
-.selected, .item, .v-list-item__content
+.item, .v-list-item__content
     display: flex
     align-items: center
     gap: 1rem
