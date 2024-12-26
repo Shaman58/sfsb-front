@@ -78,7 +78,6 @@ const startDate = new Date(getFirstTask.value.startAt).setHours(0, 0, 0, 0);
 const element = ref<HTMLDivElement>();
 const taskCaption = ref<HTMLDivElement>();
 const OFFSET = 90;
-const OFFSET_px = OFFSET + "px";
 
 const boxShadow = computed(
     () => `0 0 ${props.active ? "18px" : "0"} ${props.task.color}`
@@ -217,14 +216,14 @@ let last_known_scroll_position = {
 
 let ticking = false;
 const moveTaskCaption = ({scrollLeft, offsetLeft}: { scrollLeft: number, offsetLeft: number }) => {
-    taskCaption.value && ((scrollLeft - offsetLeft) > 0) && (taskCaption.value.style.left = `${(scrollLeft - offsetLeft + OFFSET)}px`);
+    taskCaption.value && ((scrollLeft - offsetLeft) > 0) && (taskCaption.value.style.left = `${(scrollLeft - offsetLeft)}px`);
 }
 
 const onTaskScroll = (e: WheelEvent) => {
-    const {scrollLeft} = wfbody.value
-    const {offsetLeft} = element.value
+    const {scrollLeft} = wfbody.value;
+    const {offsetLeft} = element.value;
 
-    last_known_scroll_position = {scrollLeft, offsetLeft}
+    last_known_scroll_position = {scrollLeft: scrollLeft + OFFSET, offsetLeft}
     if (!ticking) {
         window.requestAnimationFrame( ()=> {
             moveTaskCaption(last_known_scroll_position);
@@ -236,13 +235,10 @@ const onTaskScroll = (e: WheelEvent) => {
 
 }
 onMounted(() => {
-
-    // window.addEventListener("wheel", onTaskScroll);
     wfbody.value!.addEventListener("scroll", onTaskScroll);
 })
 
 onUnmounted(() => {
-    // window.removeEventListener("wheel", onTaskScroll);
     wfbody.value!.removeEventListener("scroll", onTaskScroll);
 })
 
@@ -250,18 +246,7 @@ watch([busy], () => {
     emit("busyEvent", busy.value);
 }, {immediate: true});
 
-// watch([props], () => {
-//     console.log("TaskComponent props was changed", props);
-// });
-// watch([props.task], () => {
-//     console.log("TaskComponent props.task was changed", props.task);
-// });
-// watch([startAt], () => {
-//     console.log("TaskComponent startAt was changed", startAt.value);
-// });
-// watch([endAt], () => {
-//     console.log("TaskComponent endAt was changed", endAt.value);
-// });
+
 </script>
 
 <style scoped lang="sass">
