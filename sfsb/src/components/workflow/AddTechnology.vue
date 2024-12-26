@@ -18,7 +18,7 @@
                             v-col
                                 v-text-field( v-model="currentName" label="Название" hide-details)
                             v-col
-                                v-text-field( v-model="duration" label="Продолжительность" hide-details)
+                                v-text-field( v-model="duration" type="number" label="Продолжительность, час" hide-details)
 
                         v-row.ga-2
                             v-col
@@ -43,28 +43,34 @@
                                     item-value="id"
                                 )
                         v-card-actions
-                            v-btn(@click="addSelectedItem" prepend-icon="mdi-plus-circle-outline") Добавить пункт
+                            v-btn.flex-1-1.mt-4(@click="addSelectedItem" prepend-icon="mdi-plus-circle-outline") Добавить пункт
                 ul.list
                     li.item(v-for="(item, index) in selectedItems" :key="index")
                         v-icon(@click="removeSelectedItem(item)" icon="$close")
-                        span {{ item.name}}
-                        span {{ item.operation}}
+                        span {{ item.name}} ({{`${item.duration} ${item.start} "${getCalendarById(item.calendar).calendarName}"`}})
 
 
                 v-card-actions
                     v-spacer
 
-                    v-btn(text="Добавить" color="orange" @click="onAdd(isActive)")
+                    //v-btn(text="Добавить" color="orange" @click="onAdd(isActive)")
                     v-btn(text="Закрыть" @click="isActive.value = false")
 </template>
 
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import { useOrdersInWorkflow } from "@/pinia-store/ordersInWorkflow";
-import { onMounted, type Ref, ref } from "vue";
+import {computed, onMounted, type Ref, ref} from "vue";
 import { useToast } from "vue-toast-notification";
 import { useWorkflow } from "@/pinia-store/workflow";
 import {useCalendars} from "@/pinia-store/calendar";
+
+interface ItemTech {
+    name: string,
+    duration: number
+    start: string,
+    calendar: number,
+}
 
 const toast = useToast();
 
@@ -83,42 +89,53 @@ const duration = ref();
 const start = ref();
 const startMenu = ref(false);
 
-const calendarId = ref();
+const calendarId = ref<number|undefined>();
 const {calendars} = storeToRefs(useCalendars())
 const {getCalendars} = useCalendars()
 
-const selectedItems: Ref<{ name: string; operation: string }[]> = ref([]);
+const getCalendarById = (id: number) => calendars.value && (calendars.value as Calendar[]).find((c: Calendar)=>c.id===id)
 
-const onAdd = async (isActive: Ref<boolean>) => {
-    // if (!technologyName.value)
-    //     return toast.error("Вы забыли назвать технологию");
-    const res: CreateManualTechnology = {
-        name: technologyName.value,
-        tasks: selectedItems.value,
-        orderNumber: orderNumber.value,
-    };
-    await addTaskManual(res);
-    isActive.value = false;
-    await getResources();
-};
+const selectedItems: Ref<(ItemTech)[]> = ref([]);
+
+
+
+// const onAdd = async (isActive: Ref<boolean>) => {
+//     // if (!technologyName.value)
+//     //     return toast.error("Вы забыли назвать технологию");
+//     const res: CreateManualTechnology = {
+//         name: technologyName.value,
+//         tasks: selectedItems.value,
+//         orderNumber: orderNumber.value,
+//     };
+//     await addTaskManual(res);
+//     isActive.value = false;
+//     await getResources();
+// };
 
 const addSelectedItem = () => {
-    if (!currentName.value || !currentOperation.value)
+    if (!currentName.value)
         return toast.error("Не все поля заполнены");
-    const item = {
-        name: currentName.value,
-        operation: currentOperation.value,
+    const item : ItemTech= {
+        name: currentName.value||"",
+        duration: duration.value||0,
+        start: start.value||"",
+        calendar: calendarId.value||-1,
     };
-    selectedItems.value.push(item);
-    currentOperation.value = "";
+    selectedItems.value.push({...item});
+    // currentOperation.value = "";
     currentName.value = "";
+    duration.value = 0;
+    start.value = "";
+    calendarId.value = calendars.value[0].id;
 };
 
-const removeSelectedItem = (item: { name: string; operation: string }) => {
-    selectedItems.value = selectedItems.value.filter(
-        (e) => e.name !== item.name && e.operation !== item.operation
-    );
-};
+// const removeSelectedItem = (item: { name: string; operation: string }) => {
+//     selectedItems.value = selectedItems.value.filter(
+//         (e) => e.name !== item.name && e.operation !== item.operation
+//     );
+// };
+
+const removeSelectedItem=(...args: any[]) => {}
 
 onMounted(async () => {
     if (!operations.value.length) {
