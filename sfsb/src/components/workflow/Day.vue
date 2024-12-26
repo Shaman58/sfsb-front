@@ -74,8 +74,11 @@ onUnmounted(() => {
     //border-right: 1px solid black
     position: relative
 
-    &.small:nth-child(odd)
-        background-color: #ccc
+
+
+    &.small
+        &:nth-child(odd)
+            background-color: #ccc
 
         &.day-active::before
             content: ''
@@ -86,6 +89,7 @@ onUnmounted(() => {
             translate: -50% 0
             width: 6px
             background: red
+
 
         .day__header
             &:nth-child(odd)

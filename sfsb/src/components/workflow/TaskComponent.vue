@@ -226,7 +226,7 @@ const onTaskScroll = (e: WheelEvent) => {
 
     last_known_scroll_position = {scrollLeft, offsetLeft}
     if (!ticking) {
-        window.requestAnimationFrame(function () {
+        window.requestAnimationFrame( ()=> {
             moveTaskCaption(last_known_scroll_position);
             ticking = false;
 
