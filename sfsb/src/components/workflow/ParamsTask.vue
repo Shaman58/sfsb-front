@@ -14,7 +14,7 @@
                 v-text-field(v-if="showEditName" label="Название" v-model.lazy="localTask.name")
 
             v-form.menu__form
-                v-textarea(label="Описание" v-model.lazy="localTask.description")
+                v-textarea(label="Описание" v-model.lazy="localTask.description" rows="2" hide-details)
 
                 v-switch(color="blue" v-model="switchControl" :label="switchControl ?  'Календарь':'Обычное поведение' ")
 
@@ -160,6 +160,7 @@ watch([menu],(v) => {
 
     &__form
         height: 480px
+        overflow: auto
 
 
     .footer

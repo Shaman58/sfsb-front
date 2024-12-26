@@ -265,6 +265,14 @@ watch([busy], () => {
         width: 8px
         background-color: #000
         border-inline: 1px solid #fff
+        box-shadow: 0px 0px 35px rgba(0, 0, 0, 10)
+        opacity: 0
+        cursor: pointer
+
+    &:hover .task__border
+        opacity: 1
+
+
 
     &__caption
         position: absolute
