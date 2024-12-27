@@ -17,8 +17,14 @@
                         v-row.ga-2
                             v-col.pa-0.pt-2
                                 v-text-field( v-model="currentName" label="Название" hide-details)
-                            v-col.pa-0.pt-2
-                                v-text-field( v-model="duration" type="number" min="0" label="Продолжительность, час" hide-details)
+                        v-row.mt-6
+                            v-card.w-100
+                                v-card-subtitle Продолжительность
+                                v-row.ga-2.ma-2
+                                    v-col.pa-0.pt-2
+                                        v-text-field( v-model="duration.hours" type="number" min="0" label="час" hide-details)
+                                    v-col.pa-0.pt-2
+                                        v-text-field( v-model="duration.mins" type="number" min="0" max="59" label="мин" hide-details)
 
                         v-row.ga-2
                             v-col.pa-0.pt-2
@@ -53,7 +59,9 @@
                 ul.list
                     li.item(v-for="(item, index) in selectedItems" :key="index")
                         v-icon(@click="removeSelectedItem(item)" icon="$close")
-                        span {{ item.name}} ({{`${item.duration} ${item.startAt} "${getCalendarById(item.calendarId).calendarName}" "${getResourceById(item.workflowId).name}"`}})
+                        div
+                            div {{ item.name}}
+                            div.text-overline.small ({{`${item.duration} ${item.startAt} "${getCalendarById(item.calendarId).calendarName}" "${getResourceById(item.workflowId).name}"`}})
 
 
                 v-card-actions
@@ -89,7 +97,10 @@ const currentOperation = ref("");
 const currentName = ref("");
 const orderNumber = ref<string | null>(null);
 
-const duration = ref();
+const duration = ref({
+    hours: 0,
+    mins: 0,
+});
 
 const start = ref<string>(new Date().toISOString());
 const startMenu = ref(false);
@@ -128,14 +139,14 @@ const addSelectedItem = () => {
         return toast.error("Вы забыли выбрать ресурс");
     const item : ItemTech= {
         name: currentName.value||"",
-        duration: duration.value||0,
+        duration: duration.value.hours * 60 + duration.value.mins||0,
         startAt: start.value.toLocaleString()||"",
         calendarId: calendarId.value || -1,
         workflowId: selectedResource.value || -1,
     };
     selectedItems.value.push({...item});
     currentName.value = "";
-    duration.value = 0;
+    duration.value = {hours: 0, mins: 0};
 };
 
 const removeSelectedItem = (item: ItemTech) => {
@@ -179,4 +190,7 @@ onMounted(async () => {
 
 .card
     padding: 0.5rem
+
+.text-overline.small
+    line-height: 1
 </style>
