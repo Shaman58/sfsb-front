@@ -354,14 +354,20 @@ declare interface Resource {
     operations: string[];
 }
 
+declare interface ItemTech {
+    name: string,
+    duration: number
+    start: string,
+    calendarId: number,
+    workflowId: number
+}
+
 declare interface CreateManualTechnology {
     name: string;
-    tasks: {
-        name: string;
-        operation: string;
-    }[];
+    tasks: ItemTech[];
     orderNumber: string|null;
 }
+
 
 declare type weekends = 'WEDNESDAY' | 'SUNDAY'
 declare interface Calendar {

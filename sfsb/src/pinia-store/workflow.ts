@@ -250,7 +250,7 @@ export const useWorkflow = defineStore("workflow", () => {
 
     const addTaskManual = async (tech: CreateManualTechnology) => {
         try {
-            await tasksApi.post(`/auto-allocation`, tech);
+            await tasksApi.post(`/manual-allocation`, tech);
         } catch (error) {
             console.error(error as unknown);
             toast.error((error as any).response.data.message);

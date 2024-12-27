@@ -66,18 +66,12 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import { useOrdersInWorkflow } from "@/pinia-store/ordersInWorkflow";
-import {computed, onMounted, type Ref, ref} from "vue";
+import {computed, onMounted, type Ref, ref, toRaw, toValue} from "vue";
 import { useToast } from "vue-toast-notification";
 import { useWorkflow } from "@/pinia-store/workflow";
 import {useCalendars} from "@/pinia-store/calendar";
 
-interface ItemTech {
-    name: string,
-    duration: number
-    start: string,
-    calendarId: number,
-    workflowId: number
-}
+
 
 const toast = useToast();
 
@@ -97,7 +91,7 @@ const orderNumber = ref<string | null>(null);
 
 const duration = ref();
 
-const start = ref(new Date().toLocaleString());
+const start = ref<string>(new Date().toISOString());
 const startMenu = ref(false);
 
 const calendarId = ref<number|undefined>();
@@ -111,25 +105,31 @@ const selectedItems: Ref<(ItemTech)[]> = ref([]);
 
 
 const onAdd = async (isActive: Ref<boolean>) => {
-    // if (!technologyName.value)
-    //     return toast.error("Вы забыли назвать технологию");
-    // const res: CreateManualTechnology = {
-    //     name: technologyName.value,
-    //     tasks: selectedItems.value,
-    //     orderNumber: orderNumber.value,
-    // };
-    // await addTaskManual(res);
-    // isActive.value = false;
-    // await getResources();
+    if (!technologyName.value)
+        return toast.error("Вы забыли назвать технологию");
+    if (!selectedItems.value.length)
+        return toast.error("Список пуст");
+
+    const tasks = [...selectedItems.value.map(task => toRaw(task))];
+    const res: CreateManualTechnology = {
+        name: technologyName.value,
+        tasks,
+        orderNumber: orderNumber.value,
+    };
+    await addTaskManual(res);
+    isActive.value = false;
+    await getResources();
 };
 
 const addSelectedItem = () => {
     if (!currentName.value)
-        return toast.error("Не все поля заполнены");
+        return toast.error("Вы не указали название");
+    if (!selectedResource.value)
+        return toast.error("Вы забыли выбрать ресурс");
     const item : ItemTech= {
         name: currentName.value||"",
         duration: duration.value||0,
-        start: start.value||"",
+        start: start.value.toLocaleString()||"",
         calendarId: calendarId.value || -1,
         workflowId: selectedResource.value || -1,
     };
@@ -155,6 +155,7 @@ onMounted(async () => {
         await getCalendars();
         calendarId.value = calendars.value[0].id
     }
+    start.value = (new Date(new Date().getTime() - new Date(new Date().getTimezoneOffset()*60000).getTime())).toISOString().replace(/\.\d+Z$/,"");
 });
 </script>
 
