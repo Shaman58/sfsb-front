@@ -53,7 +53,7 @@
                 ul.list
                     li.item(v-for="(item, index) in selectedItems" :key="index")
                         v-icon(@click="removeSelectedItem(item)" icon="$close")
-                        span {{ item.name}} ({{`${item.duration} ${item.start} "${getCalendarById(item.calendarId).calendarName}" "${getResourceById(item.workflowId).name}"`}})
+                        span {{ item.name}} ({{`${item.duration} ${item.startAt} "${getCalendarById(item.calendarId).calendarName}" "${getResourceById(item.workflowId).name}"`}})
 
 
                 v-card-actions
@@ -129,12 +129,11 @@ const addSelectedItem = () => {
     const item : ItemTech= {
         name: currentName.value||"",
         duration: duration.value||0,
-        start: start.value.toLocaleString()||"",
+        startAt: start.value.toLocaleString()||"",
         calendarId: calendarId.value || -1,
         workflowId: selectedResource.value || -1,
     };
     selectedItems.value.push({...item});
-    // currentOperation.value = "";
     currentName.value = "";
     duration.value = 0;
 };

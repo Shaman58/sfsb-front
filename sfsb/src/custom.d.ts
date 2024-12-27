@@ -357,7 +357,7 @@ declare interface Resource {
 declare interface ItemTech {
     name: string,
     duration: number
-    start: string,
+    startAt: string,
     calendarId: number,
     workflowId: number
 }
