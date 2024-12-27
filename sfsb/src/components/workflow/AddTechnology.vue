@@ -191,6 +191,7 @@ onMounted(async () => {
 .card
     padding: 0.5rem
 
+
 .text-overline.small
     line-height: 1
 </style>
