@@ -89,6 +89,8 @@ function getDatesForWeekday(year: number, weekday: number) {
 
 const saturdays2024 = getDatesForWeekday(2024, 6); // 6 - Суббота
 const sunday2024 = getDatesForWeekday(2024, 7);
+const saturdays2025 = getDatesForWeekday(2025, 6); // 6 - Суббота
+const sunday2025 = getDatesForWeekday(2025, 7);
 
 const date = ref([new Date(2024, 11, 15), new Date(2024, 11, 11)]);
 
@@ -105,8 +107,8 @@ const data = ref<Calendar | undefined>(),
     dates = ref<Date[]>([new Date('2024-12-01'), new Date('2024-12-05')]);
 
 const forAttributesDates = computed(() => [
-    weekends.value.includes('SATURDAY') ? saturdays2024 : [],
-    weekends.value.includes('SUNDAY') ? sunday2024 : []
+    weekends.value.includes('SATURDAY') ?  [...saturdays2024, ...saturdays2025]: [],
+    weekends.value.includes('SUNDAY') ?  [...sunday2024, ...sunday2025]: []
 ].flat())
 
 const attributesCalendar = computed(() => [
