@@ -226,8 +226,10 @@ const onTaskScroll = (e: WheelEvent) => {
     last_known_scroll_position = {scrollLeft: scrollLeft + OFFSET, offsetLeft}
     if (!ticking) {
         window.requestAnimationFrame( ()=> {
-            moveTaskCaption(last_known_scroll_position);
-            ticking = false;
+            setTimeout(()=> {
+                moveTaskCaption(last_known_scroll_position);
+                ticking = false;
+            });
 
         });
         ticking = true;
@@ -283,6 +285,8 @@ watch([busy], () => {
         flex: 1
         //display: grid
         //place-items: center
+        transition: left .2s linear
+
 
         & > *
             width: fit-content
