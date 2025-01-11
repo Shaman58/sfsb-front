@@ -69,7 +69,7 @@ const scale = ref(5); // масштаб px/час
 const overallWidth = ref(window.innerWidth);
 const daysElement = ref<DayType[]>();
 const workflowBody = ref<HTMLElement>();
-const { resources, getAllTasks, getFirstTask, getLastTask, getDaysRange } =
+const { resources, getAllTasks, getDaysRange } =
     storeToRefs(useWorkflow());
 const { getResources } = useWorkflow();
 

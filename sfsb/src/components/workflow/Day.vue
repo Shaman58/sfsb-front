@@ -1,5 +1,5 @@
 <template lang="pug">
-    .day(:class="{'day-active': isCurrentDay, small: lineWidth < 6}", :data-day="refresher")
+    .day(:class="{'day-active': isCurrentDay(), small: lineWidth < 6}", :data-day="refresher")
         .day__header
             .long
                 strong {{day.toLocaleDateString('ru-RU', {weekday: 'long'})}}
@@ -29,29 +29,20 @@ const refresher = ref(0);
 const timer = ref();
 
 const hours = Array.from({ length: 24 }, (_, i) => i);
-const isCurrentYear = computed(() => {
-    const res = new Date(props.day).getFullYear() === new Date().getFullYear();
-    return res;
-});
 
-const isCurrentMonth = computed(() => {
-    const res = new Date(props.day).getMonth() === new Date().getMonth();
-    return res;
-});
 
-const isCurrentDay = computed(() => {
+const isCurrentDay = () => {
     const res = new Date(props.day).getDate() === new Date().getDate()
         && (new Date(props.day).getMonth() === new Date().getMonth())
         && (new Date(props.day).getFullYear() === new Date().getFullYear());
     return res;
-});
+};
 
 const isCurrentHour = (index: number) => {
-    const res =
-        isCurrentYear.value &&
-        isCurrentMonth.value &&
-        isCurrentDay.value &&
-        new Date().getHours() === index;
+    const res = new Date().getHours() === index
+        && new Date(props.day).getDate() === new Date().getDate()
+        && (new Date(props.day).getMonth() === new Date().getMonth())
+        && (new Date(props.day).getFullYear() === new Date().getFullYear());
     return res;
 };
 
