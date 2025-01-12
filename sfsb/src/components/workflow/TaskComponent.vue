@@ -216,7 +216,8 @@ let last_known_scroll_position = {
 
 let ticking = false;
 const moveTaskCaption = ({scrollLeft, offsetLeft}: { scrollLeft: number, offsetLeft: number }) => {
-    taskCaption.value && ((scrollLeft - offsetLeft) > 0) && (taskCaption.value.style.left = `${(scrollLeft - offsetLeft)}px`);
+    if(!taskCaption.value ) return;
+    (scrollLeft - offsetLeft) > 0 ? (taskCaption.value.style.left = `${(scrollLeft - offsetLeft)}px`) : (taskCaption.value.style.left = "");
 }
 
 const onTaskScroll = (e: WheelEvent) => {
@@ -285,7 +286,7 @@ watch([busy], () => {
         flex: 1
         //display: grid
         //place-items: center
-        transition: left .2s linear
+        transition: left .02s linear
 
 
         & > *

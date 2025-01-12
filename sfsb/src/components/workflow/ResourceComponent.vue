@@ -309,11 +309,11 @@ watch([getAllTasks], () => {
         background-color: #77f7
 
 .label
-    position: absolute
+    position: sticky
     z-index: 2
     height: 100%
     top: 0
-    left: v-bind(offsetLabel)
+    left: 0
     border-radius: 4px
     background-color: #fffb
     padding: 4px
