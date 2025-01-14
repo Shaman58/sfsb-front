@@ -1,7 +1,7 @@
 import axios from "axios";
 import { getToken } from "@josempgon/vue-keycloak";
 
-const baseURL = "http://31.129.97.108:9000/api/calendar";
+const baseURL = import.meta.env.VITE_APP_BASE_API_URL+'/calendar';
 
 const instanceOptions = {
     baseURL,

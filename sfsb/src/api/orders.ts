@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const baseURL = "http://31.129.97.108:9000/api/order";
+const baseURL = import.meta.env.VITE_APP_BASE_API_URL+'/order';
 
 const instanceOptions = {
     baseURL,
