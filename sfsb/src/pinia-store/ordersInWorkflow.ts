@@ -13,7 +13,7 @@ export const useOrdersInWorkflow = defineStore("ordersInWorkflow", () => {
             const res = await ordersApi.get("operations");
             operations.value = res.data;
         } catch (error: any) {
-            toast.error(error.data.message);
+            toast.error(error?.data?.message || error?.message || error);
         }
     };
 
@@ -21,7 +21,7 @@ export const useOrdersInWorkflow = defineStore("ordersInWorkflow", () => {
         try {
             await workflowApi.post("/create", operation);
         } catch (error: any) {
-            toast.error(error.data.message);
+            toast.error(error?.data?.message || error?.message || error);
         }
     };
     return {

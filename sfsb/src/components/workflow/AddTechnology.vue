@@ -130,11 +130,12 @@ const onAdd = async (isActive: Ref<boolean>) => {
     await addTaskManual(res);
     isActive.value = false;
     await getResources();
+    selectedItems.value = [];
 };
 
 const addSelectedItem = () => {
-    if (!currentName.value)
-        return toast.error("Вы не указали название");
+    // if (!currentName.value)
+    //     return toast.error("Вы не указали название");
     if (!selectedResource.value)
         return toast.error("Вы забыли выбрать ресурс");
     const item : ItemTech= {

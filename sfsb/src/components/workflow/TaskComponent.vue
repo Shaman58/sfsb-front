@@ -264,6 +264,7 @@ watch([busy], () => {
     display: flex
     justify-content: space-between
     overflow: hidden
+    border-inline: 1px solid #fff
 
     &__border
         width: 8px
