@@ -255,7 +255,7 @@ watch([busy], () => {
 
 <style scoped lang="sass">
 .task
-    --margin: 4px
+    --margin: 1px
     box-sizing: border-box
     background-color: v-bind(color)
     height: calc(100% - var(--margin) * 2)
