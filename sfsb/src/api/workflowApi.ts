@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getToken } from "@josempgon/vue-keycloak";
+import {getToken} from "@josempgon/vue-keycloak";
 
 const baseURL = import.meta.env.VITE_APP_BASE_ALT_URL +'/workflow';
 
@@ -16,7 +16,6 @@ workflowApi.interceptors.request.use(
     async (config) => {
         const token = await getToken();
         console.log(token);
-        console.log('import.meta.env',import.meta.env);
         config.headers["Authorization"] = `Bearer ${token}`;
         return config;
     },
