@@ -96,14 +96,14 @@ const dragover = (e: DragEvent) => {
     dragOverPosition.value = e.x + scrollBody.value - taskMoving.value?.offsetX;
     taskMoving.value && (taskMoving.value.x = dragOverPosition.value);
     // if (!taskShadow.value) return;
-    intersected.value = isIntersected();
+    intersected.value = isIntersected() ?? false;
     console.log("intersected.value", intersected.value);
 };
 const drop = async (e: DragEvent) => {
     // if (intersected.value)
     //     return toast.error("Это время занято другой задачей");
-    const droppedTask: Task & { offsetX: number } = JSON.parse(
-        e.dataTransfer?.getData("task")
+    const droppedTask: Task & { offsetX: number } = e.dataTransfer && JSON.parse(
+        e.dataTransfer.getData("task")
     );
     console.log("drop", e, droppedTask);
 
@@ -186,7 +186,7 @@ const mousemove = (e: MouseEvent) => {
     const { x } = e;
     if (!borderMoving.value) return;
     borderMoving.value.x = e.x;
-    intersected.value = isIntersected();
+    intersected.value = isIntersected() ?? false;
     console.log("intersected.value", intersected.value);
 
     const prevTime =
@@ -279,7 +279,7 @@ onMounted(() => {
 });
 
 watch([taskMoving], () => {
-    intersected.value = isIntersected();
+    intersected.value = isIntersected() ?? false;
 });
 watch([getAllTasks], () => {
     console.log("getAllTasks from resource", getAllTasks.value);
@@ -289,7 +289,7 @@ watch([getAllTasks], () => {
 <style scoped lang="sass">
 .resource
     position: relative
-    height: 60px
+    height: 40px
     margin-left: 0
     margin-right: 0
     //width: 100cqw

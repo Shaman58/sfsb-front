@@ -65,7 +65,7 @@ type DayType = typeof Day;
 const router =useRouter();
 
 const tasks = ref(Array.from({ length: 4 }));
-const scale = ref(5); // масштаб px/час
+const scale = ref(3); // масштаб px/час
 const overallWidth = ref(window.innerWidth);
 const daysElement = ref<DayType[]>();
 const workflowBody = ref<HTMLElement>();

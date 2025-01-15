@@ -20,22 +20,22 @@
         .task__border.task__border_right(@mousedown.prevent="selectBorder($event,'right')")
 
 
-        v-tooltip(
-            activator="parent"
-            location="bottom"
-        )
-            h3 {{name}}
-            p {{description}}
-            div Номер заказа:
-                strong {{orderNumber}}
-            div Время начала:
-                time {{new Date(startAt).toLocaleDateString()}}&nbsp;
-                time
-                    strong {{new Date(startAt).toLocaleTimeString()}}
-            div Время завершения:
-                time {{new Date(endAt).toLocaleDateString()}}&nbsp;
-                time
-                    strong {{new Date(endAt).toLocaleTimeString()}}
+        //v-tooltip(
+        //    activator="parent"
+        //    location="bottom"
+        //)
+        //    h3 {{name}}
+        //    p {{description}}
+        //    div Номер заказа:
+        //        strong {{orderNumber}}
+        //    div Время начала:
+        //        time {{new Date(startAt).toLocaleDateString()}}&nbsp;
+        //        time
+        //            strong {{new Date(startAt).toLocaleTimeString()}}
+        //    div Время завершения:
+        //        time {{new Date(endAt).toLocaleDateString()}}&nbsp;
+        //        time
+        //            strong {{new Date(endAt).toLocaleTimeString()}}
 
         ParamsTask(v-model:menu="menu" v-model:task="props.task" @change="onChange($event)" @apply-calendar="applyCalendar($event)")
 
@@ -281,7 +281,10 @@ watch([busy], () => {
 
     &__caption
         position: absolute
-        top: 0
+        font-size: 0.7rem
+        line-height: 1.1
+        top: 50%
+        translate: 0 -50%
         //left: v-bind(OFFSET_px)
         left: 1rem
         flex: 1
